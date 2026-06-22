@@ -1,2 +1,137 @@
-# OREM
-Optimal Regularized re-Entry estimation Method
+# OREM — Optimal Regularized re-Entry estimation Method
+
+Optimal re-entry time prediction for resident space objects from highly elliptical orbits, using Response Surface Methodology (RSM) and Genetic Algorithm (GA) optimization with the KSROP regularized orbit propagator.
+
+**Author:** Harishkumar Sellamuthu · hari251086@gmail.com
+
+---
+
+## 1. Overview
+
+OREM predicts re-entry times of HEO debris (GTO, Molniya, SSTO upper stages) by:
+
+1. Processing TLE history for a target NORAD ID
+2. Selecting optimal TLE zones based on solar apsidal resonance
+3. Generating mean apogee surfaces via RSM (varying eccentricity and ballistic coefficient)
+4. Optimizing initial conditions with GA to match observed mean apogee
+5. Propagating with KSROP until re-entry (altitude < 80 km)
+
+Target accuracy: **< 5% relative prediction error** (RPE) validated against real re-entries.
+
+---
+
+## 2. Project Structure
+
+```
+OREM/
+├── ksrop/                          Propagator engine (from KSROP repo)
+│   ├── propagate_ks.F              KS propagator as callable subroutine
+│   ├── Subrouts.F                  Coordinate transforms, I/O, utilities
+│   ├── Legendre.F                  Zonal Legendre polynomial evaluation
+│   └── TLEread.F                   TLE reader + SGP4/SDP4 conversion
+│
+├── input/
+│   ├── const_new.dat               Physical constants
+│   └── ATM.DAT                     Atmosphere density table (60-630 km)
+│
+├── output/                         Runtime-generated files
+│
+├── test_propagate_ks.F             Tests for refactored propagator
+│
+├── ga.F                            (planned) Genetic Algorithm optimizer
+├── rsm.F                           (planned) Response Surface Methodology
+├── tle_evolution.F                 (planned) Batch TLE processing
+├── zone_select.F                   (planned) Zone selection algorithm
+├── orem.F                          (planned) Main OREM driver
+└── README.md
+```
+
+---
+
+## 3. Propagator Interface
+
+The core propagator is `propagate_ks` — a callable subroutine refactored from KSROP's `driver_KS.F`:
+
+```fortran
+call propagate_ks(
+     &   x0, xd0, cal0,              ! Initial state + epoch
+     &   nrev, istep, tole,           ! Propagation config
+     &   n_force, ngeo_deg, nsun_deg, nmoon_deg,
+     &   BN, IDRAG, WE_rot, EPS_f, FR_rot,  ! Drag params
+     &   CR_srp, AM_srp, IPSR, ISHAD,       ! SRP params
+     &   PSR_srp, amuS, amuM,               ! Constants
+     &   ALT_atm, DEN_atm, SCH_atm, ndim_atm,  ! Atmosphere
+     &   max_pts, idump,              ! Output buffer
+     &   traj_jd, traj_x, traj_xd,   ! Trajectory output
+     &   exit_code)                   ! Status
+```
+
+**Exit codes:** 0 = normal completion, 1 = re-entry (alt < 80 km), 2 = divergence (NaN)
+
+**Prerequisites:** Caller must call `init_constants()` before `propagate_ks` to populate the `/xy/` common block.
+
+---
+
+## 4. Building
+
+Requires **Intel oneAPI Fortran** (`ifx`) or **GNU Fortran** (`gfortran`).
+
+### Windows (Intel oneAPI ifx 2025.0)
+
+```bat
+call "C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Auxiliary\Build\vcvars64.bat"
+call "C:\Program Files (x86)\Intel\Fortran\compiler\2025.0\env\vars.bat"
+
+ifx test_propagate_ks.F ksrop/propagate_ks.F ksrop/Subrouts.F ksrop/Legendre.F /exe:test_propagate_ks.exe
+```
+
+### Unix / gfortran
+
+```bash
+gfortran test_propagate_ks.F ksrop/propagate_ks.F ksrop/Subrouts.F ksrop/Legendre.F -o test_propagate_ks.exe
+```
+
+---
+
+## 5. Running Tests
+
+```bash
+./test_propagate_ks.exe
+```
+
+Tests cover: two-body energy conservation, orbit closure, multi-revolution propagation, re-entry detection, input preservation.
+
+---
+
+## 6. KSROP Source Files
+
+Files in `ksrop/` are copied from [hari251086/KSROP](https://github.com/hari251086/KSROP). To update after KSROP changes:
+
+```bash
+cp ../KSROP/Subrouts.F ksrop/
+cp ../KSROP/Legendre.F ksrop/
+# propagate_ks.F is a refactored version of driver_KS.F — manual sync
+```
+
+---
+
+## 7. Roadmap
+
+| Issue | Component | Status |
+|---|---|---|
+| #1 | Batch TLE processing | Planned |
+| #2 | Mean orbital element computation | Planned |
+| #3 | Zone selection algorithm | Planned |
+| #4 | Genetic Algorithm (GA) optimizer | Planned |
+| #5 | Response Surface Methodology (RSM) | Planned |
+| #6 | OREM driver (full pipeline) | Planned |
+| #7 | RPE metric | Planned |
+| #8 | Test suite with 4 known re-entry cases | Planned |
+
+---
+
+## 8. References
+
+- Sellamuthu, H. (2019) Regularized Astrodynamics Using Kustaanheimo-Stiefel Space, Ph.D. Thesis, Karunya Institute of Technology and Sciences
+- Sellamuthu, H., Sharma, R.K. & Arumugam, S. Optimal re-entry time prediction of RSO from HEO, Advances in Space Research (submitted)
+- Stiefel, E.L. & Scheifele, G. (1971) Linear and Regular Celestial Mechanics, Springer-Verlag
