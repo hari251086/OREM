@@ -87,7 +87,7 @@ The GA **never calls the propagator** — it only evaluates the polynomial fit o
 | Module | File | Purpose | Calls propagate_ks? |
 |--------|------|---------|---------------------|
 | **TLE Evolution** | `tle_evolution.F` | Process TLE history → osculating orbital evolution time-series | No |
-| **Mean Elements** | `mean_elements.F` | Sliding-window average → mean apogee/perigee | No |
+| ~~Mean Elements~~ | ~~mean_elements.F~~ | ~~Sliding-window average~~ — **REMOVED: TLE mean elements used directly** | — |
 | **Zone Selection** | `zone_select.F` | Identify TLE intervals with quasi-linear mean apogee decay | No |
 | **RSM Surfaces** | `rsm.F` | Generate 9 mean-apogee surfaces per zone | **Yes — 9× per zone** |
 | **GA Optimizer** | `ga.F` | Search pre-computed surfaces for optimal (e, B_coeff) | **No — surface interpolation only** |
@@ -105,7 +105,6 @@ The GA **never calls the propagator** — it only evaluates the polynomial fit o
 OREM/
 ├── orem.F                        Main driver program
 ├── tle_evolution.F               Batch TLE → orbital evolution
-├── mean_elements.F               Sliding-window mean elements
 ├── zone_select.F                 Zone selection algorithm
 ├── rsm.F                         Response surface methodology
 ├── ga.F                          Genetic algorithm optimizer
@@ -142,12 +141,7 @@ TLE File (input)
 │ tle2sv()         │  ← SGP4/SDP4 conversion
 │ sun_azimuth()    │  ← Subrouts.F
 └────────┬─────────┘
-         │  Osculating elements: epoch, a, e, I, Ω, ω, ha, hp, Λ_S
-         ▼
-┌──────────────────┐
-│ mean_elements()  │  Sliding window over 1 orbital period
-└────────┬─────────┘
-         │  Mean: ha_mean[], hp_mean[]
+         │  Mean elements from TLE: epoch, a, e, I, Ω, ω, ha, hp, Λ_S
          ▼
 ┌──────────────────┐
 │ zone_select()    │  Detect linear apogee decay regions
@@ -221,15 +215,6 @@ c    epochs(maxpts)    : Julian dates
 c    a_osc..lambda_s   : osculating elements + Sun azimuth
 c    npts              : actual number of points
 c    ierr              : 0=ok
-```
-
-#### mean_elements
-```fortran
-subroutine mean_elements(epochs, ha_osc, hp_osc, npts,
-     &                   ha_mean, hp_mean)
-c  Sliding-window average over one orbital period.
-c  Input:  epochs(npts), ha_osc(npts), hp_osc(npts)
-c  Output: ha_mean(npts), hp_mean(npts)
 ```
 
 #### zone_select
@@ -382,17 +367,18 @@ Zone selection depends on the orbital dynamics regime:
 
 | Task | Issue | Effort | Description |
 |---|---|---|---|
-| Batch TLE processing | #1 | 3 days | `tle_evolution.F`: read TLE, filter by NORAD, convert via SGP4/SDP4, compute ha/hp/Λ_S |
-| Mean elements | #2 | 1 day | `mean_elements.F`: sliding-window average subroutine |
+| Batch TLE processing | #1 | 3 days | `tle_evolution.F`: read TLE, filter by NORAD, extract mean apogee/perigee/Λ_S directly from TLE mean elements |
 
-**Deliverable:** Given a TLE file + NORAD ID → complete orbital evolution time-series with mean elements.
+**Deliverable:** Given a TLE file + NORAD ID → complete orbital evolution time-series.
+
+> **Note:** Issue #2 (mean element computation) was eliminated — TLE already provides mean elements directly. No sliding-window averaging needed.
 
 ### Phase 2: Optimization Core (Issues #3, #4) — Unblocked (#4), #3 needs Phase 1
 
 | Task | Issue | Effort | Description |
 |---|---|---|---|
 | Genetic Algorithm | #4 | 3 days | `ga.F`: binary-coded GA with generic fitness interface |
-| Zone selection | #3 | 2 days | `zone_select.F`: detect linear apogee decay regions from mean elements + Λ_S |
+| Zone selection | #3 | 2 days | `zone_select.F`: detect linear apogee decay regions from TLE mean apogee + Λ_S |
 
 **Deliverable:** GA optimizer + zone boundaries from orbital evolution data.
 
@@ -424,21 +410,20 @@ Zone selection depends on the orbital dynamics regime:
 ### Timeline Summary
 
 ```
-Phase 1 ████████░░░░░░░░░░░░  (4 days)  — Foundation
-Phase 2 ░░░░████████░░░░░░░░  (5 days)  — Optimization core
-Phase 3 ░░░░░░░░░░░█████░░░░  (3 days)  — Surface generation
-Phase 4 ░░░░░░░░░░░░░░░█████  (3 days)  — Integration
-Phase 5 ░░░░░░░░░░░░░░░░░░██  (2.5 days)— Validation
-                                Total: ~18 days
+Phase 1 ████████░░░░░░░░░░░░  (3 days)  — Foundation (TLE evolution)
+Phase 2 ░░░░████████░░░░░░░░  (4 days)  — Optimization core (GA + zones)
+Phase 3 ░░░░░░░░░░░█████░░░░  (2.5 days)— Surface generation (RSM)
+Phase 4 ░░░░░░░░░░░░░░░█████  (3 days)  — Integration (OREM driver)
+Phase 5 ░░░░░░░░░░░░░░░░░░██  (2.5 days)— Validation (RPE + tests)
+                                Total: ~15 days
 ```
 
 ### Dependency Graph
 
 ```
-#1 (TLE evolution) ──┐
-                     ├──→ #3 (Zone selection) ──┐
-#2 (Mean elements) ──┘                          ├──→ #5 (RSM) ──┐
-                                                │                ├──→ #6 (OREM) ──→ #7 (RPE)
+#1 (TLE evolution) ──→ #3 (Zone selection) ──┐
+                                              ├──→ #5 (RSM) ──┐
+                                              │                ├──→ #6 (OREM) ──→ #7 (RPE)
 #4 (GA optimizer) ──────────────────────────────┘                │                  #8 (Tests)
 ```
 
@@ -465,7 +450,7 @@ input/example_35497.tle.txt       ! TLE file path
 
 ### Compile
 ```bash
-ifx orem.F tle_evolution.F mean_elements.F zone_select.F rsm.F ga.F rpe.F \
+ifx orem.F tle_evolution.F zone_select.F rsm.F ga.F rpe.F \
     ksrop/propagate_ks.F ksrop/Subrouts.F ksrop/Legendre.F ksrop/TLEread.F \
     /exe:orem.exe
 ```
