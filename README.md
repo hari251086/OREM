@@ -153,22 +153,7 @@ cp ../KSROP/Legendre.F ksrop/
 
 ---
 
-## 7. Roadmap
-
-| Issue | Component | Status |
-|---|---|---|
-| #1 | Batch TLE processing | **Done** — `tle_evolution.F` with dedup, 56 tests |
-| #2 | Mean orbital element computation | Closed — TLE mean elements used directly |
-| #3 | Zone selection algorithm | **Done** — `zone_select.F` with linfit, 68 tests |
-| #4 | Genetic Algorithm (GA) optimizer | Planned |
-| #5 | Response Surface Methodology (RSM) | Planned |
-| #6 | OREM driver (full pipeline) | Planned |
-| #7 | RPE metric | Planned |
-| #8 | Test suite with 4 known re-entry cases | Planned |
-
----
-
-## 8. Version History
+## 7. Version History
 
 | Version | Date | Changes |
 |---|---|---|
@@ -178,7 +163,7 @@ cp ../KSROP/Legendre.F ksrop/
 
 ---
 
-## 9. References
+## 8. References
 
 - Sellamuthu, H. (2019) Regularized Astrodynamics Using Kustaanheimo-Stiefel Space, Ph.D. Thesis, Karunya Institute of Technology and Sciences
 - Sellamuthu, H., Sharma, R.K. & Arumugam, S. Optimal re-entry time prediction of RSO from HEO, Advances in Space Research (submitted)
