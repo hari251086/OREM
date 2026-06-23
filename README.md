@@ -85,12 +85,16 @@ call "C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Auxiliary\Build
 call "C:\Program Files (x86)\Intel\Fortran\compiler\2025.0\env\vars.bat"
 
 ifx test_propagate_ks.F ksrop/propagate_ks.F ksrop/Subrouts.F ksrop/Legendre.F /exe:test_propagate_ks.exe
+ifx test_tle_evolution.F tle_evolution.F ksrop/Subrouts.F ksrop/TLEread.F ksrop/Legendre.F /exe:test_tle_evolution.exe
+ifx test_zone_select.F zone_select.F tle_evolution.F ksrop/Subrouts.F ksrop/TLEread.F ksrop/Legendre.F /exe:test_zone_select.exe
 ```
 
 ### Unix / gfortran
 
 ```bash
 gfortran test_propagate_ks.F ksrop/propagate_ks.F ksrop/Subrouts.F ksrop/Legendre.F -o test_propagate_ks.exe
+gfortran test_tle_evolution.F tle_evolution.F ksrop/Subrouts.F ksrop/TLEread.F ksrop/Legendre.F -o test_tle_evolution.exe
+gfortran test_zone_select.F zone_select.F tle_evolution.F ksrop/Subrouts.F ksrop/TLEread.F ksrop/Legendre.F -o test_zone_select.exe
 ```
 
 ---
@@ -100,6 +104,7 @@ gfortran test_propagate_ks.F ksrop/propagate_ks.F ksrop/Subrouts.F ksrop/Legendr
 ```bash
 ./test_propagate_ks.exe        # Propagator tests
 ./test_tle_evolution.exe       # TLE evolution tests (56 checks)
+./test_zone_select.exe         # Zone selection tests (48 checks)
 ```
 
 ### test_propagate_ks
@@ -116,6 +121,16 @@ Two-body energy conservation, orbit closure, multi-revolution propagation, re-en
 - Large catalog: 94597-entry file, maxpts cap, field ranges, Vanguard-1 filter
 - Repeatability, boundary conditions (maxpts=1)
 - Deduplication: no consecutive epochs within 86 sec, duplicate removal count
+
+### test_zone_select (48 tests)
+- linfit unit: perfect linear, negative slope, constant, 2-point, noisy, 1-point
+- Synthetic: linear decay, flat, oscillating, rising, empty, single, nzones cap
+- Real HEO: 42928 PSLV-C39, 35497 Ariane 5, 37151 Long March 3B, 39615 Proton-M
+- Zone validity: indices, non-overlapping, slopes<0, R²>0.90, min points
+- Parameter sensitivity: R² threshold, min_zone_pts, max_zone_days, slope threshold
+- Advanced: two-segment decay, noisy linear, step function, steep vs gradual
+- Deep validation: duration limits, epoch sorting, ha>0
+- Repeatability, robustness (nzones_max=0, large nzones_max)
 
 ---
 
@@ -137,7 +152,7 @@ cp ../KSROP/Legendre.F ksrop/
 |---|---|---|
 | #1 | Batch TLE processing | **Done** — `tle_evolution.F` with dedup, 56 tests |
 | #2 | Mean orbital element computation | Closed — TLE mean elements used directly |
-| #3 | Zone selection algorithm | **Done** — `zone_select.F` with linfit, 28 tests |
+| #3 | Zone selection algorithm | **Done** — `zone_select.F` with linfit, 48 tests |
 | #4 | Genetic Algorithm (GA) optimizer | Planned |
 | #5 | Response Surface Methodology (RSM) | Planned |
 | #6 | OREM driver (full pipeline) | Planned |
@@ -146,7 +161,17 @@ cp ../KSROP/Legendre.F ksrop/
 
 ---
 
-## 8. References
+## 8. Version History
+
+| Version | Date | Changes |
+|---|---|---|
+| 0.1 | 2026-06-23 | Initial repo: propagate_ks refactored from KSROP driver_KS.F |
+| 0.2 | 2026-06-23 | Batch TLE processing (`tle_evolution.F`), 56 tests, epoch dedup |
+| 0.3 | 2026-06-23 | Zone selection (`zone_select.F`, `linfit`), 48 tests, 4 HEO TLE histories |
+
+---
+
+## 9. References
 
 - Sellamuthu, H. (2019) Regularized Astrodynamics Using Kustaanheimo-Stiefel Space, Ph.D. Thesis, Karunya Institute of Technology and Sciences
 - Sellamuthu, H., Sharma, R.K. & Arumugam, S. Optimal re-entry time prediction of RSO from HEO, Advances in Space Research (submitted)
