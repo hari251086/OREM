@@ -744,6 +744,375 @@ c     Z45: nzones_max=0 → 0 zones (edge)
      &              nzones, 0, npass, nfail)
 
 c     ==============================================================
+c     37151/39615 deep validation (gap fill)
+c     ==============================================================
+      write(*,*) ''
+      write(*,*) '  --- 37151/39615 deep validation ---'
+
+c     Z46-Z48: 37151 Long March 3B deep checks
+      call tle_evolve('input/example_37151.tle.txt',
+     &               37151, maxpts,
+     &               epochs, a_out, e_out, inc_out,
+     &               raan_out, aop_out,
+     &               ha, hp, ls_out,
+     &               npts, ierr)
+      call zone_select(epochs, ha, npts,
+     &                 8, 10.d0, 0.90d0, -1.d0, 4,
+     &                 zone_start, zone_end, nzones)
+
+c     Z46: Durations valid
+      iall_ok = 1
+      do i = 1, nzones
+         span_days = epochs(zone_end(i)) - epochs(zone_start(i))
+         if (span_days .gt. 15.d0 .or. span_days .lt. 0.d0)
+     &      iall_ok = 0
+      end do
+      call assert_i('Z46 37151 durations valid',
+     &              iall_ok, 1, npass, nfail)
+
+c     Z47: Sorted and non-overlapping
+      iall_ok = 1
+      do i = 2, nzones
+         if (zone_start(i) .le. zone_end(i-1)) iall_ok = 0
+      end do
+      call assert_i('Z47 37151 sorted+non-overlap',
+     &              iall_ok, 1, npass, nfail)
+
+c     Z48: Zone ha > 0
+      iall_ok = 1
+      do i = 1, nzones
+         do j = zone_start(i), zone_end(i)
+            if (ha(j) .le. 0.d0) iall_ok = 0
+         end do
+      end do
+      call assert_i('Z48 37151 zone ha > 0',
+     &              iall_ok, 1, npass, nfail)
+
+c     Z49-Z51: 39615 Proton-M deep checks
+      call tle_evolve('input/example_39615.tle.txt',
+     &               39615, maxpts,
+     &               epochs, a_out, e_out, inc_out,
+     &               raan_out, aop_out,
+     &               ha, hp, ls_out,
+     &               npts, ierr)
+      call zone_select(epochs, ha, npts,
+     &                 8, 10.d0, 0.90d0, -1.d0, 4,
+     &                 zone_start, zone_end, nzones)
+
+c     Z49: Durations valid
+      iall_ok = 1
+      do i = 1, nzones
+         span_days = epochs(zone_end(i)) - epochs(zone_start(i))
+         if (span_days .gt. 15.d0 .or. span_days .lt. 0.d0)
+     &      iall_ok = 0
+      end do
+      call assert_i('Z49 39615 durations valid',
+     &              iall_ok, 1, npass, nfail)
+
+c     Z50: Sorted and non-overlapping
+      iall_ok = 1
+      do i = 2, nzones
+         if (zone_start(i) .le. zone_end(i-1)) iall_ok = 0
+      end do
+      call assert_i('Z50 39615 sorted+non-overlap',
+     &              iall_ok, 1, npass, nfail)
+
+c     Z51: Zone ha > 0
+      iall_ok = 1
+      do i = 1, nzones
+         do j = zone_start(i), zone_end(i)
+            if (ha(j) .le. 0.d0) iall_ok = 0
+         end do
+      end do
+      call assert_i('Z51 39615 zone ha > 0',
+     &              iall_ok, 1, npass, nfail)
+
+c     ==============================================================
+c     Ha monotonicity within zones
+c     ==============================================================
+      write(*,*) ''
+      write(*,*) '  --- Ha monotonicity in zones ---'
+
+c     Check all 4 objects: no local ha spike > 5% within any zone
+c     (allows small TLE noise but catches big excursions)
+
+c     Z52: 42928 no local ha spike in zones
+      call tle_evolve('input/example_42928.tle.txt',
+     &               42928, maxpts,
+     &               epochs, a_out, e_out, inc_out,
+     &               raan_out, aop_out,
+     &               ha, hp, ls_out,
+     &               npts, ierr)
+      call zone_select(epochs, ha, npts,
+     &                 8, 10.d0, 0.90d0, -1.d0, 4,
+     &                 zone_start, zone_end, nzones)
+      iall_ok = 1
+      do i = 1, nzones
+         ha_z1 = ha(zone_start(i))
+         ha_zn = ha(zone_end(i))
+         ha_range = dabs(ha_z1 - ha_zn)
+         if (ha_range .lt. 1.d0) ha_range = 1.d0
+         do j = zone_start(i)+1, zone_end(i)
+            ha_jump = ha(j) - ha(j-1)
+            if (ha_jump .gt. 0.05d0*ha_range) iall_ok = 0
+         end do
+      end do
+      call assert_i('Z52 42928 no ha spike in zone',
+     &              iall_ok, 1, npass, nfail)
+
+c     Z53: 37151 no local ha spike
+      call tle_evolve('input/example_37151.tle.txt',
+     &               37151, maxpts,
+     &               epochs, a_out, e_out, inc_out,
+     &               raan_out, aop_out,
+     &               ha, hp, ls_out,
+     &               npts, ierr)
+      call zone_select(epochs, ha, npts,
+     &                 8, 10.d0, 0.90d0, -1.d0, 4,
+     &                 zone_start, zone_end, nzones)
+      iall_ok = 1
+      do i = 1, nzones
+         ha_z1 = ha(zone_start(i))
+         ha_zn = ha(zone_end(i))
+         ha_range = dabs(ha_z1 - ha_zn)
+         if (ha_range .lt. 1.d0) ha_range = 1.d0
+         do j = zone_start(i)+1, zone_end(i)
+            ha_jump = ha(j) - ha(j-1)
+            if (ha_jump .gt. 0.05d0*ha_range) iall_ok = 0
+         end do
+      end do
+      call assert_i('Z53 37151 no ha spike in zone',
+     &              iall_ok, 1, npass, nfail)
+
+c     ==============================================================
+c     max_zone_days enforcement on all objects
+c     ==============================================================
+      write(*,*) ''
+      write(*,*) '  --- max_zone_days all objects ---'
+
+c     Z54: 37151 max_zone_days=10 enforced
+      call zone_select(epochs, ha, npts,
+     &                 8, 10.d0, 0.90d0, -1.d0, 4,
+     &                 zone_start, zone_end, nzones)
+      iall_ok = 1
+      do i = 1, nzones
+         span_days = epochs(zone_end(i)) - epochs(zone_start(i))
+         if (span_days .gt. 10.1d0) iall_ok = 0
+      end do
+      call assert_i('Z54 37151 durations <=10d',
+     &              iall_ok, 1, npass, nfail)
+
+c     Z55: 39615 max_zone_days=10 enforced
+      call tle_evolve('input/example_39615.tle.txt',
+     &               39615, maxpts,
+     &               epochs, a_out, e_out, inc_out,
+     &               raan_out, aop_out,
+     &               ha, hp, ls_out,
+     &               npts, ierr)
+      call zone_select(epochs, ha, npts,
+     &                 8, 10.d0, 0.90d0, -1.d0, 4,
+     &                 zone_start, zone_end, nzones)
+      iall_ok = 1
+      do i = 1, nzones
+         span_days = epochs(zone_end(i)) - epochs(zone_start(i))
+         if (span_days .gt. 10.1d0) iall_ok = 0
+      end do
+      call assert_i('Z55 39615 durations <=10d',
+     &              iall_ok, 1, npass, nfail)
+
+c     ==============================================================
+c     Zone count reasonableness
+c     ==============================================================
+      write(*,*) ''
+      write(*,*) '  --- Zone count bounds ---'
+
+c     Z56: 42928 (2+ years) should have 1-10 zones, not 50+
+      call tle_evolve('input/example_42928.tle.txt',
+     &               42928, maxpts,
+     &               epochs, a_out, e_out, inc_out,
+     &               raan_out, aop_out,
+     &               ha, hp, ls_out,
+     &               npts, ierr)
+      call zone_select(epochs, ha, npts,
+     &                 8, 10.d0, 0.90d0, -1.d0, mxz,
+     &                 zone_start, zone_end, nzones)
+      if (nzones .ge. 1 .and. nzones .le. 10) then
+         call assert_i('Z56 42928 count in [1,10]',
+     &                 1, 1, npass, nfail)
+      else
+         call assert_i('Z56 42928 count in [1,10]',
+     &                 0, 1, npass, nfail)
+      end if
+
+c     Z57: 35497 (3+ years) zone count reasonable
+      call tle_evolve('input/example_35497.tle.txt',
+     &               35497, maxpts,
+     &               epochs, a_out, e_out, inc_out,
+     &               raan_out, aop_out,
+     &               ha, hp, ls_out,
+     &               npts, ierr)
+      call zone_select(epochs, ha, npts,
+     &                 8, 10.d0, 0.90d0, -1.d0, mxz,
+     &                 zone_start, zone_end, nzones)
+      if (nzones .ge. 1 .and. nzones .le. 10) then
+         call assert_i('Z57 35497 count in [1,10]',
+     &                 1, 1, npass, nfail)
+      else
+         call assert_i('Z57 35497 count in [1,10]',
+     &                 0, 1, npass, nfail)
+      end if
+
+c     ==============================================================
+c     Exact min_zone_pts boundary
+c     ==============================================================
+      write(*,*) ''
+      write(*,*) '  --- Boundary: npts = min_zone_pts ---'
+
+c     Z58: npts exactly = min_zone_pts, linear decay → 1 zone
+      do i = 1, 8
+         epochs(i) = 2460000.d0 + dble(i-1)*1.d0
+         ha(i) = 30000.d0 - 200.d0*dble(i-1)
+      end do
+      call zone_select(epochs, ha, 8,
+     &                 8, 15.d0, 0.90d0, -1.d0, 4,
+     &                 zone_start, zone_end, nzones)
+      if (nzones .eq. 1) then
+         call assert_i('Z58 npts=minpts: 1 zone',
+     &                 1, 1, npass, nfail)
+      else
+         call assert_i('Z58 npts=minpts: 1 zone',
+     &                 0, 1, npass, nfail)
+      end if
+
+c     Z59: npts = min_zone_pts - 1 → 0 zones
+      call zone_select(epochs, ha, 7,
+     &                 8, 15.d0, 0.90d0, -1.d0, 4,
+     &                 zone_start, zone_end, nzones)
+      call assert_i('Z59 npts=minpts-1: 0 zones',
+     &              nzones, 0, npass, nfail)
+
+c     ==============================================================
+c     Sparse data (large epoch gaps)
+c     ==============================================================
+      write(*,*) ''
+      write(*,*) '  --- Sparse data ---'
+
+c     Z60: Linear decay with 30-day gaps between points
+c     10 points spanning 270 days but max_zone_days=15
+c     Should find 0 zones (gaps too large for single zone)
+      do i = 1, 10
+         epochs(i) = 2460000.d0 + dble(i-1)*30.d0
+         ha(i) = 30000.d0 - 100.d0*dble(i-1)*30.d0
+      end do
+      call zone_select(epochs, ha, 10,
+     &                 8, 15.d0, 0.90d0, -1.d0, 4,
+     &                 zone_start, zone_end, nzones)
+      call assert_i('Z60 sparse 30d gaps: 0 zones',
+     &              nzones, 0, npass, nfail)
+
+c     Z61: Dense cluster then large gap then dense cluster
+c     Each cluster has 10 pts in 5 days, gap = 60 days
+      do i = 1, 10
+         epochs(i) = 2460000.d0 + dble(i-1)*0.5d0
+         ha(i) = 30000.d0 - 100.d0*dble(i-1)*0.5d0
+      end do
+      do i = 11, 20
+         epochs(i) = 2460060.d0 + dble(i-11)*0.5d0
+         ha(i) = 25000.d0 - 80.d0*dble(i-11)*0.5d0
+      end do
+      call zone_select(epochs, ha, 20,
+     &                 8, 15.d0, 0.90d0, -1.d0, 4,
+     &                 zone_start, zone_end, nzones)
+      if (nzones .ge. 2) then
+         call assert_i('Z61 two clusters: >=2 zones',
+     &                 1, 1, npass, nfail)
+      else
+         call assert_i('Z61 two clusters: >=2 zones',
+     &                 0, 1, npass, nfail)
+      end if
+
+c     ==============================================================
+c     Independent R² verification
+c     ==============================================================
+      write(*,*) ''
+      write(*,*) '  --- Independent R2 check ---'
+
+c     Z62: Verify R² by computing SS_res/SS_tot independently
+c     Use a known noisy dataset
+      xfit(1) = 1.d0
+      xfit(2) = 2.d0
+      xfit(3) = 3.d0
+      xfit(4) = 4.d0
+      xfit(5) = 5.d0
+      yfit(1) = 10.d0
+      yfit(2) = 8.1d0
+      yfit(3) = 5.9d0
+      yfit(4) = 4.2d0
+      yfit(5) = 1.8d0
+      call linfit(xfit, yfit, 5, slope, intercept, r2)
+c     Compute R² independently:
+c     ymean = (10+8.1+5.9+4.2+1.8)/5 = 6.0
+c     SS_tot = sum((yi - 6)²)
+c            = 16 + 4.41 + 0.01 + 3.24 + 17.64 = 41.30
+c     predicted: slope*x + intercept for each
+c     SS_res = sum((yi - pred)²)
+      ymean2 = 6.d0
+      ss_tot2 = 0.d0
+      ss_res2 = 0.d0
+      do i = 1, 5
+         ss_tot2 = ss_tot2 + (yfit(i) - ymean2)**2
+         pred = slope*xfit(i) + intercept
+         ss_res2 = ss_res2 + (yfit(i) - pred)**2
+      end do
+      r2_indep = 1.d0 - ss_res2 / ss_tot2
+      call assert_d('Z62 R2 indep verify',
+     &              r2, r2_indep, 1.d-10, npass, nfail)
+
+c     ==============================================================
+c     Degenerate cases
+c     ==============================================================
+      write(*,*) ''
+      write(*,*) '  --- Degenerate cases ---'
+
+c     Z63: All identical epochs → 0 zones (degenerate)
+      do i = 1, 10
+         epochs(i) = 2460000.d0
+         ha(i) = 30000.d0 - dble(i)*100.d0
+      end do
+      call zone_select(epochs, ha, 10,
+     &                 8, 15.d0, 0.90d0, -1.d0, 4,
+     &                 zone_start, zone_end, nzones)
+      call assert_i('Z63 identical epochs: 0 zones',
+     &              nzones, 0, npass, nfail)
+
+c     Z64: 2 points only (< default min_zone_pts) → 0 zones
+      epochs(1) = 2460000.d0
+      epochs(2) = 2460001.d0
+      ha(1) = 30000.d0
+      ha(2) = 29500.d0
+      call zone_select(epochs, ha, 2,
+     &                 8, 15.d0, 0.90d0, -1.d0, 4,
+     &                 zone_start, zone_end, nzones)
+      call assert_i('Z64 2pts < minpts: 0 zones',
+     &              nzones, 0, npass, nfail)
+
+c     Z65: Very steep decay (-10000 km/day)
+      do i = 1, 10
+         epochs(i) = 2460000.d0 + dble(i-1)*0.1d0
+         ha(i) = 30000.d0 - 10000.d0*dble(i-1)*0.1d0
+      end do
+      call zone_select(epochs, ha, 10,
+     &                 8, 2.d0, 0.85d0, -1.d0, 4,
+     &                 zone_start, zone_end, nzones)
+      if (nzones .ge. 1) then
+         call assert_i('Z65 very steep: >=1 zone',
+     &                 1, 1, npass, nfail)
+      else
+         call assert_i('Z65 very steep: >=1 zone',
+     &                 0, 1, npass, nfail)
+      end if
+
+c     ==============================================================
 c     Summary
 c     ==============================================================
       write(*,*) ''
