@@ -104,7 +104,7 @@ gfortran test_zone_select.F zone_select.F tle_evolution.F ksrop/Subrouts.F ksrop
 ```bash
 ./test_propagate_ks.exe        # Propagator tests
 ./test_tle_evolution.exe       # TLE evolution tests (56 checks)
-./test_zone_select.exe         # Zone selection tests (48 checks)
+./test_zone_select.exe         # Zone selection tests (68 checks)
 ```
 
 ### test_propagate_ks
@@ -122,14 +122,21 @@ Two-body energy conservation, orbit closure, multi-revolution propagation, re-en
 - Repeatability, boundary conditions (maxpts=1)
 - Deduplication: no consecutive epochs within 86 sec, duplicate removal count
 
-### test_zone_select (48 tests)
+### test_zone_select (68 tests)
 - linfit unit: perfect linear, negative slope, constant, 2-point, noisy, 1-point
 - Synthetic: linear decay, flat, oscillating, rising, empty, single, nzones cap
 - Real HEO: 42928 PSLV-C39, 35497 Ariane 5, 37151 Long March 3B, 39615 Proton-M
 - Zone validity: indices, non-overlapping, slopes<0, R²>0.90, min points
 - Parameter sensitivity: R² threshold, min_zone_pts, max_zone_days, slope threshold
 - Advanced: two-segment decay, noisy linear, step function, steep vs gradual
-- Deep validation: duration limits, epoch sorting, ha>0
+- Deep validation: duration limits, epoch sorting, ha>0 (all 4 objects)
+- Ha monotonicity within zones (no local spikes)
+- max_zone_days enforcement on all objects
+- Zone count reasonableness [1,10]
+- Boundary: npts=min_zone_pts exact, npts=min_zone_pts-1
+- Sparse data: 30-day gaps, two clusters with gap
+- Independent R² verification (manual SS_res/SS_tot)
+- Degenerate: identical epochs, 2 points, very steep decay
 - Repeatability, robustness (nzones_max=0, large nzones_max)
 
 ---
@@ -152,7 +159,7 @@ cp ../KSROP/Legendre.F ksrop/
 |---|---|---|
 | #1 | Batch TLE processing | **Done** — `tle_evolution.F` with dedup, 56 tests |
 | #2 | Mean orbital element computation | Closed — TLE mean elements used directly |
-| #3 | Zone selection algorithm | **Done** — `zone_select.F` with linfit, 48 tests |
+| #3 | Zone selection algorithm | **Done** — `zone_select.F` with linfit, 68 tests |
 | #4 | Genetic Algorithm (GA) optimizer | Planned |
 | #5 | Response Surface Methodology (RSM) | Planned |
 | #6 | OREM driver (full pipeline) | Planned |
@@ -167,7 +174,7 @@ cp ../KSROP/Legendre.F ksrop/
 |---|---|---|
 | 0.1 | 2026-06-23 | Initial repo: propagate_ks refactored from KSROP driver_KS.F |
 | 0.2 | 2026-06-23 | Batch TLE processing (`tle_evolution.F`), 56 tests, epoch dedup |
-| 0.3 | 2026-06-23 | Zone selection (`zone_select.F`, `linfit`), 48 tests, 4 HEO TLE histories |
+| 0.3 | 2026-06-23 | Zone selection (`zone_select.F`, `linfit`), 68 tests, 4 HEO TLE histories, max_zone_days bug fix |
 
 ---
 
