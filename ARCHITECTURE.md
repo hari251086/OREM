@@ -28,42 +28,72 @@ OREM treats re-entry prediction as an optimization problem: find the (eccentrici
 │  Input: TLE file, NORAD ID, config file                         │
 │  Output: predicted re-entry epoch, optimal e/Bcoeff, RPE         │
 │                                                                   │
-│  ┌──────────────┐  ┌───────────────┐  ┌────────────────────┐    │
-│  │ TLE Evolution │→ │ Zone Selection │→ │ RSM Surface Gen.   │    │
-│  │ (tle_evol.F) │  │ (zone_sel.F)  │  │ (rsm.F)            │    │
-│  └──────────────┘  └───────────────┘  └────────┬───────────┘    │
-│                                                  │                │
-│                                        ┌─────────▼─────────┐    │
-│                                        │ GA Optimization    │    │
-│                                        │ (ga.F)             │    │
-│                                        │ Design vars: e, Bc │    │
-│                                        └─────────┬─────────┘    │
-│                                                  │                │
-│                                        ┌─────────▼─────────┐    │
-│                                        │ KSROP Propagation  │    │
-│                                        │ (propagate_ks.F)   │    │
-│                                        │ → until re-entry   │    │
-│                                        └─────────┬─────────┘    │
-│                                                  │                │
-│                                        ┌─────────▼─────────┐    │
-│                                        │ RPE Computation    │    │
-│                                        │ (rpe.F)            │    │
-│                                        └───────────────────┘    │
+│  ┌──────────────┐  ┌───────────────┐                             │
+│  │ TLE Evolution │→ │ Zone Selection │                             │
+│  │ (tle_evol.F) │  │ (zone_sel.F)  │                             │
+│  └──────────────┘  └───────┬───────┘                             │
+│                            │                                       │
+│                   ┌────────▼────────────────────────────┐         │
+│                   │ RSM Surface Generation (rsm.F)      │         │
+│                   │                                      │         │
+│                   │  Calls propagate_ks.F 9× per zone   │         │
+│                   │  (3 values of e × 3 of Bcoeff)      │         │
+│                   │                                      │         │
+│                   │  ┌──────────────────────────┐       │         │
+│                   │  │ propagate_ks (×9/zone)   │       │         │
+│                   │  │ short propagation within  │       │         │
+│                   │  │ zone duration only        │       │         │
+│                   │  └──────────────────────────┘       │         │
+│                   │                                      │         │
+│                   │  Output: 9 mean-apogee curves        │         │
+│                   │        + polynomial surface fit       │         │
+│                   └────────────────┬────────────────────┘         │
+│                                    │                               │
+│                   ┌────────────────▼────────────────────┐         │
+│                   │ GA Optimization (ga.F)               │         │
+│                   │                                      │         │
+│                   │  Searches pre-computed surfaces      │         │
+│                   │  (NO propagation — surface interp.)  │         │
+│                   │  Fitness: |surface_ha - TLE_ha|      │         │
+│                   │                                      │         │
+│                   │  Output: optimal e, Bcoeff           │         │
+│                   └────────────────┬────────────────────┘         │
+│                                    │                               │
+│                   ┌────────────────▼────────────────────┐         │
+│                   │ Final Propagation (propagate_ks ×1) │         │
+│                   │                                      │         │
+│                   │  Uses optimal ICs from GA            │         │
+│                   │  Long propagation → until re-entry   │         │
+│                   │  (altitude < 80 km)                  │         │
+│                   └────────────────┬────────────────────┘         │
+│                                    │                               │
+│                   ┌────────────────▼────────────────────┐         │
+│                   │ RPE Computation (rpe.F)              │         │
+│                   └─────────────────────────────────────┘         │
 └─────────────────────────────────────────────────────────────────┘
 ```
 
+### Propagation Call Budget
+
+`propagate_ks` is called at two distinct stages with different purposes:
+
+1. **RSM surface generation**: 9 × N_zones short propagations (within each zone's time span only). These produce the mean-apogee surfaces that the GA searches.
+2. **Final re-entry prediction**: 1 long propagation with optimal (e, B_coeff) from the GA, running from the zone epoch forward until altitude < 80 km.
+
+The GA **never calls the propagator** — it only evaluates the polynomial fit of the pre-computed surfaces. This is what makes OREM computationally feasible: expensive propagation is done upfront in RSM, and GA is a cheap surface search.
+
 ### Module Descriptions
 
-| Module | File | Purpose | I/O |
-|--------|------|---------|-----|
-| **TLE Evolution** | `tle_evolution.F` | Process TLE history for single NORAD ID → osculating orbital evolution time-series | In: TLE file, NORAD ID. Out: epoch[], a[], e[], I[], Ω[], ω[], ha[], hp[], Λ_S[] |
-| **Mean Elements** | `mean_elements.F` | Sliding-window average of osculating elements → mean apogee/perigee | In: osculating time-series. Out: mean ha[], mean hp[] |
-| **Zone Selection** | `zone_select.F` | Identify TLE epoch intervals with quasi-linear mean apogee decay | In: mean ha[], Λ_S[]. Out: zone boundaries (start/end indices) |
-| **RSM Surfaces** | `rsm.F` | Generate 9 mean-apogee surfaces per zone from (e, B_coeff) grid | In: zone, TLE elements, e-bounds, B-bounds. Out: surfaces, polynomial fit |
-| **GA Optimizer** | `ga.F` | Binary-coded genetic algorithm to find optimal (e, B_coeff) | In: fitness function, bounds, GA params. Out: optimal e, B_coeff |
-| **KSROP Propagator** | `ksrop/propagate_ks.F` | KS regular elements orbit propagation until re-entry | In: initial state, force config, atm tables. Out: trajectory, exit_code |
-| **RPE Metric** | `rpe.F` | Compute relative prediction error against observed re-entry | In: predicted epoch, observed epoch, zone epoch. Out: RPE value |
-| **OREM Driver** | `orem.F` | Main program orchestrating the full pipeline | In: config file. Out: results to stdout + output file |
+| Module | File | Purpose | Calls propagate_ks? |
+|--------|------|---------|---------------------|
+| **TLE Evolution** | `tle_evolution.F` | Process TLE history → osculating orbital evolution time-series | No |
+| **Mean Elements** | `mean_elements.F` | Sliding-window average → mean apogee/perigee | No |
+| **Zone Selection** | `zone_select.F` | Identify TLE intervals with quasi-linear mean apogee decay | No |
+| **RSM Surfaces** | `rsm.F` | Generate 9 mean-apogee surfaces per zone | **Yes — 9× per zone** |
+| **GA Optimizer** | `ga.F` | Search pre-computed surfaces for optimal (e, B_coeff) | **No — surface interpolation only** |
+| **KSROP Propagator** | `ksrop/propagate_ks.F` | KS regular elements orbit propagation | (called by RSM and final prediction) |
+| **RPE Metric** | `rpe.F` | Compute relative prediction error | No |
+| **OREM Driver** | `orem.F` | Orchestrates full pipeline; calls final propagate_ks ×1 | **Yes — 1× final prediction** |
 
 ---
 
@@ -127,28 +157,46 @@ TLE File (input)
 ┌──────────────────────────────────────────────────┐
 │ FOR EACH ZONE:                                    │
 │                                                    │
-│   ┌────────────────┐                              │
-│   │ RSM Surface Gen │  9 propagation runs per zone │
-│   │                 │  3 values of e × 3 of Bcoeff │
-│   └────────┬───────┘                              │
-│            │  9 mean-apogee curves                  │
-│            ▼                                        │
-│   ┌────────────────┐                              │
-│   │ GA Optimization │  Fitness: |propagated - TLE| │
-│   │ pop=4, gen=500  │  Design vars: e, Bcoeff     │
-│   └────────┬───────┘                              │
-│            │  Optimal: e_opt, Bcoeff_opt            │
-│            ▼                                        │
-│   ┌────────────────────────────────┐              │
-│   │ propagate_ks(optimal ICs)      │              │
-│   │ → propagate until re-entry     │              │
-│   │   (altitude < 80 km)           │              │
-│   └────────┬───────────────────────┘              │
-│            │  Predicted re-entry epoch              │
-│            ▼                                        │
-│   ┌────────────────┐                              │
-│   │ RPE Computation │                              │
-│   └────────────────┘                              │
+│   STAGE 1: RSM Surface Generation                  │
+│   ┌────────────────────────────────────────┐      │
+│   │ rsm_generate()                         │      │
+│   │                                        │      │
+│   │  FOR i=1,3 (eccentricity values):      │      │
+│   │    FOR j=1,3 (Bcoeff values):          │      │
+│   │      ┌─────────────────────────┐       │      │
+│   │      │ propagate_ks(e_i, Bc_j) │       │      │
+│   │      │ short prop within zone  │       │      │
+│   │      │ → mean apogee curve_ij  │       │      │
+│   │      └─────────────────────────┘       │      │
+│   │                                        │      │
+│   │  Output: 9 mean-apogee curves          │      │
+│   │        + polynomial surface fit         │      │
+│   └───────────────────┬────────────────────┘      │
+│                       │                            │
+│   STAGE 2: GA Surface Search (NO propagation)      │
+│   ┌───────────────────▼────────────────────┐      │
+│   │ ga_optimize()                          │      │
+│   │                                        │      │
+│   │  Fitness: evaluate polynomial surface  │      │
+│   │           vs observed TLE mean apogee  │      │
+│   │  (interpolation only — no propagation) │      │
+│   │                                        │      │
+│   │  Output: optimal e_opt, Bcoeff_opt     │      │
+│   └───────────────────┬────────────────────┘      │
+│                       │                            │
+│   STAGE 3: Final Re-entry Propagation (×1)         │
+│   ┌───────────────────▼────────────────────┐      │
+│   │ propagate_ks(e_opt, Bcoeff_opt)        │      │
+│   │                                        │      │
+│   │ Long propagation from zone epoch       │      │
+│   │ forward until altitude < 80 km         │      │
+│   └───────────────────┬────────────────────┘      │
+│                       │                            │
+│   ┌───────────────────▼────────────────────┐      │
+│   │ RPE Computation                        │      │
+│   │ ε = (predicted - observed) /           │      │
+│   │     (observed - last_zone_epoch)       │      │
+│   └────────────────────────────────────────┘      │
 └──────────────────────────────────────────────────┘
          │
          ▼
@@ -258,30 +306,52 @@ c  Already implemented. exit_code: 0=normal, 1=reentry, 2=divergence
 | Eccentricity | e | ±0.003 around TLE value | SGP4/SDP4 reconstruction error |
 | Ballistic coefficient | B_coeff | 30–160 kg/m² | Unknown tumbling state, shape |
 
-### 5.2 Objective Function (Fitness)
+### 5.2 RSM-GA Coupling (Computational Architecture)
 
-For a given zone with N_obs TLE observations:
+The optimization has two distinct computational phases:
+
+**Phase A — RSM Surface Generation (expensive, done once per zone):**
+- 9 calls to `propagate_ks`, each propagating from the zone start epoch through the zone duration
+- Each call uses a different (e, B_coeff) combination from the 3×3 grid
+- Output: 9 mean-apogee altitude curves + a polynomial surface fit
+- This is the **only** stage where orbit propagation occurs during optimization
+
+**Phase B — GA Surface Search (cheap, iterative):**
+- GA evaluates candidate (e, B_coeff) pairs by interpolating the pre-computed polynomial surface
+- Fitness = how well the interpolated mean apogee matches the observed TLE mean apogee
+- **No propagation calls** — pure arithmetic on the polynomial coefficients
+- 500 generations × 4 population = 2000 fitness evaluations, all via surface interpolation
+
+This separation makes OREM computationally feasible: 9 propagations per zone (seconds each) rather than thousands.
+
+### 5.3 Objective Function (Fitness)
+
+For a given zone with N_obs TLE observations, the GA evaluates:
 
 ```
 fitness(e, Bcoeff) = 1 / (1 + RMSE)
 
-where RMSE = sqrt( (1/N_obs) * Σ (ha_propagated_i - ha_observed_i)² )
+where RMSE = sqrt( (1/N_obs) * Σ (ha_surface(e,Bc,t_i) - ha_observed_i)² )
 ```
 
-The GA maximizes fitness → minimizes RMSE between propagated and observed mean apogee altitude within the zone.
+`ha_surface(e, Bc, t_i)` is the polynomial interpolation of the 9 pre-computed RSM surfaces at the candidate (e, Bc) point and observation time t_i. No propagation is involved.
 
-### 5.3 Response Surface Model
+The GA maximizes fitness → minimizes RMSE between the RSM surface prediction and observed TLE mean apogee altitude within the zone.
+
+### 5.4 Response Surface Model
 
 For each zone, 9 propagation runs map the (e, B_coeff) → mean_apogee_altitude response:
 
 ```
          B₁    B₂    B₃
-    e₁  [run1] [run2] [run3]
-    e₂  [run4] [run5] [run6]
-    e₃  [run7] [run8] [run9]
+    e₁  [run1] [run2] [run3]     ← propagate_ks called 9 times
+    e₂  [run4] [run5] [run6]     ← short propagation (zone duration)
+    e₃  [run7] [run8] [run9]     ← each produces a mean-apogee curve
 ```
 
-Each run produces a mean-apogee curve over the zone duration. The observed TLE mean apogee must be bounded within the 9 surfaces. First-order polynomial fit for linear zones.
+Each run produces a mean-apogee curve over the zone duration. The observed TLE mean apogee must be bounded within the 9 surfaces. A first-order polynomial is fitted for linear zones (higher-order for curved evolution).
+
+The polynomial surface `ha(e, Bc, t)` is then used by the GA for cheap fitness evaluation without further propagation.
 
 ### 5.4 GA Parameters
 
