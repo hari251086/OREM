@@ -146,6 +146,13 @@ c     Extend forward to find the longest linear segment
       istart = i
       iend = i + min_zone_pts - 1
 
+c     Check if minimum window fits within max_zone_days
+      if (epochs(iend) - epochs(istart) .gt.
+     &    max_zone_days) then
+         i = i + 1
+         goto 10
+      end if
+
 c     Check if this minimum window has negative slope
       call linfit(epochs(istart), ha(istart),
      &            iend - istart + 1, slope, intercept, r2)
