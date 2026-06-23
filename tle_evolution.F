@@ -101,16 +101,22 @@ c     --- Read all TLEs from file ---
       end if
 
 c     --- Filter by NORAD ID and extract evolution ---
+c     Skip duplicate epochs (same epoch within 0.001 day ≈ 86 sec)
       do i = 1, ntle
          if (target_norad .gt. 0 .and.
      &       norad(i) .ne. target_norad) goto 20
 
          if (npts .ge. maxpts) goto 30
 
+c        Compute epoch JD for duplicate check
+         call tle_epoch2jd(epoch_yr(i), epoch_day(i), djd)
+         if (npts .ge. 1) then
+            if (dabs(djd - epochs(npts)) .lt. 0.001d0) goto 20
+         end if
+
          npts = npts + 1
 
-c        Epoch → Julian Date
-         call tle_epoch2jd(epoch_yr(i), epoch_day(i), djd)
+c        Epoch already computed above (djd set before dup check)
          epochs(npts) = djd
 
 c        Mean motion (rev/day) → semi-major axis (km)

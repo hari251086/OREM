@@ -38,9 +38,10 @@ OREM/
 │
 ├── test_propagate_ks.F             Tests for refactored propagator
 │
+├── tle_evolution.F                 Batch TLE → orbital evolution (56 tests)
+├── test_tle_evolution.F            TLE evolution tests
 ├── ga.F                            (planned) Genetic Algorithm optimizer
 ├── rsm.F                           (planned) Response Surface Methodology
-├── tle_evolution.F                 (planned) Batch TLE processing
 ├── zone_select.F                   (planned) Zone selection algorithm
 ├── orem.F                          (planned) Main OREM driver
 └── README.md
@@ -96,10 +97,24 @@ gfortran test_propagate_ks.F ksrop/propagate_ks.F ksrop/Subrouts.F ksrop/Legendr
 ## 5. Running Tests
 
 ```bash
-./test_propagate_ks.exe
+./test_propagate_ks.exe        # Propagator tests
+./test_tle_evolution.exe       # TLE evolution tests (56 checks)
 ```
 
-Tests cover: two-body energy conservation, orbit closure, multi-revolution propagation, re-entry detection, input preservation.
+### test_propagate_ks
+Two-body energy conservation, orbit closure, multi-revolution propagation, re-entry detection, input preservation.
+
+### test_tle_evolution (56 tests)
+- Basic: 47944 SSO (element ranges, epoch ordering, ha>hp, Sun azimuth)
+- 42928 PSLV-C39 Zone 0 (i≈19°, e≈0.32, decaying apogee, RAAN regression)
+- Error handling: bad file (ierr=1), no NORAD match (ierr=2)
+- Geometric: ha+hp+2Re=2a identity, ha=a(1+e)-Re, hp=a(1-e)-Re
+- Finite output (NaN check), perigee radius>0, ra>rp
+- Sun azimuth physics: varies over time, seasonal shift
+- Spot-check: epoch years, inclination values
+- Large catalog: 94597-entry file, maxpts cap, field ranges, Vanguard-1 filter
+- Repeatability, boundary conditions (maxpts=1)
+- Deduplication: no consecutive epochs within 86 sec, duplicate removal count
 
 ---
 
@@ -119,8 +134,8 @@ cp ../KSROP/Legendre.F ksrop/
 
 | Issue | Component | Status |
 |---|---|---|
-| #1 | Batch TLE processing | Planned |
-| #2 | Mean orbital element computation | Planned |
+| #1 | Batch TLE processing | **Done** — `tle_evolution.F` with dedup, 56 tests |
+| #2 | Mean orbital element computation | Closed — TLE mean elements used directly |
 | #3 | Zone selection algorithm | Planned |
 | #4 | Genetic Algorithm (GA) optimizer | Planned |
 | #5 | Response Surface Methodology (RSM) | Planned |
