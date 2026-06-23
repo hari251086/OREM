@@ -39,10 +39,11 @@ OREM/
 ├── test_propagate_ks.F             Tests for refactored propagator
 │
 ├── tle_evolution.F                 Batch TLE → orbital evolution (56 tests)
+├── zone_select.F                   Zone selection — linear apogee decay (28 tests)
 ├── test_tle_evolution.F            TLE evolution tests
+├── test_zone_select.F              Zone selection tests
 ├── ga.F                            (planned) Genetic Algorithm optimizer
 ├── rsm.F                           (planned) Response Surface Methodology
-├── zone_select.F                   (planned) Zone selection algorithm
 ├── orem.F                          (planned) Main OREM driver
 └── README.md
 ```
@@ -136,7 +137,7 @@ cp ../KSROP/Legendre.F ksrop/
 |---|---|---|
 | #1 | Batch TLE processing | **Done** — `tle_evolution.F` with dedup, 56 tests |
 | #2 | Mean orbital element computation | Closed — TLE mean elements used directly |
-| #3 | Zone selection algorithm | Planned |
+| #3 | Zone selection algorithm | **Done** — `zone_select.F` with linfit, 28 tests |
 | #4 | Genetic Algorithm (GA) optimizer | Planned |
 | #5 | Response Surface Methodology (RSM) | Planned |
 | #6 | OREM driver (full pipeline) | Planned |
