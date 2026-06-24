@@ -53,6 +53,7 @@ OREM/
 ├── test_ga.F                       GA optimizer tests
 ├── rsm.F                           RSM surface generation (39 tests)
 ├── test_rsm.F                      RSM integration tests
+├── main_orem.F                     Standalone runner (reads orem.cfg)
 ├── orem.F                          OREM driver + compute_rpe (14 tests)
 ├── test_orem.F                     OREM driver tests
 ├── test_reentry.F                  7-object re-entry validation (35 tests)
@@ -118,7 +119,84 @@ gfortran test_reentry.F orem.F rsm.F ga.F tle_evolution.F zone_select.F ksrop/pr
 
 ---
 
-## 5. Running Tests
+## 5. How to Run (Quick Start)
+
+### Step 1: Compile
+
+```bat
+REM Windows — Intel oneAPI
+call "C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Auxiliary\Build\vcvars64.bat"
+call "C:\Program Files (x86)\Intel\Fortran\compiler\2025.0\env\vars.bat"
+
+ifx /heap-arrays /F:16777216 main_orem.F orem.F rsm.F ga.F tle_evolution.F zone_select.F ksrop/propagate_ks.F ksrop/Subrouts.F ksrop/TLEread.F ksrop/Legendre.F /exe:orem.exe
+```
+
+```bash
+# Unix — gfortran
+gfortran main_orem.F orem.F rsm.F ga.F tle_evolution.F zone_select.F ksrop/propagate_ks.F ksrop/Subrouts.F ksrop/TLEread.F ksrop/Legendre.F -o orem.exe
+```
+
+### Step 2: Create a config file
+
+Copy an example and edit:
+```
+cp input/orem_42928.cfg input/my_run.cfg
+```
+
+Config file format (`input/orem_42928.cfg`):
+```
+input/example_42928.tle.txt          <- TLE file path
+42928                                <- NORAD ID
+2019 3 3 0 0 0.0                    <- Observed re-entry (yr mo dy hr mn sc). Use 0 0 0 0 0 0.0 if unknown
+4                                    <- Max number of zones
+8 10.0 0.90 -1.0                    <- Zone: min_pts, max_days, R2_threshold, slope_threshold
+0.5 5.0                             <- Area bounds [A_min, A_max] in m^2
+1000.0                              <- Spacecraft mass (kg)
+2.2                                  <- Drag coefficient Cd
+4 200 40 16 0.8 0.01 0.123          <- GA: pop, gen, bits_e, bits_A, Pc, Pm, seed
+2 0 0                               <- Force model: geo_deg, sun_deg, moon_deg
+0 7.2921150d-5 3.35281066d-3 1.0    <- Drag: IDRAG(0=off,1=on), WE, EPS_f, FR
+0 0.0 0.0 0                         <- SRP: IPSR(0=off,1=on), CR, AM, ISHAD
+```
+
+### Step 3: Run
+
+```bash
+./orem.exe input/orem_42928.cfg
+```
+
+### Step 4: Read output
+
+The output shows per-zone results:
+```
+Zone    Epoch (JD)     e_opt  A (m2)  Re-entry (JD)   Re-entry (UTC)    RPE(%)
+   1    2458152.54  0.273541   0.500  2458543.20       2019-03-02        -0.30
+   2    2458235.23  0.240538   2.180  2458545.80       2019-03-05         1.20
+```
+
+- **e_opt** — optimal eccentricity found by GA for this zone
+- **A (m2)** — optimal cross-sectional area (m²)
+- **Re-entry (JD/UTC)** — predicted re-entry date
+- **RPE(%)** — relative prediction error vs observed (if provided)
+
+### Notes
+
+- Set `IDRAG=1` (line 11, first number) to enable atmospheric drag — required for re-entry prediction
+- Set `IDRAG=0` for fast testing without drag (orbit won't decay)
+- The `input/ATM.DAT` file must be present for drag computation
+- Known re-entry date (line 3) is optional — set to `0 0 0 0 0 0.0` for operational prediction mode
+
+### Example config files
+
+| File | Object | Description |
+|---|---|---|
+| `input/orem_42928.cfg` | PSLV-C39 R/B | HEO, i=19°, e=0.33, re-entry 2019-03-03 |
+
+To run on a different object: copy the config, change lines 1-3 (TLE file, NORAD, re-entry date), and optionally lines 6-7 (area/mass).
+
+---
+
+## 6. Running Tests
 
 ```bash
 ./test_propagate_ks.exe        # Propagator tests
@@ -199,7 +277,7 @@ Two-body energy conservation, orbit closure, multi-revolution propagation, re-en
 
 ---
 
-## 6. KSROP Source Files
+## 7. KSROP Source Files
 
 Files in `ksrop/` are copied from [hari251086/KSROP](https://github.com/hari251086/KSROP). To update after KSROP changes:
 
@@ -211,7 +289,7 @@ cp ../KSROP/Legendre.F ksrop/
 
 ---
 
-## 7. Version History
+## 8. Version History
 
 | Version | Date | Changes |
 |---|---|---|
@@ -226,7 +304,7 @@ cp ../KSROP/Legendre.F ksrop/
 
 ---
 
-## 8. References
+## 9. References
 
 - Sellamuthu, H. (2019) Regularized Astrodynamics Using Kustaanheimo-Stiefel Space, Ph.D. Thesis, Karunya Institute of Technology and Sciences
 - Sellamuthu, H., Sharma, R.K. & Arumugam, S. Optimal re-entry time prediction of RSO from HEO, Advances in Space Research (submitted)
