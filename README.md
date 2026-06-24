@@ -42,7 +42,7 @@ OREM/
 ├── zone_select.F                   Zone selection — linear apogee decay (28 tests)
 ├── test_tle_evolution.F            TLE evolution tests
 ├── test_zone_select.F              Zone selection tests
-├── ga.F                            Binary-coded GA optimizer (50 tests)
+├── ga.F                            Binary-coded GA optimizer (58 tests)
 ├── test_ga.F                       GA optimizer tests
 ├── rsm.F                           (planned) Response Surface Methodology
 ├── orem.F                          (planned) Main OREM driver
@@ -108,7 +108,7 @@ gfortran test_ga.F ga.F -o test_ga.exe
 ./test_propagate_ks.exe        # Propagator tests
 ./test_tle_evolution.exe       # TLE evolution tests (56 checks)
 ./test_zone_select.exe         # Zone selection tests (68 checks)
-./test_ga.exe                  # GA optimizer tests (50 checks)
+./test_ga.exe                  # GA optimizer tests (58 checks)
 ```
 
 ### test_propagate_ks
@@ -143,7 +143,7 @@ Two-body energy conservation, orbit closure, multi-revolution propagation, re-en
 - Degenerate: identical epochs, 2 points, very steep decay
 - Repeatability, robustness (nzones_max=0, large nzones_max)
 
-### test_ga (50 tests)
+### test_ga (58 tests)
 - TWOINT bilinear interpolation: constant, linear, corners, center, edges, quadratic, boundary
 - Chromosome decode: all-zeros, all-ones, single-bit, asymmetric bits (60+20), non-zero lower bound
 - RNG: range [0,1), different seeds, reproducibility
@@ -152,6 +152,7 @@ Two-body energy conservation, orbit closure, multi-revolution propagation, re-en
 - Convergence: deterministic (same seed), more gen improves, fitness>0, NaN check, 5gen/1gen bounds
 - Surface edge cases: corner optima, steep e-gradient, narrow bounds, few observations
 - Robustness: flat surface, bounds checking, fewer generations, non-negative RMS
+- High eccentricity: e~0.68 (39615), e~0.63 (35497), e~0.56 (37151), extreme asymmetric sensitivity, GEO-scale apogee, finite/bounds checks
 
 ---
 
@@ -174,7 +175,7 @@ cp ../KSROP/Legendre.F ksrop/
 | 0.1 | 2026-06-23 | Initial repo: propagate_ks refactored from KSROP driver_KS.F |
 | 0.2 | 2026-06-23 | Batch TLE processing (`tle_evolution.F`), 56 tests, epoch dedup |
 | 0.3 | 2026-06-23 | Zone selection (`zone_select.F`, `linfit`), 68 tests, 4 HEO TLE histories, max_zone_days bug fix |
-| 0.4 | 2026-06-24 | GA optimizer (`ga.F`), refactored from GENESIS, 50 tests, TWOINT interpolation |
+| 0.4 | 2026-06-24 | GA optimizer (`ga.F`), refactored from GENESIS, 58 tests, high-e orbits validated |
 
 ---
 
