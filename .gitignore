@@ -1,0 +1,16 @@
+# Compiled executables
+*.exe
+*.obj
+*.pdb
+*.ilk
+
+# Editor files
+*~
+*.swp
+*.swo
+
+# Debug files
+debug_*.F
+
+# Large multi-satellite catalog (94k entries, not needed for tests)
+input/example_multi.tle.txt
