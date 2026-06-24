@@ -188,8 +188,8 @@ cp ../KSROP/Legendre.F ksrop/
 | 0.1 | 2026-06-23 | Initial repo: propagate_ks refactored from KSROP driver_KS.F |
 | 0.2 | 2026-06-23 | Batch TLE processing (`tle_evolution.F`), 56 tests, epoch dedup |
 | 0.3 | 2026-06-23 | Zone selection (`zone_select.F`, `linfit`), 68 tests, 4 HEO TLE histories, max_zone_days bug fix |
-| 0.4 | 2026-06-24 | GA optimizer (`ga.F`), refactored from GENESIS, 58 tests, high-e orbits validated |
-| 0.5 | 2026-06-24 | RSM surface generation (`rsm.F`), 9× propagate_ks per zone, 39 tests, RSM→GA integration verified |
+| 0.4 | 2026-06-24 | GA optimizer (`ga.F`), refactored from GENESIS, 71 tests, high-e orbits + piecewise internals |
+| 0.5 | 2026-06-24 | RSM surface generation (`rsm.F`), 9× propagate_ks per zone, 39 tests, ATM.DAT reader fix, RSM→GA integration verified |
 
 ---
 
