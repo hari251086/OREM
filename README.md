@@ -44,7 +44,7 @@ OREM/
 ├── test_zone_select.F              Zone selection tests
 ├── ga.F                            Binary-coded GA optimizer (58 tests)
 ├── test_ga.F                       GA optimizer tests
-├── rsm.F                           RSM surface generation (23 tests)
+├── rsm.F                           RSM surface generation (39 tests)
 ├── test_rsm.F                      RSM integration tests
 ├── orem.F                          (planned) Main OREM driver
 └── README.md
@@ -112,7 +112,7 @@ gfortran test_rsm.F rsm.F ga.F tle_evolution.F zone_select.F ksrop/propagate_ks.
 ./test_tle_evolution.exe       # TLE evolution tests (56 checks)
 ./test_zone_select.exe         # Zone selection tests (68 checks)
 ./test_ga.exe                  # GA optimizer tests (58 checks)
-./test_rsm.exe                 # RSM integration tests (23 checks)
+./test_rsm.exe                 # RSM integration tests (39 checks)
 ```
 
 ### test_propagate_ks
@@ -158,11 +158,13 @@ Two-body energy conservation, orbit closure, multi-revolution propagation, re-en
 - Robustness: flat surface, bounds checking, fewer generations, non-negative RMS
 - High eccentricity: e~0.68 (39615), e~0.63 (35497), e~0.56 (37151), extreme asymmetric sensitivity, GEO-scale apogee, finite/bounds checks
 
-### test_rsm (23 tests)
-- jd2cal: J2000 epoch, 2017-09-22 (42928 zone 0 start)
+### test_rsm (39 tests)
+- jd2cal: J2000, 2017-09-22, leap year 2000-02-29, 2019-03-03 (re-entry), fractional hours, midnight
 - Grid construction: e_mid/a_mid, BN=m/(Cd*A), perigee-preserving SMA adjustment
 - Error handling: nzone<2 → ierr=1
 - 42928 Zone 0 integration: 9 propagation runs (two-body+J2), surface physicality, center nearest obs, tobs/apobs extraction
+- Surface quality: higher e → higher ha, all finite (NaN check), physical range [5k-20k km], center nearest, repeatability
+- RSM→GA integration: feed real RSM surfaces into ga_optimize, e_opt/a_opt in bounds, rms valid, e_opt near TLE ecc, fitness>0.5
 
 ---
 
@@ -186,7 +188,7 @@ cp ../KSROP/Legendre.F ksrop/
 | 0.2 | 2026-06-23 | Batch TLE processing (`tle_evolution.F`), 56 tests, epoch dedup |
 | 0.3 | 2026-06-23 | Zone selection (`zone_select.F`, `linfit`), 68 tests, 4 HEO TLE histories, max_zone_days bug fix |
 | 0.4 | 2026-06-24 | GA optimizer (`ga.F`), refactored from GENESIS, 58 tests, high-e orbits validated |
-| 0.5 | 2026-06-24 | RSM surface generation (`rsm.F`), 9× propagate_ks per zone, 23 tests, jd2cal |
+| 0.5 | 2026-06-24 | RSM surface generation (`rsm.F`), 9× propagate_ks per zone, 39 tests, RSM→GA integration verified |
 
 ---
 
