@@ -42,7 +42,8 @@ OREM/
 ├── zone_select.F                   Zone selection — linear apogee decay (28 tests)
 ├── test_tle_evolution.F            TLE evolution tests
 ├── test_zone_select.F              Zone selection tests
-├── ga.F                            (planned) Genetic Algorithm optimizer
+├── ga.F                            Binary-coded GA optimizer (25 tests)
+├── test_ga.F                       GA optimizer tests
 ├── rsm.F                           (planned) Response Surface Methodology
 ├── orem.F                          (planned) Main OREM driver
 └── README.md
@@ -87,6 +88,7 @@ call "C:\Program Files (x86)\Intel\Fortran\compiler\2025.0\env\vars.bat"
 ifx test_propagate_ks.F ksrop/propagate_ks.F ksrop/Subrouts.F ksrop/Legendre.F /exe:test_propagate_ks.exe
 ifx test_tle_evolution.F tle_evolution.F ksrop/Subrouts.F ksrop/TLEread.F ksrop/Legendre.F /exe:test_tle_evolution.exe
 ifx test_zone_select.F zone_select.F tle_evolution.F ksrop/Subrouts.F ksrop/TLEread.F ksrop/Legendre.F /exe:test_zone_select.exe
+ifx test_ga.F ga.F /exe:test_ga.exe
 ```
 
 ### Unix / gfortran
@@ -95,6 +97,7 @@ ifx test_zone_select.F zone_select.F tle_evolution.F ksrop/Subrouts.F ksrop/TLEr
 gfortran test_propagate_ks.F ksrop/propagate_ks.F ksrop/Subrouts.F ksrop/Legendre.F -o test_propagate_ks.exe
 gfortran test_tle_evolution.F tle_evolution.F ksrop/Subrouts.F ksrop/TLEread.F ksrop/Legendre.F -o test_tle_evolution.exe
 gfortran test_zone_select.F zone_select.F tle_evolution.F ksrop/Subrouts.F ksrop/TLEread.F ksrop/Legendre.F -o test_zone_select.exe
+gfortran test_ga.F ga.F -o test_ga.exe
 ```
 
 ---
@@ -105,6 +108,7 @@ gfortran test_zone_select.F zone_select.F tle_evolution.F ksrop/Subrouts.F ksrop
 ./test_propagate_ks.exe        # Propagator tests
 ./test_tle_evolution.exe       # TLE evolution tests (56 checks)
 ./test_zone_select.exe         # Zone selection tests (68 checks)
+./test_ga.exe                  # GA optimizer tests (25 checks)
 ```
 
 ### test_propagate_ks
@@ -139,6 +143,13 @@ Two-body energy conservation, orbit closure, multi-revolution propagation, re-en
 - Degenerate: identical epochs, 2 points, very steep decay
 - Repeatability, robustness (nzones_max=0, large nzones_max)
 
+### test_ga (25 tests)
+- TWOINT bilinear interpolation: constant, linear, corners, center, edges
+- Chromosome decode: all-zeros, all-ones, single-bit
+- RNG: range [0,1), different seeds, reproducibility
+- Synthetic optimization: known-optimum (e=0.32, A=120), different seeds, wide bounds, 1000 generations
+- Robustness: flat surface, bounds checking, fewer generations, non-negative RMS
+
 ---
 
 ## 6. KSROP Source Files
@@ -160,6 +171,7 @@ cp ../KSROP/Legendre.F ksrop/
 | 0.1 | 2026-06-23 | Initial repo: propagate_ks refactored from KSROP driver_KS.F |
 | 0.2 | 2026-06-23 | Batch TLE processing (`tle_evolution.F`), 56 tests, epoch dedup |
 | 0.3 | 2026-06-23 | Zone selection (`zone_select.F`, `linfit`), 68 tests, 4 HEO TLE histories, max_zone_days bug fix |
+| 0.4 | 2026-06-24 | GA optimizer (`ga.F`), refactored from GENESIS, 25 tests, TWOINT interpolation |
 
 ---
 
