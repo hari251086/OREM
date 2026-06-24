@@ -285,7 +285,7 @@ c     RSM outputs
       integer nsurf_pts, nobs, ierr_rsm
 
 c     Atmosphere tables
-      parameter(ndim_a = 100)
+      parameter(ndim_a = 400)
       double precision alt_a(ndim_a), den_a(ndim_a), sch_a(ndim_a)
       integer natm
 
@@ -463,7 +463,7 @@ c     ============================================================
       double precision tobs(500), apobs(500)
       integer nsurf_pts, nobs, ierr_rsm
 
-      parameter(ndim_a = 100)
+      parameter(ndim_a = 400)
       double precision alt_a(ndim_a), den_a(ndim_a), sch_a(ndim_a)
       integer natm, n_f(3)
 
@@ -614,7 +614,7 @@ c     ============================================================
       double precision tobs(500), apobs(500)
       integer nsurf_pts, nobs, ierr_rsm
 
-      parameter(ndim_a = 100)
+      parameter(ndim_a = 400)
       double precision alt_a(ndim_a), den_a(ndim_a), sch_a(ndim_a)
       integer natm, n_f(3)
 
@@ -778,22 +778,42 @@ c     R39: Midnight — 00:00 UT
       end
 
 c     ============================================================
-c     Read atmosphere table
+c     Read atmosphere table (same format as test_propagate_ks)
 c     ============================================================
       subroutine read_atm(alt, den, sch, maxn, natm)
       implicit double precision (a-h, o-z)
       integer maxn, natm
       double precision alt(maxn), den(maxn), sch(maxn)
 
-      natm = 0
+c     Build altitude array: 60-200 km (1 km), 202-500 (2 km) = 291
+      natm = 291
+      if (natm .gt. maxn) natm = maxn
+      alt(1) = 60.d0
+      do i = 2, 141
+         alt(i) = alt(i-1) + 1.d0
+      end do
+      do i = 142, natm
+         alt(i) = alt(i-1) + 2.d0
+      end do
+
+c     Read scale heights then densities from ATM.DAT
       open(unit=88, file='input/ATM.DAT', status='old',
      &     err=900)
-      do i = 1, maxn
-         read(88, *, end=800) alt(i), den(i), sch(i)
-         natm = natm + 1
-      end do
- 800  continue
+      read(88,110) (sch(i), i=1,61)
+      read(88,110) (sch(i), i=62,natm)
+      read(88,111) (den(i), i=1,61)
+      read(88,111) (den(i), i=62,natm)
       close(88)
+ 110  format(8f10.3)
+ 111  format(8e10.3)
+
+c     Convert to SI: km→m, km→m, density scaling
+      do i = 1, natm
+         alt(i) = alt(i) * 1000.d0
+         sch(i) = sch(i) * 1000.d0
+         den(i) = den(i) * 1.0d10
+      end do
+
       return
  900  continue
       natm = 0
