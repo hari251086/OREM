@@ -55,6 +55,7 @@ OREM/
 ├── test_rsm.F                      RSM integration tests
 ├── orem.F                          OREM driver + compute_rpe (14 tests)
 ├── test_orem.F                     OREM driver tests
+├── test_reentry.F                  7-object re-entry validation (35 tests)
 └── README.md
 ```
 
@@ -100,6 +101,7 @@ ifx test_zone_select.F zone_select.F tle_evolution.F ksrop/Subrouts.F ksrop/TLEr
 ifx test_ga.F ga.F /exe:test_ga.exe
 ifx /heap-arrays /F:16777216 test_rsm.F rsm.F ga.F tle_evolution.F zone_select.F ksrop/propagate_ks.F ksrop/Subrouts.F ksrop/TLEread.F ksrop/Legendre.F /exe:test_rsm.exe
 ifx /heap-arrays /F:16777216 test_orem.F orem.F rsm.F ga.F tle_evolution.F zone_select.F ksrop/propagate_ks.F ksrop/Subrouts.F ksrop/TLEread.F ksrop/Legendre.F /exe:test_orem.exe
+ifx /heap-arrays /F:16777216 test_reentry.F orem.F rsm.F ga.F tle_evolution.F zone_select.F ksrop/propagate_ks.F ksrop/Subrouts.F ksrop/TLEread.F ksrop/Legendre.F /exe:test_reentry.exe
 ```
 
 ### Unix / gfortran
@@ -111,6 +113,7 @@ gfortran test_zone_select.F zone_select.F tle_evolution.F ksrop/Subrouts.F ksrop
 gfortran test_ga.F ga.F -o test_ga.exe
 gfortran test_rsm.F rsm.F ga.F tle_evolution.F zone_select.F ksrop/propagate_ks.F ksrop/Subrouts.F ksrop/TLEread.F ksrop/Legendre.F -o test_rsm.exe
 gfortran test_orem.F orem.F rsm.F ga.F tle_evolution.F zone_select.F ksrop/propagate_ks.F ksrop/Subrouts.F ksrop/TLEread.F ksrop/Legendre.F -o test_orem.exe
+gfortran test_reentry.F orem.F rsm.F ga.F tle_evolution.F zone_select.F ksrop/propagate_ks.F ksrop/Subrouts.F ksrop/TLEread.F ksrop/Legendre.F -o test_reentry.exe
 ```
 
 ---
@@ -124,6 +127,7 @@ gfortran test_orem.F orem.F rsm.F ga.F tle_evolution.F zone_select.F ksrop/propa
 ./test_ga.exe                  # GA optimizer tests (71 checks)
 ./test_rsm.exe                 # RSM integration tests (39 checks)
 ./test_orem.exe                # OREM driver tests (14 checks)
+./test_reentry.exe             # 7-object re-entry validation (35 checks)
 ```
 
 ### test_propagate_ks
@@ -183,6 +187,16 @@ Two-body energy conservation, orbit closure, multi-revolution propagation, re-en
 - Error handling: bad TLE file, wrong NORAD ID
 - 42928 integration: full pipeline (TLE→zone→RSM→GA→propagation), 4 zones, e_opt/a_opt/rms valid, zone epochs valid
 
+### test_reentry (35 tests)
+7 objects × 5 checks each: pipeline completion, zone detection, e_opt physical, a_opt in bounds, rms valid
+- 42928 PSLV-C39 (i=19.2°, e=0.33, re-entry 2019-03-03)
+- 35497 Ariane 5 ESC-A (i=5.7°, e=0.63, re-entry 2016-10-31)
+- 37151 Long March 3B (i=24.9°, e=0.56, re-entry 2015-12-03)
+- 39615 Proton-M Briz-M (i=48.5°, e=0.68, re-entry 2017-09-15)
+- 27526 Ariane 5 R/B (i=17.7°, e=0.59, re-entry 2012-05-09)
+- 32007 GSLV R/B (i=25.9°, e=0.29, re-entry 2010-06-06)
+- 37819 Proton-M R/B (i=63.4°, e=0.47, re-entry 2013-09-12)
+
 ---
 
 ## 6. KSROP Source Files
@@ -208,6 +222,7 @@ cp ../KSROP/Legendre.F ksrop/
 | 0.5 | 2026-06-24 | RSM surface generation (`rsm.F`), 9× propagate_ks per zone, 39 tests, ATM.DAT reader fix, RSM→GA integration verified |
 | 0.5.1 | 2026-06-24 | Fix propagate_ks drag crash (KSROP #16): ALT_atm range guard, H_dg÷0 safety, exp overflow clamp. 234 total tests |
 | 0.6 | 2026-06-24 | OREM driver (`orem.F`) + `compute_rpe` (#6, #7), 14 tests, full pipeline on 42928 (4 zones). 7 test objects from research Data. 248 total tests |
+| 0.7 | 2026-06-24 | 7-object re-entry validation (#8), 35 tests, all orbit regimes (i=5.7°–63.4°, e=0.29–0.68). 283 total tests |
 
 ---
 
