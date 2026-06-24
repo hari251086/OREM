@@ -190,6 +190,7 @@ cp ../KSROP/Legendre.F ksrop/
 | 0.3 | 2026-06-23 | Zone selection (`zone_select.F`, `linfit`), 68 tests, 4 HEO TLE histories, max_zone_days bug fix |
 | 0.4 | 2026-06-24 | GA optimizer (`ga.F`), refactored from GENESIS, 71 tests, high-e orbits + piecewise internals |
 | 0.5 | 2026-06-24 | RSM surface generation (`rsm.F`), 9× propagate_ks per zone, 39 tests, ATM.DAT reader fix, RSM→GA integration verified |
+| 0.5.1 | 2026-06-24 | Fix propagate_ks drag crash (KSROP #16): ALT_atm range guard, H_dg÷0 safety, exp overflow clamp. 234 total tests |
 
 ---
 
