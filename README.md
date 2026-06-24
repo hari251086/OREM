@@ -44,7 +44,8 @@ OREM/
 ├── test_zone_select.F              Zone selection tests
 ├── ga.F                            Binary-coded GA optimizer (58 tests)
 ├── test_ga.F                       GA optimizer tests
-├── rsm.F                           (planned) Response Surface Methodology
+├── rsm.F                           RSM surface generation (23 tests)
+├── test_rsm.F                      RSM integration tests
 ├── orem.F                          (planned) Main OREM driver
 └── README.md
 ```
@@ -89,6 +90,7 @@ ifx test_propagate_ks.F ksrop/propagate_ks.F ksrop/Subrouts.F ksrop/Legendre.F /
 ifx test_tle_evolution.F tle_evolution.F ksrop/Subrouts.F ksrop/TLEread.F ksrop/Legendre.F /exe:test_tle_evolution.exe
 ifx test_zone_select.F zone_select.F tle_evolution.F ksrop/Subrouts.F ksrop/TLEread.F ksrop/Legendre.F /exe:test_zone_select.exe
 ifx test_ga.F ga.F /exe:test_ga.exe
+ifx /heap-arrays /F:16777216 test_rsm.F rsm.F ga.F tle_evolution.F zone_select.F ksrop/propagate_ks.F ksrop/Subrouts.F ksrop/TLEread.F ksrop/Legendre.F /exe:test_rsm.exe
 ```
 
 ### Unix / gfortran
@@ -98,6 +100,7 @@ gfortran test_propagate_ks.F ksrop/propagate_ks.F ksrop/Subrouts.F ksrop/Legendr
 gfortran test_tle_evolution.F tle_evolution.F ksrop/Subrouts.F ksrop/TLEread.F ksrop/Legendre.F -o test_tle_evolution.exe
 gfortran test_zone_select.F zone_select.F tle_evolution.F ksrop/Subrouts.F ksrop/TLEread.F ksrop/Legendre.F -o test_zone_select.exe
 gfortran test_ga.F ga.F -o test_ga.exe
+gfortran test_rsm.F rsm.F ga.F tle_evolution.F zone_select.F ksrop/propagate_ks.F ksrop/Subrouts.F ksrop/TLEread.F ksrop/Legendre.F -o test_rsm.exe
 ```
 
 ---
@@ -109,6 +112,7 @@ gfortran test_ga.F ga.F -o test_ga.exe
 ./test_tle_evolution.exe       # TLE evolution tests (56 checks)
 ./test_zone_select.exe         # Zone selection tests (68 checks)
 ./test_ga.exe                  # GA optimizer tests (58 checks)
+./test_rsm.exe                 # RSM integration tests (23 checks)
 ```
 
 ### test_propagate_ks
@@ -154,6 +158,12 @@ Two-body energy conservation, orbit closure, multi-revolution propagation, re-en
 - Robustness: flat surface, bounds checking, fewer generations, non-negative RMS
 - High eccentricity: e~0.68 (39615), e~0.63 (35497), e~0.56 (37151), extreme asymmetric sensitivity, GEO-scale apogee, finite/bounds checks
 
+### test_rsm (23 tests)
+- jd2cal: J2000 epoch, 2017-09-22 (42928 zone 0 start)
+- Grid construction: e_mid/a_mid, BN=m/(Cd*A), perigee-preserving SMA adjustment
+- Error handling: nzone<2 → ierr=1
+- 42928 Zone 0 integration: 9 propagation runs (two-body+J2), surface physicality, center nearest obs, tobs/apobs extraction
+
 ---
 
 ## 6. KSROP Source Files
@@ -176,6 +186,7 @@ cp ../KSROP/Legendre.F ksrop/
 | 0.2 | 2026-06-23 | Batch TLE processing (`tle_evolution.F`), 56 tests, epoch dedup |
 | 0.3 | 2026-06-23 | Zone selection (`zone_select.F`, `linfit`), 68 tests, 4 HEO TLE histories, max_zone_days bug fix |
 | 0.4 | 2026-06-24 | GA optimizer (`ga.F`), refactored from GENESIS, 58 tests, high-e orbits validated |
+| 0.5 | 2026-06-24 | RSM surface generation (`rsm.F`), 9× propagate_ks per zone, 23 tests, jd2cal |
 
 ---
 
