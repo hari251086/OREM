@@ -53,7 +53,8 @@ OREM/
 ├── test_ga.F                       GA optimizer tests
 ├── rsm.F                           RSM surface generation (39 tests)
 ├── test_rsm.F                      RSM integration tests
-├── orem.F                          (planned) Main OREM driver
+├── orem.F                          OREM driver + compute_rpe (14 tests)
+├── test_orem.F                     OREM driver tests
 └── README.md
 ```
 
@@ -98,6 +99,7 @@ ifx test_tle_evolution.F tle_evolution.F ksrop/Subrouts.F ksrop/TLEread.F ksrop/
 ifx test_zone_select.F zone_select.F tle_evolution.F ksrop/Subrouts.F ksrop/TLEread.F ksrop/Legendre.F /exe:test_zone_select.exe
 ifx test_ga.F ga.F /exe:test_ga.exe
 ifx /heap-arrays /F:16777216 test_rsm.F rsm.F ga.F tle_evolution.F zone_select.F ksrop/propagate_ks.F ksrop/Subrouts.F ksrop/TLEread.F ksrop/Legendre.F /exe:test_rsm.exe
+ifx /heap-arrays /F:16777216 test_orem.F orem.F rsm.F ga.F tle_evolution.F zone_select.F ksrop/propagate_ks.F ksrop/Subrouts.F ksrop/TLEread.F ksrop/Legendre.F /exe:test_orem.exe
 ```
 
 ### Unix / gfortran
@@ -108,6 +110,7 @@ gfortran test_tle_evolution.F tle_evolution.F ksrop/Subrouts.F ksrop/TLEread.F k
 gfortran test_zone_select.F zone_select.F tle_evolution.F ksrop/Subrouts.F ksrop/TLEread.F ksrop/Legendre.F -o test_zone_select.exe
 gfortran test_ga.F ga.F -o test_ga.exe
 gfortran test_rsm.F rsm.F ga.F tle_evolution.F zone_select.F ksrop/propagate_ks.F ksrop/Subrouts.F ksrop/TLEread.F ksrop/Legendre.F -o test_rsm.exe
+gfortran test_orem.F orem.F rsm.F ga.F tle_evolution.F zone_select.F ksrop/propagate_ks.F ksrop/Subrouts.F ksrop/TLEread.F ksrop/Legendre.F -o test_orem.exe
 ```
 
 ---
@@ -120,6 +123,7 @@ gfortran test_rsm.F rsm.F ga.F tle_evolution.F zone_select.F ksrop/propagate_ks.
 ./test_zone_select.exe         # Zone selection tests (68 checks)
 ./test_ga.exe                  # GA optimizer tests (71 checks)
 ./test_rsm.exe                 # RSM integration tests (39 checks)
+./test_orem.exe                # OREM driver tests (14 checks)
 ```
 
 ### test_propagate_ks
@@ -174,6 +178,11 @@ Two-body energy conservation, orbit closure, multi-revolution propagation, re-en
 - Surface quality: higher e → higher ha, all finite (NaN check), physical range [5k-20k km], center nearest, repeatability
 - RSM→GA integration: feed real RSM surfaces into ga_optimize, e_opt/a_opt in bounds, rms valid, e_opt near TLE ecc, fitness>0.5
 
+### test_orem (14 tests)
+- compute_rpe: perfect RPE=0, 10-day late RPE~1.9%, mean/std (Mode 2), zero predictions
+- Error handling: bad TLE file, wrong NORAD ID
+- 42928 integration: full pipeline (TLE→zone→RSM→GA→propagation), 4 zones, e_opt/a_opt/rms valid, zone epochs valid
+
 ---
 
 ## 6. KSROP Source Files
@@ -198,6 +207,7 @@ cp ../KSROP/Legendre.F ksrop/
 | 0.4 | 2026-06-24 | GA optimizer (`ga.F`), refactored from GENESIS, 71 tests, high-e orbits + piecewise internals |
 | 0.5 | 2026-06-24 | RSM surface generation (`rsm.F`), 9× propagate_ks per zone, 39 tests, ATM.DAT reader fix, RSM→GA integration verified |
 | 0.5.1 | 2026-06-24 | Fix propagate_ks drag crash (KSROP #16): ALT_atm range guard, H_dg÷0 safety, exp overflow clamp. 234 total tests |
+| 0.6 | 2026-06-24 | OREM driver (`orem.F`) + `compute_rpe` (#6, #7), 14 tests, full pipeline on 42928 (4 zones). 7 test objects from research Data. 248 total tests |
 
 ---
 
