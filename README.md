@@ -42,7 +42,7 @@ OREM/
 ├── zone_select.F                   Zone selection — linear apogee decay (28 tests)
 ├── test_tle_evolution.F            TLE evolution tests
 ├── test_zone_select.F              Zone selection tests
-├── ga.F                            Binary-coded GA optimizer (58 tests)
+├── ga.F                            Binary-coded GA optimizer (71 tests)
 ├── test_ga.F                       GA optimizer tests
 ├── rsm.F                           RSM surface generation (39 tests)
 ├── test_rsm.F                      RSM integration tests
@@ -111,7 +111,7 @@ gfortran test_rsm.F rsm.F ga.F tle_evolution.F zone_select.F ksrop/propagate_ks.
 ./test_propagate_ks.exe        # Propagator tests
 ./test_tle_evolution.exe       # TLE evolution tests (56 checks)
 ./test_zone_select.exe         # Zone selection tests (68 checks)
-./test_ga.exe                  # GA optimizer tests (58 checks)
+./test_ga.exe                  # GA optimizer tests (71 checks)
 ./test_rsm.exe                 # RSM integration tests (39 checks)
 ```
 
@@ -147,7 +147,7 @@ Two-body energy conservation, orbit closure, multi-revolution propagation, re-en
 - Degenerate: identical epochs, 2 points, very steep decay
 - Repeatability, robustness (nzones_max=0, large nzones_max)
 
-### test_ga (58 tests)
+### test_ga (71 tests)
 - TWOINT bilinear interpolation: constant, linear, corners, center, edges, quadratic, boundary
 - Chromosome decode: all-zeros, all-ones, single-bit, asymmetric bits (60+20), non-zero lower bound
 - RNG: range [0,1), different seeds, reproducibility
@@ -157,6 +157,7 @@ Two-body energy conservation, orbit closure, multi-revolution propagation, re-en
 - Surface edge cases: corner optima, steep e-gradient, narrow bounds, few observations
 - Robustness: flat surface, bounds checking, fewer generations, non-negative RMS
 - High eccentricity: e~0.68 (39615), e~0.63 (35497), e~0.56 (37151), extreme asymmetric sensitivity, GEO-scale apogee, finite/bounds checks
+- GA internals: ga_stats (sum/avg/max/min/ibest, equal fitness), ga_mutate (bit flip, pm=0/1), ga_iflip (prob=0), ga_irnd (range, variation), ga_fitness (perfect match)
 
 ### test_rsm (39 tests)
 - jd2cal: J2000, 2017-09-22, leap year 2000-02-29, 2019-03-03 (re-entry), fractional hours, midnight

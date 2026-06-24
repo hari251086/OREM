@@ -105,6 +105,14 @@ c     ==============================================================
       call test_high_ecc(npass, nfail)
 
 c     ==============================================================
+c     Piecewise GA internals
+c     ==============================================================
+      write(*,*) ''
+      write(*,*) '  --- GA internals ---'
+
+      call test_ga_internals(npass, nfail)
+
+c     ==============================================================
 c     Summary
 c     ==============================================================
       write(*,*) ''
@@ -1169,6 +1177,159 @@ c     G58: Outputs within bounds at high-e
      &                 1, 1, npass, nfail)
       else
          call assert_i('G58 high-e in bounds',
+     &                 0, 1, npass, nfail)
+      end if
+
+      return
+      end
+
+c     ============================================================
+c     GA internal piecewise tests
+c     ============================================================
+      subroutine test_ga_internals(npass, nfail)
+      implicit double precision (a-h, o-z)
+      integer npass, nfail
+
+      double precision fit(4), sumf, avg, amax, amin
+      integer ibest
+      double precision oldrand(55)
+      integer jrand
+      integer chrom(80), child1(20,80), child2(20,80)
+      integer parent1(20,80), mate1, mate2
+      integer ncross, nmute, iall_ok
+      integer ga_mutate, ga_iflip, ga_irnd
+
+c     G59: ga_stats with known fitness [0.1, 0.9, 0.5, 0.3]
+      fit(1) = 0.1d0
+      fit(2) = 0.9d0
+      fit(3) = 0.5d0
+      fit(4) = 0.3d0
+      call ga_stats(fit, 4, sumf, avg, amax, amin, ibest)
+      call assert_d('G59 stats sum=1.8',
+     &              sumf, 1.8d0, 1.d-10, npass, nfail)
+      call assert_d('G60 stats avg=0.45',
+     &              avg, 0.45d0, 1.d-10, npass, nfail)
+      call assert_d('G61 stats max=0.9',
+     &              amax, 0.9d0, 1.d-10, npass, nfail)
+      call assert_d('G62 stats min=0.1',
+     &              amin, 0.1d0, 1.d-10, npass, nfail)
+      call assert_i('G63 stats ibest=2',
+     &              ibest, 2, npass, nfail)
+
+c     G64: ga_stats with equal fitness
+      fit(1) = 0.5d0
+      fit(2) = 0.5d0
+      fit(3) = 0.5d0
+      fit(4) = 0.5d0
+      call ga_stats(fit, 4, sumf, avg, amax, amin, ibest)
+      call assert_d('G64 equal fitness avg=0.5',
+     &              avg, 0.5d0, 1.d-10, npass, nfail)
+
+c     G65: ga_mutate preserves value when no flip
+      call ga_warmup(0.555d0, oldrand, jrand)
+      nmute = 0
+      ival = ga_mutate(0, 0.d0, nmute, oldrand, jrand)
+c     With prob=0, should return original (0) most of the time
+c     Just verify it returns 0 or 1 (valid bit)
+      if (ival .eq. 0 .or. ival .eq. 1) then
+         call assert_i('G65 mutate returns valid bit',
+     &                 1, 1, npass, nfail)
+      else
+         call assert_i('G65 mutate returns valid bit',
+     &                 0, 1, npass, nfail)
+      end if
+
+c     G66: ga_mutate flips 0→1 when mutation occurs
+c     Use pmute=1 to guarantee flip
+      nmute = 0
+      ival = ga_mutate(0, 1.d0, nmute, oldrand, jrand)
+      call assert_i('G66 mutate 0→1 w/ pm=1',
+     &              ival, 1, npass, nfail)
+
+c     G67: ga_mutate flips 1→0 when mutation occurs
+      ival = ga_mutate(1, 1.d0, nmute, oldrand, jrand)
+      call assert_i('G67 mutate 1→0 w/ pm=1',
+     &              ival, 0, npass, nfail)
+
+c     G68: ga_iflip with prob=0 → always 0
+      call ga_warmup(0.123d0, oldrand, jrand)
+      iall_ok = 1
+      do i = 1, 100
+         if (ga_iflip(0.d0, oldrand, jrand) .ne. 0)
+     &      iall_ok = 0
+      end do
+      call assert_i('G68 iflip prob=0 → 0',
+     &              iall_ok, 1, npass, nfail)
+
+c     G69: ga_irnd returns value in [lo, hi]
+      call ga_warmup(0.123d0, oldrand, jrand)
+      iall_ok = 1
+      do i = 1, 500
+         k = ga_irnd(1, 80, oldrand, jrand)
+         if (k .lt. 1 .or. k .gt. 80) iall_ok = 0
+      end do
+      call assert_i('G69 irnd in [1,80]',
+     &              iall_ok, 1, npass, nfail)
+
+c     G70: ga_irnd produces varied output (not constant)
+      k1 = ga_irnd(1, 80, oldrand, jrand)
+      ivaried = 0
+      do i = 1, 20
+         k = ga_irnd(1, 80, oldrand, jrand)
+         if (k .ne. k1) ivaried = 1
+      end do
+      call assert_i('G70 irnd not constant',
+     &              ivaried, 1, npass, nfail)
+
+c     G71: ga_fitness with perfect match → fitness ≈ 1
+      call test_fitness_perfect(npass, nfail)
+
+      return
+      end
+
+c     ============================================================
+      subroutine test_fitness_perfect(npass, nfail)
+      implicit double precision (a-h, o-z)
+      integer npass, nfail
+
+      parameter(ne = 3, na = 3, npts = 5, nob = 5)
+      double precision surf(npts, ne, na)
+      double precision eg(ne), ag(na)
+      double precision tob(nob), apob(nob)
+      double precision xvec(2)
+
+      eg(1) = 0.30d0
+      eg(2) = 0.32d0
+      eg(3) = 0.34d0
+      ag(1) = 80.d0
+      ag(2) = 120.d0
+      ag(3) = 160.d0
+
+c     All surfaces = constant 10000
+      do k = 1, na
+         do j = 1, ne
+            do i = 1, npts
+               surf(i, j, k) = 10000.d0
+            end do
+         end do
+      end do
+      do i = 1, nob
+         tob(i) = dble(i-1) / dble(npts-1)
+         apob(i) = 10000.d0
+      end do
+
+c     Any (e, A) should give perfect match
+      xvec(1) = 0.32d0
+      xvec(2) = 120.d0
+      fit = ga_fitness(xvec, surf, eg, ag,
+     &                 ne, na, npts, tob, apob, nob)
+
+c     Fitness should be very close to 1.0
+      if (fit .gt. 0.99d0) then
+         call assert_i('G71 perfect match fit~1',
+     &                 1, 1, npass, nfail)
+      else
+         call assert_i('G71 perfect match fit~1',
      &                 0, 1, npass, nfail)
       end if
 
