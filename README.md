@@ -39,14 +39,13 @@ OREM/
 │   ├── example_37151.tle.txt       Long March 3B (i=24.9°, e=0.56, re-entry ~2015-12-03)
 │   ├── example_37819.tle.txt       Proton-M R/B (i=63.4°, e=0.47, re-entry ~2013-09-12)
 │   ├── example_39615.tle.txt       Proton-M Briz-M (i=48.5°, e=0.68, re-entry ~2017-09-15)
-│   └── example_42928.tle.txt       PSLV-C39 R/B (i=19.2°, e=0.33, re-entry ~2019-02-28)
-│
-├── output/                         Runtime-generated files
+│   ├── example_42928.tle.txt       PSLV-C39 R/B (i=19.2°, e=0.33, re-entry ~2019-02-28)
+│   └── orem_42928.cfg             Example config file for PSLV-C39
 │
 ├── test_propagate_ks.F             Tests for refactored propagator
 │
 ├── tle_evolution.F                 Batch TLE → orbital evolution (56 tests)
-├── zone_select.F                   Zone selection — linear apogee decay (28 tests)
+├── zone_select.F                   Zone selection — linear apogee decay (68 tests)
 ├── test_tle_evolution.F            TLE evolution tests
 ├── test_zone_select.F              Zone selection tests
 ├── ga.F                            Binary-coded GA optimizer (71 tests)
@@ -103,6 +102,9 @@ ifx test_ga.F ga.F /exe:test_ga.exe
 ifx /heap-arrays /F:16777216 test_rsm.F rsm.F ga.F tle_evolution.F zone_select.F ksrop/propagate_ks.F ksrop/Subrouts.F ksrop/TLEread.F ksrop/Legendre.F /exe:test_rsm.exe
 ifx /heap-arrays /F:16777216 test_orem.F orem.F rsm.F ga.F tle_evolution.F zone_select.F ksrop/propagate_ks.F ksrop/Subrouts.F ksrop/TLEread.F ksrop/Legendre.F /exe:test_orem.exe
 ifx /heap-arrays /F:16777216 test_reentry.F orem.F rsm.F ga.F tle_evolution.F zone_select.F ksrop/propagate_ks.F ksrop/Subrouts.F ksrop/TLEread.F ksrop/Legendre.F /exe:test_reentry.exe
+
+REM Standalone runner
+ifx /heap-arrays /F:16777216 main_orem.F orem.F rsm.F ga.F tle_evolution.F zone_select.F ksrop/propagate_ks.F ksrop/Subrouts.F ksrop/TLEread.F ksrop/Legendre.F /exe:orem.exe
 ```
 
 ### Unix / gfortran
@@ -115,6 +117,9 @@ gfortran test_ga.F ga.F -o test_ga.exe
 gfortran test_rsm.F rsm.F ga.F tle_evolution.F zone_select.F ksrop/propagate_ks.F ksrop/Subrouts.F ksrop/TLEread.F ksrop/Legendre.F -o test_rsm.exe
 gfortran test_orem.F orem.F rsm.F ga.F tle_evolution.F zone_select.F ksrop/propagate_ks.F ksrop/Subrouts.F ksrop/TLEread.F ksrop/Legendre.F -o test_orem.exe
 gfortran test_reentry.F orem.F rsm.F ga.F tle_evolution.F zone_select.F ksrop/propagate_ks.F ksrop/Subrouts.F ksrop/TLEread.F ksrop/Legendre.F -o test_reentry.exe
+
+# Standalone runner
+gfortran main_orem.F orem.F rsm.F ga.F tle_evolution.F zone_select.F ksrop/propagate_ks.F ksrop/Subrouts.F ksrop/TLEread.F ksrop/Legendre.F -o orem.exe
 ```
 
 ---
