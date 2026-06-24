@@ -97,6 +97,14 @@ c     ==============================================================
       call test_surface_edge(npass, nfail)
 
 c     ==============================================================
+c     High eccentricity orbits
+c     ==============================================================
+      write(*,*) ''
+      write(*,*) '  --- High eccentricity orbits ---'
+
+      call test_high_ecc(npass, nfail)
+
+c     ==============================================================
 c     Summary
 c     ==============================================================
       write(*,*) ''
@@ -930,6 +938,237 @@ c     G50: Fewer obs (3 points) still works
      &                 1, 1, npass, nfail)
       else
          call assert_i('G50 3obs valid output',
+     &                 0, 1, npass, nfail)
+      end if
+
+      return
+      end
+
+c     ============================================================
+c     High eccentricity orbit tests
+c     ============================================================
+      subroutine test_high_ecc(npass, nfail)
+      implicit double precision (a-h, o-z)
+      integer npass, nfail
+
+      parameter(ne = 3, na = 3, npts = 14, nob = 14)
+      double precision surf(npts, ne, na)
+      double precision eg(ne), ag(na)
+      double precision tob(nob), apob(nob)
+      double precision e_opt, a_opt, rms_opt
+
+c     --- 39615-like: e ~ 0.68, ha ~ 35000 km ---
+      eg(1) = 0.6806d0
+      eg(2) = 0.6808d0
+      eg(3) = 0.6810d0
+      ag(1) = 1.0d0
+      ag(2) = 3.0d0
+      ag(3) = 5.0d0
+
+c     SMA ~ 20000 km at this ecc, so ha = a*(1+e)-Re ~ 27000
+c     Sensitivity: dha/de = a ~ 20000 km per unit e
+      do k = 1, na
+         do j = 1, ne
+            do i = 1, npts
+               t = dble(i-1) / dble(npts-1)
+               surf(i,j,k) = 27000.d0 - 200.d0*t
+     &           - 20000.d0*(eg(j) - 0.6808d0)
+     &           - 10.d0*(ag(k) - 3.d0)
+            end do
+         end do
+      end do
+      do i = 1, nob
+         tob(i) = dble(i-1) / dble(npts-1)
+         apob(i) = 27000.d0 - 200.d0*tob(i)
+      end do
+
+c     G51: High-e (0.68) finds optimum
+      call ga_optimize(surf, eg, ag, ne, na, npts,
+     &   tob, apob, nob,
+     &   0.6806d0, 0.6810d0, 1.d0, 5.d0,
+     &   4, 500, 40, 16, 0.8d0, 0.01d0, 0.123d0,
+     &   e_opt, a_opt, rms_opt)
+      if (dabs(e_opt - 0.6808d0) .lt. 0.0002d0) then
+         call assert_i('G51 e~0.68 converges',
+     &                 1, 1, npass, nfail)
+      else
+         call assert_i('G51 e~0.68 converges',
+     &                 0, 1, npass, nfail)
+      end if
+
+c     G52: RMS near zero at high-e optimum
+      if (rms_opt .lt. 0.5d0) then
+         call assert_i('G52 e~0.68 rms < 0.5',
+     &                 1, 1, npass, nfail)
+      else
+         call assert_i('G52 e~0.68 rms < 0.5',
+     &                 0, 1, npass, nfail)
+      end if
+
+c     --- 35497-like: e ~ 0.63 ---
+      eg(1) = 0.6290d0
+      eg(2) = 0.6295d0
+      eg(3) = 0.6300d0
+      ag(1) = 1.0d0
+      ag(2) = 2.0d0
+      ag(3) = 3.0d0
+
+      do k = 1, na
+         do j = 1, ne
+            do i = 1, npts
+               t = dble(i-1) / dble(npts-1)
+               surf(i,j,k) = 35000.d0 - 300.d0*t
+     &           - 25000.d0*(eg(j) - 0.6295d0)
+     &           - 5.d0*(ag(k) - 2.d0)
+            end do
+         end do
+      end do
+      do i = 1, nob
+         tob(i) = dble(i-1) / dble(npts-1)
+         apob(i) = 35000.d0 - 300.d0*tob(i)
+      end do
+
+c     G53: Ariane 5-like e~0.63
+      call ga_optimize(surf, eg, ag, ne, na, npts,
+     &   tob, apob, nob,
+     &   0.6290d0, 0.6300d0, 1.d0, 3.d0,
+     &   4, 500, 40, 16, 0.8d0, 0.01d0, 0.123d0,
+     &   e_opt, a_opt, rms_opt)
+      if (dabs(e_opt - 0.6295d0) .lt. 0.0005d0) then
+         call assert_i('G53 e~0.63 converges',
+     &                 1, 1, npass, nfail)
+      else
+         call assert_i('G53 e~0.63 converges',
+     &                 0, 1, npass, nfail)
+      end if
+
+c     --- 37151-like: e ~ 0.56 ---
+      eg(1) = 0.5645d0
+      eg(2) = 0.5650d0
+      eg(3) = 0.5655d0
+      ag(1) = 1.0d0
+      ag(2) = 3.0d0
+      ag(3) = 5.0d0
+
+      do k = 1, na
+         do j = 1, ne
+            do i = 1, npts
+               t = dble(i-1) / dble(npts-1)
+               surf(i,j,k) = 15000.d0 - 150.d0*t
+     &           - 15000.d0*(eg(j) - 0.5650d0)
+     &           - 8.d0*(ag(k) - 3.d0)
+            end do
+         end do
+      end do
+      do i = 1, nob
+         tob(i) = dble(i-1) / dble(npts-1)
+         apob(i) = 15000.d0 - 150.d0*tob(i)
+      end do
+
+c     G54: Long March 3B-like e~0.56
+      call ga_optimize(surf, eg, ag, ne, na, npts,
+     &   tob, apob, nob,
+     &   0.5645d0, 0.5655d0, 1.d0, 5.d0,
+     &   4, 500, 40, 16, 0.8d0, 0.01d0, 0.123d0,
+     &   e_opt, a_opt, rms_opt)
+      if (dabs(e_opt - 0.5650d0) .lt. 0.0005d0) then
+         call assert_i('G54 e~0.56 converges',
+     &                 1, 1, npass, nfail)
+      else
+         call assert_i('G54 e~0.56 converges',
+     &                 0, 1, npass, nfail)
+      end if
+
+c     --- Extreme sensitivity: e 1000× more sensitive than A ---
+      eg(1) = 0.680d0
+      eg(2) = 0.681d0
+      eg(3) = 0.682d0
+      ag(1) = 1.d0
+      ag(2) = 3.d0
+      ag(3) = 5.d0
+
+      do k = 1, na
+         do j = 1, ne
+            do i = 1, npts
+               t = dble(i-1) / dble(npts-1)
+               surf(i,j,k) = 30000.d0 - 100.d0*t
+     &           - 50000.d0*(eg(j) - 0.681d0)
+     &           - 0.01d0*(ag(k) - 3.d0)
+            end do
+         end do
+      end do
+      do i = 1, nob
+         tob(i) = dble(i-1) / dble(npts-1)
+         apob(i) = 30000.d0 - 100.d0*tob(i)
+      end do
+
+c     G55: Extreme asymmetric sensitivity
+      call ga_optimize(surf, eg, ag, ne, na, npts,
+     &   tob, apob, nob,
+     &   0.680d0, 0.682d0, 1.d0, 5.d0,
+     &   4, 500, 40, 16, 0.8d0, 0.01d0, 0.123d0,
+     &   e_opt, a_opt, rms_opt)
+      if (dabs(e_opt - 0.681d0) .lt. 0.001d0) then
+         call assert_i('G55 extreme asym sensitivity',
+     &                 1, 1, npass, nfail)
+      else
+         call assert_i('G55 extreme asym sensitivity',
+     &                 0, 1, npass, nfail)
+      end if
+
+c     --- Large apogee altitude scale (GEO-like ~35000 km) ---
+      eg(1) = 0.70d0
+      eg(2) = 0.72d0
+      eg(3) = 0.74d0
+      ag(1) = 0.5d0
+      ag(2) = 1.5d0
+      ag(3) = 2.5d0
+
+      do k = 1, na
+         do j = 1, ne
+            do i = 1, npts
+               t = dble(i-1) / dble(npts-1)
+               surf(i,j,k) = 36000.d0 - 500.d0*t
+     &           - 30000.d0*(eg(j) - 0.72d0)
+     &           - 20.d0*(ag(k) - 1.5d0)
+            end do
+         end do
+      end do
+      do i = 1, nob
+         tob(i) = dble(i-1) / dble(npts-1)
+         apob(i) = 36000.d0 - 500.d0*tob(i)
+      end do
+
+c     G56: GEO-scale apogee
+      call ga_optimize(surf, eg, ag, ne, na, npts,
+     &   tob, apob, nob,
+     &   0.70d0, 0.74d0, 0.5d0, 2.5d0,
+     &   4, 500, 40, 16, 0.8d0, 0.01d0, 0.123d0,
+     &   e_opt, a_opt, rms_opt)
+      if (dabs(e_opt - 0.72d0) .lt. 0.01d0 .and.
+     &    rms_opt .lt. 2.d0) then
+         call assert_i('G56 GEO-scale converges',
+     &                 1, 1, npass, nfail)
+      else
+         call assert_i('G56 GEO-scale converges',
+     &                 0, 1, npass, nfail)
+      end if
+
+c     G57: All outputs finite at high-e
+      iall_ok = 1
+      if (e_opt .ne. e_opt) iall_ok = 0
+      if (a_opt .ne. a_opt) iall_ok = 0
+      if (rms_opt .ne. rms_opt) iall_ok = 0
+      call assert_i('G57 high-e outputs finite',
+     &              iall_ok, 1, npass, nfail)
+
+c     G58: Outputs within bounds at high-e
+      if (e_opt .ge. 0.70d0 .and. e_opt .le. 0.74d0 .and.
+     &    a_opt .ge. 0.5d0 .and. a_opt .le. 2.5d0) then
+         call assert_i('G58 high-e in bounds',
+     &                 1, 1, npass, nfail)
+      else
+         call assert_i('G58 high-e in bounds',
      &                 0, 1, npass, nfail)
       end if
 
