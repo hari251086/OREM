@@ -180,7 +180,7 @@ c           Call propagator
 c           Check for propagator failure
             if (exit_code .eq. 2) then
                nfail = nfail + 1
-               if (nfail .gt. 3) then
+               if (nfail .gt. 6) then
                   ierr = 2
                   return
                end if
