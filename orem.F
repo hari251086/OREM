@@ -240,12 +240,6 @@ c        Compute e-grid from TLE scatter
          end do
          if (de .lt. 1.d-5) de = 5.d-4
 
-         write(*,'(A,I2,A,F10.4,A,F8.4,A,F8.2,A,F8.2,
-     &      A,I4)')
-     &      '  Zone ', iz, ': MA=', maz(1),
-     &      ' e=', e_mid, ' A=[', a_lo, ',', a_hi,
-     &      '] nz=', nzone
-
 c        Generate RSM surfaces
          call rsm_generate(
      &      epz, haz, ez, incz, raanz, aopz, maz, smaz,
@@ -263,11 +257,6 @@ c        Generate RSM surfaces
      &      tobs, apobs, nobs,
      &      e_grid, a_grid,
      &      ierr_rsm)
-
-         write(*,'(A,I2,A,I2,A,I4)')
-     &      '  RSM: ierr=', ierr_rsm,
-     &      ' nsurf_pts=', nsurf_pts,
-     &      ' nobs=', nobs
 
          if (ierr_rsm .ne. 0 .or. nsurf_pts .le. 0) then
             reentry_jd(iz) = 0.d0

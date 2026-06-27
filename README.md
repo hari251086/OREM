@@ -195,9 +195,12 @@ Zone    Epoch (JD)     e_opt  A (m2)  Re-entry (JD)   Re-entry (UTC)    RPE(%)
 
 | File | Object | Description |
 |---|---|---|
-| `input/orem_42928.cfg` | PSLV-C39 R/B | HEO, i=19°, e=0.33, re-entry 2019-03-03 |
+| `input/orem_42928.cfg` | PSLV-C39 R/B | IDRAG=0, fast test (no re-entry) |
+| `input/orem_42928_drag.cfg` | PSLV-C39 R/B | IDRAG=1, drag enabled, A=[2.5,6.0] m² |
 
-To run on a different object: copy the config, change lines 1-3 (TLE file, NORAD, re-entry date), and optionally lines 6-7 (area/mass).
+To run on a different object: copy the config, change lines 1-3 (TLE file, NORAD, re-entry date), and lines 6-8 (area/mass/Cd).
+
+**Area bounds from ballistic number:** BN = mass/(Cd×A). For typical HEO debris with known BN range [B_lo, B_hi]: A_min = mass/(Cd×B_hi), A_max = mass/(Cd×B_lo).
 
 ---
 
@@ -306,6 +309,7 @@ cp ../KSROP/Legendre.F ksrop/
 | 0.5.1 | 2026-06-24 | Fix propagate_ks drag crash (KSROP #16): ALT_atm range guard, H_dg÷0 safety, exp overflow clamp. 234 total tests |
 | 0.6 | 2026-06-24 | OREM driver (`orem.F`) + `compute_rpe` (#6, #7), 14 tests, full pipeline on 42928 (4 zones). 7 test objects from research Data. 248 total tests |
 | 0.7 | 2026-06-24 | 7-object re-entry validation (#8), 35 tests, all orbit regimes (i=5.7°–63.4°, e=0.29–0.68). 283 total tests |
+| 0.8 | 2026-06-27 | Fix RSM mean anomaly + time coupling: MA from TLE (not 0), surfaces interpolated at obs JDs, drag-enabled pipeline. First re-entry detection on 42928. 283 tests |
 
 ---
 
