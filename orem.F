@@ -209,8 +209,10 @@ c     ============================================================
 
       do iz = 1, nzones
 
-c        Extract zone TLE data
-         nzone = zone_end(iz) - zone_start(iz) + 1
+c        Extract TLE data from zone start to end of evolution
+c        (RSM surfaces span full remaining lifetime, not just zone)
+         nzone = npts - zone_start(iz) + 1
+         if (nzone .gt. 500) nzone = 500
          do i = 1, nzone
             epz(i) = epochs(zone_start(iz) + i - 1)
             haz(i) = ha_tle(zone_start(iz) + i - 1)
@@ -221,19 +223,13 @@ c        Extract zone TLE data
             smaz(i) = a_tle(zone_start(iz) + i - 1)
          end do
 
-c        Find mean anomaly from raw TLE matching zone start
-         maz(1) = 0.d0
-         do i = 1, ntle_raw
-            if (norad_raw(i) .eq. norad_id) then
-               call tle_epoch2jd(epoch_yr_raw(i),
-     &              epoch_day_raw(i), djd_tmp)
-               if (dabs(djd_tmp - epz(1)) .lt. 0.01d0) then
-                  maz(1) = ama_raw(i)
-                  goto 15
-               end if
-            end if
+c        Find mean anomaly from raw TLE for each zone point
+         do j = 1, nzone
+            maz(j) = 0.d0
+            call tle_find_ma(norad_id, epz(j),
+     &           norad_raw, epoch_yr_raw, epoch_day_raw,
+     &           ama_raw, ntle_raw, maxtle, maz(j))
          end do
- 15      continue
 
 c        Compute e-grid from TLE scatter
          e_mid = ez(1)
@@ -244,6 +240,12 @@ c        Compute e-grid from TLE scatter
          end do
          if (de .lt. 1.d-5) de = 5.d-4
 
+         write(*,'(A,I2,A,F10.4,A,F8.4,A,F8.2,A,F8.2,
+     &      A,I4)')
+     &      '  Zone ', iz, ': MA=', maz(1),
+     &      ' e=', e_mid, ' A=[', a_lo, ',', a_hi,
+     &      '] nz=', nzone
+
 c        Generate RSM surfaces
          call rsm_generate(
      &      epz, haz, ez, incz, raanz, aopz, maz, smaz,
@@ -251,7 +253,7 @@ c        Generate RSM surfaces
      &      e_mid - de, e_mid + de,
      &      a_lo, a_hi,
      &      fixed_mass, cd_drag, idrag_flag,
-     &      100, 1, 1.d-10,
+     &      10000, 1, 1.d-10,
      &      n_force, ngeo_deg, nsun_deg, nmoon_deg,
      &      WE_rot, EPS_f, FR_rot,
      &      CR_srp, AM_srp, IPSR, ISHAD,
@@ -261,6 +263,11 @@ c        Generate RSM surfaces
      &      tobs, apobs, nobs,
      &      e_grid, a_grid,
      &      ierr_rsm)
+
+         write(*,'(A,I2,A,I2,A,I4)')
+     &      '  RSM: ierr=', ierr_rsm,
+     &      ' nsurf_pts=', nsurf_pts,
+     &      ' nobs=', nobs
 
          if (ierr_rsm .ne. 0 .or. nsurf_pts .le. 0) then
             reentry_jd(iz) = 0.d0
@@ -428,6 +435,34 @@ c           Mode 2: vs ensemble mean
      &                / denom * 100.d0
             else
                rpe(i) = 0.d0
+            end if
+         end if
+      end do
+
+      return
+      end
+
+c     ============================================================
+      subroutine tle_find_ma(norad_id, epoch_jd,
+     &   norad_raw, epoch_yr_raw, epoch_day_raw,
+     &   ama_raw, ntle_raw, maxtle, ma_out)
+c     Find mean anomaly from raw TLE array matching epoch.
+c     ============================================================
+      implicit double precision (a-h, o-z)
+      integer norad_id, ntle_raw, maxtle
+      integer norad_raw(maxtle), epoch_yr_raw(maxtle)
+      double precision epoch_day_raw(maxtle)
+      double precision ama_raw(maxtle)
+      double precision epoch_jd, ma_out
+
+      ma_out = 0.d0
+      do i = 1, ntle_raw
+         if (norad_raw(i) .eq. norad_id) then
+            call tle_epoch2jd(epoch_yr_raw(i),
+     &           epoch_day_raw(i), djd_tmp)
+            if (dabs(djd_tmp - epoch_jd) .lt. 0.01d0) then
+               ma_out = ama_raw(i)
+               return
             end if
          end if
       end do

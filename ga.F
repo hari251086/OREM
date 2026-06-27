@@ -250,14 +250,11 @@ c      at tobs times)
 
       sout = 0.d0
       do it = 1, nobs
-c        For each observation time, interpolate across surfaces
+c        Surfaces are pre-interpolated at observation times
+c        surfaces(it, ih, ia) = apogee at obs time it
          do ih = 1, nsurf_e
             do ia = 1, nsurf_a
-c              Interpolate surface(ih,ia) at time tobs(it)
-c              using linear interpolation in time
-               call ga_tinterp(surfaces(1, ih, ia),
-     &              nsurf_pts, tobs(it), fout)
-               f2d(ih, ia) = fout
+               f2d(ih, ia) = surfaces(it, ih, ia)
             end do
          end do
 

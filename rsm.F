@@ -92,9 +92,11 @@ c     Propagator output buffers
 c     Working
       double precision a_kep(7), x0(3), xd0(3), cal0(6)
       double precision bn_val, zone_dur
-      double precision epoch0_jd
-      integer ie, ia, ipt, nfail
+      double precision epoch0_jd, t_want
+      integer ie, ia, ipt, nfail, ntraj
       integer idump_loc, idrag_loc
+      double precision traj_ha(max_traj), traj_t(max_traj)
+      save traj_ha, traj_t
 
       ierr = 0
       nsurf_pts = 0
@@ -191,16 +193,13 @@ c              Fill surface with zeros for failed run
                goto 20
             end if
 
-c           Extract mean apogee from trajectory
-c           Count valid trajectory points within zone duration
-            nsurf_pts = 0
+c           Compute apogee at each trajectory point
+c           Store in temporary arrays (traj_ha, traj_t)
+            ntraj = 0
             do ipt = 1, max_traj
-               if (traj_jd(ipt) .le. 0.d0) goto 15
-               if (traj_jd(ipt) - epoch0_jd .gt.
-     &             zone_dur + 0.5d0) goto 15
-               nsurf_pts = nsurf_pts + 1
+               if (traj_jd(ipt) .le. 0.d0) goto 16
+               ntraj = ntraj + 1
 
-c              Compute apogee altitude from state vector
                r_mag = dsqrt(traj_x(1,ipt)**2 +
      &                       traj_x(2,ipt)**2 +
      &                       traj_x(3,ipt)**2)
@@ -208,11 +207,9 @@ c              Compute apogee altitude from state vector
      &                       traj_xd(2,ipt)**2 +
      &                       traj_xd(3,ipt)**2)
 
-c              Vis-viva → SMA
                sma_pt = 1.d0 /
      &           (2.d0/r_mag - v_mag**2/amue)
 
-c              Angular momentum → eccentricity
                hx = traj_x(2,ipt)*traj_xd(3,ipt)
      &            - traj_x(3,ipt)*traj_xd(2,ipt)
                hy = traj_x(3,ipt)*traj_xd(1,ipt)
@@ -223,11 +220,19 @@ c              Angular momentum → eccentricity
                p_sl = h_mag**2 / amue
                ecc_pt = dsqrt(dabs(1.d0 - p_sl/sma_pt))
 
-c              Mean apogee altitude
-               surfaces(nsurf_pts, ie, ia) =
-     &            sma_pt * (1.d0 + ecc_pt) - R_Earth
+               traj_ha(ntraj) = sma_pt*(1.d0+ecc_pt)-R_Earth
+               traj_t(ntraj) = traj_jd(ipt)
             end do
- 15         continue
+ 16         continue
+
+c           Interpolate surface at observation times
+            nsurf_pts = nobs
+            do ipt = 1, nobs
+               t_want = epochs_zone(ipt) - epoch0_jd
+               call rsm_tinterp(traj_t, traj_ha,
+     &              ntraj, epoch0_jd, t_want,
+     &              surfaces(ipt, ie, ia))
+            end do
 
  20         continue
          end do
@@ -286,5 +291,54 @@ c     ============================================================
       cal(6) = (frac_day*86400.d0 - cal(4)*3600.d0
      &         - cal(5)*60.d0)
 
+      return
+      end
+
+c     ============================================================
+      subroutine rsm_tinterp(t_arr, y_arr, n,
+     &                        t0, t_want, y_out)
+c     Linear interpolation in JD-time arrays.
+c     t_arr(n): JD times, y_arr(n): values.
+c     t_want: days from t0. Interpolates at t0 + t_want.
+c     ============================================================
+      implicit double precision (a-h, o-z)
+      integer n
+      double precision t_arr(n), y_arr(n)
+      double precision t0, t_want, y_out
+
+      double precision t_target
+      integer i
+
+      t_target = t0 + t_want
+      y_out = 0.d0
+
+      if (n .le. 0) return
+      if (n .eq. 1) then
+         y_out = y_arr(1)
+         return
+      end if
+
+c     Clamp to range
+      if (t_target .le. t_arr(1)) then
+         y_out = y_arr(1)
+         return
+      end if
+      if (t_target .ge. t_arr(n)) then
+         y_out = y_arr(n)
+         return
+      end if
+
+c     Find bracketing interval
+      do i = 2, n
+         if (t_target .le. t_arr(i)) then
+            frac = (t_target - t_arr(i-1)) /
+     &             (t_arr(i) - t_arr(i-1))
+            y_out = y_arr(i-1) + frac *
+     &              (y_arr(i) - y_arr(i-1))
+            return
+         end if
+      end do
+
+      y_out = y_arr(n)
       return
       end
