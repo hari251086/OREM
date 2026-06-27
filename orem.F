@@ -12,8 +12,8 @@ c     ============================================================
      &   t_obs_cal,
      &   nzones_max, min_zone_pts, max_zone_days,
      &   r2_thresh, slope_thresh,
-     &   a_min_init, a_max_init,
-     &   fixed_mass, cd_drag, idrag_flag,
+     &   bn_min_init, bn_max_init,
+     &   idrag_flag,
      &   ipopsize, maxgen, nbits_e, nbits_a,
      &   pcross, pmute, ga_seed,
      &   ngeo_deg, nsun_deg, nmoon_deg,
@@ -21,7 +21,7 @@ c     ============================================================
      &   CR_srp, AM_srp, IPSR, ISHAD,
      &   PSR_srp, amuS, amuM,
      &   ALT_atm, DEN_atm, SCH_atm, ndim_atm,
-     &   reentry_jd, e_opt_out, a_opt_out, rms_out,
+     &   reentry_jd, e_opt_out, bn_opt_out, rms_out,
      &   zone_epoch, nzones_used,
      &   rpe_out, t_mean, t_std,
      &   ierr)
@@ -37,7 +37,7 @@ c
 c     Output
 c       reentry_jd(nzones_max) : predicted re-entry JD per zone
 c       e_opt_out(nzones_max)  : optimal eccentricity per zone
-c       a_opt_out(nzones_max)  : optimal area (m²) per zone
+c       bn_opt_out(nzones_max) : optimal ballistic number per zone
 c       rms_out(nzones_max)    : GA RMS per zone
 c       zone_epoch(nzones_max) : zone start epoch (JD)
 c       nzones_used            : number of zones processed
@@ -55,8 +55,7 @@ c     --- Input arguments ---
       integer min_zone_pts
       double precision max_zone_days, r2_thresh, slope_thresh
       double precision t_obs_cal(6)
-      double precision a_min_init, a_max_init
-      double precision fixed_mass, cd_drag
+      double precision bn_min_init, bn_max_init
       integer idrag_flag
       integer ipopsize, maxgen, nbits_e, nbits_a
       double precision pcross, pmute, ga_seed
@@ -73,7 +72,7 @@ c     --- Input arguments ---
 c     --- Output arguments ---
       double precision reentry_jd(nzones_max)
       double precision e_opt_out(nzones_max)
-      double precision a_opt_out(nzones_max)
+      double precision bn_opt_out(nzones_max)
       double precision rms_out(nzones_max)
       double precision zone_epoch(nzones_max)
       integer nzones_used
@@ -117,7 +116,7 @@ c     Zone selection
 
 c     RSM
       double precision surfaces(max_surf, 3, 3)
-      double precision e_grid(3), a_grid(3)
+      double precision e_grid(3), bn_grid(3)
       double precision tobs(500), apobs(500)
       integer nsurf_pts, nobs, ierr_rsm
       save surfaces
@@ -139,7 +138,7 @@ c     Force model
       integer n_force(3)
 
 c     Working
-      double precision a_lo, a_hi, e_mid, de
+      double precision bn_lo, bn_hi, e_mid, de
       double precision bn_val, t_obs_jd
       double precision a_kep(7), x0(3), xd0(3), cal0(6)
       integer iz, i, nzone, nvalid
@@ -200,8 +199,8 @@ c     ============================================================
 c     ============================================================
 c     Step 5: Zone-by-zone RSM → GA → re-entry prediction
 c     ============================================================
-      a_lo = a_min_init
-      a_hi = a_max_init
+      bn_lo = bn_min_init
+      bn_hi = bn_max_init
       n_force(1) = 1
       n_force(2) = 1
       n_force(3) = 1
@@ -209,10 +208,8 @@ c     ============================================================
 
       do iz = 1, nzones
 
-c        Extract TLE data from zone start to end of evolution
-c        (RSM surfaces span full remaining lifetime, not just zone)
-         nzone = npts - zone_start(iz) + 1
-         if (nzone .gt. 500) nzone = 500
+c        Extract TLE data within zone only (RSM is zone-length)
+         nzone = zone_end(iz) - zone_start(iz) + 1
          do i = 1, nzone
             epz(i) = epochs(zone_start(iz) + i - 1)
             haz(i) = ha_tle(zone_start(iz) + i - 1)
@@ -245,9 +242,9 @@ c        Generate RSM surfaces
      &      epz, haz, ez, incz, raanz, aopz, maz, smaz,
      &      nzone,
      &      e_mid - de, e_mid + de,
-     &      a_lo, a_hi,
-     &      fixed_mass, cd_drag, idrag_flag,
-     &      10000, 1, 1.d-10,
+     &      bn_lo, bn_hi,
+     &      idrag_flag,
+     &      200, 1, 1.d-10,
      &      n_force, ngeo_deg, nsun_deg, nmoon_deg,
      &      WE_rot, EPS_f, FR_rot,
      &      CR_srp, AM_srp, IPSR, ISHAD,
@@ -255,13 +252,13 @@ c        Generate RSM surfaces
      &      ALT_atm, DEN_atm, SCH_atm, ndim_atm,
      &      surfaces, nsurf_pts,
      &      tobs, apobs, nobs,
-     &      e_grid, a_grid,
+     &      e_grid, bn_grid,
      &      ierr_rsm)
 
          if (ierr_rsm .ne. 0 .or. nsurf_pts .le. 0) then
             reentry_jd(iz) = 0.d0
             e_opt_out(iz) = 0.d0
-            a_opt_out(iz) = 0.d0
+            bn_opt_out(iz) = 0.d0
             rms_out(iz) = -1.d0
             zone_epoch(iz) = epz(1)
             goto 50
@@ -269,14 +266,14 @@ c        Generate RSM surfaces
 
 c        GA optimization
          call ga_optimize(
-     &      surfaces, e_grid, a_grid,
+     &      surfaces, e_grid, bn_grid,
      &      3, 3, nsurf_pts,
      &      tobs, apobs, nobs,
      &      e_grid(1), e_grid(3),
-     &      a_grid(1), a_grid(3),
+     &      bn_grid(1), bn_grid(3),
      &      ipopsize, maxgen, nbits_e, nbits_a,
      &      pcross, pmute, ga_seed,
-     &      e_opt_out(iz), a_opt_out(iz), rms_out(iz))
+     &      e_opt_out(iz), bn_opt_out(iz), rms_out(iz))
 
 c        Re-entry propagation with optimal (e, A)
          a_kep(1) = smaz(1)
@@ -294,7 +291,8 @@ c        Preserve perigee radius
          call oe2car(a_kep, x0, xd0, 1.d-12)
          call jd2cal(epz(1), cal0)
 
-         bn_val = fixed_mass / (cd_drag * a_opt_out(iz))
+c        BN directly from GA optimal
+         bn_val = bn_opt_out(iz)
 
 c        Long propagation until re-entry
          period_s = 2.d0*pi*dsqrt(a_kep(1)**3/amue)
@@ -318,6 +316,10 @@ c        Propagate up to 5 years
 
          zone_epoch(iz) = epz(1)
 
+         write(*,'(A,I2,A,I2,A,I6,A,F8.2)')
+     &      '  Z', iz, ': exit=', exit_code_re,
+     &      ' pts=', idump_re, ' BN=', bn_val
+
          if (exit_code_re .eq. 1) then
 c           Re-entry detected
             reentry_jd(iz) = traj_jd(idump_re)
@@ -327,11 +329,11 @@ c           No re-entry within 5 years
             reentry_jd(iz) = 0.d0
          end if
 
-c        Narrow A bounds for next zone
-         a_range = (a_hi - a_lo) * 0.5d0
-         a_lo = a_opt_out(iz) - a_range / 2.d0
-         a_hi = a_opt_out(iz) + a_range / 2.d0
-         if (a_lo .lt. 0.01d0) a_lo = 0.01d0
+c        Narrow BN bounds for next zone
+         bn_range = (bn_hi - bn_lo) * 0.5d0
+         bn_lo = bn_opt_out(iz) - bn_range / 2.d0
+         bn_hi = bn_opt_out(iz) + bn_range / 2.d0
+         if (bn_lo .lt. 10.d0) bn_lo = 10.d0
 
  50      continue
       end do

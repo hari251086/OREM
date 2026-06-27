@@ -17,7 +17,7 @@ c     -------------------------------------------------------
       double precision ALT_a(ndim_a), DEN_a(ndim_a), SCH_a(ndim_a)
       integer natm
 
-      double precision reentry(mxz), e_opt(mxz), a_opt(mxz)
+      double precision reentry(mxz), e_opt(mxz), bn_opt(mxz)
       double precision rms_o(mxz), zepoch(mxz), rpe(mxz)
       double precision t_obs(6), t_mean, t_std
       integer nzu, ierr
@@ -146,7 +146,7 @@ c     ============================================================
       double precision ALT_a(ndim_a), DEN_a(ndim_a), SCH_a(ndim_a)
       integer npass, nfail
 
-      double precision reentry(4), e_opt(4), a_opt(4)
+      double precision reentry(4), e_opt(4), bn_opt(4)
       double precision rms_o(4), zepoch(4), rpe(4)
       double precision t_obs(6), t_mean, t_std
       integer nzu, ierr, i
@@ -164,14 +164,14 @@ c     ============================================================
       call orem_run(
      &   tle_file, norad,
      &   t_obs, mxz, 8, 10.d0, 0.90d0, -1.d0,
-     &   0.5d0, 5.d0, 1000.d0, 2.2d0, 0,
+     &   80.d0, 160.d0, 0,
      &   4, 200, 40, 16, 0.8d0, 0.01d0, 0.123d0,
      &   2, 0, 0,
      &   7.2921150d-5, 3.35281066d-3, 1.d0,
      &   0.d0, 0.d0, 0, 0,
      &   0.d0, 0.d0, 0.d0,
      &   ALT_a, DEN_a, SCH_a, natm,
-     &   reentry, e_opt, a_opt, rms_o,
+     &   reentry, e_opt, bn_opt, rms_o,
      &   zepoch, nzu,
      &   rpe, t_mean, t_std, ierr)
 
@@ -207,13 +207,13 @@ c     (zone may be selected later when e has decayed)
      &                 0, 1, npass, nfail)
       end if
 
-c     V4: a_opt in bounds [0.5, 5.0]
-      if (a_opt(1) .ge. 0.5d0 .and.
-     &    a_opt(1) .le. 5.d0) then
-         call assert_i(obj_name//' a_opt in bounds',
+c     V4: bn_opt in bounds [80, 160]
+      if (bn_opt(1) .ge. 80.d0 .and.
+     &    bn_opt(1) .le. 160.d0) then
+         call assert_i(obj_name//' bn_opt in bounds',
      &                 1, 1, npass, nfail)
       else
-         call assert_i(obj_name//' a_opt in bounds',
+         call assert_i(obj_name//' bn_opt in bounds',
      &                 0, 1, npass, nfail)
       end if
 
@@ -233,12 +233,12 @@ c     Print zone summary
          if (reentry(i) .gt. 0.d0) then
             write(*,'(A,I1,A,F8.4,A,F5.2,A,F6.2,A)')
      &         '    Z', i, ': e=', e_opt(i),
-     &         ' A=', a_opt(i),
+     &         ' A=', bn_opt(i),
      &         ' RPE=', rpe(i), '%'
          else
             write(*,'(A,I1,A,F8.4,A,F5.2)')
      &         '    Z', i, ': e=', e_opt(i),
-     &         ' A=', a_opt(i)
+     &         ' A=', bn_opt(i)
          end if
       end do
 

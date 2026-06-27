@@ -14,8 +14,8 @@ c     ============================================================
      &   epochs_zone, ha_zone, e_zone, inc_zone,
      &   raan_zone, aop_zone, ma_zone, a_zone,
      &   nzone,
-     &   e_min, e_max, a_min, a_max,
-     &   fixed_mass, cd_drag, IDRAG_in,
+     &   e_min, e_max, bn_min, bn_max,
+     &   IDRAG_in,
      &   nrev_prop, istep_prop, tole_prop,
      &   n_force, ngeo_deg, nsun_deg, nmoon_deg,
      &   WE_rot, EPS_f, FR_rot,
@@ -24,7 +24,7 @@ c     ============================================================
      &   ALT_atm, DEN_atm, SCH_atm, ndim_atm,
      &   surfaces, nsurf_pts,
      &   tobs, apobs, nobs,
-     &   e_grid, a_grid,
+     &   e_grid, bn_grid,
      &   ierr)
 c
 c     Input
@@ -59,8 +59,7 @@ c     ============================================================
       double precision e_zone(nzone), inc_zone(nzone)
       double precision raan_zone(nzone), aop_zone(nzone)
       double precision ma_zone(nzone), a_zone(nzone)
-      double precision e_min, e_max, a_min, a_max
-      double precision fixed_mass, cd_drag
+      double precision e_min, e_max, bn_min, bn_max
       integer IDRAG_in
       integer nrev_prop, istep_prop
       double precision tole_prop
@@ -79,7 +78,7 @@ c     Output
       integer nsurf_pts, nobs, ierr
       double precision surfaces(max_surf, 3, 3)
       double precision tobs(nzone), apobs(nzone)
-      double precision e_grid(3), a_grid(3)
+      double precision e_grid(3), bn_grid(3)
 
 c     Propagator output buffers
       parameter(max_traj = 2000)
@@ -112,9 +111,9 @@ c     --- Build 3×3 grid ---
       e_grid(1) = e_min
       e_grid(2) = (e_min + e_max) / 2.d0
       e_grid(3) = e_max
-      a_grid(1) = a_min
-      a_grid(2) = (a_min + a_max) / 2.d0
-      a_grid(3) = a_max
+      bn_grid(1) = bn_min
+      bn_grid(2) = (bn_min + bn_max) / 2.d0
+      bn_grid(3) = bn_max
 
 c     --- Extract observed TLE apogee (tobs relative to zone start) ---
       epoch0_jd = epochs_zone(1)
@@ -155,8 +154,8 @@ c           a_new = rp / (1 - e_new)
 c           Convert to Cartesian
             call oe2car(a_kep, x0, xd0, 1.d-12)
 
-c           Compute ballistic number: BN = m / (Cd * A)
-            bn_val = fixed_mass / (cd_drag * a_grid(ia))
+c           Ballistic number directly from grid
+            bn_val = bn_grid(ia)
 
 c           Estimate number of revolutions from zone duration
 c           period = 2*pi*sqrt(a^3/mu)
@@ -193,11 +192,13 @@ c              Fill surface with zeros for failed run
                goto 20
             end if
 
-c           Compute apogee at each trajectory point
-c           Store in temporary arrays (traj_ha, traj_t)
+c           Compute apogee at each trajectory point within zone
+c           Store in temporary arrays for interpolation
             ntraj = 0
             do ipt = 1, max_traj
                if (traj_jd(ipt) .le. 0.d0) goto 16
+               if (traj_jd(ipt) - epoch0_jd .gt.
+     &             zone_dur + 0.5d0) goto 16
                ntraj = ntraj + 1
 
                r_mag = dsqrt(traj_x(1,ipt)**2 +
@@ -225,7 +226,7 @@ c           Store in temporary arrays (traj_ha, traj_t)
             end do
  16         continue
 
-c           Interpolate surface at observation times
+c           Interpolate surface at observation times (zone only)
             nsurf_pts = nobs
             do ipt = 1, nobs
                t_want = epochs_zone(ipt) - epoch0_jd

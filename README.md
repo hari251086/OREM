@@ -155,10 +155,8 @@ input/example_42928.tle.txt          <- TLE file path
 2019 3 3 0 0 0.0                    <- Observed re-entry (yr mo dy hr mn sc). Use 0 0 0 0 0 0.0 if unknown
 4                                    <- Max number of zones
 8 10.0 0.90 -1.0                    <- Zone: min_pts, max_days, R2_threshold, slope_threshold
-0.5 5.0                             <- Area bounds [A_min, A_max] in m^2
-1000.0                              <- Spacecraft mass (kg)
-2.2                                  <- Drag coefficient Cd
-4 200 40 16 0.8 0.01 0.123          <- GA: pop, gen, bits_e, bits_A, Pc, Pm, seed
+80.0 160.0                          <- Ballistic number bounds [BN_min, BN_max]
+4 200 40 16 0.8 0.01 0.123          <- GA: pop, gen, bits_e, bits_BN, Pc, Pm, seed
 2 0 0                               <- Force model: geo_deg, sun_deg, moon_deg
 0 7.2921150d-5 3.35281066d-3 1.0    <- Drag: IDRAG(0=off,1=on), WE, EPS_f, FR
 0 0.0 0.0 0                         <- SRP: IPSR(0=off,1=on), CR, AM, ISHAD
@@ -196,11 +194,11 @@ Zone    Epoch (JD)     e_opt  A (m2)  Re-entry (JD)   Re-entry (UTC)    RPE(%)
 | File | Object | Description |
 |---|---|---|
 | `input/orem_42928.cfg` | PSLV-C39 R/B | IDRAG=0, fast test (no re-entry) |
-| `input/orem_42928_drag.cfg` | PSLV-C39 R/B | IDRAG=1, drag enabled, A=[2.5,6.0] m² |
+| `input/orem_42928_drag.cfg` | PSLV-C39 R/B | IDRAG=1, drag enabled, BN=[80,160] |
 
-To run on a different object: copy the config, change lines 1-3 (TLE file, NORAD, re-entry date), and lines 6-8 (area/mass/Cd).
+To run on a different object: copy the config, change lines 1-3 (TLE file, NORAD, re-entry date), and line 6 (BN bounds).
 
-**Area bounds from ballistic number:** BN = mass/(Cd×A). For typical HEO debris with known BN range [B_lo, B_hi]: A_min = mass/(Cd×B_hi), A_max = mass/(Cd×B_lo).
+**Ballistic number (BN):** BN = m/(Cd×A) in kg/m². Typical range for GTO/HEO debris: 30–200. The GA optimizes BN directly, as in the original NPOE research.
 
 ---
 
@@ -310,6 +308,7 @@ cp ../KSROP/Legendre.F ksrop/
 | 0.6 | 2026-06-24 | OREM driver (`orem.F`) + `compute_rpe` (#6, #7), 14 tests, full pipeline on 42928 (4 zones). 7 test objects from research Data. 248 total tests |
 | 0.7 | 2026-06-24 | 7-object re-entry validation (#8), 35 tests, all orbit regimes (i=5.7°–63.4°, e=0.29–0.68). 283 total tests |
 | 0.8 | 2026-06-27 | Fix RSM mean anomaly + time coupling: MA from TLE (not 0), surfaces interpolated at obs JDs, drag-enabled pipeline. First re-entry detection on 42928. 283 tests |
+| 0.9 | 2026-06-27 | Revert to original BN-based estimation (mass as variable, Cd=1, A=1). Config uses BN bounds [80,160] directly. RSM zone-length propagation only. 283 tests |
 
 ---
 

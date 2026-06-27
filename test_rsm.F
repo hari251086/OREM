@@ -133,7 +133,7 @@ c     ============================================================
 
       parameter(max_surf = 5000, maxzone = 100)
       double precision surfaces(max_surf, 3, 3)
-      double precision e_grid(3), a_grid(3)
+      double precision e_grid(3), bn_grid(3)
       double precision tobs(maxzone), apobs(maxzone)
       integer nsurf_pts, nobs, ierr
 
@@ -208,7 +208,7 @@ c     ============================================================
 
       parameter(max_surf = 5000)
       double precision surfaces(max_surf, 3, 3)
-      double precision e_grid(3), a_grid(3)
+      double precision e_grid(3), bn_grid(3)
       double precision tobs(1), apobs(1)
       integer nsurf_pts, nobs, ierr
 
@@ -238,8 +238,8 @@ c     R10: nzone < 2 returns ierr = 1
       call rsm_generate(
      &   ep, ha, ez, iz, rz, az, mz, sz,
      &   1,
-     &   0.319d0, 0.321d0, 1.d0, 5.d0,
-     &   1000.d0, 2.2d0, 0,
+     &   0.319d0, 0.321d0, 80.d0, 160.d0,
+     &   0,
      &   10, 1, 1.d-12,
      &   n_f, 0, 0, 0,
      &   7.29d-5, 3.35d-3, 1.d0,
@@ -248,7 +248,7 @@ c     R10: nzone < 2 returns ierr = 1
      &   alt, den, sch, 1,
      &   surfaces, nsurf_pts,
      &   tobs, apobs, nobs,
-     &   e_grid, a_grid,
+     &   e_grid, bn_grid,
      &   ierr)
       call assert_i('R10 nzone<2 ierr=1',
      &              ierr, 1, npass, nfail)
@@ -280,7 +280,7 @@ c     Zone selection
 
 c     RSM outputs
       double precision surfaces(max_surf, 3, 3)
-      double precision e_grid(3), a_grid(3)
+      double precision e_grid(3), bn_grid(3)
       double precision tobs(500), apobs(500)
       integer nsurf_pts, nobs, ierr_rsm
 
@@ -352,8 +352,8 @@ c     Call RSM — IDRAG=0 (no drag for unit test speed)
      &   epz, haz, ez, iz, rz, az, mz, sz,
      &   nzone,
      &   e_mid - de, e_mid + de,
-     &   1.d0, 5.d0,
-     &   1000.d0, 2.2d0, 0,
+     &   80.d0, 160.d0,
+     &   0,
      &   10, 1, 1.d-10,
      &   n_f, 2, 0, 0,
      &   7.2921150d-5, 3.35281066d-3, 1.d0,
@@ -362,7 +362,7 @@ c     Call RSM — IDRAG=0 (no drag for unit test speed)
      &   alt_a, den_a, sch_a, natm,
      &   surfaces, nsurf_pts,
      &   tobs, apobs, nobs,
-     &   e_grid, a_grid,
+     &   e_grid, bn_grid,
      &   ierr_rsm)
 
 c     R13: RSM completed (ierr=0 ok, ierr=2 tolerated with drag)
@@ -398,9 +398,9 @@ c     R16: e_grid values correct
      &              e_grid(3), e_mid + de,
      &              1.d-10, npass, nfail)
 
-c     R19: a_grid values correct
-      call assert_d('R19 a_grid mid=3',
-     &              a_grid(2), 3.d0,
+c     R19: bn_grid values correct
+      call assert_d('R19 bn_grid mid=120',
+     &              bn_grid(2), 120.d0,
      &              1.d-10, npass, nfail)
 
 c     R20: Successful surface values are physical (apogee > 0)
@@ -474,7 +474,7 @@ c     ============================================================
       integer npts, ierr_tle
 
       double precision surfaces(max_surf, 3, 3)
-      double precision e_grid(3), a_grid(3)
+      double precision e_grid(3), bn_grid(3)
       double precision tobs(500), apobs(500)
       integer nsurf_pts, nobs, ierr_rsm
 
@@ -517,8 +517,8 @@ c     ============================================================
      &   epz, haz, ez, iz, rz, az, mz, sz,
      &   nzone,
      &   e_mid - de, e_mid + de,
-     &   1.d0, 5.d0,
-     &   1000.d0, 2.2d0, 0,
+     &   80.d0, 160.d0,
+     &   0,
      &   10, 1, 1.d-10,
      &   n_f, 2, 0, 0,
      &   7.2921150d-5, 3.35281066d-3, 1.d0,
@@ -527,7 +527,7 @@ c     ============================================================
      &   alt_a, den_a, sch_a, natm,
      &   surfaces, nsurf_pts,
      &   tobs, apobs, nobs,
-     &   e_grid, a_grid,
+     &   e_grid, bn_grid,
      &   ierr_rsm)
 
       if (ierr_rsm .ne. 0 .or. nsurf_pts .le. 0) then
@@ -588,8 +588,8 @@ c     R28: Repeatability — second call gives same surfaces
      &   epz, haz, ez, iz, rz, az, mz, sz,
      &   nzone,
      &   e_mid - de, e_mid + de,
-     &   1.d0, 5.d0,
-     &   1000.d0, 2.2d0, 0,
+     &   80.d0, 160.d0,
+     &   0,
      &   10, 1, 1.d-10,
      &   n_f, 2, 0, 0,
      &   7.2921150d-5, 3.35281066d-3, 1.d0,
@@ -598,7 +598,7 @@ c     R28: Repeatability — second call gives same surfaces
      &   alt_a, den_a, sch_a, natm,
      &   surfaces, nsurf_pts,
      &   tobs, apobs, nobs,
-     &   e_grid, a_grid,
+     &   e_grid, bn_grid,
      &   ierr_rsm)
 c     (Can't easily compare without storing first run, so just
 c      verify it completes without error)
@@ -625,7 +625,7 @@ c     ============================================================
       integer npts, ierr_tle
 
       double precision surfaces(max_surf, 3, 3)
-      double precision e_grid(3), a_grid(3)
+      double precision e_grid(3), bn_grid(3)
       double precision tobs(500), apobs(500)
       integer nsurf_pts, nobs, ierr_rsm
 
@@ -671,8 +671,8 @@ c     Generate RSM surfaces
      &   epz, haz, ez, iz, rz, az, mz, sz,
      &   nzone,
      &   e_mid - de, e_mid + de,
-     &   1.d0, 5.d0,
-     &   1000.d0, 2.2d0, 0,
+     &   80.d0, 160.d0,
+     &   0,
      &   10, 1, 1.d-10,
      &   n_f, 2, 0, 0,
      &   7.2921150d-5, 3.35281066d-3, 1.d0,
@@ -681,7 +681,7 @@ c     Generate RSM surfaces
      &   alt_a, den_a, sch_a, natm,
      &   surfaces, nsurf_pts,
      &   tobs, apobs, nobs,
-     &   e_grid, a_grid,
+     &   e_grid, bn_grid,
      &   ierr_rsm)
 
       if (ierr_rsm .ne. 0 .or. nsurf_pts .le. 0) then
@@ -691,11 +691,11 @@ c     Generate RSM surfaces
 
 c     R29: Feed RSM surfaces into GA optimizer
       call ga_optimize(
-     &   surfaces, e_grid, a_grid,
+     &   surfaces, e_grid, bn_grid,
      &   3, 3, nsurf_pts,
      &   tobs, apobs, nobs,
      &   e_grid(1), e_grid(3),
-     &   a_grid(1), a_grid(3),
+     &   bn_grid(1), bn_grid(3),
      &   4, 500, 40, 16,
      &   0.8d0, 0.01d0, 0.123d0,
      &   e_opt, a_opt, rms_opt)
@@ -711,8 +711,8 @@ c     R29: GA produces valid output
       end if
 
 c     R30: GA a_opt in bounds
-      if (a_opt .ge. a_grid(1) .and.
-     &    a_opt .le. a_grid(3)) then
+      if (a_opt .ge. bn_grid(1) .and.
+     &    a_opt .le. bn_grid(3)) then
          call assert_i('R30 GA a_opt in bounds',
      &                 1, 1, npass, nfail)
       else

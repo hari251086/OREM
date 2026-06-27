@@ -16,7 +16,7 @@ c     Config
       double precision t_obs_cal(6)
       integer nzones_max, min_zone_pts
       double precision max_zone_days, r2_thresh, slope_thresh
-      double precision a_min, a_max, fixed_mass, cd_drag
+      double precision bn_min, bn_max
       integer idrag_flag
       integer ipopsize, maxgen, nbits_e, nbits_a
       double precision pcross, pmute, ga_seed
@@ -31,7 +31,7 @@ c     Atmosphere
       integer natm
 
 c     Output
-      double precision reentry(mxz), e_opt(mxz), a_opt(mxz)
+      double precision reentry(mxz), e_opt(mxz), bn_opt(mxz)
       double precision rms_o(mxz), zepoch(mxz), rpe(mxz)
       double precision t_mean, t_std
       integer nzu, ierr
@@ -66,9 +66,7 @@ c     ============================================================
       read(10,*) nzones_max
       read(10,*) min_zone_pts, max_zone_days,
      &           r2_thresh, slope_thresh
-      read(10,*) a_min, a_max
-      read(10,*) fixed_mass
-      read(10,*) cd_drag
+      read(10,*) bn_min, bn_max
       read(10,*) ipopsize, maxgen, nbits_e, nbits_a,
      &           pcross, pmute, ga_seed
       read(10,*) ngeo_deg, nsun_deg, nmoon_deg
@@ -128,10 +126,8 @@ c     ============================================================
          write(*,*) '  Observed:  (operational mode)'
       end if
       write(*,'(A,I3)') '  Max zones: ', nzones_max
-      write(*,'(A,F6.2,A,F6.2,A)')
-     &   '  Area:      [', a_min, ', ', a_max, '] m^2'
-      write(*,'(A,F8.1,A)') '  Mass:      ', fixed_mass, ' kg'
-      write(*,'(A,F4.1)') '  Cd:        ', cd_drag
+      write(*,'(A,F6.1,A,F6.1,A)')
+     &   '  BN:        [', bn_min, ', ', bn_max, ']'
       write(*,'(A,I1)') '  Drag:      ', idrag_flag
       write(*,*) ''
 
@@ -146,8 +142,8 @@ c     ============================================================
      &   t_obs_cal,
      &   nzones_max, min_zone_pts, max_zone_days,
      &   r2_thresh, slope_thresh,
-     &   a_min, a_max,
-     &   fixed_mass, cd_drag, idrag_flag,
+     &   bn_min, bn_max,
+     &   idrag_flag,
      &   ipopsize, maxgen, nbits_e, nbits_a,
      &   pcross, pmute, ga_seed,
      &   ngeo_deg, nsun_deg, nmoon_deg,
@@ -155,7 +151,7 @@ c     ============================================================
      &   CR_srp, AM_srp, IPSR, ISHAD,
      &   PSR_srp, amuS, amuM,
      &   ALT_a, DEN_a, SCH_a, natm,
-     &   reentry, e_opt, a_opt, rms_o,
+     &   reentry, e_opt, bn_opt, rms_o,
      &   zepoch, nzu,
      &   rpe, t_mean, t_std,
      &   ierr)
@@ -180,7 +176,7 @@ c     ============================================================
       write(*,*) ''
 
       write(*,'(A4,A14,A10,A8,A14,A18,A10)')
-     &   'Zone', 'Epoch (JD)', 'e_opt', 'A (m2)',
+     &   'Zone', 'Epoch (JD)', 'e_opt', 'BN',
      &   'Re-entry (JD)', 'Re-entry (UTC)', 'RPE(%)'
       write(*,'(A4,A14,A10,A8,A14,A18,A10)')
      &   '----', '--------------', '----------',
@@ -192,7 +188,7 @@ c     ============================================================
             call jd2cal(reentry(i), cal_out)
             write(*,'(I4,F14.2,F10.6,F8.3,F14.2,
      &         I5,A,I2.2,A,I2.2,F10.2)')
-     &         i, zepoch(i), e_opt(i), a_opt(i),
+     &         i, zepoch(i), e_opt(i), bn_opt(i),
      &         reentry(i),
      &         int(cal_out(1)), '-',
      &         int(cal_out(2)), '-',
@@ -200,7 +196,7 @@ c     ============================================================
      &         rpe(i)
          else
             write(*,'(I4,F14.2,F10.6,F8.3,A14,A18,A10)')
-     &         i, zepoch(i), e_opt(i), a_opt(i),
+     &         i, zepoch(i), e_opt(i), bn_opt(i),
      &         '  (no re-entry)', '', ''
          end if
       end do
