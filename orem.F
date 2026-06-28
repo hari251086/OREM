@@ -126,8 +126,8 @@ c     Zone data
       double precision incz(500), raanz(500), aopz(500)
       double precision maz(500), smaz(500)
 
-c     Propagator output for re-entry
-      parameter(max_reentry = 50000)
+c     Propagator output for re-entry (1 point/rev, up to 20k rev)
+      parameter(max_reentry = 20000)
       double precision traj_jd(max_reentry)
       double precision traj_x(3, max_reentry)
       double precision traj_xd(3, max_reentry)
@@ -244,7 +244,7 @@ c        Generate RSM surfaces
      &      e_mid - de, e_mid + de,
      &      bn_lo, bn_hi,
      &      idrag_flag,
-     &      200, 1, 1.d-10,
+     &      200, 360, 1.d-10,
      &      n_force, ngeo_deg, nsun_deg, nmoon_deg,
      &      WE_rot, EPS_f, FR_rot,
      &      CR_srp, AM_srp, IPSR, ISHAD,
@@ -304,7 +304,7 @@ c        Propagate up to 5 years
          idump_re = 1
          call propagate_ks(
      &      x0, xd0, cal0,
-     &      nrev_re, 1, 1.d-10,
+     &      nrev_re, 360, 1.d-10,
      &      n_force, ngeo_deg, nsun_deg, nmoon_deg,
      &      bn_val, idrag_flag, WE_rot, EPS_f, FR_rot,
      &      CR_srp, AM_srp, IPSR, ISHAD,

@@ -89,7 +89,7 @@ c     referenced to perigee conditions)
       double precision RHOPI_dg,H_dg,BETA_dg,RPO_dg,VPO_dg
       double precision F_dg,XX_dg,XXX_dg,C_dg
       double precision SEA_dg,CEA_dg,TER_dg,TER2_dg
-      double precision CSEF_dg,SIEF_dg,FA_dg,exp_arg
+      double precision CSEF_dg,SIEF_dg,FA_dg,exp_arg,hp_osc
 c     SRP: cannonball SRP perturbation
       dimension p_srp(3), qsrp(4), r_srp(3)
       double precision PSR_loc
@@ -530,27 +530,31 @@ c     Refresh drag-model eccentricity and advance EA
             E_0 = E_0+dE_0
             iE = dint(E_0*r2d)
 
-!     Buffer state at every completed integration step
-            idump = idump + 1
-            traj_jd(idump) = djulian + T/86400.d0
-            do i = 1,3
-               traj_x(i,idump)  = x(i)
-               traj_xd(i,idump) = xd(i)
-            end do
-
-c     -----------------------------------------------------------
-c     Re-entry / divergence check
-c     -----------------------------------------------------------
+c     Re-entry / divergence check (every step, h_alt = |r| - R_E)
             h_alt = R(1) - R_Earth
             if (h_alt .ne. h_alt) then
-               idump = idump - 1
                exit_code = 2
                return
             else if (h_alt .lt. 80.d0) then
+c              Dump re-entry point and return
+               idump = idump + 1
+               traj_jd(idump) = djulian + T/86400.d0
+               do i = 1,3
+                  traj_x(i,idump)  = x(i)
+                  traj_xd(i,idump) = xd(i)
+               end do
                exit_code = 1
                return
             end if
 
+         end do
+
+c     Dump state once per revolution (after all steps)
+         idump = idump + 1
+         traj_jd(idump) = djulian + T/86400.d0
+         do i = 1,3
+            traj_x(i,idump)  = x(i)
+            traj_xd(i,idump) = xd(i)
          end do
 
       end do
