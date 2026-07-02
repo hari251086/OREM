@@ -294,39 +294,47 @@ c        Preserve perigee radius
 c        BN directly from GA optimal
          bn_val = bn_opt_out(iz)
 
-c        Long propagation until re-entry
-         period_s = 2.d0*pi*dsqrt(a_kep(1)**3/amue)
-         period_d = period_s / 86400.d0
-c        Propagate up to 5 years
-         nrev_re = int(5.d0*365.25d0 / period_d) + 1
-         if (nrev_re .gt. max_reentry) nrev_re = max_reentry
-
-         idump_re = 1
-         call propagate_ks(
-     &      x0, xd0, cal0,
-     &      nrev_re, 360, 1.d-10,
-     &      n_force, ngeo_deg, nsun_deg, nmoon_deg,
-     &      bn_val, idrag_flag, WE_rot, EPS_f, FR_rot,
-     &      CR_srp, AM_srp, IPSR, ISHAD,
-     &      PSR_srp, amuS, amuM,
-     &      ALT_atm, DEN_atm, SCH_atm, ndim_atm,
-     &      max_reentry, idump_re,
-     &      traj_jd, traj_x, traj_xd,
-     &      exit_code_re)
-
+c        Long propagation until re-entry (skip if drag off)
          zone_epoch(iz) = epz(1)
 
-         write(*,'(A,I2,A,I2,A,I6,A,F8.2)')
-     &      '  Z', iz, ': exit=', exit_code_re,
-     &      ' pts=', idump_re, ' BN=', bn_val
-
-         if (exit_code_re .eq. 1) then
-c           Re-entry detected
-            reentry_jd(iz) = traj_jd(idump_re)
-            nvalid = nvalid + 1
-         else
-c           No re-entry within 5 years
+         if (idrag_flag .eq. 0) then
             reentry_jd(iz) = 0.d0
+            exit_code_re = 0
+            idump_re = 0
+            write(*,'(A,I2,A,F8.2)')
+     &         '  Z', iz, ': skip re-entry (IDRAG=0) BN=', bn_val
+         else
+            period_s = 2.d0*pi*dsqrt(a_kep(1)**3/amue)
+            period_d = period_s / 86400.d0
+c           Propagate up to 5 years
+            nrev_re = int(5.d0*365.25d0 / period_d) + 1
+            if (nrev_re .gt. max_reentry) nrev_re = max_reentry
+
+            idump_re = 1
+            call propagate_ks(
+     &         x0, xd0, cal0,
+     &         nrev_re, 360, 1.d-10,
+     &         n_force, ngeo_deg, nsun_deg, nmoon_deg,
+     &         bn_val, idrag_flag, WE_rot, EPS_f, FR_rot,
+     &         CR_srp, AM_srp, IPSR, ISHAD,
+     &         PSR_srp, amuS, amuM,
+     &         ALT_atm, DEN_atm, SCH_atm, ndim_atm,
+     &         max_reentry, idump_re,
+     &         traj_jd, traj_x, traj_xd,
+     &         exit_code_re)
+
+            write(*,'(A,I2,A,I2,A,I6,A,F8.2)')
+     &         '  Z', iz, ': exit=', exit_code_re,
+     &         ' pts=', idump_re, ' BN=', bn_val
+
+            if (exit_code_re .eq. 1) then
+c              Re-entry detected
+               reentry_jd(iz) = traj_jd(idump_re)
+               nvalid = nvalid + 1
+            else
+c              No re-entry within 5 years
+               reentry_jd(iz) = 0.d0
+            end if
          end if
 
 c        Narrow BN bounds for next zone
