@@ -13,7 +13,7 @@ OREM predicts re-entry times of HEO debris (GTO, Molniya, SSTO upper stages) by:
 1. Processing TLE history for a target NORAD ID
 2. Selecting optimal TLE zones based on solar apsidal resonance
 3. Generating mean apogee surfaces via RSM (varying eccentricity and ballistic coefficient)
-4. Optimizing initial conditions with GA to match observed mean apogee
+4. Optimizing initial conditions with slope-based GA to match observed dha/dt from TLE history
 5. Propagating with KSROP until re-entry (altitude < 80 km)
 
 Target accuracy: **< 5% relative prediction error** (RPE) validated against real re-entries.
@@ -52,7 +52,7 @@ OREM/
 ├── zone_select.F                   Zone selection — linear apogee decay (68 tests)
 ├── test_tle_evolution.F            TLE evolution tests
 ├── test_zone_select.F              Zone selection tests
-├── ga.F                            Binary-coded GA optimizer (71 tests); ld_surf fix v1.4
+├── ga.F                            Binary-coded GA optimizer (71 tests); ld_surf fix v1.4; slope GA v1.6
 ├── test_ga.F                       GA optimizer tests
 ├── test_ga_sensitivity.F           GA parameter sensitivity study (pop/gen/Pm sweep, not in test suite)
 ├── rsm.F                           RSM surface generation (39 tests)
@@ -281,13 +281,13 @@ Two-body energy conservation, orbit closure, multi-revolution propagation, re-en
 - 42928 integration: full pipeline (TLE→zone→RSM→GA→propagation), 4 zones, e_opt/a_opt/rms valid, zone epochs valid
 
 ### test_e2e (20 tests) — Issue #16
-Full pipeline with IDRAG=1, force model geo=4/sun=2/moon=3 (campaign fitting v1.5):
-- E1–E5: 42928 PSLV-C39 R/B (re-entry 2019-03-03): pipeline, zones, e_opt, campaign BN in [80,160], re-entry in all 4 zones
-- E6–E10: 42928 zone-0 (14 TLEs, e≈0.32, epoch 2017-09-22): single-zone campaign BN, re-entry detected
-- E11–E15: 39615 Proton-M Briz-M (re-entry 2017-09-15): pipeline, zones, e_opt, campaign BN in [50,500], re-entry
-- E16–E20: 35497 Ariane 5 ESC-A (re-entry 2016-10-31): pipeline, zones, e_opt, campaign BN in [50,500]; no re-entry predicted (BN>50, within-zone fit; informational)
-- Campaign BN is the same for all zones; e_opt per zone reflects zone TLE eccentricity
-- RPE printed as diagnostic (not enforced — BN identifiability limited by lunisolar perturbations in 10-day zones)
+Full pipeline with IDRAG=1, force model geo=4/sun=2/moon=3 (slope-fitting v1.6):
+- E1–E5: 42928 PSLV-C39 R/B (re-entry 2019-03-03): pipeline, zones, e_opt, BN in [80,160] per zone, re-entry in all 4 zones
+- E6–E10: 42928 zone-0 (14 TLEs, e≈0.32, epoch 2017-09-22): per-zone slope BN, re-entry detected
+- E11–E15: 39615 Proton-M Briz-M (re-entry 2017-09-15): pipeline, zones, e_opt, per-zone BN in [50,500], re-entry
+- E16–E20: 35497 Ariane 5 ESC-A (re-entry 2016-10-31): pipeline, zones, e_opt, per-zone BN; no re-entry predicted (BN>50, within-zone fit; informational)
+- BN narrows across zones (each zone reduces the search range by 50%); e_opt per zone reflects zone TLE eccentricity
+- RPE printed as diagnostic (not enforced — BN identifiability being improved via slope fitting)
 
 ### test_npoe (14 tests) — Issue #11
 Cross-validates propagate_ks against NPOE reference runs on 42928 PSLV-C39 R/B, Zone 0 (2017-09-24):
@@ -344,6 +344,7 @@ cp ../KSROP/Legendre.F ksrop/
 | 1.3 | 2026-07-04 | Add zone-0 E2E run (E6–E10) in test_e2e.F using example_42928_zone0.tle.txt (14 TLEs, e≈0.32, epoch 2017-09-22); zone-0 RPE = −55.5% vs −87–96% for late zones, confirming improved accuracy when propagating from early orbit. 317 total tests. |
 | 1.4 | 2026-07-04 | Fix GA array-dimension mismatch bug: ga_optimize and ga_fitness declared surfaces with leading dimension nsurf_pts (≈nobs≈26) but callers allocated surfaces(max_surf=5000,...). All surface reads were reading wrong memory — GA always returned lower bound regardless of fitness landscape. Fix: add ld_surf parameter to ga_optimize and ga_fitness; callers pass max_surf. Add E11–E20 tests for 39615 and 35497 with zone-specific TLE files. Zone-0 RPE improves from −55.5% to −16.1%. 327 total tests. |
 | 1.5 | 2026-07-04 | Multi-zone campaign fitting (#12): replace per-zone independent GA with a single campaign GA that finds one BN consistent across all zones simultaneously. ga.F: add ga_campaign (1-D BN-only GA) and ga_camp_fitness (mean RMS across valid zones). orem.F: three-phase Step 5 — Phase 1 generates RSM for all zones on full BN range [bn_min, bn_max] (no iterative narrowing), Phase 5b runs campaign GA, Phase 5c propagates re-entry from each zone using the shared campaign BN. Eccentricity fixed at zone TLE midpoint. 327/327 tests pass. |
+| 1.6 | 2026-07-04 | Slope-based BN estimation (#12): replace instantaneous apogee GA with dha/dt slope fitting. Lunisolar oscillations (~2-day period) cancel in the linear regression slope over 10-day zones; drag contribution is secular and accumulates (BN=80 → −2.2 km/day vs BN=160 → −1.1 km/day, 2× signal). ga.F: add ga_slope_optimize (2-D GA matching apogee-rate slope) and ga_slope_fitness (bilinear-interpolate surf_slopes at (e,BN), compare to obs slope). orem.F: Step 5 now computes surf_slopes(3,3) via linear regression of each RSM surface column, obs_slope from TLE apogee history, then calls ga_slope_optimize per zone with BN narrowing. Campaign fitting (v1.5) removed; per-zone BN physically correct since BN encodes attitude (BN = M/CdA, A depends on attitude which varies per zone). 327/327 tests pass. |
 
 ---
 
