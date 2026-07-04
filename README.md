@@ -56,6 +56,8 @@ OREM/
 ├── orem.F                          OREM driver + compute_rpe (14 tests)
 ├── test_orem.F                     OREM driver tests
 ├── test_reentry.F                  7-object re-entry validation (35 tests)
+├── test_e2e.F                      End-to-end integration test, IDRAG=1 (5 tests)
+├── test_npoe.F                     NPOE cross-validation: BN sensitivity (14 tests)
 └── README.md
 ```
 
@@ -213,6 +215,7 @@ To run on a different object: copy the config, change lines 1-3 (TLE file, NORAD
 ./test_orem.exe                # OREM driver tests (14 checks)
 ./test_reentry.exe             # 7-object re-entry validation (35 checks)
 ./test_e2e.exe                 # End-to-end integration test, IDRAG=1 (5 checks)
+./test_npoe.exe                # NPOE cross-validation: propagator BN sensitivity (14 checks)
 ```
 
 ### test_propagate_ks
@@ -281,6 +284,17 @@ Full pipeline with IDRAG=1, force model geo=4/sun=2/moon=3 on 42928 PSLV-C39 R/B
 - E5: re-entry detected (exit_code=1) in ≥1 zone
 - RPE printed as diagnostic (not enforced — BN sensitivity tuning pending Issue #11)
 
+### test_npoe (14 tests) — Issue #11
+Cross-validates propagate_ks against NPOE reference runs on 42928 PSLV-C39 R/B, Zone 0 (2017-09-24):
+- N1-N3: BN monotonicity — higher BN → less apogee decay (each of 3 e-rows)
+- N4-N6: e monotonicity — higher e → higher initial apogee (each of 3 BN columns)
+- N7-N9: BN sensitivity ratio decay(BN=80)/decay(BN=160) > 1.5 (confirmed ~2.0, matches NPOE's 2.02)
+- N10: No divergence across all 9 RSM grid runs
+- N11: IDRAG=0 gives < 0.5 km drop in 7 days
+- N12: All drops negative for IDRAG=1
+- N13-N14: Magnitude within factor 3 of NPOE for BN=80 and BN=160 (ATM.DAT gives ~50% of Jacchia-70)
+- **Key finding**: propagate_ks correctly models BN physics; RPE inaccuracy is due to short zone windows and TLE noise, not a propagator bug
+
 ### test_reentry (35 tests)
 7 objects × 5 checks each: pipeline completion, zone detection, e_opt physical, a_opt in bounds, rms valid
 - 42928 PSLV-C39 (i=19.2°, e=0.33, re-entry 2019-03-03)
@@ -320,6 +334,7 @@ cp ../KSROP/Legendre.F ksrop/
 | 0.8 | 2026-06-27 | Fix RSM mean anomaly + time coupling: MA from TLE (not 0), surfaces interpolated at obs JDs, drag-enabled pipeline. First re-entry detection on 42928. 283 tests |
 | 0.9 | 2026-06-27 | Revert to original BN-based estimation (mass as variable, Cd=1, A=1). Config uses BN bounds [80,160] directly. RSM zone-length propagation only. 283 tests |
 | 1.0 | 2026-07-04 | E2E integration test with IDRAG=1 (#16): TLE→zone→RSM→GA→re-entry→RPE proven end-to-end on 42928. Fix test_propagate_ks T2/T6 (per-rev dump). Skip re-entry propagation when IDRAG=0. 298 total tests |
+| 1.1 | 2026-07-04 | NPOE cross-validation (#11): 14 tests confirm propagate_ks correctly models BN sensitivity (ratio ~2.0 vs NPOE 2.02) and apogee decay direction. Magnitude is ~50% of Jacchia-70 (ATM.DAT vs Jacchia model). RPE inaccuracy diagnosed as short-zone/noise issue, not propagator bug. 312 total tests |
 
 ---
 
