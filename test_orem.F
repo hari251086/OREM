@@ -141,7 +141,7 @@ c     ============================================================
       integer npass, nfail
 
       parameter(mxz = 4, ndim_a = 291)
-      double precision reentry(mxz), e_opt(mxz), a_opt(mxz)
+      double precision reentry(mxz), e_opt(mxz), bn_opt(mxz)
       double precision rms_o(mxz), zepoch(mxz), rpe(mxz)
       double precision t_obs(6), t_mean, t_std
       double precision alt(ndim_a), den(ndim_a), sch(ndim_a)
@@ -160,13 +160,13 @@ c     D6: Bad TLE file → ierr=1
       call orem_run(
      &   'nonexistent.tle', 42928,
      &   t_obs, 4, 8, 10.d0, 0.90d0, -1.d0,
-     &   1.d0, 5.d0, 1000.d0, 2.2d0, 0,
+     &   80.d0, 160.d0, 0,
      &   4, 500, 40, 16, 0.8d0, 0.01d0, 0.123d0,
      &   2, 0, 0,
      &   7.29d-5, 3.35d-3, 1.d0,
      &   0.d0, 0.d0, 0, 0, 0.d0, 0.d0, 0.d0,
      &   alt, den, sch, natm,
-     &   reentry, e_opt, a_opt, rms_o,
+     &   reentry, e_opt, bn_opt, rms_o,
      &   zepoch, nzu,
      &   rpe, t_mean, t_std, ierr)
       call assert_i('D6 bad file ierr=1',
@@ -176,13 +176,13 @@ c     D7: Wrong NORAD → ierr=1 (no match)
       call orem_run(
      &   'input/example_42928_zone0.tle.txt', 99999,
      &   t_obs, 4, 8, 10.d0, 0.90d0, -1.d0,
-     &   1.d0, 5.d0, 1000.d0, 2.2d0, 0,
+     &   80.d0, 160.d0, 0,
      &   4, 500, 40, 16, 0.8d0, 0.01d0, 0.123d0,
      &   2, 0, 0,
      &   7.29d-5, 3.35d-3, 1.d0,
      &   0.d0, 0.d0, 0, 0, 0.d0, 0.d0, 0.d0,
      &   alt, den, sch, natm,
-     &   reentry, e_opt, a_opt, rms_o,
+     &   reentry, e_opt, bn_opt, rms_o,
      &   zepoch, nzu,
      &   rpe, t_mean, t_std, ierr)
       call assert_i('D7 wrong NORAD ierr=1',
@@ -200,7 +200,7 @@ c     ============================================================
       integer npass, nfail
 
       parameter(mxz = 4, ndim_a = 291)
-      double precision reentry(mxz), e_opt(mxz), a_opt(mxz)
+      double precision reentry(mxz), e_opt(mxz), bn_opt(mxz)
       double precision rms_o(mxz), zepoch(mxz), rpe(mxz)
       double precision t_obs(6), t_mean, t_std
       double precision alt(ndim_a), den(ndim_a), sch(ndim_a)
@@ -221,14 +221,14 @@ c     Observed re-entry: 2019-03-03
       call orem_run(
      &   'input/example_42928.tle.txt', 42928,
      &   t_obs, mxz, 8, 10.d0, 0.90d0, -1.d0,
-     &   1.d0, 5.d0, 1000.d0, 2.2d0, 0,
+     &   80.d0, 160.d0, 0,
      &   4, 200, 40, 16, 0.8d0, 0.01d0, 0.123d0,
      &   2, 0, 0,
      &   7.2921150d-5, 3.35281066d-3, 1.d0,
      &   0.d0, 0.d0, 0, 0,
      &   0.d0, 0.d0, 0.d0,
      &   alt, den, sch, natm,
-     &   reentry, e_opt, a_opt, rms_o,
+     &   reentry, e_opt, bn_opt, rms_o,
      &   zepoch, nzu,
      &   rpe, t_mean, t_std, ierr)
 
@@ -270,13 +270,13 @@ c     D11: e_opt in physical range
      &                 0, 1, npass, nfail)
       end if
 
-c     D12: a_opt in bounds
-      if (a_opt(1) .ge. 1.d0 .and.
-     &    a_opt(1) .le. 5.d0) then
-         call assert_i('D12 a_opt in [1,5]',
+c     D12: bn_opt in bounds
+      if (bn_opt(1) .ge. 80.d0 .and.
+     &    bn_opt(1) .le. 160.d0) then
+         call assert_i('D12 bn_opt in [80,160]',
      &                 1, 1, npass, nfail)
       else
-         call assert_i('D12 a_opt in [1,5]',
+         call assert_i('D12 bn_opt in [1,5]',
      &                 0, 1, npass, nfail)
       end if
 
@@ -305,7 +305,7 @@ c     D14: t_mean finite (0 is valid with IDRAG=0)
             write(*,'(A,I2,A,F12.2,A,F8.4,A,F6.2,A,F6.2)')
      &         '    Z', i, ': JD=', reentry(i),
      &         ' e=', e_opt(i),
-     &         ' A=', a_opt(i), ' RPE=', rpe(i)
+     &         ' A=', bn_opt(i), ' RPE=', rpe(i)
          else
             write(*,'(A,I2,A)') '    Z', i, ': no re-entry'
          end if

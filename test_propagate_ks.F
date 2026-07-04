@@ -103,9 +103,9 @@ c     ==============================================================
          nfail = nfail + 1
       end if
 
-c     T2: Correct number of output points (1*360+1 = 361)
-      if (idump .eq. 361) then
-         write(*,*) '  [PASS]  T2 idump = 361'
+c     T2: Correct number of output points (1 initial + nrev = 2)
+      if (idump .eq. 2) then
+         write(*,*) '  [PASS]  T2 idump = 2'
          npass = npass + 1
       else
          write(*,'(A,I6)')
@@ -183,8 +183,8 @@ c     ==============================================================
      &   traj_jd, traj_x, traj_xd,
      &   exit_code)
 
-      if (exit_code .eq. 0 .and. idump .eq. 3601) then
-         write(*,*) '  [PASS]  T6 10rev exit=0, 3601 pts'
+      if (exit_code .eq. 0 .and. idump .eq. 11) then
+         write(*,*) '  [PASS]  T6 10rev exit=0, 11 pts'
          npass = npass + 1
       else
          write(*,'(A,I3,A,I6)')

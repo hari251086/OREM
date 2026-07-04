@@ -56,6 +56,8 @@ OREM/
 ├── orem.F                          OREM driver + compute_rpe (14 tests)
 ├── test_orem.F                     OREM driver tests
 ├── test_reentry.F                  7-object re-entry validation (35 tests)
+├── test_e2e.F                      End-to-end integration test, IDRAG=1 (5 tests)
+├── test_npoe.F                     NPOE cross-validation: BN sensitivity (14 tests)
 └── README.md
 ```
 
@@ -155,10 +157,8 @@ input/example_42928.tle.txt          <- TLE file path
 2019 3 3 0 0 0.0                    <- Observed re-entry (yr mo dy hr mn sc). Use 0 0 0 0 0 0.0 if unknown
 4                                    <- Max number of zones
 8 10.0 0.90 -1.0                    <- Zone: min_pts, max_days, R2_threshold, slope_threshold
-0.5 5.0                             <- Area bounds [A_min, A_max] in m^2
-1000.0                              <- Spacecraft mass (kg)
-2.2                                  <- Drag coefficient Cd
-4 200 40 16 0.8 0.01 0.123          <- GA: pop, gen, bits_e, bits_A, Pc, Pm, seed
+80.0 160.0                          <- Ballistic number bounds [BN_min, BN_max]
+4 200 40 16 0.8 0.01 0.123          <- GA: pop, gen, bits_e, bits_BN, Pc, Pm, seed
 2 0 0                               <- Force model: geo_deg, sun_deg, moon_deg
 0 7.2921150d-5 3.35281066d-3 1.0    <- Drag: IDRAG(0=off,1=on), WE, EPS_f, FR
 0 0.0 0.0 0                         <- SRP: IPSR(0=off,1=on), CR, AM, ISHAD
@@ -195,9 +195,12 @@ Zone    Epoch (JD)     e_opt  A (m2)  Re-entry (JD)   Re-entry (UTC)    RPE(%)
 
 | File | Object | Description |
 |---|---|---|
-| `input/orem_42928.cfg` | PSLV-C39 R/B | HEO, i=19°, e=0.33, re-entry 2019-03-03 |
+| `input/orem_42928.cfg` | PSLV-C39 R/B | IDRAG=0, fast test (no re-entry) |
+| `input/orem_42928_drag.cfg` | PSLV-C39 R/B | IDRAG=1, drag enabled, BN=[80,160] |
 
-To run on a different object: copy the config, change lines 1-3 (TLE file, NORAD, re-entry date), and optionally lines 6-7 (area/mass).
+To run on a different object: copy the config, change lines 1-3 (TLE file, NORAD, re-entry date), and line 6 (BN bounds).
+
+**Ballistic number (BN):** BN = m/(Cd×A) in kg/m². Typical range for GTO/HEO debris: 30–200. The GA optimizes BN directly, as in the original NPOE research.
 
 ---
 
@@ -211,6 +214,8 @@ To run on a different object: copy the config, change lines 1-3 (TLE file, NORAD
 ./test_rsm.exe                 # RSM integration tests (39 checks)
 ./test_orem.exe                # OREM driver tests (14 checks)
 ./test_reentry.exe             # 7-object re-entry validation (35 checks)
+./test_e2e.exe                 # End-to-end integration test, IDRAG=1 (5 checks)
+./test_npoe.exe                # NPOE cross-validation: propagator BN sensitivity (14 checks)
 ```
 
 ### test_propagate_ks
@@ -270,6 +275,26 @@ Two-body energy conservation, orbit closure, multi-revolution propagation, re-en
 - Error handling: bad TLE file, wrong NORAD ID
 - 42928 integration: full pipeline (TLE→zone→RSM→GA→propagation), 4 zones, e_opt/a_opt/rms valid, zone epochs valid
 
+### test_e2e (5 tests) — Issue #16
+Full pipeline with IDRAG=1, force model geo=4/sun=2/moon=3 on 42928 PSLV-C39 R/B (re-entry 2019-03-03):
+- E1: pipeline completes (ierr=0)
+- E2: ≥1 zone found
+- E3: e_opt physical
+- E4: bn_opt in [80,160]
+- E5: re-entry detected (exit_code=1) in ≥1 zone
+- RPE printed as diagnostic (not enforced — BN sensitivity tuning pending Issue #11)
+
+### test_npoe (14 tests) — Issue #11
+Cross-validates propagate_ks against NPOE reference runs on 42928 PSLV-C39 R/B, Zone 0 (2017-09-24):
+- N1-N3: BN monotonicity — higher BN → less apogee decay (each of 3 e-rows)
+- N4-N6: e monotonicity — higher e → higher initial apogee (each of 3 BN columns)
+- N7-N9: BN sensitivity ratio decay(BN=80)/decay(BN=160) > 1.5 (confirmed ~2.0, matches NPOE's 2.02)
+- N10: No divergence across all 9 RSM grid runs
+- N11: IDRAG=0 gives < 0.5 km drop in 7 days
+- N12: All drops negative for IDRAG=1
+- N13-N14: Magnitude within factor 3 of NPOE for BN=80 and BN=160 (ATM.DAT gives ~50% of Jacchia-70)
+- **Key finding**: propagate_ks correctly models BN physics; RPE inaccuracy is due to short zone windows and TLE noise, not a propagator bug
+
 ### test_reentry (35 tests)
 7 objects × 5 checks each: pipeline completion, zone detection, e_opt physical, a_opt in bounds, rms valid
 - 42928 PSLV-C39 (i=19.2°, e=0.33, re-entry 2019-03-03)
@@ -306,6 +331,11 @@ cp ../KSROP/Legendre.F ksrop/
 | 0.5.1 | 2026-06-24 | Fix propagate_ks drag crash (KSROP #16): ALT_atm range guard, H_dg÷0 safety, exp overflow clamp. 234 total tests |
 | 0.6 | 2026-06-24 | OREM driver (`orem.F`) + `compute_rpe` (#6, #7), 14 tests, full pipeline on 42928 (4 zones). 7 test objects from research Data. 248 total tests |
 | 0.7 | 2026-06-24 | 7-object re-entry validation (#8), 35 tests, all orbit regimes (i=5.7°–63.4°, e=0.29–0.68). 283 total tests |
+| 0.8 | 2026-06-27 | Fix RSM mean anomaly + time coupling: MA from TLE (not 0), surfaces interpolated at obs JDs, drag-enabled pipeline. First re-entry detection on 42928. 283 tests |
+| 0.9 | 2026-06-27 | Revert to original BN-based estimation (mass as variable, Cd=1, A=1). Config uses BN bounds [80,160] directly. RSM zone-length propagation only. 283 tests |
+| 1.0 | 2026-07-04 | E2E integration test with IDRAG=1 (#16): TLE→zone→RSM→GA→re-entry→RPE proven end-to-end on 42928. Fix test_propagate_ks T2/T6 (per-rev dump). Skip re-entry propagation when IDRAG=0. 298 total tests |
+| 1.1 | 2026-07-04 | NPOE cross-validation (#11): 14 tests confirm propagate_ks correctly models BN sensitivity (ratio ~2.0 vs NPOE 2.02) and apogee decay direction. Magnitude is ~50% of Jacchia-70 (ATM.DAT vs Jacchia model). RPE inaccuracy diagnosed as short-zone/noise issue, not propagator bug. 312 total tests |
+| 1.2 | 2026-07-04 | Fix NaN in RSM propagation: (1) car2oe clamps all dacos() arguments to [-1,1] — floating-point overflow at orbital perigee caused NaN true-anomaly → NaN drag → NaN state in ie=2,3 RSM surfaces; (2) rsm_generate hardcodes IDRAG=1 — without drag all 9 RSM surfaces were identical and the GA had no BN signal. 312 tests still pass. |
 
 ---
 

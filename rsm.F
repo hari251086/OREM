@@ -14,8 +14,7 @@ c     ============================================================
      &   epochs_zone, ha_zone, e_zone, inc_zone,
      &   raan_zone, aop_zone, ma_zone, a_zone,
      &   nzone,
-     &   e_min, e_max, a_min, a_max,
-     &   fixed_mass, cd_drag, IDRAG_in,
+     &   e_min, e_max, bn_min, bn_max,
      &   nrev_prop, istep_prop, tole_prop,
      &   n_force, ngeo_deg, nsun_deg, nmoon_deg,
      &   WE_rot, EPS_f, FR_rot,
@@ -24,7 +23,7 @@ c     ============================================================
      &   ALT_atm, DEN_atm, SCH_atm, ndim_atm,
      &   surfaces, nsurf_pts,
      &   tobs, apobs, nobs,
-     &   e_grid, a_grid,
+     &   e_grid, bn_grid,
      &   ierr)
 c
 c     Input
@@ -59,9 +58,7 @@ c     ============================================================
       double precision e_zone(nzone), inc_zone(nzone)
       double precision raan_zone(nzone), aop_zone(nzone)
       double precision ma_zone(nzone), a_zone(nzone)
-      double precision e_min, e_max, a_min, a_max
-      double precision fixed_mass, cd_drag
-      integer IDRAG_in
+      double precision e_min, e_max, bn_min, bn_max
       integer nrev_prop, istep_prop
       double precision tole_prop
       integer n_force(3), ngeo_deg, nsun_deg, nmoon_deg
@@ -79,7 +76,7 @@ c     Output
       integer nsurf_pts, nobs, ierr
       double precision surfaces(max_surf, 3, 3)
       double precision tobs(nzone), apobs(nzone)
-      double precision e_grid(3), a_grid(3)
+      double precision e_grid(3), bn_grid(3)
 
 c     Propagator output buffers
       parameter(max_traj = 2000)
@@ -92,9 +89,11 @@ c     Propagator output buffers
 c     Working
       double precision a_kep(7), x0(3), xd0(3), cal0(6)
       double precision bn_val, zone_dur
-      double precision epoch0_jd
-      integer ie, ia, ipt, nfail
+      double precision epoch0_jd, t_want
+      integer ie, ia, ipt, nfail, ntraj
       integer idump_loc, idrag_loc
+      double precision traj_ha(max_traj), traj_t(max_traj)
+      save traj_ha, traj_t
 
       ierr = 0
       nsurf_pts = 0
@@ -110,9 +109,9 @@ c     --- Build 3×3 grid ---
       e_grid(1) = e_min
       e_grid(2) = (e_min + e_max) / 2.d0
       e_grid(3) = e_max
-      a_grid(1) = a_min
-      a_grid(2) = (a_min + a_max) / 2.d0
-      a_grid(3) = a_max
+      bn_grid(1) = bn_min
+      bn_grid(2) = (bn_min + bn_max) / 2.d0
+      bn_grid(3) = bn_max
 
 c     --- Extract observed TLE apogee (tobs relative to zone start) ---
       epoch0_jd = epochs_zone(1)
@@ -153,8 +152,8 @@ c           a_new = rp / (1 - e_new)
 c           Convert to Cartesian
             call oe2car(a_kep, x0, xd0, 1.d-12)
 
-c           Compute ballistic number: BN = m / (Cd * A)
-            bn_val = fixed_mass / (cd_drag * a_grid(ia))
+c           Ballistic number directly from grid
+            bn_val = bn_grid(ia)
 
 c           Estimate number of revolutions from zone duration
 c           period = 2*pi*sqrt(a^3/mu)
@@ -163,7 +162,7 @@ c           period = 2*pi*sqrt(a^3/mu)
             nrev_zone = int(zone_dur / period_d) + 2
 
 c           Call propagator
-            idrag_loc = IDRAG_in
+            idrag_loc = 1
             idump_loc = 1
             call propagate_ks(
      &         x0, xd0, cal0,
@@ -191,16 +190,15 @@ c              Fill surface with zeros for failed run
                goto 20
             end if
 
-c           Extract mean apogee from trajectory
-c           Count valid trajectory points within zone duration
-            nsurf_pts = 0
+c           Compute apogee at each trajectory point within zone
+c           Store in temporary arrays for interpolation
+            ntraj = 0
             do ipt = 1, max_traj
-               if (traj_jd(ipt) .le. 0.d0) goto 15
+               if (traj_jd(ipt) .le. 0.d0) goto 16
                if (traj_jd(ipt) - epoch0_jd .gt.
-     &             zone_dur + 0.5d0) goto 15
-               nsurf_pts = nsurf_pts + 1
+     &             zone_dur + 0.5d0) goto 16
+               ntraj = ntraj + 1
 
-c              Compute apogee altitude from state vector
                r_mag = dsqrt(traj_x(1,ipt)**2 +
      &                       traj_x(2,ipt)**2 +
      &                       traj_x(3,ipt)**2)
@@ -208,11 +206,9 @@ c              Compute apogee altitude from state vector
      &                       traj_xd(2,ipt)**2 +
      &                       traj_xd(3,ipt)**2)
 
-c              Vis-viva → SMA
                sma_pt = 1.d0 /
      &           (2.d0/r_mag - v_mag**2/amue)
 
-c              Angular momentum → eccentricity
                hx = traj_x(2,ipt)*traj_xd(3,ipt)
      &            - traj_x(3,ipt)*traj_xd(2,ipt)
                hy = traj_x(3,ipt)*traj_xd(1,ipt)
@@ -223,11 +219,19 @@ c              Angular momentum → eccentricity
                p_sl = h_mag**2 / amue
                ecc_pt = dsqrt(dabs(1.d0 - p_sl/sma_pt))
 
-c              Mean apogee altitude
-               surfaces(nsurf_pts, ie, ia) =
-     &            sma_pt * (1.d0 + ecc_pt) - R_Earth
+               traj_ha(ntraj) = sma_pt*(1.d0+ecc_pt)-R_Earth
+               traj_t(ntraj) = traj_jd(ipt)
             end do
- 15         continue
+ 16         continue
+
+c           Interpolate surface at observation times (zone only)
+            nsurf_pts = nobs
+            do ipt = 1, nobs
+               t_want = epochs_zone(ipt) - epoch0_jd
+               call rsm_tinterp(traj_t, traj_ha,
+     &              ntraj, epoch0_jd, t_want,
+     &              surfaces(ipt, ie, ia))
+            end do
 
  20         continue
          end do
@@ -286,5 +290,54 @@ c     ============================================================
       cal(6) = (frac_day*86400.d0 - cal(4)*3600.d0
      &         - cal(5)*60.d0)
 
+      return
+      end
+
+c     ============================================================
+      subroutine rsm_tinterp(t_arr, y_arr, n,
+     &                        t0, t_want, y_out)
+c     Linear interpolation in JD-time arrays.
+c     t_arr(n): JD times, y_arr(n): values.
+c     t_want: days from t0. Interpolates at t0 + t_want.
+c     ============================================================
+      implicit double precision (a-h, o-z)
+      integer n
+      double precision t_arr(n), y_arr(n)
+      double precision t0, t_want, y_out
+
+      double precision t_target
+      integer i
+
+      t_target = t0 + t_want
+      y_out = 0.d0
+
+      if (n .le. 0) return
+      if (n .eq. 1) then
+         y_out = y_arr(1)
+         return
+      end if
+
+c     Clamp to range
+      if (t_target .le. t_arr(1)) then
+         y_out = y_arr(1)
+         return
+      end if
+      if (t_target .ge. t_arr(n)) then
+         y_out = y_arr(n)
+         return
+      end if
+
+c     Find bracketing interval
+      do i = 2, n
+         if (t_target .le. t_arr(i)) then
+            frac = (t_target - t_arr(i-1)) /
+     &             (t_arr(i) - t_arr(i-1))
+            y_out = y_arr(i-1) + frac *
+     &              (y_arr(i) - y_arr(i-1))
+            return
+         end if
+      end do
+
+      y_out = y_arr(n)
       return
       end
