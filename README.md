@@ -212,6 +212,7 @@ To run on a different object: copy the config, change lines 1-3 (TLE file, NORAD
 ./test_rsm.exe                 # RSM integration tests (39 checks)
 ./test_orem.exe                # OREM driver tests (14 checks)
 ./test_reentry.exe             # 7-object re-entry validation (35 checks)
+./test_e2e.exe                 # End-to-end integration test, IDRAG=1 (5 checks)
 ```
 
 ### test_propagate_ks
@@ -271,6 +272,15 @@ Two-body energy conservation, orbit closure, multi-revolution propagation, re-en
 - Error handling: bad TLE file, wrong NORAD ID
 - 42928 integration: full pipeline (TLE→zone→RSM→GA→propagation), 4 zones, e_opt/a_opt/rms valid, zone epochs valid
 
+### test_e2e (5 tests) — Issue #16
+Full pipeline with IDRAG=1, force model geo=4/sun=2/moon=3 on 42928 PSLV-C39 R/B (re-entry 2019-03-03):
+- E1: pipeline completes (ierr=0)
+- E2: ≥1 zone found
+- E3: e_opt physical
+- E4: bn_opt in [80,160]
+- E5: re-entry detected (exit_code=1) in ≥1 zone
+- RPE printed as diagnostic (not enforced — BN sensitivity tuning pending Issue #11)
+
 ### test_reentry (35 tests)
 7 objects × 5 checks each: pipeline completion, zone detection, e_opt physical, a_opt in bounds, rms valid
 - 42928 PSLV-C39 (i=19.2°, e=0.33, re-entry 2019-03-03)
@@ -309,6 +319,7 @@ cp ../KSROP/Legendre.F ksrop/
 | 0.7 | 2026-06-24 | 7-object re-entry validation (#8), 35 tests, all orbit regimes (i=5.7°–63.4°, e=0.29–0.68). 283 total tests |
 | 0.8 | 2026-06-27 | Fix RSM mean anomaly + time coupling: MA from TLE (not 0), surfaces interpolated at obs JDs, drag-enabled pipeline. First re-entry detection on 42928. 283 tests |
 | 0.9 | 2026-06-27 | Revert to original BN-based estimation (mass as variable, Cd=1, A=1). Config uses BN bounds [80,160] directly. RSM zone-length propagation only. 283 tests |
+| 1.0 | 2026-07-04 | E2E integration test with IDRAG=1 (#16): TLE→zone→RSM→GA→re-entry→RPE proven end-to-end on 42928. Fix test_propagate_ks T2/T6 (per-rev dump). Skip re-entry propagation when IDRAG=0. 298 total tests |
 
 ---
 
