@@ -243,7 +243,6 @@ c        Generate RSM surfaces
      &      nzone,
      &      e_mid - de, e_mid + de,
      &      bn_lo, bn_hi,
-     &      idrag_flag,
      &      200, 360, 1.d-10,
      &      n_force, ngeo_deg, nsun_deg, nmoon_deg,
      &      WE_rot, EPS_f, FR_rot,

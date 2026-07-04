@@ -239,7 +239,6 @@ c     R10: nzone < 2 returns ierr = 1
      &   ep, ha, ez, iz, rz, az, mz, sz,
      &   1,
      &   0.319d0, 0.321d0, 80.d0, 160.d0,
-     &   0,
      &   10, 1, 1.d-12,
      &   n_f, 0, 0, 0,
      &   7.29d-5, 3.35d-3, 1.d0,
@@ -347,14 +346,13 @@ c     Eccentricity grid from TLE scatter
 
       write(*,*) '    calling rsm_generate...'
 
-c     Call RSM — IDRAG=0 (no drag for unit test speed)
+c     Call RSM — drag always active (IDRAG=1 hardcoded in rsm_generate)
       call rsm_generate(
      &   epz, haz, ez, iz, rz, az, mz, sz,
      &   nzone,
      &   e_mid - de, e_mid + de,
      &   80.d0, 160.d0,
-     &   0,
-     &   10, 1, 1.d-10,
+     &   10, 360, 1.d-10,
      &   n_f, 2, 0, 0,
      &   7.2921150d-5, 3.35281066d-3, 1.d0,
      &   0.d0, 0.d0, 0, 0,
@@ -518,8 +516,7 @@ c     ============================================================
      &   nzone,
      &   e_mid - de, e_mid + de,
      &   80.d0, 160.d0,
-     &   0,
-     &   10, 1, 1.d-10,
+     &   10, 360, 1.d-10,
      &   n_f, 2, 0, 0,
      &   7.2921150d-5, 3.35281066d-3, 1.d0,
      &   0.d0, 0.d0, 0, 0,
@@ -589,8 +586,7 @@ c     R28: Repeatability — second call gives same surfaces
      &   nzone,
      &   e_mid - de, e_mid + de,
      &   80.d0, 160.d0,
-     &   0,
-     &   10, 1, 1.d-10,
+     &   10, 360, 1.d-10,
      &   n_f, 2, 0, 0,
      &   7.2921150d-5, 3.35281066d-3, 1.d0,
      &   0.d0, 0.d0, 0, 0,
@@ -672,8 +668,7 @@ c     Generate RSM surfaces
      &   nzone,
      &   e_mid - de, e_mid + de,
      &   80.d0, 160.d0,
-     &   0,
-     &   10, 1, 1.d-10,
+     &   10, 360, 1.d-10,
      &   n_f, 2, 0, 0,
      &   7.2921150d-5, 3.35281066d-3, 1.d0,
      &   0.d0, 0.d0, 0, 0,

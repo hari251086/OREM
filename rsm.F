@@ -15,7 +15,6 @@ c     ============================================================
      &   raan_zone, aop_zone, ma_zone, a_zone,
      &   nzone,
      &   e_min, e_max, bn_min, bn_max,
-     &   IDRAG_in,
      &   nrev_prop, istep_prop, tole_prop,
      &   n_force, ngeo_deg, nsun_deg, nmoon_deg,
      &   WE_rot, EPS_f, FR_rot,
@@ -60,7 +59,6 @@ c     ============================================================
       double precision raan_zone(nzone), aop_zone(nzone)
       double precision ma_zone(nzone), a_zone(nzone)
       double precision e_min, e_max, bn_min, bn_max
-      integer IDRAG_in
       integer nrev_prop, istep_prop
       double precision tole_prop
       integer n_force(3), ngeo_deg, nsun_deg, nmoon_deg
@@ -164,7 +162,7 @@ c           period = 2*pi*sqrt(a^3/mu)
             nrev_zone = int(zone_dur / period_d) + 2
 
 c           Call propagator
-            idrag_loc = IDRAG_in
+            idrag_loc = 1
             idump_loc = 1
             call propagate_ks(
      &         x0, xd0, cal0,
