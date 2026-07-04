@@ -36,10 +36,14 @@ OREM/
 │   ├── example_27526.tle.txt       Ariane 5 R/B (i=17.7°, e=0.59, re-entry ~2012-05-09)
 │   ├── example_32007.tle.txt       GSLV R/B (i=25.9°, e=0.29, re-entry ~2010-06-06)
 │   ├── example_35497.tle.txt       Ariane 5 ESC-A (i=5.7°, e=0.63, re-entry ~2016-10-31)
+│   ├── example_35497_zone2.tle.txt Ariane 5 ESC-A zone-2 (12 TLEs, e=0.60, epoch 2015-06-06)
 │   ├── example_37151.tle.txt       Long March 3B (i=24.9°, e=0.56, re-entry ~2015-12-03)
 │   ├── example_37819.tle.txt       Proton-M R/B (i=63.4°, e=0.47, re-entry ~2013-09-12)
 │   ├── example_39615.tle.txt       Proton-M Briz-M (i=48.5°, e=0.68, re-entry ~2017-09-15)
+│   ├── example_39615_zone1.tle.txt Proton-M Briz-M zone-1 (10 TLEs, e=0.68, epoch 2015-07-16)
 │   ├── example_42928.tle.txt       PSLV-C39 R/B (i=19.2°, e=0.33, re-entry ~2019-02-28)
+│   ├── example_42928_zone0.tle.txt PSLV-C39 zone-0 (14 TLEs, e=0.32, epoch 2017-09-22)
+│   ├── example_42928_zone12.tle.txt PSLV-C39 zone-12 (12 TLEs, e=0.28, epoch 2018-01-21)
 │   └── orem_42928.cfg             Example config file for PSLV-C39
 │
 ├── test_propagate_ks.F             Tests for refactored propagator
@@ -48,8 +52,9 @@ OREM/
 ├── zone_select.F                   Zone selection — linear apogee decay (68 tests)
 ├── test_tle_evolution.F            TLE evolution tests
 ├── test_zone_select.F              Zone selection tests
-├── ga.F                            Binary-coded GA optimizer (71 tests)
+├── ga.F                            Binary-coded GA optimizer (71 tests); ld_surf fix v1.4
 ├── test_ga.F                       GA optimizer tests
+├── test_ga_sensitivity.F           GA parameter sensitivity study (pop/gen/Pm sweep, not in test suite)
 ├── rsm.F                           RSM surface generation (39 tests)
 ├── test_rsm.F                      RSM integration tests
 ├── main_orem.F                     Standalone runner (reads orem.cfg)
@@ -214,7 +219,7 @@ To run on a different object: copy the config, change lines 1-3 (TLE file, NORAD
 ./test_rsm.exe                 # RSM integration tests (39 checks)
 ./test_orem.exe                # OREM driver tests (14 checks)
 ./test_reentry.exe             # 7-object re-entry validation (35 checks)
-./test_e2e.exe                 # End-to-end integration test, IDRAG=1 (5 checks)
+./test_e2e.exe                 # End-to-end integration test, IDRAG=1 (20 checks)
 ./test_npoe.exe                # NPOE cross-validation: propagator BN sensitivity (14 checks)
 ```
 
