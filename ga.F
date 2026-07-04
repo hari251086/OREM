@@ -424,6 +424,183 @@ c     ============================================================
       end
 
 c     ============================================================
+      subroutine ga_slope_optimize(
+     &   surf_slopes, e_grid, bn_grid,
+     &   obs_slope,
+     &   e_lo, e_hi, bn_lo, bn_hi,
+     &   ipopsize, maxgen, nbits_e, nbits_bn,
+     &   pcross, pmute, seed,
+     &   e_opt, bn_opt, slope_err_opt)
+c
+c     GA optimizing (e, BN) to match observed TLE apogee decay slope.
+c     Fitness = 1/(1 + |slope_pred - obs_slope|) where slope is in km/day.
+c     Less sensitive to lunisolar apogee oscillations than instantaneous fit.
+c     ============================================================
+      implicit double precision (a-h, o-z)
+      double precision surf_slopes(3, 3)
+      double precision e_grid(3), bn_grid(3)
+      double precision obs_slope
+      double precision e_lo, e_hi, bn_lo, bn_hi
+      integer ipopsize, maxgen, nbits_e, nbits_bn
+      double precision pcross, pmute, seed
+      double precision e_opt, bn_opt, slope_err_opt
+
+      parameter(maxpop = 20, maxbits = 200)
+      integer nparam
+      parameter(nparam = 2)
+
+      integer lchrom
+      integer oldchr(maxpop, maxbits)
+      integer newchr(maxpop, maxbits)
+      integer chr(maxbits)
+      integer lsubstr(nparam), choices(maxpop)
+      double precision oldx(maxpop, nparam), newx(maxpop, nparam)
+      double precision oldfit(maxpop), newfit(maxpop)
+      double precision fraction(maxpop)
+      double precision factor(nparam), xvec(nparam)
+      double precision alow(nparam), ahigh(nparam)
+      double precision bestsol(nparam)
+      double precision bestfit
+      integer ibest, igenbst
+
+      double precision oldrand(55)
+      integer jrand
+
+      integer i, j, k, igen, ncross, nmute
+      double precision sumfitness, avg, amax, amin
+
+      lchrom = nbits_e + nbits_bn
+      alow(1) = e_lo
+      ahigh(1) = e_hi
+      alow(2) = bn_lo
+      ahigh(2) = bn_hi
+      lsubstr(1) = nbits_e
+      lsubstr(2) = nbits_bn
+
+      do i = 1, nparam
+         factor(i) = 2.d0**dble(lsubstr(i)) - 1.d0
+      end do
+
+      ncross = 0
+      nmute  = 0
+
+      call ga_warmup(seed, oldrand, jrand)
+
+      do j = 1, ipopsize
+         do k = 1, lchrom
+            chr(k) = ga_iflip(0.5d0, oldrand, jrand)
+            oldchr(j, k) = chr(k)
+         end do
+         call ga_decode(chr, lchrom, xvec, nparam,
+     &                  lsubstr, alow, ahigh, factor)
+         do k = 1, nparam
+            oldx(j, k) = xvec(k)
+         end do
+         oldfit(j) = ga_slope_fitness(xvec,
+     &      surf_slopes, e_grid, bn_grid, obs_slope)
+      end do
+
+      call ga_stats(oldfit, ipopsize,
+     &              sumfitness, avg, amax, amin, ibest)
+      bestfit = oldfit(ibest)
+      do j = 1, nparam
+         bestsol(j) = oldx(ibest, j)
+      end do
+      igenbst = 0
+
+      do igen = 1, maxgen
+         call ga_preselect(oldfit, ipopsize, avg,
+     &                     choices, fraction, oldrand, jrand)
+         j = 1
+ 50      continue
+         if (j .gt. ipopsize) goto 60
+         call ga_select2(choices, ipopsize, oldrand, jrand, mate1)
+         call ga_select2(choices, ipopsize, oldrand, jrand, mate2)
+         call ga_crossover(j, mate1, mate2,
+     &      oldchr, newchr, ipopsize, lchrom,
+     &      pcross, pmute, ncross, nmute, oldrand, jrand)
+
+         do k = 1, lchrom
+            chr(k) = newchr(j, k)
+         end do
+         call ga_decode(chr, lchrom, xvec, nparam,
+     &                  lsubstr, alow, ahigh, factor)
+         do k = 1, nparam
+            newx(j, k) = xvec(k)
+         end do
+         newfit(j) = ga_slope_fitness(xvec,
+     &      surf_slopes, e_grid, bn_grid, obs_slope)
+
+         do k = 1, lchrom
+            chr(k) = newchr(j+1, k)
+         end do
+         call ga_decode(chr, lchrom, xvec, nparam,
+     &                  lsubstr, alow, ahigh, factor)
+         do k = 1, nparam
+            newx(j+1, k) = xvec(k)
+         end do
+         newfit(j+1) = ga_slope_fitness(xvec,
+     &      surf_slopes, e_grid, bn_grid, obs_slope)
+
+         j = j + 2
+         goto 50
+ 60      continue
+
+         call ga_stats(newfit, ipopsize,
+     &                 sumfitness, avg, amax, amin, ibest)
+
+         if (newfit(ibest) .gt. bestfit) then
+            bestfit = newfit(ibest)
+            igenbst = igen
+            do k = 1, nparam
+               bestsol(k) = newx(ibest, k)
+            end do
+         end if
+
+         do i = 1, ipopsize
+            do k = 1, lchrom
+               oldchr(i, k) = newchr(i, k)
+            end do
+            do k = 1, nparam
+               oldx(i, k) = newx(i, k)
+            end do
+            oldfit(i) = newfit(i)
+         end do
+      end do
+
+      e_opt         = bestsol(1)
+      bn_opt        = bestsol(2)
+      slope_err_opt = (1.d0 - bestfit) / bestfit
+
+      return
+      end
+
+c     ============================================================
+      double precision function ga_slope_fitness(xvec,
+     &   surf_slopes, e_grid, bn_grid, obs_slope)
+c
+c     Fitness = 1/(1 + |slope_pred - obs_slope|)
+c     where slope_pred is the bilinear-interpolated surface slope
+c     at (e_val, bn_val) and obs_slope is the TLE apogee slope.
+c     ============================================================
+      implicit double precision (a-h, o-z)
+      double precision xvec(2)
+      double precision surf_slopes(3, 3)
+      double precision e_grid(3), bn_grid(3)
+      double precision obs_slope, slope_pred
+
+      e_val  = xvec(1)
+      bn_val = xvec(2)
+
+      call ga_twoint(e_grid, bn_grid, surf_slopes,
+     &               e_val, bn_val, slope_pred, 3, 3)
+
+      ga_slope_fitness = 1.d0 / (1.d0 + dabs(slope_pred - obs_slope))
+
+      return
+      end
+
+c     ============================================================
       double precision function ga_fitness(xvec,
      &   surfaces, ld_surf, e_grid, a_grid,
      &   nsurf_e, nsurf_a, nsurf_pts,

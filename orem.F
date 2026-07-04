@@ -81,8 +81,7 @@ c     --- Output arguments ---
       integer ierr
 
 c     --- Internal arrays ---
-      parameter(maxpts = 10000, max_surf = 5000,
-     &           max_camp_zones = 20)
+      parameter(maxpts = 10000, max_surf = 5000)
       parameter(maxtle = 100000)
 
 c     TLE evolution
@@ -122,16 +121,6 @@ c     RSM
       integer nsurf_pts, nobs, ierr_rsm
       save surfaces
 
-c     Campaign storage — all zones together
-      double precision all_surfaces(max_surf, 3, 3, max_camp_zones)
-      double precision all_e_grid(3, max_camp_zones)
-      double precision all_bn_grid(3, max_camp_zones)
-      double precision all_emid(max_camp_zones)
-      double precision all_tobs(500, max_camp_zones)
-      double precision all_apobs(500, max_camp_zones)
-      integer all_nobs(max_camp_zones), all_nsurf(max_camp_zones)
-      save all_surfaces, all_e_grid, all_bn_grid
-      save all_emid, all_tobs, all_apobs, all_nobs, all_nsurf
 
 c     Zone data
       double precision epz(500), haz(500), ez(500)
@@ -154,13 +143,8 @@ c     Working
       double precision bn_val, t_obs_jd
       double precision a_kep(7), x0(3), xd0(3), cal0(6)
       integer iz, i, nzone, nvalid
-      double precision zone_sma(max_camp_zones)
-      double precision zone_inc(max_camp_zones)
-      double precision zone_raan(max_camp_zones)
-      double precision zone_aop(max_camp_zones)
-      double precision zone_ma(max_camp_zones)
-      integer nzones_actual
-      double precision bn_campaign, rms_campaign
+      double precision surf_slopes(3, 3)
+      double precision obs_slope
 
       ierr = 0
       nzones_used = 0
@@ -216,23 +200,20 @@ c     ============================================================
       end if
 
 c     ============================================================
-c     Step 5: Multi-zone campaign fitting
-c       Phase 1 : RSM for all zones using full [bn_min, bn_max]
-c       Phase 5b: Campaign GA — single BN across all zones
-c       Phase 5c: Re-entry propagation with campaign BN
+c     Step 5: Zone-by-zone RSM → slope GA → re-entry prediction
+c     Fitness matches dha/dt slope rather than instantaneous apogee.
+c     Lunisolar oscillations cancel in slope; drag signal dominates.
 c     ============================================================
+      bn_lo = bn_min_init
+      bn_hi = bn_max_init
       n_force(1) = 1
       n_force(2) = 1
       n_force(3) = 1
       nvalid = 0
-      nzones_actual = 0
-      do i = 1, max_camp_zones
-         all_nsurf(i) = 0
-         all_nobs(i)  = 0
-      end do
 
-c     --- Phase 1: RSM surface generation for all zones ---
       do iz = 1, nzones
+
+c        Extract TLE data within zone
          nzone = zone_end(iz) - zone_start(iz) + 1
          do i = 1, nzone
             epz(i)   = epochs(zone_start(iz) + i - 1)
@@ -259,20 +240,11 @@ c     --- Phase 1: RSM surface generation for all zones ---
          end do
          if (de .lt. 1.d-5) de = 5.d-4
 
-         zone_epoch(iz) = epz(1)
-         if (iz .le. max_camp_zones) then
-            zone_sma(iz)  = smaz(1)
-            zone_inc(iz)  = incz(1)
-            zone_raan(iz) = raanz(1)
-            zone_aop(iz)  = aopz(1)
-            zone_ma(iz)   = maz(1)
-         end if
-
          call rsm_generate(
      &      epz, haz, ez, incz, raanz, aopz, maz, smaz,
      &      nzone,
      &      e_mid - de, e_mid + de,
-     &      bn_min_init, bn_max_init,
+     &      bn_lo, bn_hi,
      &      200, 360, 1.d-10,
      &      n_force, ngeo_deg, nsun_deg, nmoon_deg,
      &      WE_rot, EPS_f, FR_rot,
@@ -289,84 +261,78 @@ c     --- Phase 1: RSM surface generation for all zones ---
             e_opt_out(iz)  = 0.d0
             bn_opt_out(iz) = 0.d0
             rms_out(iz)    = -1.d0
+            zone_epoch(iz) = epz(1)
             goto 50
          end if
 
-         if (iz .gt. max_camp_zones) goto 50
-
+c        Compute dha/dt slope for each (e, BN) surface via linear regression
          do ih = 1, 3
             do ia = 1, 3
-               do k = 1, nsurf_pts
-                  all_surfaces(k, ih, ia, iz) = surfaces(k, ih, ia)
+               sx  = 0.d0
+               sy  = 0.d0
+               sxx = 0.d0
+               sxy = 0.d0
+               do k = 1, nobs
+                  sx  = sx  + tobs(k)
+                  sy  = sy  + surfaces(k, ih, ia)
+                  sxx = sxx + tobs(k)**2
+                  sxy = sxy + tobs(k) * surfaces(k, ih, ia)
                end do
+               denom = dble(nobs) * sxx - sx**2
+               if (dabs(denom) .gt. 0.d0) then
+                  surf_slopes(ih, ia) =
+     &               (dble(nobs) * sxy - sx * sy) / denom
+               else
+                  surf_slopes(ih, ia) = 0.d0
+               end if
             end do
          end do
+
+c        Compute observed TLE apogee slope
+         sx  = 0.d0
+         sy  = 0.d0
+         sxx = 0.d0
+         sxy = 0.d0
          do k = 1, nobs
-            all_tobs(k, iz)  = tobs(k)
-            all_apobs(k, iz) = apobs(k)
+            sx  = sx  + tobs(k)
+            sy  = sy  + apobs(k)
+            sxx = sxx + tobs(k)**2
+            sxy = sxy + tobs(k) * apobs(k)
          end do
-         do k = 1, 3
-            all_e_grid(k, iz)  = e_grid(k)
-            all_bn_grid(k, iz) = bn_grid(k)
-         end do
-         all_emid(iz)  = e_mid
-         all_nsurf(iz) = nsurf_pts
-         all_nobs(iz)  = nobs
-         nzones_actual = nzones_actual + 1
-
- 50      continue
-      end do
-
-c     --- Phase 5b: Campaign GA ---
-      if (nzones_actual .eq. 0) then
-         ierr = 3
-         return
-      end if
-
-      call ga_campaign(
-     &   all_surfaces, max_surf, max_camp_zones,
-     &   all_e_grid, all_bn_grid,
-     &   all_emid, all_nsurf,
-     &   all_tobs, all_apobs, all_nobs,
-     &   nzones,
-     &   bn_min_init, bn_max_init,
-     &   ipopsize, maxgen, nbits_a,
-     &   pcross, pmute, ga_seed,
-     &   bn_campaign, rms_campaign)
-
-      write(*,'(A,F8.2,A,F8.4)')
-     &   '  Campaign: BN=', bn_campaign, ' RMS=', rms_campaign
-
-c     --- Phase 5c: Re-entry propagation with campaign BN ---
-      do iz = 1, nzones
-         if (iz .gt. max_camp_zones) then
-            reentry_jd(iz) = 0.d0
-            e_opt_out(iz)  = 0.d0
-            bn_opt_out(iz) = 0.d0
-            rms_out(iz)    = -1.d0
-            goto 60
+         denom = dble(nobs) * sxx - sx**2
+         if (dabs(denom) .gt. 0.d0) then
+            obs_slope = (dble(nobs) * sxy - sx * sy) / denom
+         else
+            obs_slope = 0.d0
          end if
-         if (all_nsurf(iz) .le. 0) goto 60
 
-         e_opt_out(iz)  = all_emid(iz)
-         bn_opt_out(iz) = bn_campaign
-         rms_out(iz)    = rms_campaign
+c        GA optimization on slope
+         call ga_slope_optimize(
+     &      surf_slopes, e_grid, bn_grid,
+     &      obs_slope,
+     &      e_grid(1), e_grid(3),
+     &      bn_grid(1), bn_grid(3),
+     &      ipopsize, maxgen, nbits_e, nbits_a,
+     &      pcross, pmute, ga_seed,
+     &      e_opt_out(iz), bn_opt_out(iz), rms_out(iz))
 
-         a_kep(1) = zone_sma(iz)
-         a_kep(2) = all_emid(iz)
-         a_kep(3) = zone_inc(iz)
-         a_kep(4) = zone_raan(iz)
-         a_kep(5) = zone_aop(iz)
-         a_kep(6) = zone_ma(iz)
+c        Re-entry propagation with optimal (e, BN)
+         a_kep(1) = smaz(1)
+         a_kep(2) = e_opt_out(iz)
+         a_kep(3) = incz(1)
+         a_kep(4) = raanz(1)
+         a_kep(5) = aopz(1)
+         a_kep(6) = maz(1)
          a_kep(7) = 0.d0
 
-         rp = zone_sma(iz) * (1.d0 - all_emid(iz))
-         a_kep(1) = rp / (1.d0 - all_emid(iz))
+         rp = smaz(1) * (1.d0 - ez(1))
+         a_kep(1) = rp / (1.d0 - e_opt_out(iz))
 
          call oe2car(a_kep, x0, xd0, 1.d-12)
-         call jd2cal(zone_epoch(iz), cal0)
+         call jd2cal(epz(1), cal0)
 
-         bn_val = bn_campaign
+         bn_val = bn_opt_out(iz)
+         zone_epoch(iz) = epz(1)
 
          if (idrag_flag .eq. 0) then
             reentry_jd(iz) = 0.d0
@@ -405,7 +371,13 @@ c     --- Phase 5c: Re-entry propagation with campaign BN ---
             end if
          end if
 
- 60      continue
+c        Narrow BN bounds for next zone
+         bn_range = (bn_hi - bn_lo) * 0.5d0
+         bn_lo = bn_opt_out(iz) - bn_range / 2.d0
+         bn_hi = bn_opt_out(iz) + bn_range / 2.d0
+         if (bn_lo .lt. 10.d0) bn_lo = 10.d0
+
+ 50      continue
       end do
 
       nzones_used = nzones
