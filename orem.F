@@ -265,7 +265,7 @@ c        Generate RSM surfaces
 
 c        GA optimization
          call ga_optimize(
-     &      surfaces, e_grid, bn_grid,
+     &      surfaces, max_surf, e_grid, bn_grid,
      &      3, 3, nsurf_pts,
      &      tobs, apobs, nobs,
      &      e_grid(1), e_grid(3),

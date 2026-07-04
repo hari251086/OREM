@@ -56,7 +56,7 @@ OREM/
 ├── orem.F                          OREM driver + compute_rpe (14 tests)
 ├── test_orem.F                     OREM driver tests
 ├── test_reentry.F                  7-object re-entry validation (35 tests)
-├── test_e2e.F                      End-to-end integration test, IDRAG=1 (10 tests: E1–E5 main + E6–E10 zone-0)
+├── test_e2e.F                      End-to-end integration test, IDRAG=1 (20 tests: E1–E10 42928 + E11–E20 39615/35497)
 ├── test_npoe.F                     NPOE cross-validation: BN sensitivity (14 tests)
 └── README.md
 ```
@@ -275,13 +275,12 @@ Two-body energy conservation, orbit closure, multi-revolution propagation, re-en
 - Error handling: bad TLE file, wrong NORAD ID
 - 42928 integration: full pipeline (TLE→zone→RSM→GA→propagation), 4 zones, e_opt/a_opt/rms valid, zone epochs valid
 
-### test_e2e (5 tests) — Issue #16
-Full pipeline with IDRAG=1, force model geo=4/sun=2/moon=3 on 42928 PSLV-C39 R/B (re-entry 2019-03-03):
-- E1: pipeline completes (ierr=0)
-- E2: ≥1 zone found
-- E3: e_opt physical
-- E4: bn_opt in [80,160]
-- E5: re-entry detected (exit_code=1) in ≥1 zone
+### test_e2e (20 tests) — Issue #16
+Full pipeline with IDRAG=1, force model geo=4/sun=2/moon=3:
+- E1–E5: 42928 PSLV-C39 R/B (re-entry 2019-03-03): pipeline, zones, e_opt, bn_opt in [80,160], re-entry
+- E6–E10: 42928 zone-0 (14 TLEs, e≈0.32, epoch 2017-09-22): zone-0 RPE = −16% (vs −87–96% for late zones after GA bug fix)
+- E11–E15: 39615 Proton-M Briz-M (re-entry 2017-09-15): pipeline, zones, e_opt, bn_opt in [50,500], re-entry
+- E16–E20: 35497 Ariane 5 ESC-A (re-entry 2016-10-31): pipeline, zones, e_opt, bn_opt in [50,500]; no re-entry predicted with zone-based BN (informational)
 - RPE printed as diagnostic (not enforced — BN sensitivity tuning pending Issue #11)
 
 ### test_npoe (14 tests) — Issue #11
@@ -337,6 +336,7 @@ cp ../KSROP/Legendre.F ksrop/
 | 1.1 | 2026-07-04 | NPOE cross-validation (#11): 14 tests confirm propagate_ks correctly models BN sensitivity (ratio ~2.0 vs NPOE 2.02) and apogee decay direction. Magnitude is ~50% of Jacchia-70 (ATM.DAT vs Jacchia model). RPE inaccuracy diagnosed as short-zone/noise issue, not propagator bug. 312 total tests |
 | 1.2 | 2026-07-04 | Fix NaN in RSM propagation: (1) car2oe clamps all dacos() arguments to [-1,1] — floating-point overflow at orbital perigee caused NaN true-anomaly → NaN drag → NaN state in ie=2,3 RSM surfaces; (2) rsm_generate hardcodes IDRAG=1 — without drag all 9 RSM surfaces were identical and the GA had no BN signal. 312 tests still pass. |
 | 1.3 | 2026-07-04 | Add zone-0 E2E run (E6–E10) in test_e2e.F using example_42928_zone0.tle.txt (14 TLEs, e≈0.32, epoch 2017-09-22); zone-0 RPE = −55.5% vs −87–96% for late zones, confirming improved accuracy when propagating from early orbit. 317 total tests. |
+| 1.4 | 2026-07-04 | Fix GA array-dimension mismatch bug: ga_optimize and ga_fitness declared surfaces with leading dimension nsurf_pts (≈nobs≈26) but callers allocated surfaces(max_surf=5000,...). All surface reads were reading wrong memory — GA always returned lower bound regardless of fitness landscape. Fix: add ld_surf parameter to ga_optimize and ga_fitness; callers pass max_surf. Add E11–E20 tests for 39615 and 35497 with zone-specific TLE files. Zone-0 RPE improves from −55.5% to −16.1%. 327 total tests. |
 
 ---
 

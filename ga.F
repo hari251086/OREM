@@ -13,7 +13,7 @@ c     ============================================================
 
 c     ============================================================
       subroutine ga_optimize(
-     &   surfaces, e_grid, a_grid,
+     &   surfaces, ld_surf, e_grid, a_grid,
      &   nsurf_e, nsurf_a, nsurf_pts,
      &   tobs, apobs, nobs,
      &   e_lo, e_hi, a_lo, a_hi,
@@ -24,11 +24,12 @@ c
 c     Binary-coded GA searching pre-computed RSM surfaces.
 c
 c     Input
-c       surfaces(nsurf_pts, nsurf_e, nsurf_a) : mean apogee
+c       surfaces(ld_surf, nsurf_e, nsurf_a) : mean apogee
+c       ld_surf            : leading dimension of surfaces array
 c       e_grid(nsurf_e)    : eccentricity grid values
 c       a_grid(nsurf_a)    : area grid values
 c       nsurf_e, nsurf_a   : grid dimensions (typically 3)
-c       nsurf_pts          : time points per surface
+c       nsurf_pts          : time points per surface (<=ld_surf)
 c       tobs(nobs)         : observation times (days from zone start)
 c       apobs(nobs)        : observed TLE mean apogee (km)
 c       nobs               : number of observations
@@ -48,9 +49,9 @@ c       a_opt              : optimal area
 c       rms_opt            : RMS fitness at optimum
 c     ============================================================
       implicit double precision (a-h, o-z)
-      integer nsurf_e, nsurf_a, nsurf_pts, nobs
+      integer nsurf_e, nsurf_a, nsurf_pts, ld_surf, nobs
       integer ipopsize, maxgen, nbits_e, nbits_a
-      double precision surfaces(nsurf_pts, nsurf_e, nsurf_a)
+      double precision surfaces(ld_surf, nsurf_e, nsurf_a)
       double precision e_grid(nsurf_e), a_grid(nsurf_a)
       double precision tobs(nobs), apobs(nobs)
       double precision e_lo, e_hi, a_lo, a_hi
@@ -114,7 +115,7 @@ c     Create initial population
             oldx(j, k) = xvec(k)
          end do
          oldfit(j) = ga_fitness(xvec,
-     &      surfaces, e_grid, a_grid,
+     &      surfaces, ld_surf, e_grid, a_grid,
      &      nsurf_e, nsurf_a, nsurf_pts,
      &      tobs, apobs, nobs)
       end do
@@ -163,7 +164,7 @@ c        Decode and evaluate child 1
             newx(j, k) = xvec(k)
          end do
          newfit(j) = ga_fitness(xvec,
-     &      surfaces, e_grid, a_grid,
+     &      surfaces, ld_surf, e_grid, a_grid,
      &      nsurf_e, nsurf_a, nsurf_pts,
      &      tobs, apobs, nobs)
 
@@ -177,7 +178,7 @@ c        Decode and evaluate child 2
             newx(j+1, k) = xvec(k)
          end do
          newfit(j+1) = ga_fitness(xvec,
-     &      surfaces, e_grid, a_grid,
+     &      surfaces, ld_surf, e_grid, a_grid,
      &      nsurf_e, nsurf_a, nsurf_pts,
      &      tobs, apobs, nobs)
 
@@ -221,7 +222,7 @@ c     Output best solution
 
 c     ============================================================
       double precision function ga_fitness(xvec,
-     &   surfaces, e_grid, a_grid,
+     &   surfaces, ld_surf, e_grid, a_grid,
      &   nsurf_e, nsurf_a, nsurf_pts,
      &   tobs, apobs, nobs)
 c
@@ -230,9 +231,9 @@ c     interpolating the 9 RSM surfaces at (e, A) and
 c     comparing to observed TLE apogee.
 c     ============================================================
       implicit double precision (a-h, o-z)
-      integer nsurf_e, nsurf_a, nsurf_pts, nobs
+      integer nsurf_e, nsurf_a, nsurf_pts, ld_surf, nobs
       double precision xvec(2)
-      double precision surfaces(nsurf_pts, nsurf_e, nsurf_a)
+      double precision surfaces(ld_surf, nsurf_e, nsurf_a)
       double precision e_grid(nsurf_e), a_grid(nsurf_a)
       double precision tobs(nobs), apobs(nobs)
 
