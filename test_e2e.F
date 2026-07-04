@@ -203,6 +203,115 @@ c     ============================================================
  999  continue
 
 c     ============================================================
+c     Zone-0 run: example_42928_zone0.tle.txt
+c     14 TLEs, e~0.32, epoch 2017-09-22 (NPOE reference zone)
+c     ============================================================
+      write(*,*) ''
+      write(*,*) '=============================================='
+      write(*,*) ' Zone-0 run: example_42928_zone0.tle.txt'
+      write(*,*) '=============================================='
+
+      call orem_run(
+     &   'input/example_42928_zone0.tle.txt', 42928,
+     &   t_obs, mxz, 8, 10.d0, 0.90d0, -1.d0,
+     &   80.d0, 160.d0, 1,
+     &   4, 500, 40, 16, 0.8d0, 0.01d0, 0.123d0,
+     &   4, 2, 3,
+     &   7.2921150d-5, 3.35281066d-3, 1.d0,
+     &   0.d0, 0.d0, 0, 0,
+     &   0.d0, 1.32712440018d11, 4.902801076d3,
+     &   ALT_a, DEN_a, SCH_a, natm,
+     &   reentry, e_opt, bn_opt, rms_o,
+     &   zepoch, nzu,
+     &   rpe, t_mean, t_std, ierr)
+
+c     E6: Pipeline completes
+      if (ierr .eq. 0 .or. ierr .eq. 3) then
+         write(*,'(A,I2,A)') '  [PASS]  E6 z0 pipeline ok   (ierr=',
+     &      ierr, ')'
+         npass = npass + 1
+      else
+         write(*,'(A,I2)') '  [FAIL]  E6 z0 pipeline ierr=', ierr
+         nfail = nfail + 1
+         goto 998
+      end if
+
+c     E7: At least 1 zone found
+      if (nzu .ge. 1) then
+         write(*,'(A,I2)') '  [PASS]  E7 z0 zones found: ', nzu
+         npass = npass + 1
+      else
+         write(*,*) '  [FAIL]  E7 z0 no zones found'
+         nfail = nfail + 1
+         goto 998
+      end if
+
+c     E8: e_opt physical for zone 1
+      if (e_opt(1) .gt. 0.d0 .and. e_opt(1) .lt. 1.d0) then
+         write(*,'(A,F7.4)') '  [PASS]  E8 z0 e_opt physical: ',
+     &      e_opt(1)
+         npass = npass + 1
+      else
+         write(*,'(A,F10.4)') '  [FAIL]  E8 z0 e_opt invalid: ',
+     &      e_opt(1)
+         nfail = nfail + 1
+      end if
+
+c     E9: bn_opt in bounds
+      if (bn_opt(1) .ge. 80.d0 .and. bn_opt(1) .le. 160.d0) then
+         write(*,'(A,F7.2)') '  [PASS]  E9 z0 bn_opt in [80,160]: ',
+     &      bn_opt(1)
+         npass = npass + 1
+      else
+         write(*,'(A,F10.2)')
+     &      '  [FAIL]  E9 z0 bn_opt out of bounds: ', bn_opt(1)
+         nfail = nfail + 1
+      end if
+
+c     E10: Re-entry detected
+      nreentry = 0
+      do iz = 1, nzu
+         if (reentry(iz) .gt. 0.d0) nreentry = nreentry + 1
+      end do
+      if (nreentry .ge. 1) then
+         write(*,'(A,I2,A,I2,A)')
+     &      '  [PASS]  E10 z0 re-entry in ', nreentry,
+     &      ' of ', nzu, ' zones'
+         npass = npass + 1
+      else
+         write(*,*) '  [FAIL]  E10 z0 no re-entry detected'
+         nfail = nfail + 1
+      end if
+
+c     RPE diagnostic for zone-0 run
+      write(*,*) ''
+      write(*,*) '  --- Zone-0 RPE diagnostic ---'
+      rpe_best = 1.d10
+      do iz = 1, nzu
+         if (reentry(iz) .gt. 0.d0) then
+            write(*,'(A,I1,A,F8.4,A,F7.2,A,F8.2,A)')
+     &         '    Z', iz, ': e=', e_opt(iz),
+     &         ' BN=', bn_opt(iz),
+     &         ' RPE=', rpe(iz), '%'
+            if (dabs(rpe(iz)) .lt. dabs(rpe_best))
+     &         rpe_best = rpe(iz)
+         else
+            write(*,'(A,I1,A,F8.4,A,F7.2,A)')
+     &         '    Z', iz, ': e=', e_opt(iz),
+     &         ' BN=', bn_opt(iz), ' (no re-entry)'
+         end if
+      end do
+      if (nreentry .ge. 1) then
+         write(*,'(A,F7.2,A)')
+     &      '  [INFO]  z0 best |RPE|=', dabs(rpe_best), '%'
+         write(*,'(A,F12.2,A,F6.2,A)')
+     &      '  Ensemble: mean JD=', t_mean,
+     &      ' std=', t_std, ' days'
+      end if
+
+ 998  continue
+
+c     ============================================================
 c     Summary
 c     ============================================================
       write(*,*) ''

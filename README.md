@@ -56,7 +56,7 @@ OREM/
 ├── orem.F                          OREM driver + compute_rpe (14 tests)
 ├── test_orem.F                     OREM driver tests
 ├── test_reentry.F                  7-object re-entry validation (35 tests)
-├── test_e2e.F                      End-to-end integration test, IDRAG=1 (5 tests)
+├── test_e2e.F                      End-to-end integration test, IDRAG=1 (10 tests: E1–E5 main + E6–E10 zone-0)
 ├── test_npoe.F                     NPOE cross-validation: BN sensitivity (14 tests)
 └── README.md
 ```
@@ -336,6 +336,7 @@ cp ../KSROP/Legendre.F ksrop/
 | 1.0 | 2026-07-04 | E2E integration test with IDRAG=1 (#16): TLE→zone→RSM→GA→re-entry→RPE proven end-to-end on 42928. Fix test_propagate_ks T2/T6 (per-rev dump). Skip re-entry propagation when IDRAG=0. 298 total tests |
 | 1.1 | 2026-07-04 | NPOE cross-validation (#11): 14 tests confirm propagate_ks correctly models BN sensitivity (ratio ~2.0 vs NPOE 2.02) and apogee decay direction. Magnitude is ~50% of Jacchia-70 (ATM.DAT vs Jacchia model). RPE inaccuracy diagnosed as short-zone/noise issue, not propagator bug. 312 total tests |
 | 1.2 | 2026-07-04 | Fix NaN in RSM propagation: (1) car2oe clamps all dacos() arguments to [-1,1] — floating-point overflow at orbital perigee caused NaN true-anomaly → NaN drag → NaN state in ie=2,3 RSM surfaces; (2) rsm_generate hardcodes IDRAG=1 — without drag all 9 RSM surfaces were identical and the GA had no BN signal. 312 tests still pass. |
+| 1.3 | 2026-07-04 | Add zone-0 E2E run (E6–E10) in test_e2e.F using example_42928_zone0.tle.txt (14 TLEs, e≈0.32, epoch 2017-09-22); zone-0 RPE = −55.5% vs −87–96% for late zones, confirming improved accuracy when propagating from early orbit. 317 total tests. |
 
 ---
 
