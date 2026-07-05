@@ -143,8 +143,6 @@ c     Working
       double precision bn_val, t_obs_jd
       double precision a_kep(7), x0(3), xd0(3), cal0(6)
       integer iz, i, nzone, nvalid
-      double precision surf_slopes(3, 3)
-      double precision obs_slope
 
       ierr = 0
       nzones_used = 0
@@ -200,9 +198,9 @@ c     ============================================================
       end if
 
 c     ============================================================
-c     Step 5: Zone-by-zone RSM → slope GA → re-entry prediction
-c     Fitness matches dha/dt slope rather than instantaneous apogee.
-c     Lunisolar oscillations cancel in slope; drag signal dominates.
+c     Step 5: Zone-by-zone RSM → GA → re-entry prediction
+c     Fitness = RMS(predicted_apogee - observed_apogee) over all TLE
+c     points in the zone. Matches original genpoen1.f algorithm.
 c     ============================================================
       bn_lo = bn_min_init
       bn_hi = bn_max_init
@@ -265,51 +263,11 @@ c        Extract TLE data within zone
             goto 50
          end if
 
-c        Compute dha/dt slope for each (e, BN) surface via linear regression
-         do ih = 1, 3
-            do ia = 1, 3
-               sx  = 0.d0
-               sy  = 0.d0
-               sxx = 0.d0
-               sxy = 0.d0
-               do k = 1, nobs
-                  sx  = sx  + tobs(k)
-                  sy  = sy  + surfaces(k, ih, ia)
-                  sxx = sxx + tobs(k)**2
-                  sxy = sxy + tobs(k) * surfaces(k, ih, ia)
-               end do
-               denom = dble(nobs) * sxx - sx**2
-               if (dabs(denom) .gt. 0.d0) then
-                  surf_slopes(ih, ia) =
-     &               (dble(nobs) * sxy - sx * sy) / denom
-               else
-                  surf_slopes(ih, ia) = 0.d0
-               end if
-            end do
-         end do
-
-c        Compute observed TLE apogee slope
-         sx  = 0.d0
-         sy  = 0.d0
-         sxx = 0.d0
-         sxy = 0.d0
-         do k = 1, nobs
-            sx  = sx  + tobs(k)
-            sy  = sy  + apobs(k)
-            sxx = sxx + tobs(k)**2
-            sxy = sxy + tobs(k) * apobs(k)
-         end do
-         denom = dble(nobs) * sxx - sx**2
-         if (dabs(denom) .gt. 0.d0) then
-            obs_slope = (dble(nobs) * sxy - sx * sy) / denom
-         else
-            obs_slope = 0.d0
-         end if
-
-c        GA optimization on slope
-         call ga_slope_optimize(
-     &      surf_slopes, e_grid, bn_grid,
-     &      obs_slope,
+c        GA optimization: match predicted apogee trajectory to TLE observations
+         call ga_optimize(
+     &      surfaces, max_surf, e_grid, bn_grid,
+     &      3, 3, nsurf_pts,
+     &      tobs, apobs, nobs,
      &      e_grid(1), e_grid(3),
      &      bn_grid(1), bn_grid(3),
      &      ipopsize, maxgen, nbits_e, nbits_a,
