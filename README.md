@@ -13,7 +13,7 @@ OREM predicts re-entry times of HEO debris (GTO, Molniya, SSTO upper stages) by:
 1. Processing TLE history for a target NORAD ID
 2. Selecting optimal TLE zones based on solar apsidal resonance
 3. Generating mean apogee surfaces via RSM (varying eccentricity and ballistic coefficient)
-4. Optimizing initial conditions with GA to match observed mean apogee
+4. Optimizing initial conditions with GA to minimize RMS error between propagated and observed TLE apogee trajectory
 5. Propagating with KSROP until re-entry (altitude < 80 km)
 
 Target accuracy: **< 5% relative prediction error** (RPE) validated against real re-entries.
@@ -36,10 +36,14 @@ OREM/
 │   ├── example_27526.tle.txt       Ariane 5 R/B (i=17.7°, e=0.59, re-entry ~2012-05-09)
 │   ├── example_32007.tle.txt       GSLV R/B (i=25.9°, e=0.29, re-entry ~2010-06-06)
 │   ├── example_35497.tle.txt       Ariane 5 ESC-A (i=5.7°, e=0.63, re-entry ~2016-10-31)
+│   ├── example_35497_zone2.tle.txt Ariane 5 ESC-A zone-2 (12 TLEs, e=0.60, epoch 2015-06-06)
 │   ├── example_37151.tle.txt       Long March 3B (i=24.9°, e=0.56, re-entry ~2015-12-03)
 │   ├── example_37819.tle.txt       Proton-M R/B (i=63.4°, e=0.47, re-entry ~2013-09-12)
 │   ├── example_39615.tle.txt       Proton-M Briz-M (i=48.5°, e=0.68, re-entry ~2017-09-15)
+│   ├── example_39615_zone1.tle.txt Proton-M Briz-M zone-1 (10 TLEs, e=0.68, epoch 2015-07-16)
 │   ├── example_42928.tle.txt       PSLV-C39 R/B (i=19.2°, e=0.33, re-entry ~2019-02-28)
+│   ├── example_42928_zone0.tle.txt PSLV-C39 zone-0 (14 TLEs, e=0.32, epoch 2017-09-22)
+│   ├── example_42928_zone12.tle.txt PSLV-C39 zone-12 (12 TLEs, e=0.28, epoch 2018-01-21)
 │   └── orem_42928.cfg             Example config file for PSLV-C39
 │
 ├── test_propagate_ks.F             Tests for refactored propagator
@@ -48,15 +52,16 @@ OREM/
 ├── zone_select.F                   Zone selection — linear apogee decay (68 tests)
 ├── test_tle_evolution.F            TLE evolution tests
 ├── test_zone_select.F              Zone selection tests
-├── ga.F                            Binary-coded GA optimizer (71 tests)
+├── ga.F                            Binary-coded GA optimizer (71 tests); ld_surf fix v1.4; trajectory-matching fitness
 ├── test_ga.F                       GA optimizer tests
+├── test_ga_sensitivity.F           GA parameter sensitivity study (pop/gen/Pm sweep, not in test suite)
 ├── rsm.F                           RSM surface generation (39 tests)
 ├── test_rsm.F                      RSM integration tests
 ├── main_orem.F                     Standalone runner (reads orem.cfg)
 ├── orem.F                          OREM driver + compute_rpe (14 tests)
 ├── test_orem.F                     OREM driver tests
 ├── test_reentry.F                  7-object re-entry validation (35 tests)
-├── test_e2e.F                      End-to-end integration test, IDRAG=1 (10 tests: E1–E5 main + E6–E10 zone-0)
+├── test_e2e.F                      End-to-end integration test, IDRAG=1 (20 tests: E1–E10 42928 + E11–E20 39615/35497)
 ├── test_npoe.F                     NPOE cross-validation: BN sensitivity (14 tests)
 └── README.md
 ```
@@ -214,7 +219,7 @@ To run on a different object: copy the config, change lines 1-3 (TLE file, NORAD
 ./test_rsm.exe                 # RSM integration tests (39 checks)
 ./test_orem.exe                # OREM driver tests (14 checks)
 ./test_reentry.exe             # 7-object re-entry validation (35 checks)
-./test_e2e.exe                 # End-to-end integration test, IDRAG=1 (5 checks)
+./test_e2e.exe                 # End-to-end integration test, IDRAG=1 (20 checks)
 ./test_npoe.exe                # NPOE cross-validation: propagator BN sensitivity (14 checks)
 ```
 
@@ -275,14 +280,14 @@ Two-body energy conservation, orbit closure, multi-revolution propagation, re-en
 - Error handling: bad TLE file, wrong NORAD ID
 - 42928 integration: full pipeline (TLE→zone→RSM→GA→propagation), 4 zones, e_opt/a_opt/rms valid, zone epochs valid
 
-### test_e2e (5 tests) — Issue #16
-Full pipeline with IDRAG=1, force model geo=4/sun=2/moon=3 on 42928 PSLV-C39 R/B (re-entry 2019-03-03):
-- E1: pipeline completes (ierr=0)
-- E2: ≥1 zone found
-- E3: e_opt physical
-- E4: bn_opt in [80,160]
-- E5: re-entry detected (exit_code=1) in ≥1 zone
-- RPE printed as diagnostic (not enforced — BN sensitivity tuning pending Issue #11)
+### test_e2e (20 tests) — Issue #16
+Full pipeline with IDRAG=1, force model geo=4/sun=2/moon=3; GA minimizes trajectory RMS (v1.7):
+- E1–E5: 42928 PSLV-C39 R/B (re-entry 2019-03-03): pipeline, zones, e_opt, BN in [80,160] per zone, re-entry in all 4 zones
+- E6–E10: 42928 zone-0 (14 TLEs, e≈0.32, epoch 2017-09-22): per-zone BN, re-entry detected, zone-0 RPE ≈ −16%
+- E11–E15: 39615 Proton-M Briz-M (re-entry 2017-09-15): pipeline, zones, e_opt, per-zone BN in [50,500], re-entry
+- E16–E20: 35497 Ariane 5 ESC-A (re-entry 2016-10-31): pipeline, zones, e_opt, per-zone BN; no re-entry predicted (BN>50, within-zone fit; informational)
+- BN narrows across zones (each zone reduces the search range by 50%); e_opt per zone reflects zone TLE eccentricity
+- RPE printed as diagnostic (not enforced — open as issue #12)
 
 ### test_npoe (14 tests) — Issue #11
 Cross-validates propagate_ks against NPOE reference runs on 42928 PSLV-C39 R/B, Zone 0 (2017-09-24):
@@ -337,6 +342,10 @@ cp ../KSROP/Legendre.F ksrop/
 | 1.1 | 2026-07-04 | NPOE cross-validation (#11): 14 tests confirm propagate_ks correctly models BN sensitivity (ratio ~2.0 vs NPOE 2.02) and apogee decay direction. Magnitude is ~50% of Jacchia-70 (ATM.DAT vs Jacchia model). RPE inaccuracy diagnosed as short-zone/noise issue, not propagator bug. 312 total tests |
 | 1.2 | 2026-07-04 | Fix NaN in RSM propagation: (1) car2oe clamps all dacos() arguments to [-1,1] — floating-point overflow at orbital perigee caused NaN true-anomaly → NaN drag → NaN state in ie=2,3 RSM surfaces; (2) rsm_generate hardcodes IDRAG=1 — without drag all 9 RSM surfaces were identical and the GA had no BN signal. 312 tests still pass. |
 | 1.3 | 2026-07-04 | Add zone-0 E2E run (E6–E10) in test_e2e.F using example_42928_zone0.tle.txt (14 TLEs, e≈0.32, epoch 2017-09-22); zone-0 RPE = −55.5% vs −87–96% for late zones, confirming improved accuracy when propagating from early orbit. 317 total tests. |
+| 1.4 | 2026-07-04 | Fix GA array-dimension mismatch bug: ga_optimize and ga_fitness declared surfaces with leading dimension nsurf_pts (≈nobs≈26) but callers allocated surfaces(max_surf=5000,...). All surface reads were reading wrong memory — GA always returned lower bound regardless of fitness landscape. Fix: add ld_surf parameter to ga_optimize and ga_fitness; callers pass max_surf. Add E11–E20 tests for 39615 and 35497 with zone-specific TLE files. Zone-0 RPE improves from −55.5% to −16.1%. 327 total tests. |
+| 1.5 | 2026-07-04 | Multi-zone campaign fitting (#12): replace per-zone independent GA with a single campaign GA that finds one BN consistent across all zones simultaneously. ga.F: add ga_campaign (1-D BN-only GA) and ga_camp_fitness (mean RMS across valid zones). orem.F: three-phase Step 5 — Phase 1 generates RSM for all zones on full BN range [bn_min, bn_max] (no iterative narrowing), Phase 5b runs campaign GA, Phase 5c propagates re-entry from each zone using the shared campaign BN. Eccentricity fixed at zone TLE midpoint. 327/327 tests pass. |
+| 1.6 | 2026-07-04 | Slope-based BN estimation (#12): replace instantaneous apogee GA with dha/dt slope fitting. Lunisolar oscillations (~2-day period) cancel in the linear regression slope over 10-day zones; drag contribution is secular and accumulates (BN=80 → −2.2 km/day vs BN=160 → −1.1 km/day, 2× signal). ga.F: add ga_slope_optimize (2-D GA matching apogee-rate slope) and ga_slope_fitness (bilinear-interpolate surf_slopes at (e,BN), compare to obs slope). orem.F: Step 5 now computes surf_slopes(3,3) via linear regression of each RSM surface column, obs_slope from TLE apogee history, then calls ga_slope_optimize per zone with BN narrowing. Campaign fitting (v1.5) removed; per-zone BN physically correct since BN encodes attitude (BN = M/CdA, A depends on attitude which varies per zone). 327/327 tests pass. |
+| 1.7 | 2026-07-05 | Revert to original trajectory-matching fitness (genpoen1.f algorithm): Step 5 calls ga_optimize (not ga_slope_optimize), matching RMS of propagated apogee trajectory against all TLE observations in the zone — identical to the published NPOE research fitness function. Slope-fitting approach (v1.6) caused GA to saturate at BN lower bound; trajectory matching restores correct BN identification (Z1: BN≈151 vs 80 in v1.6). Zone-0 RPE −16% confirmed. ga_slope_optimize kept in ga.F for reference. 327/327 tests pass. |
 
 ---
 

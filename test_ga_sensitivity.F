@@ -1,4 +1,4 @@
-c     test_ga_sensitivity.F — GA parameter sensitivity study
+﻿c     test_ga_sensitivity.F â€” GA parameter sensitivity study
 c     -------------------------------------------------------
 c     Runs the GA with varying parameters on synthetic surfaces
 c     matching all 4 manuscript orbit regimes. Reports convergence
@@ -116,7 +116,7 @@ c     ==============================================================
          end do
 
          do ip = 1, 3
-            call ga_optimize(surf, eg, ag, ne, na, npts,
+            call ga_optimize(surf, npts, eg, ag, ne, na, npts,
      &         tob, apob, nob,
      &         eg(1), eg(3), ag(1), ag(3),
      &         ipops(ip), 500, 40, 16,
@@ -164,7 +164,7 @@ c     ==============================================================
          end do
 
          do ig = 1, 3
-            call ga_optimize(surf, eg, ag, ne, na, npts,
+            call ga_optimize(surf, npts, eg, ag, ne, na, npts,
      &         tob, apob, nob,
      &         eg(1), eg(3), ag(1), ag(3),
      &         4, igens(ig), 40, 16,
@@ -212,7 +212,7 @@ c     ==============================================================
          end do
 
          do im = 1, 3
-            call ga_optimize(surf, eg, ag, ne, na, npts,
+            call ga_optimize(surf, npts, eg, ag, ne, na, npts,
      &         tob, apob, nob,
      &         eg(1), eg(3), ag(1), ag(3),
      &         4, 500, 40, 16,

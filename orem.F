@@ -121,6 +121,7 @@ c     RSM
       integer nsurf_pts, nobs, ierr_rsm
       save surfaces
 
+
 c     Zone data
       double precision epz(500), haz(500), ez(500)
       double precision incz(500), raanz(500), aopz(500)
@@ -198,6 +199,8 @@ c     ============================================================
 
 c     ============================================================
 c     Step 5: Zone-by-zone RSM → GA → re-entry prediction
+c     Fitness = RMS(predicted_apogee - observed_apogee) over all TLE
+c     points in the zone. Matches original genpoen1.f algorithm.
 c     ============================================================
       bn_lo = bn_min_init
       bn_hi = bn_max_init
@@ -208,19 +211,18 @@ c     ============================================================
 
       do iz = 1, nzones
 
-c        Extract TLE data within zone only (RSM is zone-length)
+c        Extract TLE data within zone
          nzone = zone_end(iz) - zone_start(iz) + 1
          do i = 1, nzone
-            epz(i) = epochs(zone_start(iz) + i - 1)
-            haz(i) = ha_tle(zone_start(iz) + i - 1)
-            ez(i) = e_tle(zone_start(iz) + i - 1)
-            incz(i) = inc_tle(zone_start(iz) + i - 1)
+            epz(i)   = epochs(zone_start(iz) + i - 1)
+            haz(i)   = ha_tle(zone_start(iz) + i - 1)
+            ez(i)    = e_tle(zone_start(iz) + i - 1)
+            incz(i)  = inc_tle(zone_start(iz) + i - 1)
             raanz(i) = raan_tle(zone_start(iz) + i - 1)
-            aopz(i) = aop_tle(zone_start(iz) + i - 1)
-            smaz(i) = a_tle(zone_start(iz) + i - 1)
+            aopz(i)  = aop_tle(zone_start(iz) + i - 1)
+            smaz(i)  = a_tle(zone_start(iz) + i - 1)
          end do
 
-c        Find mean anomaly from raw TLE for each zone point
          do j = 1, nzone
             maz(j) = 0.d0
             call tle_find_ma(norad_id, epz(j),
@@ -228,7 +230,6 @@ c        Find mean anomaly from raw TLE for each zone point
      &           ama_raw, ntle_raw, maxtle, maz(j))
          end do
 
-c        Compute e-grid from TLE scatter
          e_mid = ez(1)
          de = 0.d0
          do i = 1, nzone
@@ -237,7 +238,6 @@ c        Compute e-grid from TLE scatter
          end do
          if (de .lt. 1.d-5) de = 5.d-4
 
-c        Generate RSM surfaces
          call rsm_generate(
      &      epz, haz, ez, incz, raanz, aopz, maz, smaz,
      &      nzone,
@@ -256,16 +256,16 @@ c        Generate RSM surfaces
 
          if (ierr_rsm .ne. 0 .or. nsurf_pts .le. 0) then
             reentry_jd(iz) = 0.d0
-            e_opt_out(iz) = 0.d0
+            e_opt_out(iz)  = 0.d0
             bn_opt_out(iz) = 0.d0
-            rms_out(iz) = -1.d0
+            rms_out(iz)    = -1.d0
             zone_epoch(iz) = epz(1)
             goto 50
          end if
 
-c        GA optimization
+c        GA optimization: match predicted apogee trajectory to TLE observations
          call ga_optimize(
-     &      surfaces, e_grid, bn_grid,
+     &      surfaces, max_surf, e_grid, bn_grid,
      &      3, 3, nsurf_pts,
      &      tobs, apobs, nobs,
      &      e_grid(1), e_grid(3),
@@ -274,7 +274,7 @@ c        GA optimization
      &      pcross, pmute, ga_seed,
      &      e_opt_out(iz), bn_opt_out(iz), rms_out(iz))
 
-c        Re-entry propagation with optimal (e, A)
+c        Re-entry propagation with optimal (e, BN)
          a_kep(1) = smaz(1)
          a_kep(2) = e_opt_out(iz)
          a_kep(3) = incz(1)
@@ -283,29 +283,24 @@ c        Re-entry propagation with optimal (e, A)
          a_kep(6) = maz(1)
          a_kep(7) = 0.d0
 
-c        Preserve perigee radius
          rp = smaz(1) * (1.d0 - ez(1))
          a_kep(1) = rp / (1.d0 - e_opt_out(iz))
 
          call oe2car(a_kep, x0, xd0, 1.d-12)
          call jd2cal(epz(1), cal0)
 
-c        BN directly from GA optimal
          bn_val = bn_opt_out(iz)
-
-c        Long propagation until re-entry (skip if drag off)
          zone_epoch(iz) = epz(1)
 
          if (idrag_flag .eq. 0) then
             reentry_jd(iz) = 0.d0
-            exit_code_re = 0
-            idump_re = 0
+            exit_code_re   = 0
+            idump_re       = 0
             write(*,'(A,I2,A,F8.2)')
      &         '  Z', iz, ': skip re-entry (IDRAG=0) BN=', bn_val
          else
             period_s = 2.d0*pi*dsqrt(a_kep(1)**3/amue)
             period_d = period_s / 86400.d0
-c           Propagate up to 5 years
             nrev_re = int(5.d0*365.25d0 / period_d) + 1
             if (nrev_re .gt. max_reentry) nrev_re = max_reentry
 
@@ -327,11 +322,9 @@ c           Propagate up to 5 years
      &         ' pts=', idump_re, ' BN=', bn_val
 
             if (exit_code_re .eq. 1) then
-c              Re-entry detected
                reentry_jd(iz) = traj_jd(idump_re)
                nvalid = nvalid + 1
             else
-c              No re-entry within 5 years
                reentry_jd(iz) = 0.d0
             end if
          end if

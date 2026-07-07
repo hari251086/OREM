@@ -1,4 +1,4 @@
-c     test_ga.F — Tests for GA optimizer
+﻿c     test_ga.F â€” Tests for GA optimizer
 c     -------------------------------------------------------
 c     Compile:
 c       ifx test_ga.F ga.F /exe:test_ga.exe
@@ -41,7 +41,7 @@ c     ==============================================================
       call test_rng(npass, nfail)
 
 c     ==============================================================
-c     GA optimization — synthetic known-optimum
+c     GA optimization â€” synthetic known-optimum
 c     ==============================================================
       write(*,*) ''
       write(*,*) '  --- Synthetic optimization ---'
@@ -140,7 +140,7 @@ c     ============================================================
 
       double precision x3(3), y3(3), f3(3,3), fout
 
-c     G1: Constant surface → interpolation returns constant
+c     G1: Constant surface â†’ interpolation returns constant
       x3(1) = 0.3d0
       x3(2) = 0.32d0
       x3(3) = 0.34d0
@@ -208,29 +208,29 @@ c     ============================================================
       factor(1) = 2.d0**40 - 1.d0
       factor(2) = 2.d0**40 - 1.d0
 
-c     G6: All zeros → both variables = lower bound
+c     G6: All zeros â†’ both variables = lower bound
       do i = 1, 80
          chrom(i) = 0
       end do
       call ga_decode(chrom, 80, xvec, 2,
      &               lsubstr, alow, ahigh, factor)
-      call assert_d('G6 all-0 chr → x=0',
+      call assert_d('G6 all-0 chr â†’ x=0',
      &              xvec(1), 0.d0, 1.d-10, npass, nfail)
-      call assert_d('G7 all-0 chr → y=0',
+      call assert_d('G7 all-0 chr â†’ y=0',
      &              xvec(2), 0.d0, 1.d-10, npass, nfail)
 
-c     G8: All ones → both variables = upper bound
+c     G8: All ones â†’ both variables = upper bound
       do i = 1, 80
          chrom(i) = 1
       end do
       call ga_decode(chrom, 80, xvec, 2,
      &               lsubstr, alow, ahigh, factor)
-      call assert_d('G8 all-1 chr → x=1',
+      call assert_d('G8 all-1 chr â†’ x=1',
      &              xvec(1), 1.d0, 1.d-10, npass, nfail)
-      call assert_d('G9 all-1 chr → y=1',
+      call assert_d('G9 all-1 chr â†’ y=1',
      &              xvec(2), 1.d0, 1.d-10, npass, nfail)
 
-c     G10: First bit only → x = 1/(2^40 - 1) ≈ 0
+c     G10: First bit only â†’ x = 1/(2^40 - 1) â‰ˆ 0
       do i = 1, 80
          chrom(i) = 0
       end do
@@ -238,10 +238,10 @@ c     G10: First bit only → x = 1/(2^40 - 1) ≈ 0
       call ga_decode(chrom, 80, xvec, 2,
      &               lsubstr, alow, ahigh, factor)
       if (xvec(1) .gt. 0.d0 .and. xvec(1) .lt. 1.d-6) then
-         call assert_i('G10 single bit → small x',
+         call assert_i('G10 single bit â†’ small x',
      &                 1, 1, npass, nfail)
       else
-         call assert_i('G10 single bit → small x',
+         call assert_i('G10 single bit â†’ small x',
      &                 0, 1, npass, nfail)
       end if
 
@@ -278,10 +278,10 @@ c     G12: Different seeds produce different sequences
       r4 = ga_random(oldrand2, jrand2)
 
       if (dabs(r1 - r3) .gt. 1.d-10) then
-         call assert_i('G12 diff seeds → diff seq',
+         call assert_i('G12 diff seeds â†’ diff seq',
      &                 1, 1, npass, nfail)
       else
-         call assert_i('G12 diff seeds → diff seq',
+         call assert_i('G12 diff seeds â†’ diff seq',
      &                 0, 1, npass, nfail)
       end if
 
@@ -301,7 +301,7 @@ c     ============================================================
       implicit double precision (a-h, o-z)
       integer npass, nfail
 
-c     Create a synthetic 3×3 surface grid where the optimal
+c     Create a synthetic 3Ã—3 surface grid where the optimal
 c     (e, A) = (0.32, 120) produces apogee matching "observations"
 
       parameter(ne = 3, na = 3, npts = 10, nob = 10)
@@ -338,7 +338,7 @@ c     "Observations" = exact match at (0.32, 120)
       end do
 
 c     G14: GA finds optimal e near 0.32
-      call ga_optimize(surf, eg, ag, ne, na, npts,
+      call ga_optimize(surf, npts, eg, ag, ne, na, npts,
      &   tob, apob, nob,
      &   0.30d0, 0.34d0, 80.d0, 160.d0,
      &   4, 500, 40, 16, 0.8d0, 0.01d0, 0.123d0,
@@ -381,7 +381,7 @@ c     G17: Fitness > 0.9 (high quality match)
       end if
 
 c     G18: Different seed still converges
-      call ga_optimize(surf, eg, ag, ne, na, npts,
+      call ga_optimize(surf, npts, eg, ag, ne, na, npts,
      &   tob, apob, nob,
      &   0.30d0, 0.34d0, 80.d0, 160.d0,
      &   4, 500, 40, 16, 0.8d0, 0.01d0, 0.987d0,
@@ -396,7 +396,7 @@ c     G18: Different seed still converges
       end if
 
 c     G19: Wider bounds still finds optimum
-      call ga_optimize(surf, eg, ag, ne, na, npts,
+      call ga_optimize(surf, npts, eg, ag, ne, na, npts,
      &   tob, apob, nob,
      &   0.28d0, 0.36d0, 60.d0, 180.d0,
      &   4, 500, 40, 20, 0.8d0, 0.01d0, 0.456d0,
@@ -411,7 +411,7 @@ c     G19: Wider bounds still finds optimum
       end if
 
 c     G20: pop=4 with more generations (1000)
-      call ga_optimize(surf, eg, ag, ne, na, npts,
+      call ga_optimize(surf, npts, eg, ag, ne, na, npts,
      &   tob, apob, nob,
      &   0.30d0, 0.34d0, 80.d0, 160.d0,
      &   4, 1000, 40, 16, 0.8d0, 0.01d0, 0.555d0,
@@ -461,8 +461,8 @@ c     Flat surface
          apob(i) = 10000.d0
       end do
 
-c     G21: Flat surface → RMS ≈ 0 (any e,A matches)
-      call ga_optimize(surf, eg, ag, ne, na, npts,
+c     G21: Flat surface â†’ RMS â‰ˆ 0 (any e,A matches)
+      call ga_optimize(surf, npts, eg, ag, ne, na, npts,
      &   tob, apob, nob,
      &   0.30d0, 0.34d0, 80.d0, 160.d0,
      &   4, 100, 20, 20, 0.8d0, 0.01d0, 0.123d0,
@@ -494,7 +494,7 @@ c     G23: Output A within bounds
       end if
 
 c     G24: Fewer generations (50) still produces valid output
-      call ga_optimize(surf, eg, ag, ne, na, npts,
+      call ga_optimize(surf, npts, eg, ag, ne, na, npts,
      &   tob, apob, nob,
      &   0.30d0, 0.34d0, 80.d0, 160.d0,
      &   4, 50, 20, 20, 0.8d0, 0.01d0, 0.123d0,
@@ -536,32 +536,32 @@ c     Surface: s = [100, 200, 300, 400, 500] at t = [0, 0.25, 0.5, 0.75, 1.0]
       s5(4) = 400.d0
       s5(5) = 500.d0
 
-c     G26: t=0 → first value
+c     G26: t=0 â†’ first value
       call ga_tinterp(s5, 5, 0.d0, fout)
       call assert_d('G26 tinterp t=0',
      &              fout, 100.d0, 1.d-10, npass, nfail)
 
-c     G27: t=1 → last value
+c     G27: t=1 â†’ last value
       call ga_tinterp(s5, 5, 1.d0, fout)
       call assert_d('G27 tinterp t=1',
      &              fout, 500.d0, 1.d-10, npass, nfail)
 
-c     G28: t=0.5 → midpoint (300)
+c     G28: t=0.5 â†’ midpoint (300)
       call ga_tinterp(s5, 5, 0.5d0, fout)
       call assert_d('G28 tinterp t=0.5',
      &              fout, 300.d0, 1.d-10, npass, nfail)
 
-c     G29: t=0.125 → interpolated (150)
+c     G29: t=0.125 â†’ interpolated (150)
       call ga_tinterp(s5, 5, 0.125d0, fout)
       call assert_d('G29 tinterp t=0.125',
      &              fout, 150.d0, 1.d-10, npass, nfail)
 
-c     G30: t>1 → clamps to last value
+c     G30: t>1 â†’ clamps to last value
       call ga_tinterp(s5, 5, 1.5d0, fout)
       call assert_d('G30 tinterp t>1 clamp',
      &              fout, 500.d0, 1.d-10, npass, nfail)
 
-c     G31: Single point surface → always returns that value
+c     G31: Single point surface â†’ always returns that value
       s1(1) = 42.d0
       call ga_tinterp(s1, 1, 0.d0, fout)
       call assert_d('G31 tinterp 1pt',
@@ -586,7 +586,7 @@ c     ============================================================
       y3(2) = 120.d0
       y3(3) = 160.d0
 
-c     G32: Quadratic surface f = x² + y²/1000
+c     G32: Quadratic surface f = xÂ² + yÂ²/1000
       do i = 1, 3
          do j = 1, 3
             f3(i,j) = x3(i)**2 + y3(j)**2/1000.d0
@@ -645,7 +645,7 @@ c     G35: Asymmetric bit allocation (60 + 20)
       factor(1) = 2.d0**60 - 1.d0
       factor(2) = 2.d0**20 - 1.d0
 
-c     All ones → upper bounds
+c     All ones â†’ upper bounds
       do i = 1, 80
          chrom(i) = 1
       end do
@@ -716,13 +716,13 @@ c     Standard synthetic surface
          apob(i) = 12000.d0 - 100.d0*tob(i)
       end do
 
-c     G39: Same seed → identical results (deterministic)
-      call ga_optimize(surf, eg, ag, ne, na, npts,
+c     G39: Same seed â†’ identical results (deterministic)
+      call ga_optimize(surf, npts, eg, ag, ne, na, npts,
      &   tob, apob, nob,
      &   0.30d0, 0.34d0, 80.d0, 160.d0,
      &   4, 200, 40, 16, 0.8d0, 0.01d0, 0.123d0,
      &   e_opt, a_opt, rms_opt)
-      call ga_optimize(surf, eg, ag, ne, na, npts,
+      call ga_optimize(surf, npts, eg, ag, ne, na, npts,
      &   tob, apob, nob,
      &   0.30d0, 0.34d0, 80.d0, 160.d0,
      &   4, 200, 40, 16, 0.8d0, 0.01d0, 0.123d0,
@@ -734,13 +734,13 @@ c     G39: Same seed → identical results (deterministic)
       call assert_i('G39 deterministic (same seed)',
      &              iall_ok, 1, npass, nfail)
 
-c     G40: More generations → equal or better RMS
-      call ga_optimize(surf, eg, ag, ne, na, npts,
+c     G40: More generations â†’ equal or better RMS
+      call ga_optimize(surf, npts, eg, ag, ne, na, npts,
      &   tob, apob, nob,
      &   0.30d0, 0.34d0, 80.d0, 160.d0,
      &   4, 50, 40, 16, 0.8d0, 0.01d0, 0.123d0,
      &   e_opt, a_opt, rms_opt)
-      call ga_optimize(surf, eg, ag, ne, na, npts,
+      call ga_optimize(surf, npts, eg, ag, ne, na, npts,
      &   tob, apob, nob,
      &   0.30d0, 0.34d0, 80.d0, 160.d0,
      &   4, 500, 40, 16, 0.8d0, 0.01d0, 0.123d0,
@@ -779,8 +779,8 @@ c     G43: e_opt and a_opt are finite
       call assert_i('G43 outputs finite',
      &              iall_ok, 1, npass, nfail)
 
-c     G44: Very few generations (5) → still valid bounds
-      call ga_optimize(surf, eg, ag, ne, na, npts,
+c     G44: Very few generations (5) â†’ still valid bounds
+      call ga_optimize(surf, npts, eg, ag, ne, na, npts,
      &   tob, apob, nob,
      &   0.30d0, 0.34d0, 80.d0, 160.d0,
      &   4, 5, 40, 16, 0.8d0, 0.01d0, 0.123d0,
@@ -791,8 +791,8 @@ c     G44: Very few generations (5) → still valid bounds
       call assert_i('G44 5gen in bounds',
      &              iall_ok, 1, npass, nfail)
 
-c     G45: 1 generation → still produces output
-      call ga_optimize(surf, eg, ag, ne, na, npts,
+c     G45: 1 generation â†’ still produces output
+      call ga_optimize(surf, npts, eg, ag, ne, na, npts,
      &   tob, apob, nob,
      &   0.30d0, 0.34d0, 80.d0, 160.d0,
      &   4, 1, 40, 16, 0.8d0, 0.01d0, 0.123d0,
@@ -844,7 +844,7 @@ c     G46: Optimum at grid corner (e=0.30, A=80)
          apob(i) = 12000.d0 - 100.d0*tob(i)
       end do
 
-      call ga_optimize(surf, eg, ag, ne, na, npts,
+      call ga_optimize(surf, npts, eg, ag, ne, na, npts,
      &   tob, apob, nob,
      &   0.30d0, 0.34d0, 80.d0, 160.d0,
      &   4, 500, 40, 16, 0.8d0, 0.01d0, 0.123d0,
@@ -873,7 +873,7 @@ c     G47: Optimum at grid corner (e=0.34, A=160)
          apob(i) = 12000.d0 - 100.d0*tob(i)
       end do
 
-      call ga_optimize(surf, eg, ag, ne, na, npts,
+      call ga_optimize(surf, npts, eg, ag, ne, na, npts,
      &   tob, apob, nob,
      &   0.30d0, 0.34d0, 80.d0, 160.d0,
      &   4, 500, 40, 16, 0.8d0, 0.01d0, 0.123d0,
@@ -903,7 +903,7 @@ c     Surface: ha = 12000 - 1000*(e-0.32) (no A dependence)
          apob(i) = 12000.d0 - 100.d0*tob(i)
       end do
 
-      call ga_optimize(surf, eg, ag, ne, na, npts,
+      call ga_optimize(surf, npts, eg, ag, ne, na, npts,
      &   tob, apob, nob,
      &   0.30d0, 0.34d0, 80.d0, 160.d0,
      &   4, 500, 40, 16, 0.8d0, 0.01d0, 0.123d0,
@@ -917,7 +917,7 @@ c     Surface: ha = 12000 - 1000*(e-0.32) (no A dependence)
       end if
 
 c     G49: Narrow bounds (e range = 0.001)
-      call ga_optimize(surf, eg, ag, ne, na, npts,
+      call ga_optimize(surf, npts, eg, ag, ne, na, npts,
      &   tob, apob, nob,
      &   0.3195d0, 0.3205d0, 80.d0, 160.d0,
      &   4, 500, 40, 16, 0.8d0, 0.01d0, 0.123d0,
@@ -936,7 +936,7 @@ c     G50: Fewer obs (3 points) still works
          tob(i) = dble(i-1) * 0.5d0
          apob(i) = 12000.d0 - 100.d0*tob(i)
       end do
-      call ga_optimize(surf, eg, ag, ne, na, npts,
+      call ga_optimize(surf, npts, eg, ag, ne, na, npts,
      &   tob, apob, 3,
      &   0.30d0, 0.34d0, 80.d0, 160.d0,
      &   4, 500, 40, 16, 0.8d0, 0.01d0, 0.123d0,
@@ -991,7 +991,7 @@ c     Sensitivity: dha/de = a ~ 20000 km per unit e
       end do
 
 c     G51: High-e (0.68) finds optimum
-      call ga_optimize(surf, eg, ag, ne, na, npts,
+      call ga_optimize(surf, npts, eg, ag, ne, na, npts,
      &   tob, apob, nob,
      &   0.6806d0, 0.6810d0, 1.d0, 5.d0,
      &   4, 500, 40, 16, 0.8d0, 0.01d0, 0.123d0,
@@ -1037,7 +1037,7 @@ c     --- 35497-like: e ~ 0.63 ---
       end do
 
 c     G53: Ariane 5-like e~0.63
-      call ga_optimize(surf, eg, ag, ne, na, npts,
+      call ga_optimize(surf, npts, eg, ag, ne, na, npts,
      &   tob, apob, nob,
      &   0.6290d0, 0.6300d0, 1.d0, 3.d0,
      &   4, 500, 40, 16, 0.8d0, 0.01d0, 0.123d0,
@@ -1074,7 +1074,7 @@ c     --- 37151-like: e ~ 0.56 ---
       end do
 
 c     G54: Long March 3B-like e~0.56
-      call ga_optimize(surf, eg, ag, ne, na, npts,
+      call ga_optimize(surf, npts, eg, ag, ne, na, npts,
      &   tob, apob, nob,
      &   0.5645d0, 0.5655d0, 1.d0, 5.d0,
      &   4, 500, 40, 16, 0.8d0, 0.01d0, 0.123d0,
@@ -1087,7 +1087,7 @@ c     G54: Long March 3B-like e~0.56
      &                 0, 1, npass, nfail)
       end if
 
-c     --- Extreme sensitivity: e 1000× more sensitive than A ---
+c     --- Extreme sensitivity: e 1000Ã— more sensitive than A ---
       eg(1) = 0.680d0
       eg(2) = 0.681d0
       eg(3) = 0.682d0
@@ -1111,7 +1111,7 @@ c     --- Extreme sensitivity: e 1000× more sensitive than A ---
       end do
 
 c     G55: Extreme asymmetric sensitivity
-      call ga_optimize(surf, eg, ag, ne, na, npts,
+      call ga_optimize(surf, npts, eg, ag, ne, na, npts,
      &   tob, apob, nob,
      &   0.680d0, 0.682d0, 1.d0, 5.d0,
      &   4, 500, 40, 16, 0.8d0, 0.01d0, 0.123d0,
@@ -1148,7 +1148,7 @@ c     --- Large apogee altitude scale (GEO-like ~35000 km) ---
       end do
 
 c     G56: GEO-scale apogee
-      call ga_optimize(surf, eg, ag, ne, na, npts,
+      call ga_optimize(surf, npts, eg, ag, ne, na, npts,
      &   tob, apob, nob,
      &   0.70d0, 0.74d0, 0.5d0, 2.5d0,
      &   4, 500, 40, 16, 0.8d0, 0.01d0, 0.123d0,
@@ -1239,26 +1239,26 @@ c     Just verify it returns 0 or 1 (valid bit)
      &                 0, 1, npass, nfail)
       end if
 
-c     G66: ga_mutate flips 0→1 when mutation occurs
+c     G66: ga_mutate flips 0â†’1 when mutation occurs
 c     Use pmute=1 to guarantee flip
       nmute = 0
       ival = ga_mutate(0, 1.d0, nmute, oldrand, jrand)
-      call assert_i('G66 mutate 0→1 w/ pm=1',
+      call assert_i('G66 mutate 0â†’1 w/ pm=1',
      &              ival, 1, npass, nfail)
 
-c     G67: ga_mutate flips 1→0 when mutation occurs
+c     G67: ga_mutate flips 1â†’0 when mutation occurs
       ival = ga_mutate(1, 1.d0, nmute, oldrand, jrand)
-      call assert_i('G67 mutate 1→0 w/ pm=1',
+      call assert_i('G67 mutate 1â†’0 w/ pm=1',
      &              ival, 0, npass, nfail)
 
-c     G68: ga_iflip with prob=0 → always 0
+c     G68: ga_iflip with prob=0 â†’ always 0
       call ga_warmup(0.123d0, oldrand, jrand)
       iall_ok = 1
       do i = 1, 100
          if (ga_iflip(0.d0, oldrand, jrand) .ne. 0)
      &      iall_ok = 0
       end do
-      call assert_i('G68 iflip prob=0 → 0',
+      call assert_i('G68 iflip prob=0 â†’ 0',
      &              iall_ok, 1, npass, nfail)
 
 c     G69: ga_irnd returns value in [lo, hi]
@@ -1281,7 +1281,7 @@ c     G70: ga_irnd produces varied output (not constant)
       call assert_i('G70 irnd not constant',
      &              ivaried, 1, npass, nfail)
 
-c     G71: ga_fitness with perfect match → fitness ≈ 1
+c     G71: ga_fitness with perfect match â†’ fitness â‰ˆ 1
       call test_fitness_perfect(npass, nfail)
 
       return
@@ -1321,7 +1321,7 @@ c     All surfaces = constant 10000
 c     Any (e, A) should give perfect match
       xvec(1) = 0.32d0
       xvec(2) = 120.d0
-      fit = ga_fitness(xvec, surf, eg, ag,
+      fit = ga_fitness(xvec, surf, npts, eg, ag,
      &                 ne, na, npts, tob, apob, nob)
 
 c     Fitness should be very close to 1.0
