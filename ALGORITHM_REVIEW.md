@@ -41,23 +41,28 @@ The KS integration step is fixed at **1° per KS regularized angle** (`istep=360
 
 ## 3. Gap analysis
 
-### G1 — Atmospheric density model [CRITICAL] (→ Issue #14)
+### G1 — Atmospheric density model [RESOLVED — commit cf37576] (→ Issue #14)
 
 **What the original used:** Jacchia-70 atmosphere with live F10.7 solar flux input.  
-**What OREM uses:** ATM.DAT — a static tabulated exponential model.
+**What OREM previously used:** ATM.DAT — a static tabulated exponential model with ~50% of the correct thermospheric density.
 
-**Measured divergence (`test_npoe` N13–N14):** OREM's `propagate_ks` produces roughly **50% of NPOE's apogee decay** over the same zone.
+**Previous divergence (`test_npoe` N13–N14):** OREM's `propagate_ks` produced roughly **50% of NPOE's apogee decay** over the same zone.
 
-| BN (kg/m²) | OREM Δha (7 days) | NPOE ref Δha | Ratio |
-|-----------|-------------------|--------------|-------|
-| 80 | −29.5 km | −61.9 km | 48% |
-| 160 | −14.8 km | −30.6 km | 48% |
+| BN (kg/m²) | OREM Δha (7 days) | NPOE ref Δha | Ratio (old) | Ratio (new J70) |
+|-----------|-------------------|--------------|-------------|-----------------|
+| 80 | −29.5 km → −59.1 km | −61.9 km | 48% | **95%** |
+| 120 | −19.7 km → −39.4 km | −41.1 km | 48% | **96%** |
+| 160 | −14.8 km → −29.6 km | −30.6 km | 48% | **97%** |
 
-**Effect on BN identification:** The RSM surfaces encode half the true drag. For early zones at high apogee (e ≈ 0.32), the total apogee change over 10 days is only 15–30 km in OREM vs. 30–60 km in reality. Lunisolar oscillations are ±50+ km. The BN signal is buried in perturbation noise; the GA returns a near-arbitrary value (~midpoint of search range).
+**Fix applied:** `input/ATM.DAT` regenerated using Jacchia-70 multi-species diffusive equilibrium (KSROP `gen_atm_j70.F90`, committed 81f470b). Conditions: F10.7=72, F10.7B=72, Kp=1.0, T_inf=640 K — matching the NPOE Zone-0 reference.
 
-**Effect on re-entry propagation:** Propagating with 50%-density atmosphere means the predicted lifetime is systematically distorted. OREM's large negative RPE (too-early re-entry) indicates the GA converged to a low BN (high drag) to partially compensate — but the compensation is inconsistent across the altitude regime from zone epoch to atmospheric entry.
+Key values at perigee altitude (170 km):
+- Old: ρ = 8.378×10⁻¹⁰ kg/m³, H = 24.5 km
+- New: ρ = 1.754×10⁻⁹ kg/m³, H = 18.4 km (correct J70 composition at low solar activity)
 
-**Resolution required:** Validate and correct ATM.DAT against Jacchia-70 reference values at 100–500 km. No other gap is worth solving before G1.
+All 327 OREM tests pass with the new ATM.DAT (OREM commit cf37576).
+
+**Remaining note:** ATM.DAT is static — it represents low solar activity (F10.7=72). For operational use at higher solar activity, density will be underestimated. A future enhancement would dynamically scale ATM.DAT based on the epoch F10.7 value (→ Issue #14).
 
 ---
 
@@ -154,7 +159,7 @@ No structural change to `compute_rpe` is required. The reporting in `orem.F` sho
 
 | Priority | Action | Issues |
 |----------|--------|--------|
-| **Critical** | Validate and correct ATM.DAT against Jacchia-70 at 100–500 km. Build comparison test vs NPOE at multiple altitude bands. Target ratio ≥ 0.90. | #14 |
+| **Critical** | ~~Validate and correct ATM.DAT against Jacchia-70 at 100–500 km.~~ **DONE** (commit cf37576): ATM.DAT replaced with J70 at F10.7=72, Kp=1.0. Ratio 95–97% vs NPOE. Future: dynamic solar-activity scaling. | #14 |
 | **High** | Introduce physics-based BN floor from TLE decay rate (Δn̄/Δt) to set object-specific starting range. Resolves G2 without per-object lookup. | #12, #15 |
 | **Medium** | Add minimum BN range floor (≥ 20 kg/m²) to narrowing logic in `orem.F:333–336`. Prevents over-convergence from biased early estimate. | #12 |
 | **Medium** | Add ensemble spread output to `orem.F` reporting. Print `t_mean`, `t_std`, `t_std/(t_mean−t_now)×100%` unconditionally. | #13 |
