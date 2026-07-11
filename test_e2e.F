@@ -26,6 +26,7 @@ c     -------------------------------------------------------
       integer nzu, ierr, natm
       integer npass, nfail, iz, nreentry
       double precision rpe_best
+      integer zstat(mxz), nzv
 
       call init_constants()
 
@@ -90,6 +91,7 @@ c     ============================================================
      &   ALT_a, DEN_a, SCH_a, natm,
      &   reentry, e_opt, bn_opt, rms_o,
      &   zepoch, nzu,
+     &   zstat, nzv,
      &   rpe, t_mean, t_std, ierr)
 
 c     ============================================================
@@ -223,6 +225,7 @@ c     ============================================================
      &   ALT_a, DEN_a, SCH_a, natm,
      &   reentry, e_opt, bn_opt, rms_o,
      &   zepoch, nzu,
+     &   zstat, nzv,
      &   rpe, t_mean, t_std, ierr)
 
 c     E6: Pipeline completes
@@ -340,6 +343,7 @@ c     ============================================================
      &   ALT_a, DEN_a, SCH_a, natm,
      &   reentry, e_opt, bn_opt, rms_o,
      &   zepoch, nzu,
+     &   zstat, nzv,
      &   rpe, t_mean, t_std, ierr)
 
       if (ierr .eq. 0 .or. ierr .eq. 3) then
@@ -430,6 +434,7 @@ c     ============================================================
      &   ALT_a, DEN_a, SCH_a, natm,
      &   reentry, e_opt, bn_opt, rms_o,
      &   zepoch, nzu,
+     &   zstat, nzv,
      &   rpe, t_mean, t_std, ierr)
 
       if (ierr .eq. 0 .or. ierr .eq. 3) then

@@ -150,6 +150,7 @@ c     ============================================================
       double precision rms_o(4), zepoch(4), rpe(4)
       double precision t_obs(6), t_mean, t_std
       integer nzu, ierr, i
+      integer zstat(4), nzv
 
       write(*,*) ''
       write(*,'(A,A)') '  --- ', obj_name
@@ -173,6 +174,7 @@ c     ============================================================
      &   ALT_a, DEN_a, SCH_a, natm,
      &   reentry, e_opt, bn_opt, rms_o,
      &   zepoch, nzu,
+     &   zstat, nzv,
      &   rpe, t_mean, t_std, ierr)
 
 c     V1: Pipeline completes (ierr=0 or 3 with no drag)

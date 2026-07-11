@@ -48,6 +48,14 @@ c     ==============================================================
       call test_42928(npass, nfail)
 
 c     ==============================================================
+c     Issue #12: RSM/GA failure recovery and diagnostics
+c     ==============================================================
+      write(*,*) ''
+      write(*,*) '  --- Failure recovery / diagnostics (#12) ---'
+
+      call test_failure_modes(npass, nfail)
+
+c     ==============================================================
 c     Summary
 c     ==============================================================
       write(*,*) ''
@@ -146,6 +154,7 @@ c     ============================================================
       double precision t_obs(6), t_mean, t_std
       double precision alt(ndim_a), den(ndim_a), sch(ndim_a)
       integer natm, ierr
+      integer zstat(mxz), nzv
 
       call read_atm_orem(alt, den, sch, ndim_a, natm)
 
@@ -168,6 +177,7 @@ c     D6: Bad TLE file → ierr=1
      &   alt, den, sch, natm,
      &   reentry, e_opt, bn_opt, rms_o,
      &   zepoch, nzu,
+     &   zstat, nzv,
      &   rpe, t_mean, t_std, ierr)
       call assert_i('D6 bad file ierr=1',
      &              ierr, 1, npass, nfail)
@@ -184,6 +194,7 @@ c     D7: Wrong NORAD → ierr=1 (no match)
      &   alt, den, sch, natm,
      &   reentry, e_opt, bn_opt, rms_o,
      &   zepoch, nzu,
+     &   zstat, nzv,
      &   rpe, t_mean, t_std, ierr)
       call assert_i('D7 wrong NORAD ierr=1',
      &              ierr, 1, npass, nfail)
@@ -205,6 +216,7 @@ c     ============================================================
       double precision t_obs(6), t_mean, t_std
       double precision alt(ndim_a), den(ndim_a), sch(ndim_a)
       integer natm, ierr, nzu
+      integer zstat(mxz), nzv
 
       call read_atm_orem(alt, den, sch, ndim_a, natm)
 
@@ -230,6 +242,7 @@ c     Observed re-entry: 2019-03-03
      &   alt, den, sch, natm,
      &   reentry, e_opt, bn_opt, rms_o,
      &   zepoch, nzu,
+     &   zstat, nzv,
      &   rpe, t_mean, t_std, ierr)
 
 c     D8: Pipeline completed (ierr=3 ok with IDRAG=0: no re-entry)
@@ -312,6 +325,123 @@ c     D14: t_mean finite (0 is valid with IDRAG=0)
       end do
       write(*,'(A,F12.2,A,F6.2,A)')
      &   '    mean JD=', t_mean, ' std=', t_std, ' days'
+
+      return
+      end
+
+c     ============================================================
+c     Issue #12 failure-mode tests.
+c
+c     BN enters the drag term as propagate_ks.F's V/(BN*2.d0), so
+c     BN=0 forces a division-by-zero -> NaN altitude -> exit_code=2
+c     on every RSM grid point. This is a deterministic, physically
+c     grounded way to force the propagator-divergence path without
+c     hand-crafting fragile orbital elements.
+c     ============================================================
+      subroutine test_failure_modes(npass, nfail)
+      implicit double precision (a-h, o-z)
+      common /xy/ pi, d2r, r2d, amue, AU, R_Earth
+      integer npass, nfail
+
+      parameter(mxz = 4, ndim_a = 291)
+      double precision reentry(mxz), e_opt(mxz), bn_opt(mxz)
+      double precision rms_o(mxz), zepoch(mxz), rpe(mxz)
+      double precision t_obs(6), t_mean, t_std
+      double precision alt(ndim_a), den(ndim_a), sch(ndim_a)
+      integer natm, ierr, nzu
+      integer zstat(mxz), nzv
+      integer i, allfail
+
+      call read_atm_orem(alt, den, sch, ndim_a, natm)
+
+      t_obs(1) = 0.d0
+      t_obs(2) = 0.d0
+      t_obs(3) = 0.d0
+      t_obs(4) = 0.d0
+      t_obs(5) = 0.d0
+      t_obs(6) = 0.d0
+
+c     D15: BN=0 forces propagator divergence on every RSM grid point
+c     for the single zone in this file -> RSM ierr=2 -> zone_status=1.
+c     Also confirms the call completes without crashing.
+      call orem_run(
+     &   'input/example_42928_zone0.tle.txt', 42928,
+     &   t_obs, mxz, 8, 10.d0, 0.90d0, -1.d0,
+     &   0.d0, 0.d0, 0,
+     &   4, 200, 40, 16, 0.8d0, 0.01d0, 0.123d0,
+     &   2, 0, 0,
+     &   7.2921150d-5, 3.35281066d-3, 1.d0,
+     &   0.d0, 0.d0, 0, 0,
+     &   0.d0, 0.d0, 0.d0,
+     &   alt, den, sch, natm,
+     &   reentry, e_opt, bn_opt, rms_o,
+     &   zepoch, nzu,
+     &   zstat, nzv,
+     &   rpe, t_mean, t_std, ierr)
+
+      call assert_i('D15 propfail zone_status=1',
+     &              zstat(1), 1, npass, nfail)
+      call assert_i('D15 propfail excluded from nzones_valid',
+     &              nzv, 0, npass, nfail)
+
+c     D16: BN search window pinned to [200, 205], well above the
+c     zone's real BN (~130-180 per earlier full-suite runs). Empirically
+c     the GA optimum lands ~11% of the window width from the upper
+c     edge (204.44) -- close enough to trip the 15% boundary check.
+c     Verifies detection + warning; the driver loop must still
+c     complete normally.
+      call orem_run(
+     &   'input/example_42928.tle.txt', 42928,
+     &   t_obs, mxz, 8, 10.d0, 0.90d0, -1.d0,
+     &   200.d0, 205.d0, 0,
+     &   4, 200, 40, 16, 0.8d0, 0.01d0, 0.123d0,
+     &   2, 0, 0,
+     &   7.2921150d-5, 3.35281066d-3, 1.d0,
+     &   0.d0, 0.d0, 0, 0,
+     &   0.d0, 0.d0, 0.d0,
+     &   alt, den, sch, natm,
+     &   reentry, e_opt, bn_opt, rms_o,
+     &   zepoch, nzu,
+     &   zstat, nzv,
+     &   rpe, t_mean, t_std, ierr)
+
+      call assert_i('D16 GA boundary zone_status=2',
+     &              zstat(1), 2, npass, nfail)
+
+c     D17: same BN=0 divergence as D15, but on the full 4-zone 42928
+c     file. Confirms zone failure doesn't crash the driver loop -- all
+c     zones are still found and processed (just all flagged failed),
+c     and nzones_valid correctly reports 0 when every zone fails.
+      call orem_run(
+     &   'input/example_42928.tle.txt', 42928,
+     &   t_obs, mxz, 8, 10.d0, 0.90d0, -1.d0,
+     &   0.d0, 0.d0, 0,
+     &   4, 200, 40, 16, 0.8d0, 0.01d0, 0.123d0,
+     &   2, 0, 0,
+     &   7.2921150d-5, 3.35281066d-3, 1.d0,
+     &   0.d0, 0.d0, 0, 0,
+     &   0.d0, 0.d0, 0.d0,
+     &   alt, den, sch, natm,
+     &   reentry, e_opt, bn_opt, rms_o,
+     &   zepoch, nzu,
+     &   zstat, nzv,
+     &   rpe, t_mean, t_std, ierr)
+
+      if (nzu .ge. 1) then
+         call assert_i('D17 all-fail: zones still found',
+     &                 1, 1, npass, nfail)
+         allfail = 1
+         do i = 1, nzu
+            if (zstat(i) .ne. 1) allfail = 0
+         end do
+         call assert_i('D17 all-fail: every zone status=1',
+     &                 allfail, 1, npass, nfail)
+      else
+         call assert_i('D17 all-fail: zones still found',
+     &                 0, 1, npass, nfail)
+      end if
+      call assert_i('D17 all-fail: nzones_valid=0',
+     &              nzv, 0, npass, nfail)
 
       return
       end
