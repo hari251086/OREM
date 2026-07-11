@@ -62,7 +62,7 @@ OREM/
 ├── test_orem.F                     OREM driver tests
 ├── test_reentry.F                  7-object re-entry validation (35 tests)
 ├── test_e2e.F                      End-to-end integration test, IDRAG=1 (20 tests: E1–E10 42928 + E11–E20 39615/35497)
-├── test_npoe.F                     NPOE cross-validation: BN sensitivity (14 tests)
+├── test_gmat.F                      GMAT cross-validation: BN sensitivity (14 tests)
 └── README.md
 ```
 
@@ -220,7 +220,7 @@ To run on a different object: copy the config, change lines 1-3 (TLE file, NORAD
 ./test_orem.exe                # OREM driver tests (14 checks)
 ./test_reentry.exe             # 7-object re-entry validation (35 checks)
 ./test_e2e.exe                 # End-to-end integration test, IDRAG=1 (20 checks)
-./test_npoe.exe                # NPOE cross-validation: propagator BN sensitivity (14 checks)
+./test_gmat.exe                # GMAT cross-validation: propagator BN sensitivity (14 checks)
 ```
 
 ### test_propagate_ks
@@ -289,15 +289,15 @@ Full pipeline with IDRAG=1, force model geo=4/sun=2/moon=3; GA minimizes traject
 - BN narrows across zones (each zone reduces the search range by 50%); e_opt per zone reflects zone TLE eccentricity
 - RPE printed as diagnostic (not enforced — open as issue #12)
 
-### test_npoe (14 tests) — Issue #11
-Cross-validates propagate_ks against NPOE reference runs on 42928 PSLV-C39 R/B, Zone 0 (2017-09-24):
+### test_gmat (14 tests) — Issue #11
+Cross-validates propagate_ks against GMAT R2026a reference runs (`scratch_gmat/gmat_xval_42928z0.script`, run via `GmatConsole.exe`) on 42928 PSLV-C39 R/B, Zone 0 (2017-09-24). Replaces the earlier NPOE-based comparison — GMAT is the trusted ground truth established by the KSROP↔GMAT validation campaign, and matching the NPOE-era heritage research is no longer a goal for this test:
 - N1-N3: BN monotonicity — higher BN → less apogee decay (each of 3 e-rows)
 - N4-N6: e monotonicity — higher e → higher initial apogee (each of 3 BN columns)
-- N7-N9: BN sensitivity ratio decay(BN=80)/decay(BN=160) > 1.5 (confirmed ~2.0, matches NPOE's 2.02)
+- N7-N9: BN sensitivity ratio decay(BN=80)/decay(BN=160) > 1.5 (propagate_ks ~2.0; GMAT ref ~1.45-1.54)
 - N10: No divergence across all 9 RSM grid runs
 - N11: IDRAG=0 gives < 0.5 km drop in 7 days
 - N12: All drops negative for IDRAG=1
-- N13-N14: Magnitude within factor 3 of NPOE for BN=80 and BN=160 (ATM.DAT gives ~50% of Jacchia-70)
+- N13-N14: Magnitude within 50% of GMAT for BN=80 and BN=160 (propagate_ks is 69-112% of GMAT magnitude across all 9 grid points; tightened from the old factor-3 NPOE tolerance)
 - **Key finding**: propagate_ks correctly models BN physics; RPE inaccuracy is due to short zone windows and TLE noise, not a propagator bug
 
 ### test_reentry (35 tests)
@@ -347,6 +347,7 @@ cp ../KSROP/Legendre.F ksrop/
 | 1.6 | 2026-07-04 | Slope-based BN estimation (#12): replace instantaneous apogee GA with dha/dt slope fitting. Lunisolar oscillations (~2-day period) cancel in the linear regression slope over 10-day zones; drag contribution is secular and accumulates (BN=80 → −2.2 km/day vs BN=160 → −1.1 km/day, 2× signal). ga.F: add ga_slope_optimize (2-D GA matching apogee-rate slope) and ga_slope_fitness (bilinear-interpolate surf_slopes at (e,BN), compare to obs slope). orem.F: Step 5 now computes surf_slopes(3,3) via linear regression of each RSM surface column, obs_slope from TLE apogee history, then calls ga_slope_optimize per zone with BN narrowing. Campaign fitting (v1.5) removed; per-zone BN physically correct since BN encodes attitude (BN = M/CdA, A depends on attitude which varies per zone). 327/327 tests pass. |
 | 1.7 | 2026-07-05 | Revert to original trajectory-matching fitness (genpoen1.f algorithm): Step 5 calls ga_optimize (not ga_slope_optimize), matching RMS of propagated apogee trajectory against all TLE observations in the zone — identical to the published NPOE research fitness function. Slope-fitting approach (v1.6) caused GA to saturate at BN lower bound; trajectory matching restores correct BN identification (Z1: BN≈151 vs 80 in v1.6). Zone-0 RPE −16% confirmed. ga_slope_optimize kept in ga.F for reference. 327/327 tests pass. |
 | 1.8 | 2026-07-12 | Sync `ksrop/` with the KSROP GMAT validation campaign fixes (KSROP #18–#23): (1) `aLegP` buffer-overflow rewrite (Legendre.F) — old version ignored its degree argument and wrote ~50× out of bounds on every call; (2) `aleg`/`sleg`/`oleg` off-by-one — force/time-element formulas need degree n+1, so `aLegP(n+1,...)` at both propagate_ks.F call sites (live in the pipeline at ngeo_deg=50); (3) `Tau_geo` sign/scale (missing `amue`; thesis eq. 2.56) — epoch labeling only; (4) `third_body_aux` `deg` declared `integer` — was implicitly double while callers pass integers, so its power-series loop ran zero times and **the third-body force was silently exactly zero**; (5) `qsun`/`qmoon` rewritten in the correct KS-elements EOM convention `shape·u + r·Lᵀ(∇shape)`, verified vs KSJLSDNP.F to machine precision; (6) `solarnpv`/`lunarpv` upgraded to Montenbruck & Gill analytic series — Sun 0.6%→0.097%, Moon 3.6%→0.109% vs DE405. KSROP-side GMAT validation: Sun-only GTO 1.2 m/rev, Moon-only 0.46 km/rev, full conservative 1.9 km/2 revs. OREM pipeline currently runs `nsun_deg=nmoon_deg=0` (const_new.DAT), so items 4–6 are dormant until lunisolar is enabled — but the geopotential fixes (1–2) are active. 327/327 tests pass. |
+| 1.9 | 2026-07-11 | Replace NPOE with GMAT as the issue #11 cross-validation reference (`test_npoe.F` → `test_gmat.F`): NPOE's own atmosphere model confounded the comparison (~50% magnitude gap unrelated to force-model correctness) and only proved consistency with the NPOE-era heritage research, not physical correctness. New reference trajectories generated by `scratch_gmat/gmat_xval_42928z0.script` (GMAT R2026a via `GmatConsole.exe`, no GUI), same force-model settings the KSROP↔GMAT validation campaign already trusted (EGM2008 zonal Degree=4/Order=0, Sun+Luna point mass, JacchiaRoberts F107=72/Kp=1.0 matching ATM.DAT). N13/N14 magnitude tolerance tightened from factor-3 (NPOE) to ±50% (GMAT), based on the actual observed 69–112% residual across all 9 grid points. 327/327 tests pass. |
 
 ---
 
