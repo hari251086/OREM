@@ -174,9 +174,12 @@ c     Local copies of constants that force_models may zero
 
       V_pot = 0.d0
 
-      call aLegP(ngeo_deg,ZbyR(1),aleg)
-      call aLegP(nsun_deg,cphi_s,sleg)
-      call aLegP(nmoon_deg,cphi_m,oleg)
+c     +1: the force/time-element formulas below need aleg(i+2)
+c     (degree i+1) for i up to ngeo_deg (same for sleg/oleg) --
+c     KSROP off-by-one fix, 2026-07-11.
+      call aLegP(ngeo_deg+1,ZbyR(1),aleg)
+      call aLegP(nsun_deg+1,cphi_s,sleg)
+      call aLegP(nmoon_deg+1,cphi_m,oleg)
 
       do i = 2,ngeo_deg
          cn_j(i) = amue*Re(i)*c_j(i)*ObyR(i+1)
@@ -368,10 +371,14 @@ c     -----------------------------------------------------------
      &              -u(3)*p_srp(2)+u(2)*p_srp(3)
             end if
 
+c     Time-element rate (KS regular elements, thesis eq. 2.56):
+c     per zonal term +amue*(n-1)*c_j(n)*Re(n)*P_n*ObyR(n).
+c     KSROP fix 2026-07-11: old form omitted amue and had the
+c     wrong sign (only affects epoch labeling, not trajectory).
             Tau_geo = 0.d0
             do i = 2,ngeo_deg
                Tau_geo = Tau_geo
-     &              -(i-1)*c_j(i)*Re(i)*aleg(i+1)
+     &              +amue*(i-1)*c_j(i)*Re(i)*aleg(i+1)
      &              *ObyR(i)
             end do
 
@@ -404,11 +411,11 @@ c     Time element
      &           *dotp4(u,us)
 
             if (ngeo_deg  .gt. 1)
-     &         call aLegP(ngeo_deg, ZbyR(1), aleg)
+     &         call aLegP(ngeo_deg+1, ZbyR(1), aleg)
             if (nsun_deg  .gt. 1)
-     &         call aLegP(nsun_deg, cphi_s,  sleg)
+     &         call aLegP(nsun_deg+1, cphi_s,  sleg)
             if (nmoon_deg .gt. 1)
-     &         call aLegP(nmoon_deg,cphi_m,  oleg)
+     &         call aLegP(nmoon_deg+1,cphi_m,  oleg)
 
             do j = 1,4
                q(j) = 0.d0
@@ -441,15 +448,14 @@ c     Time element
                sq = ts(1)*qu(1)+ts(2)*qu(2)
      &              +ts(3)*qu(3)
 
+c     Third-body q(j) in the KS-elements EOM convention (KSROP fix
+c     2026-07-12): qsun = shape*u + r*L(u)^T(grad shape) per degree,
+c     verified vs KSJLSDNP.F n=2 to machine precision:
                do i = 2,nsun_deg
-                  slambda(i)=2.d0*R(i-1)*(i+1)
-     &                 *(sleg(i+2)
-     &                 -cphi_s*sleg(i+1))/den_s
-
-                  qs = (RbyRs(i)*(sq*slambda(i)
-     &                 /Rs(1)+
-     &                 u(j)*(1-i)*sleg(i+1)
-     &                 -slambda(i)*cphi_s))
+                  qs = RbyRs(i)*(sleg(i+1)*u(j)
+     &                 -(dble(i)*(sleg(i+1)-cphi_s*sleg(i))*u(j)
+     &                 +dble(i+1)*(cphi_s*sleg(i+1)-sleg(i+2))*sq
+     &                 /Rs(1))/den_s)
                   qsun(j) = qs + qsun(j)
                end do
 
@@ -457,13 +463,10 @@ c     Time element
      &              +tm(3)*qu(3)
 
                do i = 2,nmoon_deg
-                  olambda(i)=2.d0*R(i-1)*(i+1)
-     &                 *(oleg(i+2)
-     &                 -cphi_m*oleg(i+1))/den_m
-                  qm = (RbyRm(i)*(oq*olambda(i)
-     &                 /Rm(1)+
-     &                 u(j)*(1-i)*oleg(i+1)
-     &                 -olambda(i)*cphi_m))
+                  qm = RbyRm(i)*(oleg(i+1)*u(j)
+     &                 -(dble(i)*(oleg(i+1)-cphi_m*oleg(i))*u(j)
+     &                 +dble(i+1)*(cphi_m*oleg(i+1)-oleg(i+2))*oq
+     &                 /Rm(1))/den_m)
                   qmoon(j) = qm + qmoon(j)
                end do
 
