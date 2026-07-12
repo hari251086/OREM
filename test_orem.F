@@ -56,6 +56,14 @@ c     ==============================================================
       call test_failure_modes(npass, nfail)
 
 c     ==============================================================
+c     Issue #12 (G2): physics-based BN floor
+c     ==============================================================
+      write(*,*) ''
+      write(*,*) '  --- G2 physics-based BN floor ---'
+
+      call test_bn_floor(npass, nfail)
+
+c     ==============================================================
 c     Summary
 c     ==============================================================
       write(*,*) ''
@@ -442,6 +450,71 @@ c     and nzones_valid correctly reports 0 when every zone fails.
       end if
       call assert_i('D17 all-fail: nzones_valid=0',
      &              nzv, 0, npass, nfail)
+
+      return
+      end
+
+c     ============================================================
+c     Issue #12 (G2) test: physics-based BN floor.
+c
+c     37151 Long March 3B's zone 1 (with the default bn_min_init=80,
+c     same as test_reentry.F) is a verified case where the floor
+c     estimate extends bn_lo well below 80 -- without G2, GA could
+c     never search below the caller's bn_min_init, so bn_opt(1) < 80
+c     here is only reachable because the floor extension fired.
+c     ============================================================
+      subroutine test_bn_floor(npass, nfail)
+      implicit double precision (a-h, o-z)
+      common /xy/ pi, d2r, r2d, amue, AU, R_Earth
+      integer npass, nfail
+
+      parameter(mxz = 4, ndim_a = 291)
+      double precision reentry(mxz), e_opt(mxz), bn_opt(mxz)
+      double precision rms_o(mxz), zepoch(mxz), rpe(mxz)
+      double precision t_obs(6), t_mean, t_std
+      double precision alt(ndim_a), den(ndim_a), sch(ndim_a)
+      integer natm, ierr, nzu
+      integer zstat(mxz), nzv
+
+      call read_atm_orem(alt, den, sch, ndim_a, natm)
+
+      t_obs(1) = 0.d0
+      t_obs(2) = 0.d0
+      t_obs(3) = 0.d0
+      t_obs(4) = 0.d0
+      t_obs(5) = 0.d0
+      t_obs(6) = 0.d0
+
+      call orem_run(
+     &   'input/example_37151.tle.txt', 37151,
+     &   t_obs, mxz, 8, 10.d0, 0.90d0, -1.d0,
+     &   80.d0, 160.d0, 0,
+     &   4, 200, 40, 16, 0.8d0, 0.01d0, 0.123d0,
+     &   2, 0, 0,
+     &   7.2921150d-5, 3.35281066d-3, 1.d0,
+     &   0.d0, 0.d0, 0, 0,
+     &   0.d0, 0.d0, 0.d0,
+     &   alt, den, sch, natm,
+     &   reentry, e_opt, bn_opt, rms_o,
+     &   zepoch, nzu,
+     &   zstat, nzv,
+     &   rpe, t_mean, t_std, ierr)
+
+      if (bn_opt(1) .gt. 0.d0 .and. bn_opt(1) .eq. bn_opt(1)) then
+         call assert_i('G2 37151 bn_opt physical',
+     &                 1, 1, npass, nfail)
+      else
+         call assert_i('G2 37151 bn_opt physical',
+     &                 0, 1, npass, nfail)
+      end if
+
+      if (bn_opt(1) .lt. 80.d0) then
+         call assert_i('G2 floor let bn_opt(1) go below 80',
+     &                 1, 1, npass, nfail)
+      else
+         call assert_i('G2 floor let bn_opt(1) go below 80',
+     &                 0, 1, npass, nfail)
+      end if
 
       return
       end

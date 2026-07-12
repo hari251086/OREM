@@ -209,13 +209,15 @@ c     (zone may be selected later when e has decayed)
      &                 0, 1, npass, nfail)
       end if
 
-c     V4: bn_opt in bounds [80, 160]
-      if (bn_opt(1) .ge. 80.d0 .and.
-     &    bn_opt(1) .le. 160.d0) then
-         call assert_i(obj_name//' bn_opt in bounds',
+c     V4: bn_opt is physical (positive, finite). No longer bounds-
+c     checked against the caller's [80,160] input range -- issue #12
+c     (G2)'s physics-based BN floor can legitimately push bn_opt(1)
+c     below 80 when the zone's own decay rate warrants it.
+      if (bn_opt(1) .gt. 0.d0 .and. bn_opt(1) .eq. bn_opt(1)) then
+         call assert_i(obj_name//' bn_opt physical',
      &                 1, 1, npass, nfail)
       else
-         call assert_i(obj_name//' bn_opt in bounds',
+         call assert_i(obj_name//' bn_opt physical',
      &                 0, 1, npass, nfail)
       end if
 

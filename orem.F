@@ -156,9 +156,11 @@ c     Working
       double precision bn_lo, bn_hi, e_mid, de
       double precision bn_val, t_obs_jd
       double precision a_kep(7), x0(3), xd0(3), cal0(6)
-      integer iz, i, nzone, nvalid
+      integer iz, i, nzone, nvalid, nzone1
       double precision smin, smax
       logical bn_at_bound, e_at_bound
+      double precision bn_floor_est
+      logical bn_floor_ok
 
       ierr = 0
       nzones_used = 0
@@ -224,6 +226,49 @@ c     ============================================================
       n_force(2) = 1
       n_force(3) = 1
       nvalid = 0
+
+c     Issue #12 (G2): physics-based BN floor from zone 1's own TLE
+c     decay rate. Floor-only safety net -- can only extend bn_lo
+c     downward from bn_min_init, never touches bn_hi, never raises
+c     the floor. Targets objects like 39615 whose true BN falls
+c     entirely below the hardcoded default floor.
+      nzone1 = zone_end(1) - zone_start(1) + 1
+      do i = 1, nzone1
+         epz(i)   = epochs(zone_start(1) + i - 1)
+         ez(i)    = e_tle(zone_start(1) + i - 1)
+         incz(i)  = inc_tle(zone_start(1) + i - 1)
+         raanz(i) = raan_tle(zone_start(1) + i - 1)
+         aopz(i)  = aop_tle(zone_start(1) + i - 1)
+         smaz(i)  = a_tle(zone_start(1) + i - 1)
+      end do
+      do j = 1, nzone1
+         maz(j) = 0.d0
+         call tle_find_ma(norad_id, epz(j),
+     &        norad_raw, epoch_yr_raw, epoch_day_raw,
+     &        ama_raw, ntle_raw, maxtle, maz(j))
+      end do
+
+      call estimate_bn_floor(epz, smaz, ez, incz, raanz, aopz, maz,
+     &   nzone1, n_force, ngeo_deg, nsun_deg, nmoon_deg,
+     &   WE_rot, EPS_f, FR_rot,
+     &   CR_srp, AM_srp, IPSR, ISHAD, PSR_srp, amuS, amuM,
+     &   ALT_atm, DEN_atm, SCH_atm, ndim_atm,
+     &   bn_floor_est, bn_floor_ok)
+
+      if (bn_floor_ok) then
+c        Floor-only: can only extend bn_lo downward from whatever the
+c        caller passed as bn_min_init. Deliberately no minimum-value
+c        clamp here (unlike the narrow/widen step below, which
+c        recenters on a real fitted BN) -- that would risk raising a
+c        caller-chosen floor, breaking the "never raises the floor"
+c        guarantee.
+         if (0.5d0*bn_floor_est .lt. bn_lo) then
+            bn_lo = 0.5d0*bn_floor_est
+            write(*,'(A,F8.2,A,F8.2)')
+     &         '  [INFO] G2 BN floor estimate=', bn_floor_est,
+     &         ' -> bn_lo=', bn_lo
+         end if
+      end if
 
       do iz = 1, nzones
          zone_status(iz) = 0
@@ -574,6 +619,124 @@ c     ============================================================
             end if
          end if
       end do
+
+      return
+      end
+
+c     ============================================================
+      subroutine estimate_bn_floor(epz, smaz, ez, incz, raanz, aopz,
+     &   maz, nzone, n_force, ngeo_deg, nsun_deg, nmoon_deg,
+     &   WE_rot, EPS_f, FR_rot,
+     &   CR_srp, AM_srp, IPSR, ISHAD, PSR_srp, amuS, amuM,
+     &   ALT_atm, DEN_atm, SCH_atm, ndim_atm,
+     &   bn_floor_est, ok)
+c
+c     Issue #12 (G2): physics-based BN estimate from zone 1's own TLE
+c     decay rate ("delta-n-bar/delta-t", expressed here as da/dt --
+c     directly related, avoids an unnecessary a<->n conversion since
+c     the calibration trial below also measures da/dt).
+c
+c     Numerical calibration, not a closed-form formula: propagates one
+c     short trial arc at a reference BN and scales by
+c     (trial da/dt) / (observed da/dt) -- decay rate is ~inversely
+c     proportional to BN, so this inverts correctly, and using
+c     propagate_ks itself guarantees the estimate can't disagree with
+c     the drag model's actual internal unit conventions the way a
+c     hand-derived analytic formula risks doing.
+c
+c     Output
+c       bn_floor_est : estimated BN (kg/m2); only meaningful if ok
+c       ok           : .false. if the zone's TLE slope is too noisy/
+c                      flat/short to trust (caller should leave bn_lo
+c                      untouched in that case)
+c     ============================================================
+      implicit double precision (a-h, o-z)
+      common /xy/ pi, d2r, r2d, amue, AU, R_Earth
+
+      integer nzone
+      double precision epz(nzone), smaz(nzone), ez(nzone)
+      double precision incz(nzone), raanz(nzone), aopz(nzone)
+      double precision maz(nzone)
+      integer n_force(3), ngeo_deg, nsun_deg, nmoon_deg
+      double precision WE_rot, EPS_f, FR_rot
+      double precision CR_srp, AM_srp
+      integer IPSR, ISHAD
+      double precision PSR_srp, amuS, amuM
+      integer ndim_atm
+      double precision ALT_atm(ndim_atm), DEN_atm(ndim_atm)
+      double precision SCH_atm(ndim_atm)
+      double precision bn_floor_est
+      logical ok
+
+      parameter(max_trial = 400)
+      double precision traj_jd(max_trial)
+      double precision traj_x(3, max_trial), traj_xd(3, max_trial)
+      save traj_jd, traj_x, traj_xd
+      double precision a_kep(7), x0(3), xd0(3), cal0(6)
+      double precision pek(7)
+      double precision slope_obs, intcpt_obs, r2_obs
+      double precision slope_trial, sma_t0, sma_tf
+      double precision zone_dur, period_d
+      integer nrev_trial, idump_trial, exit_code_trial
+      parameter(BN_trial = 100.d0)
+
+      ok = .false.
+      bn_floor_est = 0.d0
+
+      if (nzone .lt. 3) return
+
+c     Observed da/dt across zone 1's own TLEs (reuses zone_select's
+c     proven linfit, matching the issue's "delta-n-bar/delta-t" ask).
+      call linfit(epz, smaz, nzone, slope_obs, intcpt_obs, r2_obs)
+
+      if (r2_obs .lt. 0.5d0 .or. dabs(slope_obs) .lt. 1.d-6) return
+
+c     Short trial propagation at BN_trial from the zone's first TLE.
+      a_kep(1) = smaz(1)
+      a_kep(2) = ez(1)
+      a_kep(3) = incz(1)
+      a_kep(4) = raanz(1)
+      a_kep(5) = aopz(1)
+      a_kep(6) = maz(1)
+      a_kep(7) = 0.d0
+      call oe2car(a_kep, x0, xd0, 1.d-12)
+      call jd2cal(epz(1), cal0)
+
+      zone_dur = epz(nzone) - epz(1)
+      if (zone_dur .gt. 3.d0) zone_dur = 3.d0
+      if (zone_dur .lt. 0.5d0) zone_dur = 0.5d0
+      period_d = 2.d0*pi*dsqrt(a_kep(1)**3/amue) / 86400.d0
+      nrev_trial = int(zone_dur/period_d) + 2
+
+      idump_trial = 1
+      call propagate_ks(
+     &   x0, xd0, cal0,
+     &   nrev_trial, 360, 1.d-10,
+     &   n_force, ngeo_deg, nsun_deg, nmoon_deg,
+     &   BN_trial, 1, WE_rot, EPS_f, FR_rot,
+     &   CR_srp, AM_srp, IPSR, ISHAD,
+     &   PSR_srp, amuS, amuM,
+     &   ALT_atm, DEN_atm, SCH_atm, ndim_atm,
+     &   max_trial, idump_trial,
+     &   traj_jd, traj_x, traj_xd,
+     &   exit_code_trial)
+
+      if (exit_code_trial .eq. 2 .or. idump_trial .lt. 2) return
+
+      call car2oe(traj_x(1,1), traj_xd(1,1), pek)
+      sma_t0 = pek(1)
+      call car2oe(traj_x(1,idump_trial), traj_xd(1,idump_trial), pek)
+      sma_tf = pek(1)
+
+      slope_trial = (sma_tf - sma_t0) /
+     &   (traj_jd(idump_trial) - traj_jd(1))
+
+      if (dabs(slope_trial) .lt. 1.d-9) return
+
+      bn_floor_est = BN_trial * dabs(slope_trial) / dabs(slope_obs)
+      if (bn_floor_est .lt. 5.d0) bn_floor_est = 5.d0
+      if (bn_floor_est .gt. 500.d0) bn_floor_est = 500.d0
+      ok = .true.
 
       return
       end
