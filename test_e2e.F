@@ -3,7 +3,9 @@ c     -------------------------------------------------------
 c     Full pipeline: TLE -> zone_select -> RSM (9x propagate_ks)
 c       -> GA -> propagate_ks re-entry -> RPE
 c     Object: 42928 PSLV-C39 R/B, known re-entry 2019-03-03
-c     IDRAG=1, force model geo=4 sun=2 moon=3
+c     Full force model: IDRAG=1, geo=20 (was 4), sun=2, moon=3,
+c     SRP on (Cr=1.2, A/m=0.01 m2/kg, conical shadow) -- previously
+c     geo=4 and SRP off (CR_srp=AM_srp=IPSR=ISHAD=PSR_srp=0)
 c     -------------------------------------------------------
 c     Compile:
 c       ifx /heap-arrays /F:16777216 test_e2e.F orem.F rsm.F
@@ -61,7 +63,7 @@ c     Build altitude grid and read atmosphere table
       write(*,*) '=============================================='
       write(*,*) ' Object  : 42928 PSLV-C39 R/B'
       write(*,*) ' Re-entry: 2019-03-03 (known)'
-      write(*,*) ' Config  : IDRAG=1, geo=4, sun=2, moon=3'
+      write(*,*) ' Config  : IDRAG=1, geo=20, sun=2, moon=3, SRP on'
       write(*,*) '=============================================='
 
 c     Known re-entry date
@@ -74,9 +76,10 @@ c     Known re-entry date
 
 c     ============================================================
 c     Run full OREM pipeline with drag enabled
-c     Parameters match orem_42928_drag.cfg:
+c     Parameters match orem_42928_drag.cfg, force model widened to
+c     full (geo=20, SRP on) for issue #16:
 c       GA: pop=4, gen=500, bits_e=40, bits_BN=16
-c       Force: geo=4, sun=2, moon=3
+c       Force: geo=20, sun=2, moon=3, SRP (Cr=1.2, A/m=0.01, conical)
 c       IDRAG=1, BN=[80,160]
 c     ============================================================
       call orem_run(
@@ -84,10 +87,10 @@ c     ============================================================
      &   t_obs, mxz, 8, 10.d0, 0.90d0, -1.d0,
      &   80.d0, 160.d0, 1,
      &   4, 500, 40, 16, 0.8d0, 0.01d0, 0.123d0,
-     &   4, 2, 3,
+     &   20, 2, 3,
      &   7.2921150d-5, 3.35281066d-3, 1.d0,
-     &   0.d0, 0.d0, 0, 0,
-     &   0.d0, 1.32712440018d11, 4.902801076d3,
+     &   1.2d0, 0.01d0, 1, 2,
+     &   4.56d-6, 1.32712440018d11, 4.902801076d3,
      &   ALT_a, DEN_a, SCH_a, natm,
      &   reentry, e_opt, bn_opt, rms_o,
      &   zepoch, nzu,
@@ -218,10 +221,10 @@ c     ============================================================
      &   t_obs, mxz, 8, 10.d0, 0.90d0, -1.d0,
      &   80.d0, 160.d0, 1,
      &   4, 500, 40, 16, 0.8d0, 0.01d0, 0.123d0,
-     &   4, 2, 3,
+     &   20, 2, 3,
      &   7.2921150d-5, 3.35281066d-3, 1.d0,
-     &   0.d0, 0.d0, 0, 0,
-     &   0.d0, 1.32712440018d11, 4.902801076d3,
+     &   1.2d0, 0.01d0, 1, 2,
+     &   4.56d-6, 1.32712440018d11, 4.902801076d3,
      &   ALT_a, DEN_a, SCH_a, natm,
      &   reentry, e_opt, bn_opt, rms_o,
      &   zepoch, nzu,
@@ -336,10 +339,10 @@ c     ============================================================
      &   t_obs, mxz, 5, 10.d0, 0.90d0, -1.d0,
      &   50.d0, 500.d0, 1,
      &   4, 500, 40, 16, 0.8d0, 0.01d0, 0.123d0,
-     &   4, 2, 3,
+     &   20, 2, 3,
      &   7.2921150d-5, 3.35281066d-3, 1.d0,
-     &   0.d0, 0.d0, 0, 0,
-     &   0.d0, 1.32712440018d11, 4.902801076d3,
+     &   1.2d0, 0.01d0, 1, 2,
+     &   4.56d-6, 1.32712440018d11, 4.902801076d3,
      &   ALT_a, DEN_a, SCH_a, natm,
      &   reentry, e_opt, bn_opt, rms_o,
      &   zepoch, nzu,
@@ -427,10 +430,10 @@ c     ============================================================
      &   t_obs, mxz, 5, 10.d0, 0.90d0, -1.d0,
      &   50.d0, 500.d0, 1,
      &   4, 500, 40, 16, 0.8d0, 0.01d0, 0.123d0,
-     &   4, 2, 3,
+     &   20, 2, 3,
      &   7.2921150d-5, 3.35281066d-3, 1.d0,
-     &   0.d0, 0.d0, 0, 0,
-     &   0.d0, 1.32712440018d11, 4.902801076d3,
+     &   1.2d0, 0.01d0, 1, 2,
+     &   4.56d-6, 1.32712440018d11, 4.902801076d3,
      &   ALT_a, DEN_a, SCH_a, natm,
      &   reentry, e_opt, bn_opt, rms_o,
      &   zepoch, nzu,
