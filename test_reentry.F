@@ -166,7 +166,7 @@ c     ============================================================
      &   tle_file, norad,
      &   t_obs, mxz, 8, 10.d0, 0.90d0, -1.d0,
      &   80.d0, 160.d0, 0,
-     &   4, 200, 40, 16, 0.8d0, 0.01d0, 0.123d0,
+     &   20, 200, 40, 16, 0.8d0, 0.01d0, 0.123d0,
      &   2, 0, 0,
      &   7.2921150d-5, 3.35281066d-3, 1.d0,
      &   0.d0, 0.d0, 0, 0,
@@ -235,12 +235,12 @@ c     Print zone summary
       write(*,'(A,I2,A)') '    ', nzu, ' zones:'
       do i = 1, nzu
          if (reentry(i) .gt. 0.d0) then
-            write(*,'(A,I1,A,F8.4,A,F5.2,A,F6.2,A)')
+            write(*,'(A,I1,A,F8.4,A,F7.2,A,F6.2,A)')
      &         '    Z', i, ': e=', e_opt(i),
      &         ' A=', bn_opt(i),
      &         ' RPE=', rpe(i), '%'
          else
-            write(*,'(A,I1,A,F8.4,A,F5.2)')
+            write(*,'(A,I1,A,F8.4,A,F7.2)')
      &         '    Z', i, ': e=', e_opt(i),
      &         ' A=', bn_opt(i)
          end if

@@ -19,7 +19,13 @@ c           ksrop\propagate_ks.F ksrop\Subrouts.F
 c           ksrop\TLEread.F ksrop\Legendre.F
 c           /exe:scratch_legacy_validation\compare_bn.exe
 c     Run (from OREM repo root, so relative paths resolve):
-c       scratch_legacy_validation\compare_bn.exe
+c       scratch_legacy_validation\compare_bn.exe [bn_hi] [popsize] [out.csv]
+c     Optional positional args (issue #12 v1.14 follow-up experiments):
+c       bn_hi   : BN search ceiling, kg/m2   (default 300)
+c       popsize : GA population size, even,
+c                 <= maxpop=20 in ga.F       (default 4)
+c       out.csv : results path               (default
+c                 scratch_legacy_validation/orem_results.csv)
 c     -------------------------------------------------------
       program compare_bn
 
@@ -41,12 +47,36 @@ c     -------------------------------------------------------
       character*100 relpath, tle_file
       integer norad, nrows
 
+      character*200 argbuf, out_csv
+      double precision bn_hi_arg
+      integer ipop_arg, nargs
+
       call init_constants()
       call read_atm_v(ALT_a, DEN_a, SCH_a, ndim_a, natm)
 
+c     Optional args: [bn_hi] [popsize] [out.csv]
+      bn_hi_arg = 300.d0
+      ipop_arg  = 4
+      out_csv   = 'scratch_legacy_validation/orem_results.csv'
+      nargs = command_argument_count()
+      if (nargs .ge. 1) then
+         call get_command_argument(1, argbuf)
+         read(argbuf,*) bn_hi_arg
+      end if
+      if (nargs .ge. 2) then
+         call get_command_argument(2, argbuf)
+         read(argbuf,*) ipop_arg
+      end if
+      if (nargs .ge. 3) then
+         call get_command_argument(3, out_csv)
+      end if
+      write(*,'(A,F8.1,A,I3,A,A)')
+     &   'compare_bn: bn_hi=', bn_hi_arg, ' popsize=', ipop_arg,
+     &   ' out=', trim(out_csv)
+
       open(unit=21, file='scratch_legacy_validation/manifest.txt',
      &     status='old')
-      open(unit=22, file='scratch_legacy_validation/orem_results.csv',
+      open(unit=22, file=trim(out_csv),
      &     status='unknown')
       write(22,'(A)')
      &   'norad,zone_label,nzu,e_opt,bn_opt,rms,zstat,ierr'
@@ -70,8 +100,8 @@ c     -------------------------------------------------------
       call orem_run(
      &   trim(tle_file), norad,
      &   t_obs, mxz, 8, 10.d0, 0.90d0, -1.d0,
-     &   10.d0, 300.d0, 0,
-     &   4, 200, 40, 16, 0.8d0, 0.01d0, 0.123d0,
+     &   10.d0, bn_hi_arg, 0,
+     &   ipop_arg, 200, 40, 16, 0.8d0, 0.01d0, 0.123d0,
      &   2, 0, 0,
      &   7.2921150d-5, 3.35281066d-3, 1.d0,
      &   0.d0, 0.d0, 0, 0,

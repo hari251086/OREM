@@ -499,6 +499,17 @@ cp ../KSROP/Legendre.F ksrop/
 - The remaining spread (8/29 landing on the same GA-decoded BN=205.6167, 20/29 flagged `boundary`, mostly near the widened 300 kg/m² ceiling) now looks like real residual signal rather than corruption — informs the G3-vs-G4 decision directly
 - 335/335 tests pass (no test-visible behavior change on the existing suite — the bug required a specific multi-call/short-trajectory sequence the unit tests didn't happen to trigger)
 
+**1.15 — 2026-07-13**
+- GA population raised from 4 to 20 at all pipeline call sites (issue #12) — experiments on the 31-zone ground-truth harness proved pop=4's output is a *range-invariant seed artifact*, not an optimum:
+  - Parameterized `scratch_legacy_validation/compare_bn.F` with optional args (`bn_hi`, `popsize`, output CSV); defaults byte-for-byte reproduce the committed v1.14 baseline
+  - Smoking gun: raising the BN ceiling from 300 to 600 at pop=4 moved the pinned value 267.7896 → 534.4685 and the decoy 205.6167 → 407.9788 — both are the *identical binary chromosome* decoded over the wider range (fraction 0.888930 / 0.674540 of either interval). A 4-individual population searching a 56-bit chromosome converges on a seed-determined decode with zero influence from the data; boundary flags got worse (20/29 → 26/29)
+  - At pop=20, [10,300]: all 29 zones land on distinct data-driven BN values, `ok` zones 9→20, median GA RMS 0.164→0.058 (better in 24/29 zones), and 42928 Z0 fits BN=151.04 — matching the v1.7 chained result (151.11) and the heritage research
+  - Ceiling stays at [10,300]/[80,160]: at pop=20 the wider [10,600] range *degrades* the search (42928 Z0 drifts to 397 with worse RMS) — drag fitness goes flat at high BN, so extra range is noise for the same generation budget
+- Changes: `test_e2e.F` (4 sites), `test_orem.F` (7), `test_reentry.F` (1, + widened `F5.2`→`F7.2` BN print format that overflowed at BN≥100), `test_rsm.F` (1), both `input/*.cfg` files, `ga.F` doc comment. `test_ga.F` deliberately stays at pop=4 — its tests exercise GA mechanics, not the production config
+- 335/335 tests pass with **zero assertion changes** — including the two sensitive ones: D16 (boundary detection, [200,205] pinned window still traps the optimum at the edge) and G2 (37151 floor: pop-20 GA lands bn_opt(1)=56.79, still below 80, near the physics estimate of 46)
+- 7-object fits are now coherent per object: 37151 = 48–91, 27526 = 73–113, 32007 = 77–126, 39615 = 126–200 kg/m²; 42928/35497/37819 start pinned at the top of [80,160] and escalate zone-to-zone (up to 300–438) via the v1.10 boundary-widen carryover — their true zone-1 BN is at or above the caller's ceiling
+- **Key negative result: RPE is essentially unchanged** (42928 zone-0: −70.68% → −73.78%; 4-zone best: −72.35%; 39615: −97.68%). The broken optimizer was *masking* the real remaining problem, not causing it — with within-zone fits now excellent (RMS ~0.06) yet long-horizon predictions still 70–97% early, the RPE error must come from downstream of the fit: a BN fitted on a ~10-day zone under-predicting the months-long decay (attitude/regime drift), the static J70 density vs. the real solar cycle, or the re-entry propagation config itself — that's the reframed #12 investigation
+
 ---
 
 ## 9. References

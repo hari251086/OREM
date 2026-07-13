@@ -691,7 +691,7 @@ c     R29: Feed RSM surfaces into GA optimizer
      &   tobs, apobs, nobs,
      &   e_grid(1), e_grid(3),
      &   bn_grid(1), bn_grid(3),
-     &   4, 500, 40, 16,
+     &   20, 500, 40, 16,
      &   0.8d0, 0.01d0, 0.123d0,
      &   e_opt, a_opt, rms_opt)
 
