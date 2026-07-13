@@ -162,8 +162,21 @@ c           period = 2*pi*sqrt(a^3/mu)
             nrev_zone = int(zone_dur / period_d) + 2
 
 c           Call propagator
+c           Issue #12 follow-up: traj_jd/traj_x/traj_xd are SAVEd
+c           across grid points and across separate rsm_generate
+c           calls (different zones/objects). propagate_ks does not
+c           clear indices beyond its own output, so a shorter run
+c           here can otherwise inherit a longer prior run's leftover
+c           trajectory tail -- and the end-of-data scan below only
+c           excludes stale points *later* than the current zone, not
+c           earlier ones. Zeroing traj_jd first makes every stale
+c           slot fail the ".le. 0.d0" sentinel check regardless of
+c           its old epoch.
             idrag_loc = 1
             idump_loc = 1
+            do izero = 1, max_traj
+               traj_jd(izero) = 0.d0
+            end do
             call propagate_ks(
      &         x0, xd0, cal0,
      &         nrev_zone, istep_prop, tole_prop,
