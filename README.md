@@ -538,6 +538,12 @@ cp ../KSROP/Legendre.F ksrop/
 - N13/N14 rebased onto the first-principles reference at matched duration (±10% bands around −16.45/−8.21 km); GMAT 7-day magnitudes demoted to context output (they also carry J2-aliased osculating-apogee sampling and diurnal-bulge geometry a static-atmosphere model cannot reproduce)
 - 335/335 tests pass. KSROP's `driver_KS.F` carries the same heritage sweep (KSJLSDNP2 lineage) — porting this fix there is flagged KSROP-side
 
+**1.19 — 2026-07-14**
+- **Structured prediction report (issue #13)**: new `report.F` / `orem_report` writes `output/OREM_<NORAD>_<DATE>.txt` from `orem_run`'s outputs — config echo, per-zone fit/prediction table (epoch, e_opt, BN, re-entry JD + UTC date, RPE, `zone_status` label), and the headline **ensemble block**: mean re-entry ± std, relative spread (% of the zone-1→mean horizon), and ensemble RPE when an observed date is provided. Wired into `main_orem.F`; new R1–R4 tests in `test_orem.F`. **339 total tests**
+- Fixed a latent `main_orem.F` bug found during wiring: its `orem_run` call was never updated for v1.10's `zone_status`/`nzones_valid` arguments (positional mismatch — `rpe` landed in `zone_status`'s slot). Latent only because `orem.exe` had not been rebuilt since; now threaded and rebuilt
+- **First full 7-object drag-enabled RPE campaign post-v1.18** (`scratch_rpe/rpe_campaign.F`, full force model, results in `rpe_campaign.csv`): ensemble RPE per object — 42928 **+15.3%**, 35497 +238.7%, 37151 −7.4%, 39615 **+8.4%**, 27526 +20.4%, 32007 **+0.7%**, 37819 −17.7%. **Six of seven objects within ±21%** (median |ensemble RPE| 15.3%); the outlier 35497 is the known i=5.7° solar-apsidal-resonance case that issue #9 (3-variable optimization with inclination) was written for — its zone-4 alone predicts −1.1%, while early zones run +170..+520%
+- Design signal for #12/G4: **the latest zone is consistently the sharpest single predictor** (35497 Z4 −1.1%, 37151 Z4 the only zone predicting at all, 42928 Z3/Z4 best) — drag signal concentrates as perigee decays, motivating recency-weighted ensembles or late-zone selection over the current uniform mean
+
 ---
 
 ## 9. References

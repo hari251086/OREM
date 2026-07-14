@@ -35,9 +35,11 @@ c     Output
       double precision rms_o(mxz), zepoch(mxz), rpe(mxz)
       double precision t_mean, t_std
       integer nzu, ierr
+      integer zstat(mxz), nzv
 
       double precision cal_out(6)
-      integer iarg
+      integer iarg, ierr_rep, ivals(8)
+      character*60 rep_file
 
 c     ============================================================
 c     Parse command line argument
@@ -153,8 +155,12 @@ c     ============================================================
      &   ALT_a, DEN_a, SCH_a, natm,
      &   reentry, e_opt, bn_opt, rms_o,
      &   zepoch, nzu,
+     &   zstat, nzv,
      &   rpe, t_mean, t_std,
      &   ierr)
+c     (zstat/nzv threaded 2026-07-14 -- this call site was missed in
+c      the v1.10 interface change; orem.exe was never rebuilt, so the
+c      positional mismatch stayed latent until issue #13 touched it.)
 
 c     ============================================================
 c     Print results
@@ -219,6 +225,27 @@ c     ============================================================
          write(*,*) ''
          write(*,*) '  NOTE: No re-entry detected.'
          write(*,*) '  Enable drag (IDRAG=1) for prediction.'
+      end if
+
+c     ============================================================
+c     Write prediction report (issue #13)
+c     ============================================================
+      call date_and_time(values=ivals)
+      write(rep_file,'(A,I5.5,A,I4.4,I2.2,I2.2,A)')
+     &   'output/OREM_', norad_id, '_',
+     &   ivals(1), ivals(2), ivals(3), '.txt'
+      call orem_report(
+     &   trim(rep_file), norad_id, t_obs_cal,
+     &   bn_min, bn_max, idrag_flag,
+     &   reentry, e_opt, bn_opt, rms_o,
+     &   zepoch, nzu,
+     &   zstat, nzv,
+     &   rpe, t_mean, t_std, mxz, ierr_rep)
+      if (ierr_rep .eq. 0) then
+         write(*,'(A,A)') '  Report:  ', trim(rep_file)
+      else
+         write(*,'(A,A)') '  WARNING: could not write ',
+     &      trim(rep_file)
       end if
 
       write(*,*) ''

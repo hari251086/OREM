@@ -64,6 +64,14 @@ c     ==============================================================
       call test_bn_floor(npass, nfail)
 
 c     ==============================================================
+c     Issue #13: structured output report
+c     ==============================================================
+      write(*,*) ''
+      write(*,*) '  --- Prediction report (#13) ---'
+
+      call test_report(npass, nfail)
+
+c     ==============================================================
 c     Summary
 c     ==============================================================
       write(*,*) ''
@@ -523,6 +531,90 @@ c     ============================================================
      &                 0, 1, npass, nfail)
       end if
 
+      return
+      end
+
+c     ============================================================
+c     Issue #13 test: orem_report writes a well-formed report from
+c     a real (fast, IDRAG=0) orem_run on the 42928 zone-0 file.
+c     ============================================================
+      subroutine test_report(npass, nfail)
+      implicit double precision (a-h, o-z)
+      common /xy/ pi, d2r, r2d, amue, AU, R_Earth
+      integer npass, nfail
+
+      parameter(mxz = 4, ndim_a = 291)
+      double precision reentry(mxz), e_opt(mxz), bn_opt(mxz)
+      double precision rms_o(mxz), zepoch(mxz), rpe(mxz)
+      double precision t_obs(6), t_mean, t_std
+      double precision alt(ndim_a), den(ndim_a), sch(ndim_a)
+      integer natm, ierr, nzu, ierr_rep
+      integer zstat(mxz), nzv
+
+      character*200 line
+      integer ihdr, izone, iens, ilgd
+
+      call read_atm_orem(alt, den, sch, ndim_a, natm)
+
+      t_obs(1) = 2019.d0
+      t_obs(2) = 3.d0
+      t_obs(3) = 3.d0
+      t_obs(4) = 0.d0
+      t_obs(5) = 0.d0
+      t_obs(6) = 0.d0
+
+      call orem_run(
+     &   'input/example_42928_zone0.tle.txt', 42928,
+     &   t_obs, mxz, 8, 10.d0, 0.90d0, -1.d0,
+     &   80.d0, 160.d0, 0,
+     &   20, 200, 40, 16, 0.8d0, 0.01d0, 0.123d0,
+     &   2, 0, 0,
+     &   7.2921150d-5, 3.35281066d-3, 1.d0,
+     &   0.d0, 0.d0, 0, 0,
+     &   0.d0, 0.d0, 0.d0,
+     &   alt, den, sch, natm,
+     &   reentry, e_opt, bn_opt, rms_o,
+     &   zepoch, nzu,
+     &   zstat, nzv,
+     &   rpe, t_mean, t_std, ierr)
+
+      call orem_report(
+     &   'output/test_report.txt', 42928, t_obs,
+     &   80.d0, 160.d0, 0,
+     &   reentry, e_opt, bn_opt, rms_o,
+     &   zepoch, nzu,
+     &   zstat, nzv,
+     &   rpe, t_mean, t_std, mxz, ierr_rep)
+
+c     R1: report written without error
+      call assert_i('R1 report ierr_rep=0', ierr_rep, 0,
+     &              npass, nfail)
+
+c     R2-R4: report contains header, zone table, status legend
+      ihdr  = 0
+      izone = 0
+      iens  = 0
+      ilgd  = 0
+      open(unit=45, file='output/test_report.txt', status='old',
+     &     err=800)
+ 10   read(45,'(A)',end=20) line
+      if (index(line, 'OREM Re-entry Prediction Report') .gt. 0)
+     &   ihdr = 1
+      if (index(line, 'Zone  Epoch (JD)') .gt. 0) izone = 1
+      if (index(line, 'Ensemble') .gt. 0) iens = 1
+      if (index(line, 'zone_status legend') .gt. 0) ilgd = 1
+      goto 10
+ 20   close(45)
+
+      call assert_i('R2 report header present', ihdr, 1,
+     &              npass, nfail)
+      call assert_i('R3 zone table present', izone, 1,
+     &              npass, nfail)
+      call assert_i('R4 ensemble + legend present', iens*ilgd, 1,
+     &              npass, nfail)
+      return
+
+ 800  call assert_i('R2 report file readable', 0, 1, npass, nfail)
       return
       end
 
