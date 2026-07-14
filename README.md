@@ -528,6 +528,16 @@ cp ../KSROP/Legendre.F ksrop/
 - Assertion updates forced by the corrected table (all documented in-code): D12/E4/E9 BN checks → physical-sanity (G2 floor + thinner table put fit-consistent BN below the caller's 80); D16 boundary-detection window moved from [200,205] (pinned above the old table-consistent BN) to [20,30] (pinned below — the G2 floor un-pins windows from above); N13/N14 tolerance → honest [0.15,0.60]×GMAT band encoding the known factors, with a do-not-rewiden pointer to #25
 - 335/335 tests pass. KSROP-side: `gen_atm_jr71.F` + regenerated `input/ATM.DAT` committed to KSROP `HS-dev` separately
 
+**1.18 — 2026-07-14**
+- **Fixed the #25 drag-phase defect; RPE collapses from −72..−97% to bracketing zero.** 42928 4-zone RPE now +52.2/+14.6/**+3.2**/−13.8% (ensemble mean re-entry within **+11%** of observed on a 527-day horizon, ±100 d spread); zone-0 +37.1% (was −53.4%)
+- Root cause (two-part, and *not* what #25 originally claimed):
+  - The issue's "2× deficit at the 7-day window" was a **test artifact**: N13 compared a 35-revolution `propagate_ks` drop against GMAT references spanning 7 days = 64.1 revolutions of that orbit. Duration-matched, `propagate_ks` agrees with an exact RK4 integration of its own drag model to **~1%** (BN=80: −16.24 vs −16.45 km; BN=160: −8.12 vs −8.21; `scratch_gmat/drag_ref.py`, now with the F co-rotation factor and oblate-perigee density matched)
+  - The *arc-level* distortion was real: the old analytic eccentric-anomaly sweep (`DE_dg = (VIPP·π − EA₀)/istep`) advances the drag-density phase at **half rate whenever a revolution starts past EA=π** (the `VIPP=4` branch targets 4π over one rev's steps) — intermittently dephasing the density peak from the true perigee passage along every long decay arc as revolution boundaries drift. A phase error that comes and goes with orbit geometry cannot be absorbed by the fitted BN, which kept RPE pinned deep-negative through four generations of upstream fixes
+- Fix: the drag density now reads the **true eccentric anomaly from the state** (`pek(7)`, refreshed by the per-stage `car2oe`) instead of the analytic sweep — stage-accurate, covers both wings of the perigee density bump, no steps-per-rev assumption. Bit-identical on the N13 window (perigee-anchored revs never trigger `VIPP=4`), transformative on arcs
+- Fits: per-object BN in coherent physical bands across all 7 objects (42928: 45–75, declining with zone; 39615: 58–65; 37819: 64–73; 32007: 38–66). 39615's dedicated zone-1 file (e=0.68, weak drag signal) fits BN≈139 and honestly predicts >5-year lifetime vs the actual 2.2 — the true #12 identifiability limit, no longer masked; E15 made informational with the E20/35497 rationale
+- N13/N14 rebased onto the first-principles reference at matched duration (±10% bands around −16.45/−8.21 km); GMAT 7-day magnitudes demoted to context output (they also carry J2-aliased osculating-apogee sampling and diurnal-bulge geometry a static-atmosphere model cannot reproduce)
+- 335/335 tests pass. KSROP's `driver_KS.F` carries the same heritage sweep (KSJLSDNP2 lineage) — porting this fix there is flagged KSROP-side
+
 ---
 
 ## 9. References
