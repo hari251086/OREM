@@ -140,15 +140,18 @@ c     ============================================================
       end if
 
 c     ============================================================
-c     E4: bn_opt in bounds [80,160] for zone 1
+c     E4: bn_opt physical (positive, finite) for zone 1. Not checked
+c     against the caller's [80,160]: the G2 floor extends the zone-1
+c     search below 80, and with the corrected J71 ATM.DAT (v1.17)
+c     42928's fit-consistent BN (~70) legitimately lands there.
 c     ============================================================
-      if (bn_opt(1) .ge. 80.d0 .and. bn_opt(1) .le. 160.d0) then
-         write(*,'(A,F7.2)') '  [PASS]  E4 bn_opt(1) in [80,160]: ',
+      if (bn_opt(1) .gt. 0.d0 .and. bn_opt(1) .eq. bn_opt(1)) then
+         write(*,'(A,F7.2)') '  [PASS]  E4 bn_opt(1) physical: ',
      &      bn_opt(1)
          npass = npass + 1
       else
          write(*,'(A,F10.2)')
-     &      '  [FAIL]  E4 bn_opt(1) out of bounds: ', bn_opt(1)
+     &      '  [FAIL]  E4 bn_opt(1) unphysical: ', bn_opt(1)
          nfail = nfail + 1
       end if
 
@@ -265,14 +268,15 @@ c     E8: e_opt physical for zone 1
          nfail = nfail + 1
       end if
 
-c     E9: bn_opt in bounds
-      if (bn_opt(1) .ge. 80.d0 .and. bn_opt(1) .le. 160.d0) then
-         write(*,'(A,F7.2)') '  [PASS]  E9 z0 bn_opt in [80,160]: ',
+c     E9: bn_opt physical (see E4 -- G2 floor + corrected J71 table
+c     put zone-0's fit-consistent BN (~58) below the caller's 80)
+      if (bn_opt(1) .gt. 0.d0 .and. bn_opt(1) .eq. bn_opt(1)) then
+         write(*,'(A,F7.2)') '  [PASS]  E9 z0 bn_opt physical: ',
      &      bn_opt(1)
          npass = npass + 1
       else
          write(*,'(A,F10.2)')
-     &      '  [FAIL]  E9 z0 bn_opt out of bounds: ', bn_opt(1)
+     &      '  [FAIL]  E9 z0 bn_opt unphysical: ', bn_opt(1)
          nfail = nfail + 1
       end if
 

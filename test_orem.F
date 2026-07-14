@@ -291,13 +291,15 @@ c     D11: e_opt in physical range
      &                 0, 1, npass, nfail)
       end if
 
-c     D12: bn_opt in bounds
-      if (bn_opt(1) .ge. 80.d0 .and.
-     &    bn_opt(1) .le. 160.d0) then
-         call assert_i('D12 bn_opt in [80,160]',
+c     D12: bn_opt physical (positive, finite). Not bounds-checked
+c     against the caller's [80,160]: the G2 floor legitimately extends
+c     the zone-1 search below 80, and with the corrected J71 ATM.DAT
+c     (v1.17) 42928's fit-consistent BN (~70-85) actually lands there.
+      if (bn_opt(1) .gt. 0.d0 .and. bn_opt(1) .eq. bn_opt(1)) then
+         call assert_i('D12 bn_opt physical',
      &                 1, 1, npass, nfail)
       else
-         call assert_i('D12 bn_opt in [1,5]',
+         call assert_i('D12 bn_opt physical',
      &                 0, 1, npass, nfail)
       end if
 
@@ -392,16 +394,21 @@ c     Also confirms the call completes without crashing.
       call assert_i('D15 propfail excluded from nzones_valid',
      &              nzv, 0, npass, nfail)
 
-c     D16: BN search window pinned to [200, 205], well above the
-c     zone's real BN (~130-180 per earlier full-suite runs). Empirically
-c     the GA optimum lands ~11% of the window width from the upper
-c     edge (204.44) -- close enough to trip the 15% boundary check.
+c     D16: BN search window pinned to [20, 30], well BELOW the zone's
+c     fit-consistent BN (~70-85 with the corrected J71 ATM.DAT, v1.17)
+c     so the GA optimum pins at the UPPER edge and trips the 15%
+c     boundary check. The window must sit below the real BN, not above
+c     it: the G2 physics floor (v1.12) extends bn_lo downward on zone 1
+c     (here to ~12.5), so a window pinned above the real BN simply
+c     un-pins at the bottom and the optimum lands in the interior --
+c     that configuration stopped flagging once the corrected table
+c     moved the real BN below 200 (previously ~300 table-consistent).
 c     Verifies detection + warning; the driver loop must still
 c     complete normally.
       call orem_run(
      &   'input/example_42928.tle.txt', 42928,
      &   t_obs, mxz, 8, 10.d0, 0.90d0, -1.d0,
-     &   200.d0, 205.d0, 0,
+     &   20.d0, 30.d0, 0,
      &   20, 200, 40, 16, 0.8d0, 0.01d0, 0.123d0,
      &   2, 0, 0,
      &   7.2921150d-5, 3.35281066d-3, 1.d0,

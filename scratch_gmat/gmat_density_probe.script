@@ -1,0 +1,60 @@
+%General Mission Analysis Tool(GMAT) Script
+%  OREM issue #12 (v1.16 follow-up): JacchiaRoberts density-vs-altitude probe.
+%  Reports rho(h) at the ATM.DAT generation conditions (constant F10.7=72,
+%  F10.7A=72, Kp=1.0) for circular equatorial orbits at h = 100..300 km, to
+%  compare directly against input/ATM.DAT's DEN column and find where the
+%  J70-table profile diverges from JR. Epoch matches the 42928 zone-0
+%  cross-check. No propagation -- state is re-assigned inside a For loop and
+%  the density parameter is evaluated at the current state each Report.
+%  JR density is local-solar-time dependent (diurnal bulge); keeping TA/RAAN
+%  fixed across altitudes holds the geometry constant so the ratio *shape*
+%  vs altitude is meaningful even if the absolute level carries a diurnal
+%  factor.
+
+Create ForceModel FMp;
+GMAT FMp.CentralBody = Earth;
+GMAT FMp.PrimaryBodies = {Earth};
+GMAT FMp.GravityField.Earth.Degree = 4;
+GMAT FMp.GravityField.Earth.Order = 0;
+GMAT FMp.GravityField.Earth.PotentialFile = 'C:\Users\hari2\OneDrive\Documents\GitHub\KSROP\scratch_gmat\EGM2008_72x72.cof';
+GMAT FMp.Drag.AtmosphereModel = JacchiaRoberts;
+GMAT FMp.Drag.HistoricWeatherSource = 'ConstantFluxAndGeoMag';
+GMAT FMp.Drag.PredictedWeatherSource = 'ConstantFluxAndGeoMag';
+GMAT FMp.Drag.F107 = 72;
+GMAT FMp.Drag.F107A = 72;
+GMAT FMp.Drag.MagneticIndex = 1.0;
+GMAT FMp.SRP = Off;
+
+Create Propagator Propp;
+GMAT Propp.FM = FMp;
+GMAT Propp.Type = RungeKutta89;
+
+Create Spacecraft SCp;
+GMAT SCp.DateFormat = UTCGregorian;
+GMAT SCp.Epoch = '24 Sep 2017 21:09:49.000';
+GMAT SCp.CoordinateSystem = EarthMJ2000Eq;
+GMAT SCp.DisplayStateType = Keplerian;
+GMAT SCp.SMA = 6478.1363;
+GMAT SCp.ECC = 0.000001;
+GMAT SCp.INC = 0;
+GMAT SCp.RAAN = 0;
+GMAT SCp.AOP = 0;
+GMAT SCp.TA = 0;
+GMAT SCp.Cd = 1;
+GMAT SCp.DragArea = 1;
+GMAT SCp.DryMass = 100;
+
+Create Variable hkm;
+
+Create ReportFile Repp;
+GMAT Repp.Filename = 'gmat_density_probe.txt';
+GMAT Repp.Precision = 16;
+GMAT Repp.WriteHeaders = false;
+
+BeginMissionSequence;
+
+% start at 102: h=100 decodes to geodetic ~99.9994 km, below JR's 100 km floor
+For hkm = 102:2:300;
+   GMAT SCp.SMA = 6378.1363 + hkm;
+   Report Repp hkm SCp.Earth.Altitude SCp.FMp.AtmosDensity;
+EndFor;
