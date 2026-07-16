@@ -23,6 +23,7 @@ c     ============================================================
      &   ALT_atm, DEN_atm, SCH_atm, ndim_atm,
      &   reentry_jd, e_opt_out, bn_opt_out, rms_out,
      &   zone_epoch, nzones_used,
+     &   zone_status, nzones_valid,
      &   rpe_out, t_mean, t_std,
      &   ierr)
 c
@@ -41,6 +42,18 @@ c       bn_opt_out(nzones_max) : optimal ballistic number per zone
 c       rms_out(nzones_max)    : GA RMS per zone
 c       zone_epoch(nzones_max) : zone start epoch (JD)
 c       nzones_used            : number of zones processed
+c       zone_status(nzones_max): per-zone diagnostic (issue #12):
+c                                0=ok, 1=skip_propfail, 2=boundary,
+c                                3=nobound, 4=skip_toofewpts. Purely
+c                                diagnostic -- does not change
+c                                reentry_jd/e_opt_out/bn_opt_out/rpe_out,
+c                                except propfail/toofewpts already
+c                                skipped a zone before this existed.
+c                                If more than one condition fires for a
+c                                zone, whichever check runs last wins
+c                                (toofewpts, then propfail, then
+c                                nobound, then boundary).
+c       nzones_valid            : count of zones with zone_status==0
 c       rpe_out(nzones_max)    : RPE per zone (%)
 c       t_mean, t_std          : mean/std re-entry prediction
 c       ierr                   : 0=ok, 1=TLE error, 2=no zones,
@@ -76,6 +89,7 @@ c     --- Output arguments ---
       double precision rms_out(nzones_max)
       double precision zone_epoch(nzones_max)
       integer nzones_used
+      integer zone_status(nzones_max), nzones_valid
       double precision rpe_out(nzones_max)
       double precision t_mean, t_std
       integer ierr
@@ -142,7 +156,11 @@ c     Working
       double precision bn_lo, bn_hi, e_mid, de
       double precision bn_val, t_obs_jd
       double precision a_kep(7), x0(3), xd0(3), cal0(6)
-      integer iz, i, nzone, nvalid
+      integer iz, i, nzone, nvalid, nzone1
+      double precision smin, smax
+      logical bn_at_bound, e_at_bound
+      double precision bn_floor_est
+      logical bn_floor_ok
 
       ierr = 0
       nzones_used = 0
@@ -209,10 +227,77 @@ c     ============================================================
       n_force(3) = 1
       nvalid = 0
 
+c     Issue #12 (G2): physics-based BN floor from zone 1's own TLE
+c     decay rate. Floor-only safety net -- can only extend bn_lo
+c     downward from bn_min_init, never touches bn_hi, never raises
+c     the floor. Targets objects like 39615 whose true BN falls
+c     entirely below the hardcoded default floor.
+      nzone1 = zone_end(1) - zone_start(1) + 1
+      do i = 1, nzone1
+         epz(i)   = epochs(zone_start(1) + i - 1)
+         ez(i)    = e_tle(zone_start(1) + i - 1)
+         incz(i)  = inc_tle(zone_start(1) + i - 1)
+         raanz(i) = raan_tle(zone_start(1) + i - 1)
+         aopz(i)  = aop_tle(zone_start(1) + i - 1)
+         smaz(i)  = a_tle(zone_start(1) + i - 1)
+      end do
+      do j = 1, nzone1
+         maz(j) = 0.d0
+         call tle_find_ma(norad_id, epz(j),
+     &        norad_raw, epoch_yr_raw, epoch_day_raw,
+     &        ama_raw, ntle_raw, maxtle, maz(j))
+      end do
+
+      call estimate_bn_floor(epz, smaz, ez, incz, raanz, aopz, maz,
+     &   nzone1, n_force, ngeo_deg, nsun_deg, nmoon_deg,
+     &   WE_rot, EPS_f, FR_rot,
+     &   CR_srp, AM_srp, IPSR, ISHAD, PSR_srp, amuS, amuM,
+     &   ALT_atm, DEN_atm, SCH_atm, ndim_atm,
+     &   bn_floor_est, bn_floor_ok)
+
+      if (bn_floor_ok) then
+c        Floor-only: can only extend bn_lo downward from whatever the
+c        caller passed as bn_min_init. Deliberately no minimum-value
+c        clamp here (unlike the narrow/widen step below, which
+c        recenters on a real fitted BN) -- that would risk raising a
+c        caller-chosen floor, breaking the "never raises the floor"
+c        guarantee.
+         if (0.5d0*bn_floor_est .lt. bn_lo) then
+            bn_lo = 0.5d0*bn_floor_est
+            write(*,'(A,F8.2,A,F8.2)')
+     &         '  [INFO] G2 BN floor estimate=', bn_floor_est,
+     &         ' -> bn_lo=', bn_lo
+         end if
+      end if
+
       do iz = 1, nzones
+         zone_status(iz) = 0
+         bn_at_bound = .false.
 
 c        Extract TLE data within zone
          nzone = zone_end(iz) - zone_start(iz) + 1
+
+c        Issue #12: too few TLEs for reliable RSM. This is a fixed
+c        RSM-reliability floor (3 TLEs is sufficient), independent of
+c        min_zone_pts (a zone_select tuning parameter for detecting a
+c        significant decay trend at selection time, not a statement
+c        about RSM's own minimum viable input). Normally unreachable
+c        since zone_select already enforces min_zone_pts >= 3 in
+c        practice, but guarded here for when TLE quality filtering
+c        (#10) can shrink a zone after selection.
+         if (nzone .lt. 3) then
+            zone_status(iz) = 4
+            reentry_jd(iz) = 0.d0
+            e_opt_out(iz)  = 0.d0
+            bn_opt_out(iz) = 0.d0
+            rms_out(iz)    = -1.d0
+            zone_epoch(iz) = epochs(zone_start(iz))
+            write(*,'(A,I2,A,I3,A)')
+     &         '  [WARN] Z', iz, ': skip, too few TLEs for '//
+     &         'reliable RSM: nzone=', nzone, ' < 3'
+            goto 50
+         end if
+
          do i = 1, nzone
             epz(i)   = epochs(zone_start(iz) + i - 1)
             haz(i)   = ha_tle(zone_start(iz) + i - 1)
@@ -255,12 +340,48 @@ c        Extract TLE data within zone
      &      ierr_rsm)
 
          if (ierr_rsm .ne. 0 .or. nsurf_pts .le. 0) then
+            zone_status(iz) = 1
             reentry_jd(iz) = 0.d0
             e_opt_out(iz)  = 0.d0
             bn_opt_out(iz) = 0.d0
             rms_out(iz)    = -1.d0
             zone_epoch(iz) = epz(1)
+            write(*,'(A,I2,A)')
+     &         '  [WARN] Z', iz, ': skip, RSM/propagator failure '//
+     &         '(propagate_ks diverged on more than 6 of 9 grid '//
+     &         'points)'
             goto 50
+         end if
+
+c        Issue #12: does the RSM envelope bound the observations?
+c        surfaces(i,ie,ia) is already interpolated at the same times
+c        as apobs(i) (rsm_generate builds it that way), so this is a
+c        direct per-observation min/max check, no interpolation needed.
+c        Warn once per zone (with a count) rather than per point --
+c        real zones can have dozens of observations, and one line per
+c        violation would flood the console. Warn only -- still runs
+c        GA on the existing surfaces.
+         nobound_cnt = 0
+         do i = 1, nobs
+            smin = surfaces(i,1,1)
+            smax = surfaces(i,1,1)
+            do ie2 = 1, 3
+               do ia2 = 1, 3
+                  if (surfaces(i,ie2,ia2) .lt. smin)
+     &               smin = surfaces(i,ie2,ia2)
+                  if (surfaces(i,ie2,ia2) .gt. smax)
+     &               smax = surfaces(i,ie2,ia2)
+               end do
+            end do
+            if (apobs(i) .lt. smin .or. apobs(i) .gt. smax)
+     &         nobound_cnt = nobound_cnt + 1
+         end do
+         if (nobound_cnt .gt. 0) then
+            zone_status(iz) = 3
+            write(*,'(A,I2,A,I3,A,I3,A)')
+     &         '  [WARN] Z', iz, ': RSM envelope does not bound ',
+     &         nobound_cnt, ' of ', nobs,
+     &         ' observations -- proceeding anyway'
          end if
 
 c        GA optimization: match predicted apogee trajectory to TLE observations
@@ -273,6 +394,35 @@ c        GA optimization: match predicted apogee trajectory to TLE observations
      &      ipopsize, maxgen, nbits_e, nbits_a,
      &      pcross, pmute, ga_seed,
      &      e_opt_out(iz), bn_opt_out(iz), rms_out(iz))
+
+c        Issue #12: GA boundary solution (optimum within 15% of a
+c        search bound suggests the true value may lie outside the
+c        search range). 15% (not a tighter %) because the
+c        trajectory-matching RMS fitness (RMS over all TLE points in
+c        the zone, not just endpoint magnitude) does not produce a
+c        purely monotonic response to BN within a narrow, badly-off
+c        window -- empirically, a GA run whose true optimum is well
+c        outside a 5 kg/m2 window still lands ~10-12% of the window
+c        width from the edge, not exactly on it. Doesn't change this
+c        zone's outputs -- only flags it and, for BN specifically,
+c        widens (instead of narrows) the next zone's search range
+c        below.
+         e_at_bound =
+     &      dabs(e_opt_out(iz)-e_grid(1)) .le.
+     &         0.15d0*(e_grid(3)-e_grid(1)) .or.
+     &      dabs(e_opt_out(iz)-e_grid(3)) .le.
+     &         0.15d0*(e_grid(3)-e_grid(1))
+         bn_at_bound =
+     &      dabs(bn_opt_out(iz)-bn_grid(1)) .le.
+     &         0.15d0*(bn_grid(3)-bn_grid(1)) .or.
+     &      dabs(bn_opt_out(iz)-bn_grid(3)) .le.
+     &         0.15d0*(bn_grid(3)-bn_grid(1))
+         if (e_at_bound .or. bn_at_bound) then
+            zone_status(iz) = 2
+            write(*,'(A,I2,A)')
+     &         '  [WARN] Z', iz, ': GA optimum at search boundary '//
+     &         '-- true value may lie outside the search range'
+         end if
 
 c        Re-entry propagation with optimal (e, BN)
          a_kep(1) = smaz(1)
@@ -329,8 +479,15 @@ c        Re-entry propagation with optimal (e, BN)
             end if
          end if
 
-c        Narrow BN bounds for next zone
-         bn_range = (bn_hi - bn_lo) * 0.5d0
+c        Narrow BN bounds for next zone -- unless this zone's GA
+c        optimum saturated the BN search bound (issue #12), in which
+c        case widen instead: the true BN likely lies outside what was
+c        just searched, and narrowing further would only entrench it.
+         if (bn_at_bound) then
+            bn_range = (bn_hi - bn_lo) * 1.5d0
+         else
+            bn_range = (bn_hi - bn_lo) * 0.5d0
+         end if
          bn_lo = bn_opt_out(iz) - bn_range / 2.d0
          bn_hi = bn_opt_out(iz) + bn_range / 2.d0
          if (bn_lo .lt. 10.d0) bn_lo = 10.d0
@@ -339,6 +496,11 @@ c        Narrow BN bounds for next zone
       end do
 
       nzones_used = nzones
+
+      nzones_valid = 0
+      do iz = 1, nzones
+         if (zone_status(iz) .eq. 0) nzones_valid = nzones_valid + 1
+      end do
 
 c     ============================================================
 c     Step 6: Compute RPE
@@ -457,6 +619,124 @@ c     ============================================================
             end if
          end if
       end do
+
+      return
+      end
+
+c     ============================================================
+      subroutine estimate_bn_floor(epz, smaz, ez, incz, raanz, aopz,
+     &   maz, nzone, n_force, ngeo_deg, nsun_deg, nmoon_deg,
+     &   WE_rot, EPS_f, FR_rot,
+     &   CR_srp, AM_srp, IPSR, ISHAD, PSR_srp, amuS, amuM,
+     &   ALT_atm, DEN_atm, SCH_atm, ndim_atm,
+     &   bn_floor_est, ok)
+c
+c     Issue #12 (G2): physics-based BN estimate from zone 1's own TLE
+c     decay rate ("delta-n-bar/delta-t", expressed here as da/dt --
+c     directly related, avoids an unnecessary a<->n conversion since
+c     the calibration trial below also measures da/dt).
+c
+c     Numerical calibration, not a closed-form formula: propagates one
+c     short trial arc at a reference BN and scales by
+c     (trial da/dt) / (observed da/dt) -- decay rate is ~inversely
+c     proportional to BN, so this inverts correctly, and using
+c     propagate_ks itself guarantees the estimate can't disagree with
+c     the drag model's actual internal unit conventions the way a
+c     hand-derived analytic formula risks doing.
+c
+c     Output
+c       bn_floor_est : estimated BN (kg/m2); only meaningful if ok
+c       ok           : .false. if the zone's TLE slope is too noisy/
+c                      flat/short to trust (caller should leave bn_lo
+c                      untouched in that case)
+c     ============================================================
+      implicit double precision (a-h, o-z)
+      common /xy/ pi, d2r, r2d, amue, AU, R_Earth
+
+      integer nzone
+      double precision epz(nzone), smaz(nzone), ez(nzone)
+      double precision incz(nzone), raanz(nzone), aopz(nzone)
+      double precision maz(nzone)
+      integer n_force(3), ngeo_deg, nsun_deg, nmoon_deg
+      double precision WE_rot, EPS_f, FR_rot
+      double precision CR_srp, AM_srp
+      integer IPSR, ISHAD
+      double precision PSR_srp, amuS, amuM
+      integer ndim_atm
+      double precision ALT_atm(ndim_atm), DEN_atm(ndim_atm)
+      double precision SCH_atm(ndim_atm)
+      double precision bn_floor_est
+      logical ok
+
+      parameter(max_trial = 400)
+      double precision traj_jd(max_trial)
+      double precision traj_x(3, max_trial), traj_xd(3, max_trial)
+      save traj_jd, traj_x, traj_xd
+      double precision a_kep(7), x0(3), xd0(3), cal0(6)
+      double precision pek(7)
+      double precision slope_obs, intcpt_obs, r2_obs
+      double precision slope_trial, sma_t0, sma_tf
+      double precision zone_dur, period_d
+      integer nrev_trial, idump_trial, exit_code_trial
+      parameter(BN_trial = 100.d0)
+
+      ok = .false.
+      bn_floor_est = 0.d0
+
+      if (nzone .lt. 3) return
+
+c     Observed da/dt across zone 1's own TLEs (reuses zone_select's
+c     proven linfit, matching the issue's "delta-n-bar/delta-t" ask).
+      call linfit(epz, smaz, nzone, slope_obs, intcpt_obs, r2_obs)
+
+      if (r2_obs .lt. 0.5d0 .or. dabs(slope_obs) .lt. 1.d-6) return
+
+c     Short trial propagation at BN_trial from the zone's first TLE.
+      a_kep(1) = smaz(1)
+      a_kep(2) = ez(1)
+      a_kep(3) = incz(1)
+      a_kep(4) = raanz(1)
+      a_kep(5) = aopz(1)
+      a_kep(6) = maz(1)
+      a_kep(7) = 0.d0
+      call oe2car(a_kep, x0, xd0, 1.d-12)
+      call jd2cal(epz(1), cal0)
+
+      zone_dur = epz(nzone) - epz(1)
+      if (zone_dur .gt. 3.d0) zone_dur = 3.d0
+      if (zone_dur .lt. 0.5d0) zone_dur = 0.5d0
+      period_d = 2.d0*pi*dsqrt(a_kep(1)**3/amue) / 86400.d0
+      nrev_trial = int(zone_dur/period_d) + 2
+
+      idump_trial = 1
+      call propagate_ks(
+     &   x0, xd0, cal0,
+     &   nrev_trial, 360, 1.d-10,
+     &   n_force, ngeo_deg, nsun_deg, nmoon_deg,
+     &   BN_trial, 1, WE_rot, EPS_f, FR_rot,
+     &   CR_srp, AM_srp, IPSR, ISHAD,
+     &   PSR_srp, amuS, amuM,
+     &   ALT_atm, DEN_atm, SCH_atm, ndim_atm,
+     &   max_trial, idump_trial,
+     &   traj_jd, traj_x, traj_xd,
+     &   exit_code_trial)
+
+      if (exit_code_trial .eq. 2 .or. idump_trial .lt. 2) return
+
+      call car2oe(traj_x(1,1), traj_xd(1,1), pek)
+      sma_t0 = pek(1)
+      call car2oe(traj_x(1,idump_trial), traj_xd(1,idump_trial), pek)
+      sma_tf = pek(1)
+
+      slope_trial = (sma_tf - sma_t0) /
+     &   (traj_jd(idump_trial) - traj_jd(1))
+
+      if (dabs(slope_trial) .lt. 1.d-9) return
+
+      bn_floor_est = BN_trial * dabs(slope_trial) / dabs(slope_obs)
+      if (bn_floor_est .lt. 5.d0) bn_floor_est = 5.d0
+      if (bn_floor_est .gt. 500.d0) bn_floor_est = 500.d0
+      ok = .true.
 
       return
       end

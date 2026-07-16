@@ -35,7 +35,10 @@ c       apobs(nobs)        : observed TLE mean apogee (km)
 c       nobs               : number of observations
 c       e_lo, e_hi         : eccentricity search bounds
 c       a_lo, a_hi         : area search bounds (m²)
-c       ipopsize           : population size (e.g. 4)
+c       ipopsize           : population size (use 20 = maxpop;
+c                            4 converges to a range-invariant
+c                            seed artifact on weak-gradient
+c                            landscapes -- issue #12)
 c       maxgen             : max generations (e.g. 500)
 c       nbits_e            : bits for eccentricity (e.g. 40)
 c       nbits_a            : bits for area (e.g. 16-28)

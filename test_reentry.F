@@ -150,6 +150,7 @@ c     ============================================================
       double precision rms_o(4), zepoch(4), rpe(4)
       double precision t_obs(6), t_mean, t_std
       integer nzu, ierr, i
+      integer zstat(4), nzv
 
       write(*,*) ''
       write(*,'(A,A)') '  --- ', obj_name
@@ -165,7 +166,7 @@ c     ============================================================
      &   tle_file, norad,
      &   t_obs, mxz, 8, 10.d0, 0.90d0, -1.d0,
      &   80.d0, 160.d0, 0,
-     &   4, 200, 40, 16, 0.8d0, 0.01d0, 0.123d0,
+     &   20, 200, 40, 16, 0.8d0, 0.01d0, 0.123d0,
      &   2, 0, 0,
      &   7.2921150d-5, 3.35281066d-3, 1.d0,
      &   0.d0, 0.d0, 0, 0,
@@ -173,6 +174,7 @@ c     ============================================================
      &   ALT_a, DEN_a, SCH_a, natm,
      &   reentry, e_opt, bn_opt, rms_o,
      &   zepoch, nzu,
+     &   zstat, nzv,
      &   rpe, t_mean, t_std, ierr)
 
 c     V1: Pipeline completes (ierr=0 or 3 with no drag)
@@ -207,13 +209,15 @@ c     (zone may be selected later when e has decayed)
      &                 0, 1, npass, nfail)
       end if
 
-c     V4: bn_opt in bounds [80, 160]
-      if (bn_opt(1) .ge. 80.d0 .and.
-     &    bn_opt(1) .le. 160.d0) then
-         call assert_i(obj_name//' bn_opt in bounds',
+c     V4: bn_opt is physical (positive, finite). No longer bounds-
+c     checked against the caller's [80,160] input range -- issue #12
+c     (G2)'s physics-based BN floor can legitimately push bn_opt(1)
+c     below 80 when the zone's own decay rate warrants it.
+      if (bn_opt(1) .gt. 0.d0 .and. bn_opt(1) .eq. bn_opt(1)) then
+         call assert_i(obj_name//' bn_opt physical',
      &                 1, 1, npass, nfail)
       else
-         call assert_i(obj_name//' bn_opt in bounds',
+         call assert_i(obj_name//' bn_opt physical',
      &                 0, 1, npass, nfail)
       end if
 
@@ -231,12 +235,12 @@ c     Print zone summary
       write(*,'(A,I2,A)') '    ', nzu, ' zones:'
       do i = 1, nzu
          if (reentry(i) .gt. 0.d0) then
-            write(*,'(A,I1,A,F8.4,A,F5.2,A,F6.2,A)')
+            write(*,'(A,I1,A,F8.4,A,F7.2,A,F6.2,A)')
      &         '    Z', i, ': e=', e_opt(i),
      &         ' A=', bn_opt(i),
      &         ' RPE=', rpe(i), '%'
          else
-            write(*,'(A,I1,A,F8.4,A,F5.2)')
+            write(*,'(A,I1,A,F8.4,A,F7.2)')
      &         '    Z', i, ': e=', e_opt(i),
      &         ' A=', bn_opt(i)
          end if

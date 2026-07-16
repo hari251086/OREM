@@ -1,0 +1,14 @@
+Concatenated GMAT report rows from gmat_reentry_42928z0.script (issue #12 re-entry
+cross-check, 2026-07-14). SCc = JacchiaRoberts constant F107=72; SCw = JacchiaRoberts
+actual CSSI flux history (run separately with Propw Accuracy=1e-10 after the 1e-12
+run hit "Accuracy settings will be violated" on the CSSI daily-step discontinuities).
+UTCModJulian offset 2430000. References: epoch 28021.38, OREM prediction 28156.73
+(135.3 d), observed re-entry 2019-03-03 = 28545.5 (524.1 d).
+
+SCc.UTCModJulian          SCc.ElapsedDays           SCc.Earth.Altitude
+28021.38181712963         0                         365.9510735730491
+28757.74633028672         736.364513157092          101.9999999505053
+
+SCw.UTCModJulian          SCw.ElapsedDays           SCw.Earth.Altitude
+28021.38181712963         0                         365.9510735730491
+28745.23526116534         723.8534440357071         102.0000000013015

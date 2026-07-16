@@ -1,0 +1,130 @@
+%General Mission Analysis Tool(GMAT) Script
+%  OREM issue #12 (v1.15 follow-up): re-entry arc cross-check.
+%  Propagates 42928 zone-0's OREM-fitted state (pop=20 GA: e_opt=0.3216,
+%  BN=117.60 kg/m2 -> Cd=1, DragArea=1, DryMass=117.60) all the way to the
+%  80 km re-entry threshold, twice:
+%    SCc: JacchiaRoberts with CONSTANT F107=72/F107A=72/Kp=1.0 -- the same
+%         static weather OREM's input/ATM.DAT (Jacchia-70) was generated
+%         with. Isolates JR-vs-J70 density-profile-shape differences.
+%    SCw: JacchiaRoberts with the ACTUAL 2017-2019 flux history from
+%         GMAT's shipped CSSI file. Isolates static-vs-real solar activity.
+%  Reference numbers:
+%    OREM prediction (v1.15, pop=20, full force): JD 2458156.73  (GMAT
+%    UTCModJulian 28156.73, epoch + ~135 d)
+%    Observed re-entry 2019-03-03:                JD 2458545.5   (28545.5,
+%    epoch + ~524 d)
+%  State/epoch identical to gmat_xval_42928z0.script (issue #11) except
+%  ECC/DryMass now carry the fitted values. Fitted values are read from
+%  test_e2e output at printed precision (e to 1e-4, BN to 0.01 -- perigee
+%  radius uncertainty ~0.5 km, negligible vs the 4x lifetime gap probed).
+%  Force model matches the v1.11 full-force e2e config: EGM2008 zonal
+%  Degree=20/Order=0, Sun+Luna point mass, SRP on (Cr=1.2, A/m=0.01 m2/kg
+%  -> SRPArea = 0.01*117.60 = 1.176 m2), JacchiaRoberts drag.
+%  ElapsedDays=1200 is a runaway guard: if it, not Altitude, stops the run,
+%  the reported altitude will still be far above the threshold.
+%  Stop threshold is 102 km, not KSROP's 80 km: GMAT's JacchiaRoberts
+%  throws below 100 km (verified: the 80-km version of this script decayed
+%  fine but errored evaluating density under 100 km before the stop
+%  condition could interpolate). Initial perigee altitude is 159.5 km, so
+%  the first 102-km crossing is terminal decay (days from 80 km) --
+%  negligible against the ~135-vs-524-day question this probes.
+
+Create ForceModel FMc;
+GMAT FMc.CentralBody = Earth;
+GMAT FMc.PrimaryBodies = {Earth};
+GMAT FMc.PointMasses = {Sun, Luna};
+GMAT FMc.GravityField.Earth.Degree = 20;
+GMAT FMc.GravityField.Earth.Order = 0;
+GMAT FMc.GravityField.Earth.PotentialFile = 'C:\Users\hari2\OneDrive\Documents\GitHub\KSROP\scratch_gmat\EGM2008_72x72.cof';
+GMAT FMc.Drag.AtmosphereModel = JacchiaRoberts;
+GMAT FMc.Drag.HistoricWeatherSource = 'ConstantFluxAndGeoMag';
+GMAT FMc.Drag.PredictedWeatherSource = 'ConstantFluxAndGeoMag';
+GMAT FMc.Drag.F107 = 72;
+GMAT FMc.Drag.F107A = 72;
+GMAT FMc.Drag.MagneticIndex = 1.0;
+GMAT FMc.SRP = On;
+
+Create ForceModel FMw;
+GMAT FMw.CentralBody = Earth;
+GMAT FMw.PrimaryBodies = {Earth};
+GMAT FMw.PointMasses = {Sun, Luna};
+GMAT FMw.GravityField.Earth.Degree = 20;
+GMAT FMw.GravityField.Earth.Order = 0;
+GMAT FMw.GravityField.Earth.PotentialFile = 'C:\Users\hari2\OneDrive\Documents\GitHub\KSROP\scratch_gmat\EGM2008_72x72.cof';
+GMAT FMw.Drag.AtmosphereModel = JacchiaRoberts;
+GMAT FMw.Drag.HistoricWeatherSource = 'CSSISpaceWeatherFile';
+GMAT FMw.Drag.PredictedWeatherSource = 'CSSISpaceWeatherFile';
+GMAT FMw.Drag.CSSISpaceWeatherFile = 'E:\Softwares\gmat-win-R2026a\data\atmosphere\earth\SpaceWeather-All-v1.2.txt';
+GMAT FMw.SRP = On;
+
+Create Propagator Propc;
+GMAT Propc.FM = FMc;
+GMAT Propc.Type = RungeKutta89;
+GMAT Propc.InitialStepSize = 10;
+GMAT Propc.Accuracy = 1e-12;
+GMAT Propc.MinStep = 0.001;
+GMAT Propc.MaxStep = 300;
+
+% Looser Accuracy + smaller MinStep than Propc: the CSSI file's daily
+% flux steps introduce density discontinuities that RKV89 at 1e-12 /
+% MinStep=0.001 cannot step across ("Accuracy settings will be violated",
+% verified on the first run of this script). 1e-10 is ample for a
+% lifetime estimate.
+Create Propagator Propw;
+GMAT Propw.FM = FMw;
+GMAT Propw.Type = RungeKutta89;
+GMAT Propw.InitialStepSize = 10;
+GMAT Propw.Accuracy = 1e-10;
+GMAT Propw.MinStep = 1e-6;
+GMAT Propw.MaxStep = 300;
+
+Create Spacecraft SCc SCw;
+
+GMAT SCc.DateFormat = UTCGregorian;
+GMAT SCc.Epoch = '24 Sep 2017 21:09:49.000';
+GMAT SCc.CoordinateSystem = EarthMJ2000Eq;
+GMAT SCc.DisplayStateType = Keplerian;
+GMAT SCc.SMA = 9636.790207;
+GMAT SCc.ECC = 0.3216;
+GMAT SCc.INC = 19.1713;
+GMAT SCc.RAAN = 68.985106;
+GMAT SCc.AOP = 273.564599;
+GMAT SCc.TA = 28.938462;
+GMAT SCc.Cd = 1;
+GMAT SCc.DragArea = 1;
+GMAT SCc.DryMass = 117.60;
+GMAT SCc.Cr = 1.2;
+GMAT SCc.SRPArea = 1.176;
+
+GMAT SCw.DateFormat = UTCGregorian;
+GMAT SCw.Epoch = '24 Sep 2017 21:09:49.000';
+GMAT SCw.CoordinateSystem = EarthMJ2000Eq;
+GMAT SCw.DisplayStateType = Keplerian;
+GMAT SCw.SMA = 9636.790207;
+GMAT SCw.ECC = 0.3216;
+GMAT SCw.INC = 19.1713;
+GMAT SCw.RAAN = 68.985106;
+GMAT SCw.AOP = 273.564599;
+GMAT SCw.TA = 28.938462;
+GMAT SCw.Cd = 1;
+GMAT SCw.DragArea = 1;
+GMAT SCw.DryMass = 117.60;
+GMAT SCw.Cr = 1.2;
+GMAT SCw.SRPArea = 1.176;
+
+Create ReportFile Repre;
+GMAT Repre.Filename = 'gmat_reentry_42928z0.txt';
+GMAT Repre.Precision = 16;
+GMAT Repre.WriteHeaders = true;
+
+BeginMissionSequence;
+
+% Constant-flux run
+Report Repre SCc.UTCModJulian SCc.ElapsedDays SCc.Earth.Altitude;
+Propagate Propc(SCc) {SCc.Earth.Altitude = 102, SCc.ElapsedDays = 1200};
+Report Repre SCc.UTCModJulian SCc.ElapsedDays SCc.Earth.Altitude;
+
+% Real-flux-history run
+Report Repre SCw.UTCModJulian SCw.ElapsedDays SCw.Earth.Altitude;
+Propagate Propw(SCw) {SCw.Earth.Altitude = 102, SCw.ElapsedDays = 1200};
+Report Repre SCw.UTCModJulian SCw.ElapsedDays SCw.Earth.Altitude;

@@ -1,0 +1,237 @@
+%General Mission Analysis Tool(GMAT) Script
+%  OREM issue #11: propagate_ks cross-validation reference (replaces NPOE).
+%  Object 42928 PSLV-C39 R/B, Zone 0, epoch 2017-09-24 21:09:49 UTC.
+%  9-point (e, BN) RSM grid, 7-day propagation, matches test_gmat.F exactly:
+%    SMA=9636.790207 km, INC=19.1713, RAAN=68.985106, AOP=273.564599,
+%    TA=28.938462 (same for all runs; only ECC and DryMass vary)
+%    e_grid  = 0.321216 / 0.3215792 / 0.3219424   (index 1/2/3)
+%    bn_grid = 80 / 120 / 160 kg/m2, Cd=1, DragArea=1 m2 -> DryMass=BN
+%  Force model matches propagate_ks n_force=(4,2,2):
+%    Geopotential: EGM2008 zonal only, Degree=4/Order=0 (propagate_ks's
+%    geo_coeff reads J2-J4 straight from EGM2008_to2190_TideFree -- same
+%    EGM2008_72x72.cof potential file the KSROP<->GMAT validation campaign
+%    used with Order=0 for zonal-only comparisons, e.g.
+%    KSROP_fullforce_crosscheck.script).
+%    PointMasses = {Sun, Luna} (propagate_ks's degree-2 3rd-body truncation
+%    vs GMAT's exact point mass is a known, already-characterized residual).
+%    Drag: JacchiaRoberts, F107=72/F107A=72/Kp=1.0 -- same weather inputs
+%    input/ATM.DAT (Jacchia-70) was generated with; different density-model
+%    implementation by design (KSROP_drag_crosscheck.script precedent).
+%  RunID column encodes (e-index, bn-index) as a 2-digit number, e.g. 23
+%  means e-index=2, bn-index=3, so the parser doesn't depend on row order.
+
+Create Variable RunID;
+
+Create ForceModel FMxval;
+GMAT FMxval.CentralBody = Earth;
+GMAT FMxval.PrimaryBodies = {Earth};
+GMAT FMxval.PointMasses = {Sun, Luna};
+GMAT FMxval.GravityField.Earth.Degree = 4;
+GMAT FMxval.GravityField.Earth.Order = 0;
+GMAT FMxval.GravityField.Earth.PotentialFile = 'C:\Users\hari2\OneDrive\Documents\GitHub\KSROP\scratch_gmat\EGM2008_72x72.cof';
+GMAT FMxval.Drag.AtmosphereModel = JacchiaRoberts;
+GMAT FMxval.Drag.HistoricWeatherSource = 'ConstantFluxAndGeoMag';
+GMAT FMxval.Drag.PredictedWeatherSource = 'ConstantFluxAndGeoMag';
+GMAT FMxval.Drag.F107 = 72;
+GMAT FMxval.Drag.F107A = 72;
+GMAT FMxval.Drag.MagneticIndex = 1.0;
+GMAT FMxval.SRP = Off;
+
+Create Propagator Propxval;
+GMAT Propxval.FM = FMxval;
+GMAT Propxval.Type = RungeKutta89;
+GMAT Propxval.InitialStepSize = 10;
+GMAT Propxval.Accuracy = 1e-12;
+GMAT Propxval.MinStep = 0.001;
+GMAT Propxval.MaxStep = 300;
+
+% No .Add list: a non-empty Add list turns this into a live Subscriber that
+% re-publishes its (fixed) bound spacecraft's parameters on every accepted
+% integrator step of ANY Propagate command in the sequence -- not just the
+% spacecraft that Add references. With Add pinned to one spacecraft, every
+% later Propagate of a *different* spacecraft still re-logs the first
+% spacecraft's frozen post-propagation state, tagged with whatever RunID
+% happens to be current. Leaving Add unset makes this file a pure sink for
+% the explicit Report commands below (2 rows per run, 18 total).
+Create ReportFile Repxval;
+GMAT Repxval.Filename = 'gmat_xval_42928z0.txt';
+GMAT Repxval.Precision = 16;
+GMAT Repxval.WriteHeaders = true;
+
+Create Spacecraft SC11 SC12 SC13 SC21 SC22 SC23 SC31 SC32 SC33;
+
+% --- e-index 1 (ECC=0.321216) ---
+GMAT SC11.DateFormat = UTCGregorian;
+GMAT SC11.Epoch = '24 Sep 2017 21:09:49.000';
+GMAT SC11.CoordinateSystem = EarthMJ2000Eq;
+GMAT SC11.DisplayStateType = Keplerian;
+GMAT SC11.SMA = 9636.790207;
+GMAT SC11.ECC = 0.321216;
+GMAT SC11.INC = 19.1713;
+GMAT SC11.RAAN = 68.985106;
+GMAT SC11.AOP = 273.564599;
+GMAT SC11.TA = 28.938462;
+GMAT SC11.Cd = 1;
+GMAT SC11.DragArea = 1;
+GMAT SC11.DryMass = 80;
+
+GMAT SC12.DateFormat = UTCGregorian;
+GMAT SC12.Epoch = '24 Sep 2017 21:09:49.000';
+GMAT SC12.CoordinateSystem = EarthMJ2000Eq;
+GMAT SC12.DisplayStateType = Keplerian;
+GMAT SC12.SMA = 9636.790207;
+GMAT SC12.ECC = 0.321216;
+GMAT SC12.INC = 19.1713;
+GMAT SC12.RAAN = 68.985106;
+GMAT SC12.AOP = 273.564599;
+GMAT SC12.TA = 28.938462;
+GMAT SC12.Cd = 1;
+GMAT SC12.DragArea = 1;
+GMAT SC12.DryMass = 120;
+
+GMAT SC13.DateFormat = UTCGregorian;
+GMAT SC13.Epoch = '24 Sep 2017 21:09:49.000';
+GMAT SC13.CoordinateSystem = EarthMJ2000Eq;
+GMAT SC13.DisplayStateType = Keplerian;
+GMAT SC13.SMA = 9636.790207;
+GMAT SC13.ECC = 0.321216;
+GMAT SC13.INC = 19.1713;
+GMAT SC13.RAAN = 68.985106;
+GMAT SC13.AOP = 273.564599;
+GMAT SC13.TA = 28.938462;
+GMAT SC13.Cd = 1;
+GMAT SC13.DragArea = 1;
+GMAT SC13.DryMass = 160;
+
+% --- e-index 2 (ECC=0.3215792) ---
+GMAT SC21.DateFormat = UTCGregorian;
+GMAT SC21.Epoch = '24 Sep 2017 21:09:49.000';
+GMAT SC21.CoordinateSystem = EarthMJ2000Eq;
+GMAT SC21.DisplayStateType = Keplerian;
+GMAT SC21.SMA = 9636.790207;
+GMAT SC21.ECC = 0.3215792;
+GMAT SC21.INC = 19.1713;
+GMAT SC21.RAAN = 68.985106;
+GMAT SC21.AOP = 273.564599;
+GMAT SC21.TA = 28.938462;
+GMAT SC21.Cd = 1;
+GMAT SC21.DragArea = 1;
+GMAT SC21.DryMass = 80;
+
+GMAT SC22.DateFormat = UTCGregorian;
+GMAT SC22.Epoch = '24 Sep 2017 21:09:49.000';
+GMAT SC22.CoordinateSystem = EarthMJ2000Eq;
+GMAT SC22.DisplayStateType = Keplerian;
+GMAT SC22.SMA = 9636.790207;
+GMAT SC22.ECC = 0.3215792;
+GMAT SC22.INC = 19.1713;
+GMAT SC22.RAAN = 68.985106;
+GMAT SC22.AOP = 273.564599;
+GMAT SC22.TA = 28.938462;
+GMAT SC22.Cd = 1;
+GMAT SC22.DragArea = 1;
+GMAT SC22.DryMass = 120;
+
+GMAT SC23.DateFormat = UTCGregorian;
+GMAT SC23.Epoch = '24 Sep 2017 21:09:49.000';
+GMAT SC23.CoordinateSystem = EarthMJ2000Eq;
+GMAT SC23.DisplayStateType = Keplerian;
+GMAT SC23.SMA = 9636.790207;
+GMAT SC23.ECC = 0.3215792;
+GMAT SC23.INC = 19.1713;
+GMAT SC23.RAAN = 68.985106;
+GMAT SC23.AOP = 273.564599;
+GMAT SC23.TA = 28.938462;
+GMAT SC23.Cd = 1;
+GMAT SC23.DragArea = 1;
+GMAT SC23.DryMass = 160;
+
+% --- e-index 3 (ECC=0.3219424) ---
+GMAT SC31.DateFormat = UTCGregorian;
+GMAT SC31.Epoch = '24 Sep 2017 21:09:49.000';
+GMAT SC31.CoordinateSystem = EarthMJ2000Eq;
+GMAT SC31.DisplayStateType = Keplerian;
+GMAT SC31.SMA = 9636.790207;
+GMAT SC31.ECC = 0.3219424;
+GMAT SC31.INC = 19.1713;
+GMAT SC31.RAAN = 68.985106;
+GMAT SC31.AOP = 273.564599;
+GMAT SC31.TA = 28.938462;
+GMAT SC31.Cd = 1;
+GMAT SC31.DragArea = 1;
+GMAT SC31.DryMass = 80;
+
+GMAT SC32.DateFormat = UTCGregorian;
+GMAT SC32.Epoch = '24 Sep 2017 21:09:49.000';
+GMAT SC32.CoordinateSystem = EarthMJ2000Eq;
+GMAT SC32.DisplayStateType = Keplerian;
+GMAT SC32.SMA = 9636.790207;
+GMAT SC32.ECC = 0.3219424;
+GMAT SC32.INC = 19.1713;
+GMAT SC32.RAAN = 68.985106;
+GMAT SC32.AOP = 273.564599;
+GMAT SC32.TA = 28.938462;
+GMAT SC32.Cd = 1;
+GMAT SC32.DragArea = 1;
+GMAT SC32.DryMass = 120;
+
+GMAT SC33.DateFormat = UTCGregorian;
+GMAT SC33.Epoch = '24 Sep 2017 21:09:49.000';
+GMAT SC33.CoordinateSystem = EarthMJ2000Eq;
+GMAT SC33.DisplayStateType = Keplerian;
+GMAT SC33.SMA = 9636.790207;
+GMAT SC33.ECC = 0.3219424;
+GMAT SC33.INC = 19.1713;
+GMAT SC33.RAAN = 68.985106;
+GMAT SC33.AOP = 273.564599;
+GMAT SC33.TA = 28.938462;
+GMAT SC33.Cd = 1;
+GMAT SC33.DragArea = 1;
+GMAT SC33.DryMass = 160;
+
+BeginMissionSequence;
+
+GMAT RunID = 11;
+Report Repxval RunID SC11.ElapsedSecs SC11.Earth.RadApo SC11.Earth.ECC SC11.Earth.SMA;
+Propagate Propxval(SC11) {SC11.ElapsedSecs = 604800};
+Report Repxval RunID SC11.ElapsedSecs SC11.Earth.RadApo SC11.Earth.ECC SC11.Earth.SMA;
+
+GMAT RunID = 12;
+Report Repxval RunID SC12.ElapsedSecs SC12.Earth.RadApo SC12.Earth.ECC SC12.Earth.SMA;
+Propagate Propxval(SC12) {SC12.ElapsedSecs = 604800};
+Report Repxval RunID SC12.ElapsedSecs SC12.Earth.RadApo SC12.Earth.ECC SC12.Earth.SMA;
+
+GMAT RunID = 13;
+Report Repxval RunID SC13.ElapsedSecs SC13.Earth.RadApo SC13.Earth.ECC SC13.Earth.SMA;
+Propagate Propxval(SC13) {SC13.ElapsedSecs = 604800};
+Report Repxval RunID SC13.ElapsedSecs SC13.Earth.RadApo SC13.Earth.ECC SC13.Earth.SMA;
+
+GMAT RunID = 21;
+Report Repxval RunID SC21.ElapsedSecs SC21.Earth.RadApo SC21.Earth.ECC SC21.Earth.SMA;
+Propagate Propxval(SC21) {SC21.ElapsedSecs = 604800};
+Report Repxval RunID SC21.ElapsedSecs SC21.Earth.RadApo SC21.Earth.ECC SC21.Earth.SMA;
+
+GMAT RunID = 22;
+Report Repxval RunID SC22.ElapsedSecs SC22.Earth.RadApo SC22.Earth.ECC SC22.Earth.SMA;
+Propagate Propxval(SC22) {SC22.ElapsedSecs = 604800};
+Report Repxval RunID SC22.ElapsedSecs SC22.Earth.RadApo SC22.Earth.ECC SC22.Earth.SMA;
+
+GMAT RunID = 23;
+Report Repxval RunID SC23.ElapsedSecs SC23.Earth.RadApo SC23.Earth.ECC SC23.Earth.SMA;
+Propagate Propxval(SC23) {SC23.ElapsedSecs = 604800};
+Report Repxval RunID SC23.ElapsedSecs SC23.Earth.RadApo SC23.Earth.ECC SC23.Earth.SMA;
+
+GMAT RunID = 31;
+Report Repxval RunID SC31.ElapsedSecs SC31.Earth.RadApo SC31.Earth.ECC SC31.Earth.SMA;
+Propagate Propxval(SC31) {SC31.ElapsedSecs = 604800};
+Report Repxval RunID SC31.ElapsedSecs SC31.Earth.RadApo SC31.Earth.ECC SC31.Earth.SMA;
+
+GMAT RunID = 32;
+Report Repxval RunID SC32.ElapsedSecs SC32.Earth.RadApo SC32.Earth.ECC SC32.Earth.SMA;
+Propagate Propxval(SC32) {SC32.ElapsedSecs = 604800};
+Report Repxval RunID SC32.ElapsedSecs SC32.Earth.RadApo SC32.Earth.ECC SC32.Earth.SMA;
+
+GMAT RunID = 33;
+Report Repxval RunID SC33.ElapsedSecs SC33.Earth.RadApo SC33.Earth.ECC SC33.Earth.SMA;
+Propagate Propxval(SC33) {SC33.ElapsedSecs = 604800};
+Report Repxval RunID SC33.ElapsedSecs SC33.Earth.RadApo SC33.Earth.ECC SC33.Earth.SMA;
