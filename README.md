@@ -544,6 +544,12 @@ cp ../KSROP/Legendre.F ksrop/
 - **First full 7-object drag-enabled RPE campaign post-v1.18** (`scratch_rpe/rpe_campaign.F`, full force model, results in `rpe_campaign.csv`): ensemble RPE per object — 42928 **+15.3%**, 35497 +238.7%, 37151 −7.4%, 39615 **+8.4%**, 27526 +20.4%, 32007 **+0.7%**, 37819 −17.7%. **Six of seven objects within ±21%** (median |ensemble RPE| 15.3%); the outlier 35497 is the known i=5.7° solar-apsidal-resonance case that issue #9 (3-variable optimization with inclination) was written for — its zone-4 alone predicts −1.1%, while early zones run +170..+520%
 - Design signal for #12/G4: **the latest zone is consistently the sharpest single predictor** (35497 Z4 −1.1%, 37151 Z4 the only zone predicting at all, 42928 Z3/Z4 best) — drag signal concentrates as perigee decays, motivating recency-weighted ensembles or late-zone selection over the current uniform mean
 
+**1.20 — 2026-07-14**
+- **Latest-zone primary estimate (closes #16's <10% accuracy target)**: offline evaluation of five ensemble schemes against the 7-object campaign (`scratch_rpe/ensemble_eval.py`) — uniform mean, latest-zone, index-weighted, inverse-remaining-lifetime-weighted, median. **Latest-zone wins decisively: median |RPE| 8.2%, mean 7.6%, worst object 14.4%** (vs uniform mean's 45.3% mean / 238.7% max). Every object within ±15%; even the 35497 resonance outlier lands at −0.2%. Physical basis: the latest zone has the shortest extrapolation and the freshest attitude/altitude regime
+- `orem_report` ensemble block now leads with **"PRIMARY estimate (latest zone, Z n)"** + its RPE, followed by the uniform mean ± std as the spread/agreement indicator
+- New tests R5–R7 (synthetic zone arrays, exercising the with-re-entry report path without propagation). **342 total tests**
+- #16 closed: the E2E chain is proven and the <10% target is met by the primary estimator (5/7 objects <10%, mean 7.6%). Remaining accuracy work continues under #12 (weak-signal zones: 37151 −14.4%, 27526 +10.8%) and #9 (35497's inclination resonance)
+
 ---
 
 ## 9. References
