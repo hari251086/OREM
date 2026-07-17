@@ -550,6 +550,13 @@ cp ../KSROP/Legendre.F ksrop/
 - New tests R5–R7 (synthetic zone arrays, exercising the with-re-entry report path without propagation). **342 total tests**
 - #16 closed: the E2E chain is proven and the <10% target is met by the primary estimator (5/7 objects <10%, mean 7.6%). Remaining accuracy work continues under #12 (weak-signal zones: 37151 −14.4%, 27526 +10.8%) and #9 (35497's inclination resonance)
 
+**1.21 — 2026-07-14**
+- **Trust-gated BN-range carryover + 8-zone operation: latest-zone RPE now median 2.4% / mean 4.1% / max 10.4% across all 7 objects**
+- Measurement first: re-running the campaign with `nzones_max=8` (zone_select returns the top-R² candidates, so a higher cap admits *later* zones) sharpened the latest-zone estimator wherever signal exists (42928 −4.4→0.0%, 39615 8.9→2.7%, 32007 6.4→0.8%) but regressed 37151 (−14.4→−38.0%): its Z1–Z7 all predict no re-entry (weak-signal fits), yet each re-centered the v1.10 BN-range carryover, marching the search from [12.5,160] down to [17.2,24.9] and imprisoning Z8 — the only zone with real signal
+- Fix in `orem.F`: the carryover now chains **only from zones whose fit carries real signal** — with drag on, a zone that actually predicted a re-entry; with drag off, an unflagged (`zone_status=0`) zone. Untrusted zones leave the range unchanged. Objects whose zones all predict (42928, 35497, 37819) chain exactly as before — bit-identical e2e results
+- Gated 8-zone campaign (`rpe_campaign_8zone_gated.csv`; 4-zone and ungated-8-zone runs preserved alongside): 42928 0.0%, 35497 0.6%, 39615 2.0%, 32007 2.4%, 37819 −5.3%, 37151 **−8.1%** (recovered), 27526 10.4% — **all seven at or under ~10%**
+- Shipped configs raised to `nzones_max=8`. 342/342 tests pass (test suites unchanged — they run 4-zone IDRAG=0 paths whose chains are gated on `zone_status` and unaffected in practice)
+
 ---
 
 ## 9. References

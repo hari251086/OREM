@@ -1,0 +1,99 @@
+
+ ===== 42928 PSLV-C39          
+  [INFO] G2 BN floor estimate=   61.00 -> bn_lo=   30.50
+  Z 1: exit= 1 pts=  7285 BN=   76.78
+  Z 2: exit= 1 pts=  4489 BN=   65.59
+  [WARN] Z 3: GA optimum at search boundary -- true value may lie outside the search range
+  Z 3: exit= 1 pts=  2981 BN=   52.34
+  Z 4: exit= 1 pts=  1502 BN=   45.60
+  Z1: e=  0.2767 BN=  76.78 RPE=   52.17%  zstat= 0
+  Z2: e=  0.2440 BN=  65.59 RPE=   14.62%  zstat= 0
+  Z3: e=  0.2080 BN=  52.34 RPE=    3.22%  zstat= 2
+  Z4: e=  0.1582 BN=  45.60 RPE=  -13.81%  zstat= 0
+  ensemble (4 of 4 zones): mean JD=  2458605.540 std=  100.0 d
+  ENSEMBLE RPE =    15.28%
+
+ ===== 35497 Ariane 5 ESC-A    
+  [INFO] G2 BN floor estimate=   54.51 -> bn_lo=   27.25
+  Z 1: exit= 1 pts=  8183 BN=   74.85
+  Z 2: exit= 1 pts=  5490 BN=   66.23
+  [WARN] Z 3: GA optimum at search boundary -- true value may lie outside the search range
+  Z 3: exit= 1 pts=  2695 BN=   79.72
+  Z 4: exit= 1 pts=   368 BN=   94.42
+  Z1: e=  0.5750 BN=  74.85 RPE=  522.18%  zstat= 0
+  Z2: e=  0.5651 BN=  66.23 RPE=  358.42%  zstat= 0
+  Z3: e=  0.5441 BN=  79.72 RPE=  172.51%  zstat= 2
+  Z4: e=  0.3797 BN=  94.42 RPE=   -1.08%  zstat= 0
+  ensemble (4 of 4 zones): mean JD=  2458082.160 std=  374.1 d
+  ENSEMBLE RPE =   238.67%
+
+ ===== 37151 Long March 3B     
+  [INFO] G2 BN floor estimate=   36.48 -> bn_lo=   18.24
+  Z 1: exit= 0 pts=  8274 BN=   58.98
+  [WARN] Z 2: GA optimum at search boundary -- true value may lie outside the search range
+  Z 2: exit= 0 pts=  9262 BN=   27.43
+  Z 3: exit= 0 pts=  9593 BN=   32.83
+  [WARN] Z 4: GA optimum at search boundary -- true value may lie outside the search range
+  Z 4: exit= 1 pts=  3617 BN=   49.31
+  Z1: e=  0.5750 BN=  58.98 (no re-entry)  zstat= 0
+  Z2: e=  0.5427 BN=  27.43 (no re-entry)  zstat= 2
+  Z3: e=  0.5321 BN=  32.83 (no re-entry)  zstat= 0
+  Z4: e=  0.5091 BN=  49.31 RPE=  -14.39%  zstat= 2
+  ensemble (1 of 4 zones): mean JD=  2457283.575 std=    0.0 d
+  ENSEMBLE RPE =    -7.41%
+
+ ===== 39615 Proton-M Briz-M   
+  [INFO] G2 BN floor estimate=   41.95 -> bn_lo=   20.98
+  Z 1: exit= 1 pts=  3596 BN=   69.01
+  Z 2: exit= 1 pts=  3465 BN=   65.52
+  [WARN] Z 3: GA optimum at search boundary -- true value may lie outside the search range
+  Z 3: exit= 1 pts=  1925 BN=   48.42
+  Z 4: exit= 1 pts=  2109 BN=   40.69
+  Z1: e=  0.4425 BN=  69.01 RPE=   -2.58%  zstat= 0
+  Z2: e=  0.3305 BN=  65.52 RPE=   55.80%  zstat= 0
+  Z3: e=  0.3018 BN=  48.42 RPE=    2.44%  zstat= 2
+  Z4: e=  0.2811 BN=  40.69 RPE=   25.92%  zstat= 0
+  ensemble (4 of 4 zones): mean JD=  2458045.213 std=   51.7 d
+  ENSEMBLE RPE =     8.42%
+
+ ===== 27526 Ariane 5 R/B      
+  [INFO] G2 BN floor estimate=   31.05 -> bn_lo=   15.53
+  Z 1: exit= 0 pts=  8631 BN=   59.17
+  [WARN] Z 2: GA optimum at search boundary -- true value may lie outside the search range
+  Z 2: exit= 1 pts=  2402 BN=   29.91
+  Z 3: exit= 1 pts=  7358 BN=   41.66
+  Z 4: exit= 1 pts=  1823 BN=   39.81
+  Z1: e=  0.5640 BN=  59.17 (no re-entry)  zstat= 0
+  Z2: e=  0.5557 BN=  29.91 RPE=  -38.60%  zstat= 2
+  Z3: e=  0.4947 BN=  41.66 RPE=  151.41%  zstat= 0
+  Z4: e=  0.3056 BN=  39.81 RPE=   61.37%  zstat= 0
+  ensemble (3 of 4 zones): mean JD=  2456174.369 std=  361.0 d
+  ENSEMBLE RPE =    20.43%
+
+ ===== 32007 GSLV R/B          
+  [INFO] G2 BN floor estimate=   41.98 -> bn_lo=   20.99
+  Z 1: exit= 0 pts= 17931 BN=   61.07
+  Z 2: exit= 1 pts=  8404 BN=   45.41
+  Z 3: exit= 1 pts=  5656 BN=   41.13
+  Z 4: exit= 1 pts=  3550 BN=   40.52
+  Z1: e=  0.2880 BN=  61.07 (no re-entry)  zstat= 0
+  Z2: e=  0.2515 BN=  45.41 RPE=  -10.21%  zstat= 0
+  Z3: e=  0.1818 BN=  41.13 RPE=   13.33%  zstat= 0
+  Z4: e=  0.1414 BN=  40.52 RPE=   23.83%  zstat= 0
+  ensemble (3 of 4 zones): mean JD=  2455360.100 std=   72.8 d
+  ENSEMBLE RPE =     0.68%
+
+ ===== 37819 Proton-M R/B      
+  [INFO] G2 BN floor estimate=   48.04 -> bn_lo=   24.02
+  Z 1: exit= 1 pts=  2448 BN=   74.09
+  Z 2: exit= 1 pts=  2476 BN=   72.58
+  Z 3: exit= 1 pts=  1961 BN=   68.35
+  Z 4: exit= 1 pts=  1438 BN=   63.69
+  Z1: e=  0.4460 BN=  74.09 RPE=  -46.32%  zstat= 0
+  Z2: e=  0.3422 BN=  72.58 RPE=  -14.45%  zstat= 0
+  Z3: e=  0.3173 BN=  68.35 RPE=  -22.14%  zstat= 0
+  Z4: e=  0.2678 BN=  63.69 RPE=  -27.09%  zstat= 0
+  ensemble (4 of 4 zones): mean JD=  2456453.581 std=  101.0 d
+  ENSEMBLE RPE =   -17.74%
+
+ campaign complete -> scratch_rpe/rpe_campaign.csv
