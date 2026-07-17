@@ -1,5 +1,7 @@
 # OREM — Application & Physical Architecture
 
+*(current as of v1.21, 2026-07-14; the Version History in README.md is the authoritative changelog)*
+
 ## 1. System Overview
 
 **OREM** (Optimal Regularized re-Entry estimation Method) predicts the atmospheric re-entry time of resident space objects (RSO) decaying from highly elliptical orbits (HEO). It combines a regularized orbit propagator (KSROP) with response surface methodology (RSM) and genetic algorithm (GA) optimization to compensate for the low accuracy of Two-Line Element (TLE) catalog data.
@@ -8,328 +10,160 @@
 
 RSO in HEO (GTO, Molniya, SSTO) experience complex orbital evolution under luni-solar gravity, oblateness, and atmospheric drag. Their re-entry times are highly sensitive to:
 - **Initial conditions** — TLE accuracy is limited (~km-level for HEO)
-- **Ballistic coefficient** — unknown tumbling state, cross-sectional area uncertainty
+- **Ballistic number** BN = m/(Cd·A) — unknown tumbling state, cross-sectional area uncertainty, and attitude regime that changes over the object's life
 - **Eccentricity** — small errors amplify through luni-solar resonance dynamics
 
-OREM treats re-entry prediction as an optimization problem: find the (eccentricity, cross-sectional area) pair that best fits the observed TLE orbital evolution, then propagate forward to re-entry.
+OREM treats re-entry prediction as an optimization problem: per decay zone, find the (eccentricity, ballistic number) pair that best fits the observed TLE apogee evolution, then propagate each zone's fit forward to re-entry. The **latest zone's prediction is the primary estimate** — it carries the shortest extrapolation and the freshest attitude/altitude regime.
 
-### Target Accuracy
+### Achieved Accuracy (v1.21)
 
-< 5% relative prediction error (RPE), validated against 4 known re-entry cases spanning GTO, Molniya-like, and medium-eccentricity orbits.
+Latest-zone RPE **median 2.4%, mean 4.1%, worst object 10.4%** across the 7-object validation campaign (full force model, 8 zones, `scratch_rpe/rpe_campaign_8zone_gated.csv`). This required, in sequence: a working GA (population 20, v1.15), a correct atmosphere table (Jacchia-71, v1.17), a correct drag phase (v1.18), the latest-zone estimator (v1.20), and a trust-gated BN-range carryover (v1.21).
 
 ---
 
 ## 2. Application Architecture
 
 ```
-┌─────────────────────────────────────────────────────────────────┐
-│                         OREM DRIVER (orem.F)                     │
-│                                                                   │
-│  Input: TLE file, NORAD ID, config file                         │
-│  Output: re-entry predictions per zone, optimal e/A, RPE         │
-│                                                                   │
-│  ┌──────────────┐  ┌───────────────┐                             │
-│  │ TLE Evolution │→ │ Zone Selection │                             │
-│  │ tle_evolve()  │  │ zone_select() │                             │
-│  └──────────────┘  └───────┬───────┘                             │
-│                            │                                       │
-│              ┌─────────────▼──────────────────────┐               │
-│              │  FOR EACH ZONE (iterative loop):    │               │
-│              │                                      │               │
-│              │  ┌──────────────────────────────┐   │               │
-│              │  │ RSM Surface Generation        │   │               │
-│              │  │ 9× propagate_ks              │   │               │
-│              │  │ 3 ecc × 3 area values        │   │               │
-│              │  │ → 9 mean-apogee surfaces      │   │               │
-│              │  └──────────────┬───────────────┘   │               │
-│              │                 │                     │               │
-│              │  ┌──────────────▼───────────────┐   │               │
-│              │  │ GA Surface Search             │   │               │
-│              │  │ (NO propagation)              │   │               │
-│              │  │ TWOINT bilinear interpolation │   │               │
-│              │  │ → optimal e_opt, A_opt        │   │               │
-│              │  └──────────────┬───────────────┘   │               │
-│              │                 │                     │               │
-│              │  ┌──────────────▼───────────────┐   │               │
-│              │  │ Re-entry Propagation (×1)     │   │               │
-│              │  │ propagate_ks(e_opt, A_opt)    │   │               │
-│              │  │ → reentry_jd(iz)              │   │               │
-│              │  └──────────────┬───────────────┘   │               │
-│              │                 │                     │               │
-│              │  Narrow A bounds for next zone       │               │
-│              │  A_range = A_range * 0.5             │               │
-│              └─────────────────┬────────────────────┘               │
-│                                │                                     │
-│              ┌─────────────────▼────────────────────┐               │
-│              │ RPE Computation                       │               │
-│              │ Mode 1: vs observed re-entry          │               │
-│              │ Mode 2: vs ensemble mean (no obs)     │               │
-│              └───────────────────────────────────────┘               │
-└─────────────────────────────────────────────────────────────────────┘
+┌───────────────────────────────────────────────────────────────────┐
+│                   OREM DRIVER (orem.F: orem_run)                    │
+│                                                                     │
+│  Input : TLE file, NORAD ID, config                                 │
+│  Output: per-zone (e_opt, bn_opt, reentry_jd, rpe, zone_status),    │
+│          ensemble t_mean/t_std, nzones_valid                        │
+│                                                                     │
+│  ┌──────────────┐  ┌───────────────┐  ┌──────────────────────────┐ │
+│  │ TLE Evolution │→ │ Zone Selection │→ │ G2 BN floor (zone 1 only)│ │
+│  │ tle_evolve()  │  │ zone_select() │  │ estimate_bn_floor()      │ │
+│  └──────────────┘  └───────────────┘  └──────────────────────────┘ │
+│                                                                     │
+│  FOR EACH ZONE (up to nzones_max, 8 recommended):                   │
+│    1. rsm_generate(): 9× propagate_ks over the zone span            │
+│       (3 ecc × 3 BN grid → 9 mean-apogee surfaces, pre-interpolated │
+│        at the TLE observation times; scratch buffers zeroed per     │
+│        call — v1.14)                                                │
+│    2. Diagnostics: RSM envelope bounds observations? (zone_status)  │
+│    3. ga_optimize(): pop=20 GA on the surfaces (TWOINT bilinear     │
+│       interpolation, NO propagation) → e_opt, bn_opt                │
+│       + GA-boundary detection (15% of range → zone_status=2)        │
+│    4. propagate_ks(e_opt, bn_opt): long propagation → reentry_jd    │
+│    5. Trust-gated BN carryover (v1.21): re-center the next zone's   │
+│       BN range on this zone's fit ONLY if this zone actually        │
+│       predicted a re-entry (drag on) / is unflagged (drag off);     │
+│       widen ×1.5 if the fit sat at a search boundary, else ×0.5     │
+│                                                                     │
+│  compute_rpe(): per-zone RPE + ensemble t_mean/t_std                │
+└───────────────────────────────────────────────────────────────────┘
+                                │
+                                ▼
+┌───────────────────────────────────────────────────────────────────┐
+│  REPORT (report.F: orem_report — called by main_orem.F)             │
+│  output/OREM_<NORAD>_<DATE>.txt:                                    │
+│    config echo · per-zone table (epoch, e, BN, re-entry, RPE,       │
+│    status) · PRIMARY estimate (latest zone) + its RPE ·             │
+│    ensemble mean ± std + relative spread · status legend            │
+└───────────────────────────────────────────────────────────────────┘
 ```
 
 ### Propagation Call Budget
 
-`propagate_ks` is called at two distinct stages with different purposes:
+`propagate_ks` is called at three stages:
 
-1. **RSM surface generation**: 9 × N_zones short propagations (within each zone's time span only). These produce the mean-apogee surfaces that the GA searches.
-2. **Per-zone re-entry prediction**: 1 × N_zones long propagation with optimal (e, A) from the GA, running from the zone epoch forward until altitude < 80 km.
+1. **G2 BN floor** (zone 1 only): one short trial run at BN=100 to calibrate the physics-based floor numerically against the propagator's own conventions.
+2. **RSM surface generation**: 9 × N_zones short propagations (each spanning only its zone).
+3. **Per-zone re-entry prediction**: 1 × N_zones long propagation with the fitted (e, BN), until altitude < 80 km or a 5-year cap.
 
-The GA **never calls the propagator** — it only evaluates bilinear interpolation of the pre-computed surfaces. This is what makes OREM computationally feasible.
+The GA **never calls the propagator** — it evaluates bilinear interpolation of the pre-computed surfaces. This is what makes OREM computationally feasible.
 
 ### Module Descriptions
 
 | Module | File | Purpose | Calls propagate_ks? |
 |--------|------|---------|---------------------|
-| **TLE Evolution** | `tle_evolution.F` | Process TLE history → orbital evolution with epoch dedup | No |
-| **Zone Selection** | `zone_select.F` | Identify linear apogee decay intervals (R² test + linfit) | No |
-| **RSM Surfaces** | `rsm.F` | Generate 9 mean-apogee surfaces per zone | **Yes — 9× per zone** |
-| **GA Optimizer** | `ga.F` | Search pre-computed surfaces for optimal (e, A) | **No — TWOINT interpolation only** |
-| **KSROP Propagator** | `ksrop/propagate_ks.F` | KS regular elements orbit propagation | (called by RSM and re-entry prediction) |
-| **RPE Metric** | `rpe.F` | Relative prediction error (two modes) | No |
-| **OREM Driver** | `orem.F` | Orchestrates iterative zone loop | **Yes — 1× per zone (re-entry)** |
+| **TLE Evolution** | `tle_evolution.F` | TLE history → orbital evolution with epoch dedup | No |
+| **Zone Selection** | `zone_select.F` | Linear apogee-decay windows, top-R² candidates | No |
+| **RSM Surfaces** | `rsm.F` | 9 mean-apogee surfaces per zone, interpolated at obs times | **Yes — 9× per zone** |
+| **GA Optimizer** | `ga.F` | Search surfaces for optimal (e, BN); pop=20 | **No — TWOINT only** |
+| **KSROP Propagator** | `ksrop/propagate_ks.F` | KS regular-elements propagation | (called by G2/RSM/re-entry) |
+| **OREM Driver** | `orem.F` | Zone loop, G2 floor, diagnostics, trust-gated carryover, `compute_rpe` | **Yes — G2 trial + 1× per zone** |
+| **Report** | `report.F` | Prediction report with latest-zone primary estimate | No |
+| **Runner** | `main_orem.F` | Reads `orem.cfg`, runs pipeline, writes report | (via orem_run) |
 
 ---
 
-## 3. Physical Architecture
-
-### 3.1 File Structure
+## 3. Data Flow
 
 ```
-OREM/
-├── orem.F                        Main driver program
-├── tle_evolution.F               Batch TLE → orbital evolution (56 tests)
-├── zone_select.F                 Zone selection + linfit (68 tests)
-├── rsm.F                         Response surface methodology
-├── ga.F                          Genetic algorithm optimizer
-├── rpe.F                         Relative prediction error
-│
-├── ksrop/                        KSROP propagator engine (from KSROP repo)
-│   ├── propagate_ks.F            Refactored KS propagator subroutine
-│   ├── Subrouts.F                Coordinate transforms, I/O, utilities
-│   ├── Legendre.F                Zonal Legendre polynomials
-│   └── TLEread.F                 TLE reader + SGP4/SDP4 + frame transforms
-│
-├── input/
-│   ├── const_new.dat             Physical constants (mu, R_Earth, AU, etc.)
-│   ├── ATM.DAT                   Atmosphere density table
-│   ├── example_35497.tle.txt     Ariane 5 ESC-A (i=5.7°, GTO)
-│   ├── example_37151.tle.txt     Long March 3B (i=24.9°, GTO)
-│   ├── example_39615.tle.txt     Proton-M Briz-M (i=48.5°, HEO)
-│   ├── example_42928.tle.txt     PSLV-C39 (i=19.2°, HEO)
-│   ├── example_42928_zone0.tle.txt  42928 Zone 0 subset (14 TLEs)
-│   ├── example_47944.tle.txt     SSO LEO test case
-│   └── example_multi.tle.txt     Multi-satellite catalog (94597 entries)
-│
-├── test_propagate_ks.F           Propagator subroutine tests
-├── test_tle_evolution.F          TLE evolution tests (56)
-├── test_zone_select.F            Zone selection tests (68)
-└── README.md
+TLE File → tle_evolve() → epochs, a, e, i, Ω, ω, ha, hp, Λs  (deduplicated)
+         → zone_select() → up to nzones_max windows with clean linear
+                           apogee decay (R² ≥ 0.90 over ≤ 10 days),
+                           ranked by R², sorted by epoch
+         → estimate_bn_floor() → may extend zone 1's bn_lo downward
+                           (floor-only; never raises; G2, v1.12)
+
+FOR EACH ZONE:
+  3×3 grid:  e-axis = e_mid ± δe (TLE scatter in the zone)
+             BN-axis = [bn_lo, mid, bn_hi] (kg/m²)
+  rsm_generate() → surfaces(i, ie, ibn) = mean apogee at obs time i
+  zone_status: 1=propagator failure (>6 of 9 grid points diverged)
+               3=RSM envelope fails to bound an observation
+  ga_optimize() → (e_opt, bn_opt); zone_status=2 if within 15% of a bound
+  propagate_ks(e_opt, bn_opt) → reentry_jd or 0
+  trust gate → BN range for the next zone
+
+compute_rpe():
+  Mode 1 (validation): RPE(iz) = (t_pred(iz) − t_obs)/(t_obs − t_zone(iz)) × 100%
+  Mode 2 (operational): t_mean/t_std over predicting zones; RPE vs t_mean
 ```
 
-### 3.2 Data Flow
+### Key Subroutine Interfaces (as implemented)
 
-```
-TLE File (input)
-    │
-    ▼
-┌──────────────────┐
-│ tle_evolve()     │  ← tle_evolution.F
-│                  │  Reads TLE, filters by NORAD ID,
-│                  │  deduplicates epochs (<86 sec),
-│                  │  computes SMA, ha, hp, Λ_S
-└────────┬─────────┘
-         │  epochs, a, e, inc, raan, aop, ha, hp, Λ_S  (npts points)
-         ▼
-┌──────────────────┐
-│ zone_select()    │  ← zone_select.F
-│                  │  Sliding-window R² test for linear
-│                  │  apogee decay. Parameters: min_zone_pts,
-│                  │  max_zone_days, r2_threshold, slope_threshold
-└────────┬─────────┘
-         │  zone_start(1:nzones), zone_end(1:nzones)
-         ▼
-┌──────────────────────────────────────────────────────────┐
-│ FOR EACH ZONE iz = 1, nzones:                             │
-│                                                            │
-│   Build 3×3 grid:                                          │
-│     e-axis: e_mid ± δe  (δe from TLE scatter in zone)     │
-│     A-axis: [A_min, A_mid, A_max]  (from driver bounds)   │
-│                                                            │
-│   STAGE 1: RSM Surface Generation                          │
-│   ┌────────────────────────────────────────────────┐      │
-│   │ rsm_generate()                                  │      │
-│   │                                                  │      │
-│   │  FOR i=1,3 (eccentricity):                      │      │
-│   │    FOR j=1,3 (cross-sectional area):            │      │
-│   │      propagate_ks(e_i, A_j, fixed_mass)         │      │
-│   │      → mean apogee curve eXbY(t)                │      │
-│   │                                                  │      │
-│   │  Output: 9 surfaces + tleobs (observed apogee)   │      │
-│   └────────────────────┬───────────────────────────┘      │
-│                        │                                    │
-│   STAGE 2: GA Surface Search (NO propagation)              │
-│   ┌────────────────────▼───────────────────────────┐      │
-│   │ ga_optimize()                                   │      │
-│   │                                                  │      │
-│   │  Binary-coded GA (40 bits e, 16-28 bits A)      │      │
-│   │  Pop=4, Gen=500, Pc=0.8, Pm=0.01               │      │
-│   │  Fitness: TWOINT bilinear interpolation of      │      │
-│   │    9 surfaces vs observed TLE mean apogee       │      │
-│   │  RMS = sqrt(Σ((interp - obs)/100)² / N)        │      │
-│   │                                                  │      │
-│   │  Output: e_opt(iz), A_opt(iz)                   │      │
-│   └────────────────────┬───────────────────────────┘      │
-│                        │                                    │
-│   STAGE 3: Re-entry Propagation (×1 per zone)             │
-│   ┌────────────────────▼───────────────────────────┐      │
-│   │ propagate_ks(e_opt, A_opt, fixed_mass)          │      │
-│   │ Long propagation → until altitude < 80 km       │      │
-│   │ → reentry_jd(iz)                                │      │
-│   └────────────────────┬───────────────────────────┘      │
-│                        │                                    │
-│   Narrow A bounds for next zone:                           │
-│     A_range = A_range * 0.5                                │
-│     A_min = A_opt - A_range/2                              │
-│     A_max = A_opt + A_range/2                              │
-│                                                            │
-└──────────────────────────┬─────────────────────────────────┘
-                           │
-                           ▼
-┌──────────────────────────────────────────────────────────┐
-│ RPE Computation                                           │
-│                                                            │
-│ Mode 1 (validation — observed re-entry known):             │
-│   RPE(iz) = (reentry_jd(iz) - t_obs) /                   │
-│             (t_obs - t_zone(iz)) × 100%                    │
-│                                                            │
-│ Mode 2 (operational — no observed re-entry):               │
-│   t_mean = mean(reentry_jd(1:nzones))                     │
-│   t_std  = std(reentry_jd(1:nzones))                      │
-│   RPE(iz) = (reentry_jd(iz) - t_mean) /                  │
-│             (t_mean - t_zone(iz)) × 100%                   │
-└──────────────────────────────────────────────────────────┘
-         │
-         ▼
-    Results: reentry_jd per zone, e_opt/A_opt per zone, RPE, t_mean, t_std
-```
-
-### 3.3 Subroutine Interfaces
-
-#### tle_evolve (implemented, 56 tests)
 ```fortran
-subroutine tle_evolve(tle_file, target_norad, maxpts,
-     &               epochs, a_out, e_out, inc_out,
-     &               raan_out, aop_out,
-     &               ha_out, hp_out, lambda_s_out,
-     &               npts, ierr)
-c  Input:
-c    tle_file       : path to TLE file
-c    target_norad   : NORAD ID (-1 for all)
-c    maxpts         : dimension of output arrays
-c  Output:
-c    epochs(maxpts)  : Julian dates (deduplicated, <86 sec)
-c    a_out..hp_out   : SMA, ecc, inc, RAAN, AOP, ha, hp (from TLE mean elements)
-c    lambda_s_out    : Sun azimuth angle (degrees)
-c    npts            : actual count
-c    ierr            : 0=ok, 1=file error, 2=no match
-```
+call orem_run(
+     &   tle_file, norad_id, t_obs_cal,
+     &   nzones_max, min_zone_pts, max_zone_days,
+     &   r2_thresh, slope_thresh,
+     &   bn_min_init, bn_max_init, idrag_flag,
+     &   ipopsize, maxgen, nbits_e, nbits_a, pcross, pmute, ga_seed,
+     &   ngeo_deg, nsun_deg, nmoon_deg,
+     &   WE_rot, EPS_f, FR_rot,
+     &   CR_srp, AM_srp, IPSR, ISHAD, PSR_srp, amuS, amuM,
+     &   ALT_atm, DEN_atm, SCH_atm, ndim_atm,
+     &   reentry_jd, e_opt_out, bn_opt_out, rms_out,
+     &   zone_epoch, nzones_used,
+     &   zone_status, nzones_valid,          ! v1.10 — keep in every call site
+     &   rpe_out, t_mean, t_std, ierr)
 
-#### zone_select (implemented, 68 tests)
-```fortran
-subroutine zone_select(epochs, ha, npts,
-     &                 min_zone_pts, max_zone_days,
-     &                 r2_threshold, slope_threshold,
-     &                 nzones_max,
-     &                 zone_start, zone_end, nzones)
-c  Input:
-c    epochs(npts), ha(npts) : from tle_evolve
-c    min_zone_pts           : minimum TLE observations per zone (e.g. 8)
-c    max_zone_days          : maximum zone span in days (e.g. 10)
-c    r2_threshold           : R² linearity threshold (e.g. 0.90)
-c    slope_threshold        : negative slope cutoff km/day (e.g. -1.0)
-c    nzones_max             : max zones to return
-c  Output:
-c    zone_start/end(nzones_max) : index pairs into epochs/ha
-c    nzones                     : actual count (sorted, non-overlapping)
-```
+call orem_report(
+     &   rep_file, norad_id, t_obs_cal,
+     &   bn_min_init, bn_max_init, idrag_flag,
+     &   reentry_jd, e_opt, bn_opt, rms_o,
+     &   zone_epoch, nzones_used, zone_status, nzones_valid,
+     &   rpe, t_mean, t_std, nzmax, ierr_rep)
 
-#### linfit (implemented, tested within zone_select)
-```fortran
-subroutine linfit(x, y, nn, slope, intercept, r2)
-c  Least-squares linear fit with R² (coefficient of determination)
-```
-
-#### rsm_generate (planned — Issue #5)
-```fortran
-subroutine rsm_generate(
-     &   epochs_zone, ha_zone, e_zone, nzone,
-     &   cal0, x0, xd0,
-     &   e_min, e_max, a_min, a_max,
-     &   fixed_mass, cd_drag,
-     &   propagator_params...,
-     &   surfaces, tobs, apobs, nsurf_pts,
-     &   ierr)
-c  Generates 9 mean-apogee surfaces for one zone.
-c  e-axis: [e_min, e_mid, e_max] — centered on zone TLE eccentricity
-c  A-axis: [A_min, A_mid, A_max] — cross-sectional area (m²)
-c  Calls propagate_ks 9× with fixed mass, varied (e, A).
-c  Output: 9 apogee time-series + observed TLE apogee for GA.
-```
-
-#### ga_optimize (planned — Issue #4)
-```fortran
-subroutine ga_optimize(
-     &   surfaces, tobs, apobs, nsurf_pts,
-     &   e_grid, a_grid,
-     &   e_bounds, a_bounds,
-     &   pop_size, ngen, nbits_e, nbits_a, pc, pm,
-     &   e_opt, a_opt, rms_opt)
-c  Binary-coded GA searching pre-computed RSM surfaces.
-c  Fitness: TWOINT bilinear interpolation vs observed apogee.
-c  No propagation — pure surface evaluation.
-c  Output: optimal (e, A) and RMS fitness.
-```
-
-#### compute_rpe (planned — Issue #7)
-```fortran
-subroutine compute_rpe(
-     &   reentry_jd, zone_epochs, nzones,
-     &   t_obs,
-     &   rpe, t_mean, t_std,
-     &   ierr)
-c  Mode 1 (t_obs > 0): RPE against known re-entry time
-c  Mode 2 (t_obs = 0): mean/std from ensemble, RPE vs mean
-```
-
-#### propagate_ks (implemented)
-```fortran
-subroutine propagate_ks(
-     &   x0, xd0, cal0,
-     &   nrev, istep, tole,
+call propagate_ks(x0, xd0, cal0, nrev, istep, tole,
      &   n_force, ngeo_deg, nsun_deg, nmoon_deg,
      &   BN, IDRAG, WE_rot, EPS_f, FR_rot,
-     &   CR_srp, AM_srp, IPSR, ISHAD,
-     &   PSR_srp, amuS, amuM,
+     &   CR_srp, AM_srp, IPSR, ISHAD, PSR_srp, amuS, amuM,
      &   ALT_atm, DEN_atm, SCH_atm, ndim_atm,
-     &   max_pts, idump,
-     &   traj_jd, traj_x, traj_xd,
-     &   exit_code)
-c  exit_code: 0=normal, 1=reentry (alt<80km), 2=divergence (NaN)
+     &   max_pts, idump, traj_jd, traj_x, traj_xd, exit_code)
+c  exit_code: 0=normal, 1=reentry (alt<80 km), 2=divergence (NaN)
 ```
+
+`zone_status` codes: 0=ok, 1=skip_propfail, 2=GA_boundary, 3=RSM_nobound, 4=skip_toofewpts.
 
 ---
 
-## 4. Physical Models (inherited from KSROP)
+## 4. Physical Models
 
-| Perturbation | Model | Source |
+| Perturbation | Model | Notes |
 |---|---|---|
-| Earth gravity | EGM2008 zonal harmonics, configurable degree (0–2190) | Subrouts.F |
-| Luni-solar | Third-body Legendre expansion (degree 2–3) | Subrouts.F |
-| Atmospheric drag | Oblate co-rotating exponential, tabulated density (ATM.DAT) | propagate_ks.F |
-| Solar radiation pressure | Cannonball + cylindrical/conical shadow | propagate_ks.F |
-| TLE conversion | SGP4 (near-Earth) + SDP4 (deep-space) → J2000 | TLEread.F |
-| Sun geometry | Analytical ephemeris + orbital-plane azimuth angle | Subrouts.F |
+| Earth gravity | EGM2008 zonal harmonics, configurable degree | `geo_coeff` reads J2..Jn from `EGM2008_to2190_TideFree` |
+| Luni-solar | Third-body Legendre expansion (degree 2–3) | M&G analytic ephemerides (KSROP sync v1.8) |
+| Atmospheric drag | Per-revolution King-Hele: ρ_p at the oblate perigee altitude from ATM.DAT, exp(−βae(1−cosE)) along the rev, co-rotation factor F | Density phase keyed to the **true eccentric anomaly of the state** (v1.18 — the analytic sweep it replaced dephased along decay arcs) |
+| Atmosphere table | **Jacchia-71** static profile (Roberts-1971 anchors), F10.7=72, Kp=1.0, nighttime-min T∞=626.3 K | `KSROP/gen_atm_jr71.F`; validated 0.80–0.95× GMAT JacchiaRoberts over 102–300 km (v1.17). SCH column = local −dz/dlnρ |
+| Solar radiation pressure | Cannonball + cylindrical/conical shadow | |
+| TLE conversion | SGP4/SDP4 → J2000 | `TLEread.F` |
+
+Validation lineage: two-body/zonal/third-body/SRP validated against GMAT R2026a in the KSROP campaign; OREM-side drag magnitude validated to ~1% against an exact RK4 integration of the same drag model (`scratch_gmat/drag_ref.py`); the re-entry arc cross-checked against GMAT JacchiaRoberts (`scratch_gmat/gmat_reentry_42928z0.script`).
 
 ---
 
@@ -339,195 +173,95 @@ c  exit_code: 0=normal, 1=reentry (alt<80km), 2=divergence (NaN)
 
 | Variable | Symbol | Range | Source of uncertainty |
 |---|---|---|---|
-| Eccentricity | e | e_mid ± δe (TLE scatter) | SGP4/SDP4 reconstruction error |
-| Cross-sectional area | A (m²) | Iteratively narrowed | Unknown tumbling state, shape |
+| Eccentricity | e | e_mid ± δe (TLE scatter in the zone) | SGP4/SDP4 reconstruction error |
+| Ballistic number | BN (kg/m²) | zone 1: [bn_min, bn_max] with G2 floor; later zones: trust-gated carryover | Tumbling state, attitude regime drift |
 
-**Note:** Original NPOE/KS research varied mass (Cd=1, A=1 m²). OREM fixes mass (known from launch records) and varies cross-sectional area A to achieve the same ballistic coefficient range. B = Cd × A / m.
+BN is optimized directly (mass-as-variable convention: Cd=1, A=1 m², DryMass=BN), as in the original NPOE-era research. Fitted values on the validation set fall in ~20–100 kg/m² per zone.
 
-### 5.2 RSM 3×3 Grid Construction
+### 5.2 RSM 3×3 Grid
 
-For each zone, 9 propagation runs map the (e, A) → mean_apogee response:
+9 short propagations per zone map (e, BN) → mean-apogee history; each surface is pre-interpolated at the zone's TLE observation times, so the GA compares like-for-like. Propagator scratch buffers are zeroed before every grid run (v1.14 — SAVE'd buffers otherwise leak a previous zone's trajectory tail into the envelope).
 
-```
-         A₁       A₂       A₃
-    e₁  [e1b1]   [e1b2]   [e1b3]     ← propagate_ks called 9 times
-    e₂  [e2b1]   [e2b2]   [e2b3]     ← short propagation (zone duration)
-    e₃  [e3b1]   [e3b2]   [e3b3]     ← each produces a mean-apogee curve
-```
-
-**Eccentricity axis:**
-- e₂ = zone's first TLE eccentricity (center)
-- δe = half the TLE eccentricity scatter within the zone
-- e₁ = e₂ - δe, e₃ = e₂ + δe
-- Typical δe ≈ 0.0003–0.0005 (corresponds to ~3.5–5 km in apogee altitude)
-
-**Cross-sectional area axis:**
-- A₁ = A_min, A₂ = (A_min + A_max)/2, A₃ = A_max
-- Fixed mass m (from launch records), fixed Cd
-- Ballistic coefficient B = Cd × A / m
-
-### 5.3 Iterative A-bound Narrowing Across Zones
-
-The area (ballistic coefficient) search range shrinks as successive zones refine the estimate:
+### 5.3 BN Search Range Across Zones (v1.21)
 
 ```
-Zone 0:  A=[A_min, A_mid, A_max]  wide range   (no prior knowledge)
-Zone 1:  narrowed by ~50% around Zone 0 GA result
-Zone 2:  narrowed further
-  ...
-Zone N:  converged — A range typically 25% of initial
+Zone 1 : [bn_min_init, bn_max_init], with bn_lo extended downward when the
+         G2 physics floor (zone 1's own TLE decay rate, calibrated against
+         one propagate_ks trial) estimates the true BN below the caller floor.
+Zone k : IF zone k−1 is TRUSTED (drag on: it predicted a re-entry;
+              drag off: zone_status=0):
+             re-center on bn_opt(k−1); ×0.5 width if the fit was interior,
+             ×1.5 if it sat at a search boundary (true value likely outside)
+         ELSE: range unchanged (weak-signal fits must not steer the search —
+              37151's seven no-prediction zones once marched the range from
+              [12.5,160] down to [17.2,24.9], imprisoning the only real zone)
 ```
 
-Verified from 42928 research data (mass-equivalent):
-- Zone 0: range=80, Zone 2: range=40, Zone 12: range=40, Zone 13: range=20
-
-RSM accepts A_min/A_max as **inputs** from the driver. GA output from zone N feeds zone N+1.
-
-### 5.4 RSM-GA Coupling
-
-**Phase A — RSM Surface Generation (expensive, done once per zone):**
-- 9 calls to `propagate_ks`, each with a different (e, A) from the 3×3 grid
-- Each call propagates from zone start epoch through zone duration
-- Output: 9 mean-apogee radius time-series (eXbY format)
-- Also extracts observed TLE mean apogee at same time epochs (tleobs)
-
-**Phase B — GA Surface Search (cheap, iterative):**
-- GA evaluates candidate (e, A) pairs via TWOINT bilinear interpolation across the 9 surfaces
-- Fitness = RMS of (interpolated - observed) mean apogee
-- **No propagation calls** — pure arithmetic
-- 500 generations × 4 population = 2000 fitness evaluations
-
-**Phase C — Re-entry Propagation (one per zone):**
-- Long propagation with optimal (e_opt, A_opt) from zone start until altitude < 80 km
-- Produces reentry_jd(iz) — independent re-entry prediction from each zone
-
-### 5.5 Objective Function (Fitness)
-
-```
-RMS = sqrt( (1/N) × Σ ((ha_interp(e, A, t_i) - ha_obs(t_i)) / 100)² )
-```
-
-`ha_interp` uses TWOINT 2D bilinear interpolation across the 9 pre-computed surfaces. The GA minimizes RMS.
-
-### 5.6 GA Parameters
+### 5.4 GA Parameters
 
 | Parameter | Value | Rationale |
 |---|---|---|
-| Variables | 2 (e, A) | Eccentricity + cross-sectional area |
-| Population size | 4 | Small — only 2 variables |
-| Generations | 500 | Sufficient for convergence |
-| Bit encoding | 40 bits (e) + 16-28 bits (A) | ~10⁻¹² resolution for e |
-| Crossover probability | 0.8 | Standard |
-| Mutation probability | 0.01 | Low — maintain diversity |
+| Variables | 2 (e, BN) | |
+| Population size | **20** (= maxpop) | Population 4 converged to a range-invariant seed artifact — the decoded chromosome was independent of the data (v1.15). Do not lower. |
+| Generations | 200–500 | |
+| Bit encoding | 40 bits (e) + 16 bits (BN) | |
+| Crossover / mutation | 0.8 / 0.01 | |
+| Fitness | 1/(1+RMS) of TWOINT-interpolated vs observed mean apogee over all zone observations | Trajectory matching (genpoen1.f heritage); slope-fitting variant kept unused in ga.F |
 
-### 5.7 Zone Selection Strategy
+### 5.5 Estimator (v1.20)
 
-Implemented in `zone_select.F` using sliding-window R² test:
-
-| Parameter | Default | Purpose |
-|---|---|---|
-| min_zone_pts | 8 | Minimum TLE observations per zone |
-| max_zone_days | 10 | Maximum zone span (days) |
-| r2_threshold | 0.90 | Minimum R² for linearity |
-| slope_threshold | -1.0 | Minimum negative slope (km/day) |
+**Primary = the latest zone's prediction.** Offline evaluation of five schemes on the 7-object campaign (`scratch_rpe/ensemble_eval.py`): latest-zone median |RPE| 8.2% / mean 7.6% / max 14.4% at 4 zones (2.4%/4.1%/10.4% at 8 zones, gated) vs uniform mean 45% mean error. The uniform ensemble mean ± std is retained as the agreement/spread indicator.
 
 ---
 
-## 6. RPE Metric
+## 6. Validation Cases & Results (v1.21, 8-zone gated campaign)
 
-### Mode 1: Validation (observed re-entry known)
-```
-RPE(iz) = (t_pred(iz) - t_obs) / (t_obs - t_zone(iz)) × 100%
-```
-Target: |RPE| < 5% for all zones.
+| Object | NORAD | i (°) | e₀ | Known re-entry | Latest-zone RPE |
+|---|---|---|---|---|---|
+| PSLV-C39 R/B | 42928 | 19.2 | 0.33 | 2019-03-03 | **0.0%** |
+| Ariane 5 ESC-A | 35497 | 5.7 | 0.63 | 2016-10-31 | **0.6%** |
+| Proton-M Briz-M | 39615 | 48.5 | 0.68 | 2017-09-15 | **2.0%** |
+| GSLV R/B | 32007 | 25.9 | 0.29 | 2010-06-06 | **2.4%** |
+| Proton-M R/B | 37819 | 63.4 | 0.47 | 2013-09-12 | **−5.3%** |
+| Long March 3B | 37151 | 24.9 | 0.56 | 2015-12-03 | **−8.1%** |
+| Ariane 5 R/B | 27526 | 17.7 | 0.59 | 2012-05-09 | **10.4%** |
 
-### Mode 2: Operational (no observed re-entry)
-```
-t_mean = mean(t_pred(1:nzones))
-t_std  = std(t_pred(1:nzones))
-RPE(iz) = (t_pred(iz) - t_mean) / (t_mean - t_zone(iz)) × 100%
-```
-t_mean is the best estimate. t_std quantifies ensemble uncertainty.
+35497's early zones run +170..+520% (solar apsidal resonance at i=5.7° — the motivation for issue #9's 3-variable optimization); its final zone lands at −1.1% per-zone.
 
 ---
 
-## 7. Validation Cases
+## 7. Development Status
 
-| Object | NORAD | Type | i (°) | e₀ | TLE entries | Known re-entry |
-|---|---|---|---|---|---|---|
-| Ariane 5 ESC-A | 35497 | GTO, low-i | 5.7 | 0.63 | 3093 | 2016-10-31 |
-| Long March 3B | 37151 | GTO, mid-i | 24.9 | 0.56 | 3948 | 2015-12-04 |
-| Proton-M Briz-M | 39615 | HEO, high-i | 48.5 | 0.68 | 2853 | 2017-09-16 |
-| PSLV-C39 | 42928 | HEO, low-e | 19.2 | 0.32 | 2693 | 2019-03-03 |
+Core algorithm **complete** (all closed): #1–#8 pipeline, #12 diagnostics/identifiability, #13 report, #16 E2E + accuracy target, #25 drag audit, KSROP #24. Open: #9 (inclination as third variable), #10 (TLE quality filtering), #11 (GMAT re-check when lunisolar enabled), #14 (dynamic solar activity), #22 (CI), and the P4 operational backlog (#15, #17–#21, #23–#24). 342 tests across 9 suites.
 
 ---
 
-## 8. Development Status
+## 8. Configuration File (`orem.cfg`)
 
-| Issue | Component | Status | Tests |
-|---|---|---|---|
-| #1 | Batch TLE processing (`tle_evolution.F`) | **Done** | 56 |
-| #2 | Mean orbital elements | **Closed** — TLE mean elements used directly | — |
-| #3 | Zone selection (`zone_select.F` + `linfit`) | **Done** | 68 |
-| #4 | Genetic Algorithm (`ga.F`) | Open — unblocked | — |
-| #5 | Response Surface Methodology (`rsm.F`) | Open — unblocked | — |
-| #6 | OREM driver (`orem.F`) | Open — blocked by #4, #5 | — |
-| #7 | RPE metric (`rpe.F`) | Open — blocked by #6 | — |
-| #8 | Test suite (4 re-entry cases) | Open — blocked by #6 | — |
+```
+input/example_42928.tle.txt          TLE file path
+42928                                NORAD ID
+2019 3 3 0 0 0.0                     Observed re-entry (0s = operational mode)
+8                                    Max zones (8 recommended, v1.21)
+8 10.0 0.90 -1.0                     Zone: min_pts, max_days, R², slope
+80.0 160.0                           BN bounds kg/m² (G2 floor may extend down)
+20 200 40 16 0.8 0.01 0.123          GA: pop, gen, bits_e, bits_BN, Pc, Pm, seed
+2 0 0                                Force: geo_deg, sun_deg, moon_deg
+0 7.2921150d-5 3.35281066d-3 1.0     Drag: IDRAG, WE, EPS_f, FR
+0 0.0 0.0 0                          SRP: IPSR, CR, AM, ISHAD
+```
+
+Build/run/test commands: see README §4–§6 (all executables need `/heap-arrays /F:16777216`; `orem.exe` and `test_orem.exe` link `report.F`).
 
 ---
 
-## 9. Configuration File Format (`orem.cfg`)
-
-```
-input/example_35497.tle.txt       ! TLE file path
-35497                             ! Target NORAD ID
-2016 10 31 00 00 0.0              ! Observed re-entry epoch (0 if unknown)
-4                                 ! Max number of zones
-8 10.0 0.90 -1.0                  ! Zone params: min_pts, max_days, R2, slope
-0.5 5.0                           ! Area bounds (m²) — A_min, A_max
-1000.0                            ! Fixed spacecraft mass (kg)
-2.2                               ! Drag coefficient Cd
-4 500 40 16 0.8 0.01              ! GA: pop, gen, bits_e, bits_A, Pc, Pm
-50 2 2                            ! Geo degree, Sun degree, Moon degree
-1 7.2921150d-5 3.35281066d-3 1.0  ! IDRAG, WE, EPS, FR
-1.2 0.01 0 1                      ! SRP: CR, AM, IPSR, ISHAD
-```
-
----
-
-## 10. Build & Run
-
-### Compile (Intel oneAPI ifx 2025.0)
-```bat
-call "C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Auxiliary\Build\vcvars64.bat"
-call "C:\Program Files (x86)\Intel\Fortran\compiler\2025.0\env\vars.bat"
-
-ifx orem.F tle_evolution.F zone_select.F rsm.F ga.F rpe.F ^
-    ksrop/propagate_ks.F ksrop/Subrouts.F ksrop/Legendre.F ksrop/TLEread.F ^
-    /exe:orem.exe
-```
-
-### Run
-```bash
-./orem.exe input/orem.cfg
-```
-
-### Test
-```bash
-./test_propagate_ks.exe        # Propagator tests
-./test_tle_evolution.exe       # TLE evolution tests (56)
-./test_zone_select.exe         # Zone selection tests (68)
-```
-
----
-
-## 11. KSROP Linkage
+## 9. KSROP Linkage
 
 The `ksrop/` directory contains files copied from the KSROP repo. When KSROP is updated:
 
 1. Copy updated files: `cp $KSROP/{Subrouts.F,Legendre.F,TLEread.F} ksrop/`
-2. If `driver_KS.F` changes, re-apply the refactoring to `propagate_ks.F`
-3. Run `test_propagate_ks.exe` to verify compatibility
+2. If `driver_KS.F` changes, re-apply the refactoring to `propagate_ks.F` (the two carry the same physics; fixes flow in both directions — e.g. the v1.18 drag-phase fix was ported back as KSROP #24)
+3. `input/ATM.DAT` is generated by `KSROP/gen_atm_jr71.F` — regenerate there and copy
+4. Run the full OREM suite to verify
 
 The common block `/xy/` (pi, d2r, r2d, amue, AU, R_Earth) is the interface contract between KSROP files and OREM modules. `init_constants()` must be called before any KSROP subroutine.
