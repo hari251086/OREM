@@ -24,7 +24,12 @@ c     -------------------------------------------------------
       implicit double precision (a-h, o-z)
       common /xy/ pi, d2r, r2d, amue, AU, R_Earth
 
-      parameter(ndim_a = 291, mxz = 4, nobj = 7)
+c     mxz=8 (v1.21 experiment; was 4): zone_select returns the top-R2
+c     candidates, so a higher cap admits LATER zones -- and v1.20
+c     showed the latest zone is the primary estimator. This run
+c     measures how much later the latest zone gets and what it does
+c     to the latest-zone RPE.
+      parameter(ndim_a = 291, mxz = 8, nobj = 7)
 
       double precision ALT_a(ndim_a), DEN_a(ndim_a), SCH_a(ndim_a)
       integer natm

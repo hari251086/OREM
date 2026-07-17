@@ -612,9 +612,68 @@ c     R2-R4: report contains header, zone table, status legend
      &              npass, nfail)
       call assert_i('R4 ensemble + legend present', iens*ilgd, 1,
      &              npass, nfail)
+
+c     R5-R7: with-re-entry path via synthetic zone data (fast; no
+c     propagation). 3 zones with predictions, observed date between
+c     the Z3 (latest) and mean predictions. Latest-zone must be the
+c     PRIMARY estimate (v1.20: it wins the 7-object evaluation with
+c     median |RPE| 8.2% vs the uniform mean's 45% mean error).
+      nzu = 3
+      zepoch(1)  = 2458000.d0
+      zepoch(2)  = 2458100.d0
+      zepoch(3)  = 2458200.d0
+      reentry(1) = 2458700.d0
+      reentry(2) = 2458600.d0
+      reentry(3) = 2458560.d0
+      e_opt(1) = 0.30d0
+      e_opt(2) = 0.25d0
+      e_opt(3) = 0.20d0
+      bn_opt(1) = 70.d0
+      bn_opt(2) = 60.d0
+      bn_opt(3) = 55.d0
+      rms_o(1) = 0.1d0
+      rms_o(2) = 0.1d0
+      rms_o(3) = 0.1d0
+      zstat(1) = 0
+      zstat(2) = 0
+      zstat(3) = 0
+      rpe(1) = 28.3d0
+      rpe(2) = 10.0d0
+      rpe(3) = 2.7d0
+      t_mean = (reentry(1)+reentry(2)+reentry(3))/3.d0
+      t_std  = 59.3d0
+
+      call orem_report(
+     &   'output/test_report2.txt', 42928, t_obs,
+     &   80.d0, 160.d0, 1,
+     &   reentry, e_opt, bn_opt, rms_o,
+     &   zepoch, nzu,
+     &   zstat, 3,
+     &   rpe, t_mean, t_std, mxz, ierr_rep)
+
+      call assert_i('R5 synthetic report ierr_rep=0', ierr_rep, 0,
+     &              npass, nfail)
+
+      ihdr  = 0
+      izone = 0
+      open(unit=45, file='output/test_report2.txt', status='old',
+     &     err=810)
+ 30   read(45,'(A)',end=40) line
+      if (index(line, 'PRIMARY estimate (latest zone, Z 3') .gt. 0)
+     &   ihdr = 1
+      if (index(line, 'latest-zone RPE') .gt. 0) izone = 1
+      goto 30
+ 40   close(45)
+      call assert_i('R6 PRIMARY = latest zone Z3', ihdr, 1,
+     &              npass, nfail)
+      call assert_i('R7 latest-zone RPE line present', izone, 1,
+     &              npass, nfail)
       return
 
  800  call assert_i('R2 report file readable', 0, 1, npass, nfail)
+      return
+ 810  call assert_i('R5 synthetic report readable', 0, 1,
+     &              npass, nfail)
       return
       end
 

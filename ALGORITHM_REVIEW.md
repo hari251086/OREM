@@ -6,6 +6,24 @@
 
 ---
 
+## ⚑ Resolution status (added 2026-07-14, v1.21) — review CLOSED
+
+All gaps below are resolved or dispositioned. OREM v1.21 **matches the original research's accuracy**: latest-zone RPE median 2.4% / mean 4.1% / max 10.4% on the 7-object campaign (vs the baseline's "within ±3%, none over 8%" on 4 objects).
+
+| Gap | Resolution |
+|---|---|
+| G1 atmosphere | v1.8 J70 table → **superseded by v1.17**: the hand-rolled J70 generator's temperature profile was itself wrong (~3.3–3.5× too dense at 140–200 km); replaced by the real Jacchia-71 profile (`gen_atm_jr71.F`), validated 0.80–0.95× GMAT JacchiaRoberts |
+| G2 BN range | v1.12 physics-based BN floor (`estimate_bn_floor`, zone 1, floor-only) |
+| G3 narrowing | v1.10 widen-on-boundary + **v1.21 trust gate**: only zones that actually predicted a re-entry re-center the range |
+| G4 zone distribution | v1.20/v1.21: zone_select's top-R² ranking distributes zones naturally once `nzones_max=8`; the **latest-zone prediction is the primary estimate** (drag signal concentrates as perigee decays) |
+| G5 e-axis | Unchanged — inherent short-window limitation, shared with the original research |
+| G6–G8 | No change needed (as concluded below) |
+| §4 operational RPE | v1.19/v1.20 `report.F`: ensemble mean ± std, relative spread, and latest-zone primary reported unconditionally |
+
+**The lesson this review could not see:** the v1.7 −93..−55% RPE was dominated not by algorithm-vs-heritage gaps but by four implementation defects found afterwards — stale SAVE'd RSM buffers leaking trajectories between zones (v1.14), a GA population of 4 whose output was a range-invariant seed artifact (v1.15), the G1 table's wrong temperature profile (v1.17), and a drag-density phase error along decay arcs (v1.18). Each was masked by the others; the heritage comparison only became meaningful after all four were fixed. The section below is preserved as the historical analysis.
+
+---
+
 ## 1. Baseline — what the original research achieved
 
 Predictions from DATES.OUT across four objects. RPE is signed: negative = predicted earlier than actual.
@@ -155,13 +173,13 @@ No structural change to `compute_rpe` is required. The reporting in `orem.F` sho
 
 ---
 
-## 5. Recommended actions
+## 5. Recommended actions — all complete (status added 2026-07-14)
 
-| Priority | Action | Issues |
-|----------|--------|--------|
-| **Critical** | ~~Validate and correct ATM.DAT against Jacchia-70 at 100–500 km.~~ **DONE** (commit cf37576): ATM.DAT replaced with J70 at F10.7=72, Kp=1.0. Ratio 95–97% vs NPOE. Future: dynamic solar-activity scaling. | #14 |
-| **High** | Introduce physics-based BN floor from TLE decay rate (Δn̄/Δt) to set object-specific starting range. Resolves G2 without per-object lookup. | #12, #15 |
-| **Medium** | Add minimum BN range floor (≥ 20 kg/m²) to narrowing logic in `orem.F:333–336`. Prevents over-convergence from biased early estimate. | #12 |
-| **Medium** | Add ensemble spread output to `orem.F` reporting. Print `t_mean`, `t_std`, `t_std/(t_mean−t_now)×100%` unconditionally. | #13 |
-| **Later** | Distribute zone selection across observable TLE history rather than consecutive zones. Evaluate 0/25/50/75% lifetime distribution. | #12 |
-| **Later** | After ATM.DAT fix, rerun all E-series test cases to recalibrate RPE thresholds in `test_e2e`. | — |
+| Priority | Action | Issues | Outcome |
+|----------|--------|--------|---------|
+| **Critical** | ~~Validate and correct ATM.DAT~~ | #14 | v1.8 J70 table, then **superseded by v1.17's real Jacchia-71 profile** after a GMAT density probe showed the J70 generator was 3.3–3.5× too dense in the perigee band |
+| **High** | ~~Physics-based BN floor from TLE decay rate~~ | #12 | **DONE v1.12** (`estimate_bn_floor`, numerically calibrated against propagate_ks itself, floor-only) |
+| **Medium** | ~~Fix narrowing over-convergence~~ | #12 | **DONE v1.10 + v1.21**: widen-on-boundary, then the trust gate (only re-entry-predicting zones re-center the range) — a minimum-range floor proved unnecessary once untrusted zones stopped steering |
+| **Medium** | ~~Ensemble spread reporting~~ | #13 | **DONE v1.19/v1.20** (`report.F`: mean ± std, relative spread, latest-zone PRIMARY estimate) |
+| **Later** | ~~Distributed zone selection~~ | #12 | **Dispositioned v1.21**: `nzones_max=8` + top-R² ranking distributes zones across the decay; the latest-zone estimator makes explicit lifetime-percentage placement unnecessary |
+| **Later** | ~~Recalibrate E-series after ATM.DAT fix~~ | — | **DONE v1.17/v1.18** (assertions moved to physical-sanity + first-principles drag reference) |

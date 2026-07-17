@@ -483,14 +483,27 @@ c        Narrow BN bounds for next zone -- unless this zone's GA
 c        optimum saturated the BN search bound (issue #12), in which
 c        case widen instead: the true BN likely lies outside what was
 c        just searched, and narrowing further would only entrench it.
-         if (bn_at_bound) then
-            bn_range = (bn_hi - bn_lo) * 1.5d0
-         else
-            bn_range = (bn_hi - bn_lo) * 0.5d0
+c        v1.21 trust gate: only chain from a zone whose fit carries
+c        real drag signal -- with drag on, that means it actually
+c        predicted a re-entry (a no-re-entry fit's BN is weak-signal
+c        noise: 37151's 8-zone chain re-centered through seven such
+c        zones, marching the range from [12.5,160] to [17.2,24.9] and
+c        imprisoning the one zone with signal, Z8: latest-zone RPE
+c        -38% vs -14% at the 4-zone cap). With drag off there is no
+c        prediction to gate on, so chain from unflagged zones only.
+c        Untrusted zones leave the range unchanged for the next zone.
+         if ((idrag_flag .eq. 1 .and. reentry_jd(iz) .gt. 0.d0)
+     &       .or.
+     &       (idrag_flag .eq. 0 .and. zone_status(iz) .eq. 0)) then
+            if (bn_at_bound) then
+               bn_range = (bn_hi - bn_lo) * 1.5d0
+            else
+               bn_range = (bn_hi - bn_lo) * 0.5d0
+            end if
+            bn_lo = bn_opt_out(iz) - bn_range / 2.d0
+            bn_hi = bn_opt_out(iz) + bn_range / 2.d0
+            if (bn_lo .lt. 10.d0) bn_lo = 10.d0
          end if
-         bn_lo = bn_opt_out(iz) - bn_range / 2.d0
-         bn_hi = bn_opt_out(iz) + bn_range / 2.d0
-         if (bn_lo .lt. 10.d0) bn_lo = 10.d0
 
  50      continue
       end do

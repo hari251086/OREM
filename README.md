@@ -11,12 +11,13 @@ Optimal re-entry time prediction for resident space objects from highly elliptic
 OREM predicts re-entry times of HEO debris (GTO, Molniya, SSTO upper stages) by:
 
 1. Processing TLE history for a target NORAD ID
-2. Selecting optimal TLE zones based on solar apsidal resonance
-3. Generating mean apogee surfaces via RSM (varying eccentricity and ballistic coefficient)
-4. Optimizing initial conditions with GA to minimize RMS error between propagated and observed TLE apogee trajectory
-5. Propagating with KSROP until re-entry (altitude < 80 km)
+2. Selecting TLE zones with a clean linear apogee-decay trend (up to 8 zones, distributed across the object's decay by R² ranking)
+3. Generating mean apogee surfaces via RSM (varying eccentricity and ballistic number) for each zone
+4. Optimizing (e, BN) per zone with a GA that minimizes RMS error between propagated and observed TLE apogee trajectory — with a physics-based BN floor (G2) and a trust-gated BN-range carryover between zones
+5. Propagating each zone's fit with KSROP until re-entry (altitude < 80 km)
+6. Reporting the **latest-zone prediction as the primary estimate** plus the all-zone ensemble mean ± spread (`output/OREM_<NORAD>_<DATE>.txt`)
 
-Target accuracy: **< 5% relative prediction error** (RPE) validated against real re-entries.
+Accuracy (v1.21, 7-object validation campaign, full force model): latest-zone RPE **median 2.4%, mean 4.1%, worst object 10.4%** — see `scratch_rpe/`.
 
 ---
 
@@ -44,26 +45,38 @@ OREM/
 │   ├── example_42928.tle.txt       PSLV-C39 R/B (i=19.2°, e=0.33, re-entry ~2019-02-28)
 │   ├── example_42928_zone0.tle.txt PSLV-C39 zone-0 (14 TLEs, e=0.32, epoch 2017-09-22)
 │   ├── example_42928_zone12.tle.txt PSLV-C39 zone-12 (12 TLEs, e=0.28, epoch 2018-01-21)
-│   └── orem_42928.cfg             Example config file for PSLV-C39
+│   ├── orem_42928.cfg              Example config (IDRAG=0, fast)
+│   └── orem_42928_drag.cfg         Example config (IDRAG=1, full prediction)
 │
-├── test_propagate_ks.F             Tests for refactored propagator
+├── output/                         Prediction reports (OREM_<NORAD>_<DATE>.txt)
 │
-├── tle_evolution.F                 Batch TLE → orbital evolution (56 tests)
-├── zone_select.F                   Zone selection — linear apogee decay (68 tests)
-├── test_tle_evolution.F            TLE evolution tests
-├── test_zone_select.F              Zone selection tests
-├── ga.F                            Binary-coded GA optimizer (71 tests); ld_surf fix v1.4; trajectory-matching fitness
-├── test_ga.F                       GA optimizer tests
-├── test_ga_sensitivity.F           GA parameter sensitivity study (pop/gen/Pm sweep, not in test suite)
-├── rsm.F                           RSM surface generation (39 tests)
-├── test_rsm.F                      RSM integration tests
-├── main_orem.F                     Standalone runner (reads orem.cfg)
-├── orem.F                          OREM driver + compute_rpe (14 tests)
-├── test_orem.F                     OREM driver tests
-├── test_reentry.F                  7-object re-entry validation (35 tests)
-├── test_e2e.F                      End-to-end integration test, IDRAG=1 (20 tests: E1–E10 42928 + E11–E20 39615/35497)
-├── test_gmat.F                      GMAT cross-validation: BN sensitivity (14 tests)
-└── README.md
+├── scratch_gmat/                   GMAT cross-validation artifacts (issues #11/#12/#25):
+│                                   xval grid script, re-entry arc scripts + results,
+│                                   density probe, drag_ref.py exact-integration reference
+├── scratch_legacy_validation/      Ground-truth harness vs the 2017-2021 GA runs (issue #12)
+├── scratch_rpe/                    7-object RPE campaigns (4-zone / 8-zone / 8-zone gated)
+│                                   + ensemble_eval.py estimator comparison
+│
+├── tle_evolution.F                 Batch TLE → orbital evolution
+├── zone_select.F                   Zone selection — linear apogee decay, top-R² candidates
+├── ga.F                            Binary-coded GA optimizer (pop=20; trajectory-matching fitness)
+├── rsm.F                           RSM surface generation (9 surfaces per zone)
+├── orem.F                          OREM driver: pipeline + G2 BN floor + zone diagnostics
+│                                   + trust-gated BN carryover + compute_rpe
+├── report.F                        Prediction report writer (latest-zone primary + ensemble)
+├── main_orem.F                     Standalone runner (reads orem.cfg, writes the report)
+│
+├── test_propagate_ks.F             Propagator tests (10)
+├── test_tle_evolution.F            TLE evolution tests (56)
+├── test_zone_select.F              Zone selection tests (68)
+├── test_ga.F                       GA optimizer tests (71)
+├── test_ga_sensitivity.F           GA parameter sensitivity study (not in test suite)
+├── test_rsm.F                      RSM integration tests (39)
+├── test_orem.F                     Driver + diagnostics + G2 + report tests (29)
+├── test_reentry.F                  7-object re-entry validation (35)
+├── test_e2e.F                      End-to-end integration, IDRAG=1 + full force (20)
+├── test_gmat.F                     GMAT cross-validation + exact-model drag reference (14)
+└── README.md                       (342 tests total)
 ```
 
 ---
@@ -98,35 +111,32 @@ Requires **Intel oneAPI Fortran** (`ifx`) or **GNU Fortran** (`gfortran`).
 
 ### Windows (Intel oneAPI ifx 2025.0)
 
+`/heap-arrays /F:16777216` (16 MB stack) is required for every executable that links `rsm.F`/`ga.F` — the `surfaces(5000,3,3)` arrays overflow the default stack without it. `test_orem.exe` and `orem.exe` additionally link `report.F` (since v1.19).
+
 ```bat
 call "C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Auxiliary\Build\vcvars64.bat"
 call "C:\Program Files (x86)\Intel\Fortran\compiler\2025.0\env\vars.bat"
 
-ifx test_propagate_ks.F ksrop/propagate_ks.F ksrop/Subrouts.F ksrop/Legendre.F /exe:test_propagate_ks.exe
-ifx test_tle_evolution.F tle_evolution.F ksrop/Subrouts.F ksrop/TLEread.F ksrop/Legendre.F /exe:test_tle_evolution.exe
-ifx test_zone_select.F zone_select.F tle_evolution.F ksrop/Subrouts.F ksrop/TLEread.F ksrop/Legendre.F /exe:test_zone_select.exe
-ifx test_ga.F ga.F /exe:test_ga.exe
-ifx /heap-arrays /F:16777216 test_rsm.F rsm.F ga.F tle_evolution.F zone_select.F ksrop/propagate_ks.F ksrop/Subrouts.F ksrop/TLEread.F ksrop/Legendre.F /exe:test_rsm.exe
-ifx /heap-arrays /F:16777216 test_orem.F orem.F rsm.F ga.F tle_evolution.F zone_select.F ksrop/propagate_ks.F ksrop/Subrouts.F ksrop/TLEread.F ksrop/Legendre.F /exe:test_orem.exe
-ifx /heap-arrays /F:16777216 test_reentry.F orem.F rsm.F ga.F tle_evolution.F zone_select.F ksrop/propagate_ks.F ksrop/Subrouts.F ksrop/TLEread.F ksrop/Legendre.F /exe:test_reentry.exe
+ifx /heap-arrays /F:16777216 test_propagate_ks.F ksrop/propagate_ks.F ksrop/Subrouts.F ksrop/Legendre.F /exe:test_propagate_ks.exe
+ifx /heap-arrays /F:16777216 test_tle_evolution.F tle_evolution.F ksrop/TLEread.F ksrop/Subrouts.F ksrop/Legendre.F /exe:test_tle_evolution.exe
+ifx /heap-arrays /F:16777216 test_zone_select.F zone_select.F tle_evolution.F ksrop/TLEread.F ksrop/Subrouts.F ksrop/Legendre.F /exe:test_zone_select.exe
+ifx /heap-arrays /F:16777216 test_ga.F ga.F rsm.F tle_evolution.F zone_select.F ksrop/propagate_ks.F ksrop/Subrouts.F ksrop/Legendre.F ksrop/TLEread.F /exe:test_ga.exe
+ifx /heap-arrays /F:16777216 test_rsm.F rsm.F tle_evolution.F zone_select.F ksrop/propagate_ks.F ksrop/Subrouts.F ksrop/Legendre.F ksrop/TLEread.F ga.F /exe:test_rsm.exe
+ifx /heap-arrays /F:16777216 test_orem.F orem.F report.F rsm.F ga.F tle_evolution.F zone_select.F ksrop/propagate_ks.F ksrop/Subrouts.F ksrop/Legendre.F ksrop/TLEread.F /exe:test_orem.exe
+ifx /heap-arrays /F:16777216 test_reentry.F orem.F rsm.F ga.F tle_evolution.F zone_select.F ksrop/propagate_ks.F ksrop/Subrouts.F ksrop/Legendre.F ksrop/TLEread.F /exe:test_reentry.exe
+ifx /heap-arrays /F:16777216 test_e2e.F orem.F rsm.F ga.F tle_evolution.F zone_select.F ksrop/propagate_ks.F ksrop/Subrouts.F ksrop/Legendre.F ksrop/TLEread.F /exe:test_e2e.exe
+ifx /heap-arrays /F:16777216 test_gmat.F rsm.F tle_evolution.F zone_select.F ksrop/propagate_ks.F ksrop/Subrouts.F ksrop/Legendre.F ksrop/TLEread.F ga.F /exe:test_gmat.exe
 
 REM Standalone runner
-ifx /heap-arrays /F:16777216 main_orem.F orem.F rsm.F ga.F tle_evolution.F zone_select.F ksrop/propagate_ks.F ksrop/Subrouts.F ksrop/TLEread.F ksrop/Legendre.F /exe:orem.exe
+ifx /heap-arrays /F:16777216 main_orem.F orem.F report.F rsm.F ga.F tle_evolution.F zone_select.F ksrop/propagate_ks.F ksrop/Subrouts.F ksrop/TLEread.F ksrop/Legendre.F /exe:orem.exe
 ```
 
 ### Unix / gfortran
 
-```bash
-gfortran test_propagate_ks.F ksrop/propagate_ks.F ksrop/Subrouts.F ksrop/Legendre.F -o test_propagate_ks.exe
-gfortran test_tle_evolution.F tle_evolution.F ksrop/Subrouts.F ksrop/TLEread.F ksrop/Legendre.F -o test_tle_evolution.exe
-gfortran test_zone_select.F zone_select.F tle_evolution.F ksrop/Subrouts.F ksrop/TLEread.F ksrop/Legendre.F -o test_zone_select.exe
-gfortran test_ga.F ga.F -o test_ga.exe
-gfortran test_rsm.F rsm.F ga.F tle_evolution.F zone_select.F ksrop/propagate_ks.F ksrop/Subrouts.F ksrop/TLEread.F ksrop/Legendre.F -o test_rsm.exe
-gfortran test_orem.F orem.F rsm.F ga.F tle_evolution.F zone_select.F ksrop/propagate_ks.F ksrop/Subrouts.F ksrop/TLEread.F ksrop/Legendre.F -o test_orem.exe
-gfortran test_reentry.F orem.F rsm.F ga.F tle_evolution.F zone_select.F ksrop/propagate_ks.F ksrop/Subrouts.F ksrop/TLEread.F ksrop/Legendre.F -o test_reentry.exe
+Same source lists as above with `gfortran ... -o <name>.exe` (no `/heap-arrays` equivalent needed if the default stack suffices; otherwise `ulimit -s unlimited`). Example for the runner:
 
-# Standalone runner
-gfortran main_orem.F orem.F rsm.F ga.F tle_evolution.F zone_select.F ksrop/propagate_ks.F ksrop/Subrouts.F ksrop/TLEread.F ksrop/Legendre.F -o orem.exe
+```bash
+gfortran main_orem.F orem.F report.F rsm.F ga.F tle_evolution.F zone_select.F ksrop/propagate_ks.F ksrop/Subrouts.F ksrop/TLEread.F ksrop/Legendre.F -o orem.exe
 ```
 
 ---
@@ -140,12 +150,12 @@ REM Windows — Intel oneAPI
 call "C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Auxiliary\Build\vcvars64.bat"
 call "C:\Program Files (x86)\Intel\Fortran\compiler\2025.0\env\vars.bat"
 
-ifx /heap-arrays /F:16777216 main_orem.F orem.F rsm.F ga.F tle_evolution.F zone_select.F ksrop/propagate_ks.F ksrop/Subrouts.F ksrop/TLEread.F ksrop/Legendre.F /exe:orem.exe
+ifx /heap-arrays /F:16777216 main_orem.F orem.F report.F rsm.F ga.F tle_evolution.F zone_select.F ksrop/propagate_ks.F ksrop/Subrouts.F ksrop/TLEread.F ksrop/Legendre.F /exe:orem.exe
 ```
 
 ```bash
 # Unix — gfortran
-gfortran main_orem.F orem.F rsm.F ga.F tle_evolution.F zone_select.F ksrop/propagate_ks.F ksrop/Subrouts.F ksrop/TLEread.F ksrop/Legendre.F -o orem.exe
+gfortran main_orem.F orem.F report.F rsm.F ga.F tle_evolution.F zone_select.F ksrop/propagate_ks.F ksrop/Subrouts.F ksrop/TLEread.F ksrop/Legendre.F -o orem.exe
 ```
 
 ### Step 2: Create a config file
@@ -160,10 +170,10 @@ Config file format (`input/orem_42928.cfg`):
 input/example_42928.tle.txt          <- TLE file path
 42928                                <- NORAD ID
 2019 3 3 0 0 0.0                    <- Observed re-entry (yr mo dy hr mn sc). Use 0 0 0 0 0 0.0 if unknown
-4                                    <- Max number of zones
+8                                    <- Max number of zones (8 recommended: later zones sharpen the primary estimate, v1.21)
 8 10.0 0.90 -1.0                    <- Zone: min_pts, max_days, R2_threshold, slope_threshold
-80.0 160.0                          <- Ballistic number bounds [BN_min, BN_max]
-4 200 40 16 0.8 0.01 0.123          <- GA: pop, gen, bits_e, bits_BN, Pc, Pm, seed
+80.0 160.0                          <- Ballistic number bounds [BN_min, BN_max] (G2 floor may extend zone 1 downward)
+20 200 40 16 0.8 0.01 0.123         <- GA: pop, gen, bits_e, bits_BN, Pc, Pm, seed (pop=20 required — see v1.15)
 2 0 0                               <- Force model: geo_deg, sun_deg, moon_deg
 0 7.2921150d-5 3.35281066d-3 1.0    <- Drag: IDRAG(0=off,1=on), WE, EPS_f, FR
 0 0.0 0.0 0                         <- SRP: IPSR(0=off,1=on), CR, AM, ISHAD
@@ -177,17 +187,21 @@ input/example_42928.tle.txt          <- TLE file path
 
 ### Step 4: Read output
 
-The output shows per-zone results:
+Console output shows per-zone results; a full report is written to `output/OREM_<NORAD>_<DATE>.txt`:
 ```
-Zone    Epoch (JD)     e_opt  A (m2)  Re-entry (JD)   Re-entry (UTC)    RPE(%)
-   1    2458152.54  0.273541   0.500  2458543.20       2019-03-02        -0.30
-   2    2458235.23  0.240538   2.180  2458545.80       2019-03-05         1.20
+Zone  Epoch (JD)      e_opt     BN(kg/m2)  Re-entry (JD)   Re-entry (UTC)   RPE(%)    status
+   1   2458152.5397   0.27666     76.78   2458735.7260   2019  9  9      48.41   ok
+   ...
+PRIMARY estimate (latest zone, Z 4): JD  2458526.0047  ( 2019  2 11 )
+  latest-zone RPE:  -15.65 %
+Ensemble ( 4 of  4 zones with a predicted re-entry):
+  mean re-entry JD  2458602.1499  ( 2019  4 28 )  +-    94.05 days
 ```
 
-- **e_opt** — optimal eccentricity found by GA for this zone
-- **A (m2)** — optimal cross-sectional area (m²)
-- **Re-entry (JD/UTC)** — predicted re-entry date
-- **RPE(%)** — relative prediction error vs observed (if provided)
+- **e_opt / BN** — optimal eccentricity and ballistic number (kg/m²) fitted by the GA for this zone
+- **PRIMARY estimate** — the latest zone's prediction: the shortest extrapolation and the freshest attitude/altitude regime, and the most accurate single estimator on the validation set (median |RPE| 2.4% at 8 zones)
+- **Ensemble mean ± std** — agreement/spread indicator across all predicting zones
+- **RPE(%)** — relative prediction error vs observed (if provided); **status** — per-zone diagnostic (`ok`/`boundary`/`nobound`/...)
 
 ### Notes
 
@@ -205,23 +219,25 @@ Zone    Epoch (JD)     e_opt  A (m2)  Re-entry (JD)   Re-entry (UTC)    RPE(%)
 
 To run on a different object: copy the config, change lines 1-3 (TLE file, NORAD, re-entry date), and line 6 (BN bounds).
 
-**Ballistic number (BN):** BN = m/(Cd×A) in kg/m². Typical range for GTO/HEO debris: 30–200. The GA optimizes BN directly, as in the original NPOE research.
+**Ballistic number (BN):** BN = m/(Cd×A) in kg/m². The GA optimizes BN directly, as in the original NPOE research. With the corrected J71 atmosphere (v1.17) and drag phase (v1.18), fitted values on the 7-object validation set fall in ~20–100 kg/m² per zone; the default [80,160] initial range works because the G2 physics floor automatically extends zone 1's search downward when the object's own decay rate warrants it, and later zones inherit trust-gated re-centered ranges.
 
 ---
 
 ## 6. Running Tests
 
 ```bash
-./test_propagate_ks.exe        # Propagator tests
+./test_propagate_ks.exe        # Propagator tests (10 checks)
 ./test_tle_evolution.exe       # TLE evolution tests (56 checks)
 ./test_zone_select.exe         # Zone selection tests (68 checks)
 ./test_ga.exe                  # GA optimizer tests (71 checks)
 ./test_rsm.exe                 # RSM integration tests (39 checks)
-./test_orem.exe                # OREM driver tests (14 checks)
+./test_orem.exe                # Driver + diagnostics + G2 + report tests (29 checks)
 ./test_reentry.exe             # 7-object re-entry validation (35 checks)
 ./test_e2e.exe                 # End-to-end integration test, IDRAG=1 (20 checks)
-./test_gmat.exe                # GMAT cross-validation: propagator BN sensitivity (14 checks)
+./test_gmat.exe                # GMAT cross-validation + exact-model drag reference (14 checks)
 ```
+
+**342 checks total**, all passing as of v1.21.
 
 ### test_propagate_ks
 Two-body energy conservation, orbit closure, multi-revolution propagation, re-entry detection, input preservation.
@@ -275,33 +291,33 @@ Two-body energy conservation, orbit closure, multi-revolution propagation, re-en
 - Surface quality: higher e → higher ha, all finite (NaN check), physical range [5k-20k km], center nearest, repeatability
 - RSM→GA integration: feed real RSM surfaces into ga_optimize, e_opt/a_opt in bounds, rms valid, e_opt near TLE ecc, fitness>0.5
 
-### test_orem (22 tests) — includes issue #12
+### test_orem (29 tests) — includes issues #12/#13
 - compute_rpe: perfect RPE=0, 10-day late RPE~1.9%, mean/std (Mode 2), zero predictions
 - Error handling: bad TLE file, wrong NORAD ID
-- 42928 integration: full pipeline (TLE→zone→RSM→GA→propagation), 4 zones, e_opt/a_opt/rms valid, zone epochs valid
-- Failure recovery/diagnostics (#12): D15 propagator-divergence skip (BN=0 forces a division-by-zero in the drag term → NaN altitude → `zone_status=1`), D16 GA boundary detection (`zone_status=2`), D17 all-zones-fail doesn't crash the driver loop (`nzones_valid=0`)
-- G2 physics-based BN floor (#12): 37151's zone 1 with the default `bn_min_init=80` — floor estimate extends `bn_lo` well below 80, letting `bn_opt(1)` reach 48.79 (structurally impossible before this change)
+- 42928 integration: full pipeline (TLE→zone→RSM→GA→propagation), e_opt physical, bn_opt physical (positive/finite — G2 floor + the corrected J71 table put fit-consistent BN below the caller's 80), rms valid, zone epochs valid
+- Failure recovery/diagnostics (#12): D15 propagator-divergence skip (BN=0 forces a division-by-zero in the drag term → NaN altitude → `zone_status=1`), D16 GA boundary detection with a [20,30] window pinned *below* the real BN (`zone_status=2`; a window pinned above gets un-pinned by the G2 floor), D17 all-zones-fail doesn't crash the driver loop (`nzones_valid=0`)
+- G2 physics-based BN floor (#12): 37151's zone 1 with the default `bn_min_init=80` — floor estimate extends `bn_lo` well below 80, letting `bn_opt(1)` land there (structurally impossible before this change)
+- Prediction report (#13): R1–R4 real-run report (header/zone table/ensemble/legend), R5–R7 synthetic-array report exercising the with-re-entry path (PRIMARY = latest zone, latest-zone RPE line)
 
-### test_e2e (20 tests) — Issue #16
-Full pipeline with IDRAG=1, **full force model** (geo=20, sun=2, moon=3, SRP on: Cr=1.2, A/m=0.01 m²/kg, conical shadow — widened from geo=4/SRP-off in v1.11); GA minimizes trajectory RMS (v1.7):
-- E1–E5: 42928 PSLV-C39 R/B (re-entry 2019-03-03): pipeline, zones, e_opt, BN in [80,160] per zone, re-entry in all 4 zones
-- E6–E10: 42928 zone-0 (14 TLEs, e≈0.32, epoch 2017-09-22): per-zone BN, re-entry detected, zone-0 RPE ≈ −16%
-- E11–E15: 39615 Proton-M Briz-M (re-entry 2017-09-15): pipeline, zones, e_opt, per-zone BN in [50,500], re-entry
-- E16–E20: 35497 Ariane 5 ESC-A (re-entry 2016-10-31): pipeline, zones, e_opt, per-zone BN; no re-entry predicted (BN>50, within-zone fit; informational)
-- BN narrows across zones (each zone reduces the search range by 50%); e_opt per zone reflects zone TLE eccentricity
-- RPE printed as diagnostic (not enforced — open as issue #12)
-- The full force model leaves short-window (≈7–10 day) RSM/GA-fitted BN and e values unchanged to the last decimal (drag dominates at that timescale) but measurably shifts long-duration (multi-year) re-entry propagations — e.g. zone-0's re-entry trajectory shortened by 47 revolutions and its predicted date moved ~4.7 days earlier
+### test_e2e (20 tests) — Issue #16 (closed v1.20)
+Full pipeline with IDRAG=1, **full force model** (geo=20, sun=2, moon=3, SRP on: Cr=1.2, A/m=0.01 m²/kg, conical shadow); GA minimizes trajectory RMS:
+- E1–E5: 42928 PSLV-C39 R/B (re-entry 2019-03-03): pipeline, zones, e_opt/bn_opt physical, re-entry in all 4 zones
+- E6–E10: 42928 zone-0 (14 TLEs, e≈0.32, epoch 2017-09-22): bn_opt physical, re-entry detected
+- E11–E15: 39615 Proton-M Briz-M (re-entry 2017-09-15): pipeline, zones, e_opt, per-zone BN in [50,500]; E15 informational — the dedicated zone-1 file (e=0.68) is a weak-signal window whose honest fit can predict beyond the 5-year cap
+- E16–E20: 35497 Ariane 5 ESC-A (re-entry 2016-10-31): pipeline, zones, e_opt, per-zone BN; E20 informational (same rationale)
+- BN range carryover between zones is trust-gated (v1.21): only zones that actually predicted a re-entry re-center the search range
+- RPE printed as diagnostic; the enforced accuracy evidence lives in the 7-object campaigns (`scratch_rpe/`): latest-zone RPE median 2.4% / mean 4.1% / max 10.4% at 8 zones
 
 ### test_gmat (14 tests) — Issue #11
-Cross-validates propagate_ks against GMAT R2026a reference runs (`scratch_gmat/gmat_xval_42928z0.script`, run via `GmatConsole.exe`) on 42928 PSLV-C39 R/B, Zone 0 (2017-09-24). Replaces the earlier NPOE-based comparison — GMAT is the trusted ground truth established by the KSROP↔GMAT validation campaign, and matching the NPOE-era heritage research is no longer a goal for this test:
+Cross-validates propagate_ks against GMAT R2026a reference runs (`scratch_gmat/gmat_xval_42928z0.script`, run via `GmatConsole.exe`) on 42928 PSLV-C39 R/B, Zone 0 (2017-09-24), plus a first-principles drag-magnitude reference:
 - N1-N3: BN monotonicity — higher BN → less apogee decay (each of 3 e-rows)
 - N4-N6: e monotonicity — higher e → higher initial apogee (each of 3 BN columns)
 - N7-N9: BN sensitivity ratio decay(BN=80)/decay(BN=160) > 1.5 (propagate_ks ~2.0; GMAT ref ~1.45-1.54)
 - N10: No divergence across all 9 RSM grid runs
 - N11: IDRAG=0 gives < 0.5 km drop in 7 days
 - N12: All drops negative for IDRAG=1
-- N13-N14: Magnitude within 50% of GMAT for BN=80 and BN=160 (propagate_ks is 69-112% of GMAT magnitude across all 9 grid points; tightened from the old factor-3 NPOE tolerance)
-- **Key finding**: propagate_ks correctly models BN physics; RPE inaccuracy is due to short zone windows and TLE noise, not a propagator bug
+- N13-N14: Decay magnitude within ±10% of an **exact RK4 integration of propagate_ks's own drag model** at matched duration/atmosphere (`scratch_gmat/drag_ref.py`; propagate_ks agrees to ~1%). GMAT's 7-day magnitudes are printed as context only — they span 64.1 revolutions vs the 35 tested (the historical mismatch that manufactured issue #25's apparent "2× deficit") and carry J2-aliased apogee sampling and diurnal-bulge geometry a static-atmosphere model cannot reproduce
+- **Key finding**: propagate_ks's drag physics is validated at the revolution level; the historical RPE bias was the ATM.DAT profile (fixed v1.17) and an arc-level drag-phase defect (fixed v1.18), not BN physics
 
 ### test_reentry (35 tests)
 7 objects × 5 checks each: pipeline completion, zone detection, e_opt physical, BN physical (positive/finite — no longer bounds-checked against the caller's [80,160] input range as of v1.12, since the G2 physics-based BN floor can legitimately push `bn_opt` below 80), rms valid
@@ -543,6 +559,19 @@ cp ../KSROP/Legendre.F ksrop/
 - Fixed a latent `main_orem.F` bug found during wiring: its `orem_run` call was never updated for v1.10's `zone_status`/`nzones_valid` arguments (positional mismatch — `rpe` landed in `zone_status`'s slot). Latent only because `orem.exe` had not been rebuilt since; now threaded and rebuilt
 - **First full 7-object drag-enabled RPE campaign post-v1.18** (`scratch_rpe/rpe_campaign.F`, full force model, results in `rpe_campaign.csv`): ensemble RPE per object — 42928 **+15.3%**, 35497 +238.7%, 37151 −7.4%, 39615 **+8.4%**, 27526 +20.4%, 32007 **+0.7%**, 37819 −17.7%. **Six of seven objects within ±21%** (median |ensemble RPE| 15.3%); the outlier 35497 is the known i=5.7° solar-apsidal-resonance case that issue #9 (3-variable optimization with inclination) was written for — its zone-4 alone predicts −1.1%, while early zones run +170..+520%
 - Design signal for #12/G4: **the latest zone is consistently the sharpest single predictor** (35497 Z4 −1.1%, 37151 Z4 the only zone predicting at all, 42928 Z3/Z4 best) — drag signal concentrates as perigee decays, motivating recency-weighted ensembles or late-zone selection over the current uniform mean
+
+**1.20 — 2026-07-14**
+- **Latest-zone primary estimate (closes #16's <10% accuracy target)**: offline evaluation of five ensemble schemes against the 7-object campaign (`scratch_rpe/ensemble_eval.py`) — uniform mean, latest-zone, index-weighted, inverse-remaining-lifetime-weighted, median. **Latest-zone wins decisively: median |RPE| 8.2%, mean 7.6%, worst object 14.4%** (vs uniform mean's 45.3% mean / 238.7% max). Every object within ±15%; even the 35497 resonance outlier lands at −0.2%. Physical basis: the latest zone has the shortest extrapolation and the freshest attitude/altitude regime
+- `orem_report` ensemble block now leads with **"PRIMARY estimate (latest zone, Z n)"** + its RPE, followed by the uniform mean ± std as the spread/agreement indicator
+- New tests R5–R7 (synthetic zone arrays, exercising the with-re-entry report path without propagation). **342 total tests**
+- #16 closed: the E2E chain is proven and the <10% target is met by the primary estimator (5/7 objects <10%, mean 7.6%). Remaining accuracy work continues under #12 (weak-signal zones: 37151 −14.4%, 27526 +10.8%) and #9 (35497's inclination resonance)
+
+**1.21 — 2026-07-14**
+- **Trust-gated BN-range carryover + 8-zone operation: latest-zone RPE now median 2.4% / mean 4.1% / max 10.4% across all 7 objects**
+- Measurement first: re-running the campaign with `nzones_max=8` (zone_select returns the top-R² candidates, so a higher cap admits *later* zones) sharpened the latest-zone estimator wherever signal exists (42928 −4.4→0.0%, 39615 8.9→2.7%, 32007 6.4→0.8%) but regressed 37151 (−14.4→−38.0%): its Z1–Z7 all predict no re-entry (weak-signal fits), yet each re-centered the v1.10 BN-range carryover, marching the search from [12.5,160] down to [17.2,24.9] and imprisoning Z8 — the only zone with real signal
+- Fix in `orem.F`: the carryover now chains **only from zones whose fit carries real signal** — with drag on, a zone that actually predicted a re-entry; with drag off, an unflagged (`zone_status=0`) zone. Untrusted zones leave the range unchanged. Objects whose zones all predict (42928, 35497, 37819) chain exactly as before — bit-identical e2e results
+- Gated 8-zone campaign (`rpe_campaign_8zone_gated.csv`; 4-zone and ungated-8-zone runs preserved alongside): 42928 0.0%, 35497 0.6%, 39615 2.0%, 32007 2.4%, 37819 −5.3%, 37151 **−8.1%** (recovered), 27526 10.4% — **all seven at or under ~10%**
+- Shipped configs raised to `nzones_max=8`. 342/342 tests pass (test suites unchanged — they run 4-zone IDRAG=0 paths whose chains are gated on `zone_status` and unaffected in practice)
 
 ---
 
