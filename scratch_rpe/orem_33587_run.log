@@ -1,0 +1,44 @@
+ ==============================================
+  OREM — Optimal Regularized re-Entry Method
+ ==============================================
+ 
+  TLE file:  input/example_33587.tle.txt
+  NORAD ID:     33587
+  Observed:  2025- 4-22
+  Max zones:   8
+  BN:        [  80.0,  160.0]
+  Drag:      1
+ 
+   Running pipeline...
+ 
+  [INFO] G2 BN floor estimate=    5.00 -> bn_lo=    2.50
+  Z 1: exit= 0 pts= 13521 BN=   54.91
+  Z 2: exit= 0 pts= 13515 BN=   53.25
+  Z 3: exit= 0 pts= 13598 BN=   61.08
+  [WARN] Z 4: RSM envelope does not bound  11 of  16 observations -- proceeding anyway
+  [WARN] Z 4: GA optimum at search boundary -- true value may lie outside the search range
+  Z 4: exit= 0 pts= 13663 BN=   28.38
+  [WARN] Z 5: RSM envelope does not bound   2 of  14 observations -- proceeding anyway
+  [WARN] Z 5: GA optimum at search boundary -- true value may lie outside the search range
+  Z 5: exit= 0 pts= 13871 BN=   11.10
+ ==============================================
+  Results
+ ==============================================
+ 
+  Zones processed:  5
+ 
+Zone    Epoch (JD)     e_opt      BN Re-entry (JD)    Re-entry (UTC)    RPE(%)
+------------------------------------------------------------------------------
+   1    2459785.94  0.371048  54.906  (no re-entry                            
+   2    2459795.94  0.369197  53.248  (no re-entry                            
+   3    2459851.42  0.376697  61.078  (no re-entry                            
+   4    2459858.66  0.377738  28.381  (no re-entry                            
+   5    2459869.30  0.375977  11.101  (no re-entry                            
+ 
+   No re-entry predicted (drag off?)
+ 
+   NOTE: No re-entry detected.
+   Enable drag (IDRAG=1) for prediction.
+  Report:  output/OREM_33587_20260717.txt
+ 
+ ==============================================

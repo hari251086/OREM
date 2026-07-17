@@ -573,6 +573,13 @@ cp ../KSROP/Legendre.F ksrop/
 - Gated 8-zone campaign (`rpe_campaign_8zone_gated.csv`; 4-zone and ungated-8-zone runs preserved alongside): 42928 0.0%, 35497 0.6%, 39615 2.0%, 32007 2.4%, 37819 −5.3%, 37151 **−8.1%** (recovered), 27526 10.4% — **all seven at or under ~10%**
 - Shipped configs raised to `nzones_max=8`. 342/342 tests pass (test suites unchanged — they run 4-zone IDRAG=0 paths whose chains are gated on `zone_status` and unaffected in practice)
 
+**1.22 — 2026-07-17**
+- **New-object case study: 33587 (1989-039EF, i=65.2° Molniya-class fragment; analysis only, no pipeline code changed).** 306 TLEs spanning 2009 → 2022-12-03, observed decay 2025-04-22 — the prediction must extrapolate 2.4 years past the last TLE, across the 2023–2025 solar maximum. Artifacts: `input/example_33587.tle.txt`, `input/orem_33587.cfg`, `scratch_rpe/*33587*`
+- Pipeline result (honest): five zones found (Jul–Oct 2022), **no zone predicts re-entry within the 5-year cap** — under both the shipped F10.7=72 table and a regenerated F10.7=150 variant (`scratch_rpe/ATM_F150.DAT`, T∞=879 K)
+- Diagnosis, part 1 — **no drag signal in any fit window**: zone perigees sit at 440–640 km, where a ≤10-day window carries essentially no BN information (fits are table-invariant GA noise; only Z5, hp≈444 km, responded to the 1.5× table change). This object's decay was driven by **lunisolar perigee cycling** (hp 616→341 km in the last five TLE months — far too fast for drag), which hands the orbit to the atmosphere only after the TLE record ends
+- Diagnosis, part 2 — **static-atmosphere lifetime error across a solar maximum**: direct long propagation from the last TLE state (`scratch_rpe/prop_33587.F`, 60k-rev cap, full force, F150 table) does re-enter — the modeled lunisolar cycling works — but 4.6–5.7× too slowly: 4044–4929 days vs the observed 870 (RPE +365% to +467% across BN 40–120). The 2023–2025 arc averaged F10.7 ≈ 160–180 with major geomagnetic storms; a static quiet-condition table cannot represent it
+- Conclusion: 33587 is **out of scope for the static-atmosphere OREM** — it is the concrete motivating case for #14 (dynamic space-weather along the arc) and exercises the object class where zone selection needs a drag-signal criterion (hp-aware zone quality). The 7-object validation set's accuracy (median 2.4%) is unaffected: those objects' windows are drag-dominated and their arcs mostly avoid solar-max crossings
+
 ---
 
 ## 9. References
