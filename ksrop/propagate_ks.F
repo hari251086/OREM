@@ -90,6 +90,9 @@ c     referenced to perigee conditions)
       double precision F_dg,XX_dg,XXX_dg,C_dg
       double precision SEA_dg,CEA_dg,TER_dg,TER2_dg
       double precision CSEF_dg,SIEF_dg,FA_dg,exp_arg,hp_osc
+c     Issue #26: per-revolution space-weather state
+      double precision tinf_wx
+      integer ist_wx
 c     SRP: cannonball SRP perturbation
       dimension p_srp(3), qsrp(4), r_srp(3)
       double precision PSR_loc
@@ -274,11 +277,25 @@ c     the revolution only when this is below 500 km)
 
          if (HSQ_dg .ge. ALT_atm(1) .and.
      &       HSQ_dg .le. ALT_atm(ndim_atm)) then
-c     Reference density/scale-height at perigee
-            call INTPOL(ALT_atm, DEN_atm, ndim_atm,
-     &                  HSQ_dg, RHOPI_dg)
-            call INTPOL(ALT_atm, SCH_atm, ndim_atm,
-     &                  HSQ_dg, H_dg)
+c     Reference density/scale-height at perigee.
+c     Issue #26: when a space-weather history and 2-D atmosphere
+c     table are loaded (sw_load/atm2d_load in swx.F), the reference
+c     is evaluated at the exospheric temperature for THIS
+c     revolution's epoch instead of the static table -- computed
+c     once per revolution, matching the King-Hele reference-values
+c     structure. With nothing loaded (the default), sw_tinf returns
+c     0 and the legacy path below runs unchanged.
+            call sw_tinf(djulian + T/86400.d0, tinf_wx)
+            ist_wx = 2
+            if (tinf_wx .gt. 0.d0)
+     &         call atm2d_interp(HSQ_dg, tinf_wx,
+     &                           RHOPI_dg, H_dg, ist_wx)
+            if (ist_wx .ne. 0) then
+               call INTPOL(ALT_atm, DEN_atm, ndim_atm,
+     &                     HSQ_dg, RHOPI_dg)
+               call INTPOL(ALT_atm, SCH_atm, ndim_atm,
+     &                     HSQ_dg, H_dg)
+            end if
             if (H_dg .le. 0.d0) H_dg = 1.d0
             BETA_dg = 1.d0/H_dg
             RPO_dg  = SQ_dg
@@ -573,5 +590,128 @@ c     Dump state once per revolution (after all steps)
 
 c     Normal completion
       exit_code = 0
+      return
+      end
+
+c     ============================================================
+c     sw_tinf — exospheric temperature at JD t from the loaded
+c     space-weather history (issue #26). J71 nighttime-minimum plus
+c     the h<200 km geomagnetic term (same convention as the ATM.DAT
+c     generator). Returns tinf=0 when no history is loaded or t
+c     precedes the record -- callers then use the legacy path.
+c     Lives in this file (not swx.F) so executables that never load
+c     space weather link without swx.F; the common defaults to
+c     nsw=0.
+c     ============================================================
+      subroutine sw_tinf(t, tinf)
+      implicit none
+      double precision t, tinf
+
+      integer NSWMAX
+      parameter (NSWMAX = 31000)
+      double precision sw_jd(NSWMAX), sw_f107(NSWMAX)
+      double precision sw_f81(NSWMAX), sw_kp(NSWMAX)
+      integer nsw
+      common /swdat/ sw_jd, sw_f107, sw_f81, sw_kp, nsw
+
+      double precision tc
+      integer lo, hi, mid
+
+      tinf = 0.d0
+      if (nsw .le. 0) return
+      if (t .lt. sw_jd(1)) return
+
+c     binary search: largest i with sw_jd(i) <= t (rows are daily
+c     in the observed era but monthly in the predicted tail, so
+c     index arithmetic is never valid -- always search)
+      lo = 1
+      hi = nsw
+      do while (hi - lo .gt. 1)
+         mid = (lo + hi)/2
+         if (sw_jd(mid) .le. t) then
+            lo = mid
+         else
+            hi = mid
+         end if
+      end do
+      if (sw_jd(hi) .le. t) lo = hi
+
+      tc = 379.d0 + 3.24d0*sw_f81(lo)
+     &   + 1.3d0*(sw_f107(lo) - sw_f81(lo))
+      tinf = tc + 14.d0*sw_kp(lo) + 0.02d0*dexp(sw_kp(lo))
+
+      return
+      end
+
+c     ============================================================
+c     atm2d_interp — bilinear rho/H at (altitude h [m], tinf [K])
+c     from the 2-D table loaded by atm2d_load (swx.F), in the same
+c     internal scaled units as the legacy path (den x1e10, H in m).
+c     Tinf clamps to the grid edges; altitude outside the table
+c     returns istat=1 (drag treated inactive, same contract as the
+c     legacy range gate); istat=2 = table not loaded.
+c     ============================================================
+      subroutine atm2d_interp(h, tinf, rho_s, h_s, istat)
+      implicit none
+      double precision h, tinf, rho_s, h_s
+      integer istat
+
+      integer NA2D, NT2D
+      parameter (NA2D = 291, NT2D = 39)
+      double precision t2d(NT2D), alt2d(NA2D)
+      double precision den2d(NA2D,NT2D), sch2d(NA2D,NT2D)
+      integer n2d_alt, n2d_t
+      common /atm2dc/ t2d, alt2d, den2d, sch2d, n2d_alt, n2d_t
+
+      double precision tv, fa, ft, d1, d2, s1, s2
+      integer ia, it, i
+
+      istat = 0
+      rho_s = 0.d0
+      h_s   = 1.d0
+      if (n2d_t .le. 0) then
+         istat = 2
+         return
+      end if
+      if (h .lt. alt2d(1) .or. h .gt. alt2d(n2d_alt)) then
+         istat = 1
+         return
+      end if
+
+      tv = tinf
+      if (tv .lt. t2d(1))      tv = t2d(1)
+      if (tv .gt. t2d(n2d_t))  tv = t2d(n2d_t)
+
+      ia = 1
+      do i = 2, n2d_alt
+         if (alt2d(i) .ge. h) then
+            ia = i - 1
+            goto 20
+         end if
+      end do
+      ia = n2d_alt - 1
+ 20   continue
+      it = 1
+      do i = 2, n2d_t
+         if (t2d(i) .ge. tv) then
+            it = i - 1
+            goto 30
+         end if
+      end do
+      it = n2d_t - 1
+ 30   continue
+
+      fa = (h - alt2d(ia)) / (alt2d(ia+1) - alt2d(ia))
+      ft = (tv - t2d(it)) / (t2d(it+1) - t2d(it))
+
+      d1 = den2d(ia,it)   + fa*(den2d(ia+1,it)   - den2d(ia,it))
+      d2 = den2d(ia,it+1) + fa*(den2d(ia+1,it+1) - den2d(ia,it+1))
+      rho_s = d1 + ft*(d2 - d1)
+
+      s1 = sch2d(ia,it)   + fa*(sch2d(ia+1,it)   - sch2d(ia,it))
+      s2 = sch2d(ia,it+1) + fa*(sch2d(ia+1,it+1) - sch2d(ia,it+1))
+      h_s = s1 + ft*(s2 - s1)
+      if (h_s .le. 0.d0) h_s = 1.d0
+
       return
       end

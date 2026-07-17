@@ -580,6 +580,13 @@ cp ../KSROP/Legendre.F ksrop/
 - Diagnosis, part 2 — **static-atmosphere lifetime error across a solar maximum**: direct long propagation from the last TLE state (`scratch_rpe/prop_33587.F`, 60k-rev cap, full force, F150 table) does re-enter — the modeled lunisolar cycling works — but 4.6–5.7× too slowly: 4044–4929 days vs the observed 870 (RPE +365% to +467% across BN 40–120). The 2023–2025 arc averaged F10.7 ≈ 160–180 with major geomagnetic storms; a static quiet-condition table cannot represent it
 - Conclusion: 33587 is **out of scope for the static-atmosphere OREM** — it is the concrete motivating case for #14 (dynamic space-weather along the arc) and exercises the object class where zone selection needs a drag-signal criterion (hp-aware zone quality). The 7-object validation set's accuracy (median 2.4%) is unaffected: those objects' windows are drag-dominated and their arcs mostly avoid solar-max crossings
 
+**1.23 — 2026-07-17**
+- **Epoch-resolved space weather implemented (issue #26)**: `input/SW-All.csv` (CelesTrak daily history 1957→present + monthly predicts to 2041; refresh via curl) + `input/ATM2D.DAT` (new `KSROP/gen_atm2d_jr71.F`: the J71 profile over a 550–1500 K T∞ grid, 291×39; profile functions shared via new `KSROP/jr71_profile.F`, 1-D generator verified bit-identical after the split)
+- Runtime: `sw_tinf` (JD → T∞, binary-searched — predicted era is monthly) and `atm2d_interp` (bilinear ρ/H in legacy scaled units) live **inside `ksrop/propagate_ks.F`**, hooked into the per-revolution drag reference; loaders (`sw_load`/`atm2d_load`, new `swx.F`) are linked only by opt-in executables, so all legacy builds and results are bit-unchanged. `orem.exe` auto-detects both files and states ENABLED/DISABLED loudly
+- New `test_sw.F` (12 checks incl. the hand-verified 2024-05-11 G5-storm T∞=1216.56 K and the W12 smoke test: 55.4 vs 31.1 km 7-day decay at storm vs minimum epochs). **354 tests total**, 342 legacy checks unchanged
+- **33587 verdict overturned on attribution**: weather-enabled arcs are nearly identical to the F150-static arcs (T∞=879 K was already a fair proxy for the 2023–2025 average) — the 5× lifetime error is **not density**. The in-record diagnostic (`scratch_rpe/prop_33587_hp.F`) proves it: over the record's last 131 days the observed perigee descends 616→341 km (lunisolar cycle) while the modeled perigee stays flat (±20 km, wrong direction). Secular third-body eccentricity evolution is missing for this critical-inclination orbit — per-rev GMAT validations could never see it. Filed as **#27** (P1) with the ±30% acceptance transferred; GMAT hp(t) comparison specified as the decisive next experiment
+- Follow-up before #26 closes: 7-object weather-mode regression campaign
+
 ---
 
 ## 9. References

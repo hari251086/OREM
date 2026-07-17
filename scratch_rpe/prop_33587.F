@@ -40,6 +40,16 @@ c     -------------------------------------------------------
       call init_constants()
       call read_atm_p(ALT_a, DEN_a, SCH_a, ndim_a, natm)
 
+c     Issue #26: enable epoch-resolved weather when the files are
+c     present (link swx.F). ierr != 0 -> legacy static-table run.
+      call sw_load('input/SW-All.csv', ierr_sw)
+      call atm2d_load('input/ATM2D.DAT', ierr_a2)
+      if (ierr_sw .eq. 0 .and. ierr_a2 .eq. 0) then
+         write(*,'(A)') ' [SW] epoch-resolved density ENABLED'
+      else
+         write(*,'(A)') ' [SW] DISABLED -- static input/ATM.DAT'
+      end if
+
 c     Last TLE: 22337.85663267  i=64.9110 raan=132.4999 e=0.2705984
 c     aop=89.5683 MA=301.0972 n=9.82008722 -> a=9211.4 km
       epoch_jd = 2459917.35663d0
