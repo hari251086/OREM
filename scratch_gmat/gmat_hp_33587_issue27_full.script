@@ -1,0 +1,100 @@
+%General Mission Analysis Tool(GMAT) Script
+%  OREM issue #27 -- decisive experiment, FULL-FORCE run (SCfull only).
+%  33587 in-record test: propagate the 2022-07-25 TLE state 131 days in
+%  GMAT and compare osculating periapsis altitude hp(t) against the
+%  observed TLE record and against OREM/propagate_ks's own model
+%  (scratch_rpe/prop_33587_hp.F -> hp_model_33587.txt), which stays flat
+%  (+-20 km) while the real object's perigee falls 616 -> 341 km over the
+%  same window (lunisolar perigee cycling at the critical inclination
+%  i=65 deg). See gmat_hp_33587_issue27_grav.script for the gravity-only
+%  companion run (isolates third-body/oblateness from drag+SRP).
+%
+%  Originally one script driving BOTH spacecraft through a `For Step =
+%  1:1:131` loop with a `Propagate {SC.ElapsedDays = Step}` stop
+%  condition per iteration -- that pattern silently misbehaved (skipped
+%  stop points, then ran away to ElapsedDays ~8600 instead of stopping at
+%  131, ~61 min wall time). Split into two single-spacecraft,
+%  single-Propagate scripts instead, each using a ReportFile with a
+%  non-empty .Add list -- safe here because each script has exactly ONE
+%  Propagate command, so the "Add re-publishes on every accepted step of
+%  ANY Propagate" gotcha (see gmat_xval_42928z0.script) cannot cross-
+%  contaminate. This also gives a naturally dense hp(t) curve (every
+%  accepted RKV89 step) instead of 131 hand-picked points.
+%
+%  State (TLE 22206.43614790, identical to prop_33587_hp.F):
+%    a=11128.043 km, e=0.3714527, i=65.0291, RAAN=250.9049, AOP=105.5241,
+%    MA=297.8486 -> TA=254.56581 (Kepler's eqn solved to 1e-12 rad
+%    residual; this GMAT build rejects AnomalyType=MA/SC.MA directly --
+%    "setting of anomaly of type other than True Anomaly not currently
+%    allowed" -- so TA is precomputed and set instead), epoch
+%    JD 2459785.93615 = 2022-07-25 10:28:10.56 UTC.
+%  BN=55 kg/m2 (Cd=1, DragArea=1, DryMass=55) matches the Fortran
+%  diagnostic's propagate_ks call exactly; SRP Cr=1.2, A/m=0.01 ->
+%  SRPArea = 0.01*55 = 0.55 m2.
+%
+%  Full force matching propagate_ks: EGM2008 zonal Degree=20/Order=0,
+%  PointMasses={Sun,Luna} (GMAT's point-mass model is NOT degree-
+%  truncated -- this is exactly what isolates candidate #1, OREM's
+%  degree-2/3 third-body truncation), JacchiaRoberts drag with the real
+%  2022 CSSI flux history (weather-on, matching OREM's #26 epoch-resolved
+%  mode), SRP on. This is the primary decisive comparison.
+%
+%  hp = RadPer - 6378.1363 (R_Earth, matches OREM's input/const_new.DAT)
+%  is computed in post-processing.
+%
+%  Looser Accuracy/MinStep: the CSSI file's daily flux steps introduce
+%  density discontinuities that RKV89 at 1e-12/MinStep=0.001 cannot step
+%  across (same gotcha as gmat_xval_42928z0.script/gmat_reentry_42928z0
+%  .script's Propw).
+
+Create ForceModel FMfull;
+GMAT FMfull.CentralBody = Earth;
+GMAT FMfull.PrimaryBodies = {Earth};
+GMAT FMfull.PointMasses = {Sun, Luna};
+GMAT FMfull.GravityField.Earth.Degree = 20;
+GMAT FMfull.GravityField.Earth.Order = 0;
+GMAT FMfull.GravityField.Earth.PotentialFile = 'C:\Users\hari2\OneDrive\Documents\GitHub\KSROP\scratch_gmat\EGM2008_72x72.cof';
+GMAT FMfull.Drag.AtmosphereModel = JacchiaRoberts;
+GMAT FMfull.Drag.HistoricWeatherSource = 'CSSISpaceWeatherFile';
+GMAT FMfull.Drag.PredictedWeatherSource = 'CSSISpaceWeatherFile';
+GMAT FMfull.Drag.CSSISpaceWeatherFile = 'E:\Softwares\gmat-win-R2026a\data\atmosphere\earth\SpaceWeather-All-v1.2.txt';
+GMAT FMfull.SRP = On;
+
+Create Propagator Propfull;
+GMAT Propfull.FM = FMfull;
+GMAT Propfull.Type = RungeKutta89;
+GMAT Propfull.InitialStepSize = 60;
+GMAT Propfull.Accuracy = 1e-10;
+GMAT Propfull.MinStep = 1e-6;
+GMAT Propfull.MaxStep = 600;
+
+Create Spacecraft SCfull;
+
+GMAT SCfull.DateFormat = UTCGregorian;
+GMAT SCfull.Epoch = '25 Jul 2022 10:28:10.560';
+GMAT SCfull.CoordinateSystem = EarthMJ2000Eq;
+GMAT SCfull.DisplayStateType = Keplerian;
+GMAT SCfull.SMA = 11128.043;
+GMAT SCfull.ECC = 0.3714527;
+GMAT SCfull.INC = 65.0291;
+GMAT SCfull.RAAN = 250.9049;
+GMAT SCfull.AOP = 105.5241;
+GMAT SCfull.TA = 254.56581;
+GMAT SCfull.Cd = 1;
+GMAT SCfull.DragArea = 1;
+GMAT SCfull.DryMass = 55;
+GMAT SCfull.Cr = 1.2;
+GMAT SCfull.SRPArea = 0.55;
+
+% Non-empty Add list is intentional and safe here: exactly one spacecraft,
+% exactly one Propagate command in the whole mission sequence, so this
+% logs SCfull's own state on every accepted RKV89 step and nothing else.
+Create ReportFile Repfull;
+GMAT Repfull.Filename = 'gmat_hp_33587_issue27_full.txt';
+GMAT Repfull.Add = {SCfull.UTCModJulian, SCfull.ElapsedDays, SCfull.Earth.RadPer, SCfull.Earth.ECC};
+GMAT Repfull.Precision = 16;
+GMAT Repfull.WriteHeaders = true;
+
+BeginMissionSequence;
+
+Propagate Propfull(SCfull) {SCfull.ElapsedDays = 131};
