@@ -111,6 +111,11 @@ c     TLE evolution
       double precision ls_tle(maxpts)
       integer npts, ierr_tle
 
+c     Issue #10: TLE quality filtering (tle_filter.F)
+      integer mask_tle(maxpts)
+      integer nfiltered_tle, nremoved_tle, ngaps_tle
+      integer i_filt, j_filt
+
 c     Raw TLE for mean anomaly extraction
       character*24 names_raw(maxtle)
       character*5 catid_raw(maxtle)
@@ -184,6 +189,37 @@ c     ============================================================
       if (ierr_tle .ne. 0) then
          ierr = 1
          return
+      end if
+
+c     ============================================================
+c     Step 1b: TLE quality filtering (issue #10). Tuned params
+c     (sigma_ha=4, sigma_e=6, gap_days=30, nwin=20) per
+c     tle_filter.F's header comment -- validated against real TLE
+c     histories (42928, 35497, 37151) at a ~1.5% false-positive rate.
+c     Compacts the 9 parallel evolution arrays in place, dropping
+c     flagged points before zone_select ever sees them.
+c     ============================================================
+      call tle_filter(epochs, ha_tle, e_tle, npts,
+     &   4.0d0, 6.0d0, 30.0d0, 20,
+     &   mask_tle, nfiltered_tle, nremoved_tle, ngaps_tle)
+
+      if (nremoved_tle .gt. 0) then
+         j_filt = 0
+         do i_filt = 1, npts
+            if (mask_tle(i_filt) .eq. 1) then
+               j_filt = j_filt + 1
+               epochs(j_filt)   = epochs(i_filt)
+               a_tle(j_filt)    = a_tle(i_filt)
+               e_tle(j_filt)    = e_tle(i_filt)
+               inc_tle(j_filt)  = inc_tle(i_filt)
+               raan_tle(j_filt) = raan_tle(i_filt)
+               aop_tle(j_filt)  = aop_tle(i_filt)
+               ha_tle(j_filt)   = ha_tle(i_filt)
+               hp_tle(j_filt)   = hp_tle(i_filt)
+               ls_tle(j_filt)   = ls_tle(i_filt)
+            end if
+         end do
+         npts = j_filt
       end if
 
 c     ============================================================

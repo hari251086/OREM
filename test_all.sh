@@ -26,11 +26,11 @@ ifx -heap-arrays test_tle_evolution.F tle_evolution.F ksrop/TLEread.F ksrop/Subr
 ifx -heap-arrays test_zone_select.F zone_select.F tle_evolution.F ksrop/TLEread.F ksrop/Subrouts.F ksrop/Legendre.F -o test_zone_select.exe
 ifx -heap-arrays test_ga.F ga.F rsm.F tle_evolution.F zone_select.F ksrop/propagate_ks.F ksrop/Subrouts.F ksrop/Legendre.F ksrop/TLEread.F -o test_ga.exe
 ifx -heap-arrays test_rsm.F rsm.F tle_evolution.F zone_select.F ksrop/propagate_ks.F ksrop/Subrouts.F ksrop/Legendre.F ksrop/TLEread.F ga.F -o test_rsm.exe
-ifx -heap-arrays test_orem.F orem.F report.F rsm.F ga.F tle_evolution.F zone_select.F ksrop/propagate_ks.F ksrop/Subrouts.F ksrop/Legendre.F ksrop/TLEread.F -o test_orem.exe
-ifx -heap-arrays test_reentry.F orem.F rsm.F ga.F tle_evolution.F zone_select.F ksrop/propagate_ks.F ksrop/Subrouts.F ksrop/Legendre.F ksrop/TLEread.F -o test_reentry.exe
-ifx -heap-arrays test_e2e.F orem.F rsm.F ga.F tle_evolution.F zone_select.F ksrop/propagate_ks.F ksrop/Subrouts.F ksrop/Legendre.F ksrop/TLEread.F -o test_e2e.exe
+ifx -heap-arrays test_orem.F orem.F report.F rsm.F ga.F tle_evolution.F tle_filter.F zone_select.F ksrop/propagate_ks.F ksrop/Subrouts.F ksrop/Legendre.F ksrop/TLEread.F -o test_orem.exe
+ifx -heap-arrays test_reentry.F orem.F rsm.F ga.F tle_evolution.F tle_filter.F zone_select.F ksrop/propagate_ks.F ksrop/Subrouts.F ksrop/Legendre.F ksrop/TLEread.F -o test_reentry.exe
+ifx -heap-arrays test_e2e.F orem.F rsm.F ga.F tle_evolution.F tle_filter.F zone_select.F ksrop/propagate_ks.F ksrop/Subrouts.F ksrop/Legendre.F ksrop/TLEread.F -o test_e2e.exe
 ifx -heap-arrays test_gmat.F rsm.F tle_evolution.F zone_select.F ksrop/propagate_ks.F ksrop/Subrouts.F ksrop/Legendre.F ksrop/TLEread.F ga.F -o test_gmat.exe
-ifx -heap-arrays test_sw.F swx.F orem.F report.F rsm.F ga.F tle_evolution.F zone_select.F ksrop/propagate_ks.F ksrop/Subrouts.F ksrop/TLEread.F ksrop/Legendre.F -o test_sw.exe
+ifx -heap-arrays test_sw.F swx.F orem.F report.F rsm.F ga.F tle_evolution.F tle_filter.F zone_select.F ksrop/propagate_ks.F ksrop/Subrouts.F ksrop/TLEread.F ksrop/Legendre.F -o test_sw.exe
 ifx -heap-arrays test_tle_filter.F tle_filter.F zone_select.F tle_evolution.F ksrop/TLEread.F ksrop/Subrouts.F ksrop/Legendre.F -o test_tle_filter.exe
 
 echo "=== Running ==="
