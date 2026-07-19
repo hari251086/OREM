@@ -31,11 +31,13 @@ ifx -heap-arrays test_reentry.F orem.F rsm.F ga.F tle_evolution.F zone_select.F 
 ifx -heap-arrays test_e2e.F orem.F rsm.F ga.F tle_evolution.F zone_select.F ksrop/propagate_ks.F ksrop/Subrouts.F ksrop/Legendre.F ksrop/TLEread.F -o test_e2e.exe
 ifx -heap-arrays test_gmat.F rsm.F tle_evolution.F zone_select.F ksrop/propagate_ks.F ksrop/Subrouts.F ksrop/Legendre.F ksrop/TLEread.F ga.F -o test_gmat.exe
 ifx -heap-arrays test_sw.F swx.F orem.F report.F rsm.F ga.F tle_evolution.F zone_select.F ksrop/propagate_ks.F ksrop/Subrouts.F ksrop/TLEread.F ksrop/Legendre.F -o test_sw.exe
+ifx -heap-arrays test_tle_filter.F tle_filter.F zone_select.F tle_evolution.F ksrop/TLEread.F ksrop/Subrouts.F ksrop/Legendre.F -o test_tle_filter.exe
 
 echo "=== Running ==="
 fail=0
 for exe in test_propagate_ks test_tle_evolution test_zone_select test_ga \
-           test_rsm test_orem test_reentry test_e2e test_gmat test_sw; do
+           test_rsm test_orem test_reentry test_e2e test_gmat test_sw \
+           test_tle_filter; do
    echo "--- $exe ---"
    if ! "./${exe}.exe"; then
       echo "*** $exe FAILED ***"

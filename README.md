@@ -128,6 +128,7 @@ ifx /heap-arrays /F:16777216 test_e2e.F orem.F rsm.F ga.F tle_evolution.F zone_s
 ifx /heap-arrays /F:16777216 test_gmat.F rsm.F tle_evolution.F zone_select.F ksrop/propagate_ks.F ksrop/Subrouts.F ksrop/Legendre.F ksrop/TLEread.F ga.F /exe:test_gmat.exe
 
 ifx /heap-arrays /F:16777216 test_sw.F swx.F orem.F report.F rsm.F ga.F tle_evolution.F zone_select.F ksrop/propagate_ks.F ksrop/Subrouts.F ksrop/TLEread.F ksrop/Legendre.F /exe:test_sw.exe
+ifx /heap-arrays /F:16777216 test_tle_filter.F tle_filter.F zone_select.F tle_evolution.F ksrop/TLEread.F ksrop/Subrouts.F ksrop/Legendre.F /exe:test_tle_filter.exe
 
 REM Standalone runner -- swx.F required since v1.23 (main_orem.F calls sw_load/atm2d_load)
 ifx /heap-arrays /F:16777216 main_orem.F orem.F report.F swx.F rsm.F ga.F tle_evolution.F zone_select.F ksrop/propagate_ks.F ksrop/Subrouts.F ksrop/TLEread.F ksrop/Legendre.F /exe:orem.exe
@@ -242,9 +243,10 @@ To run on a different object: copy the config, change lines 1-3 (TLE file, NORAD
 ./test_e2e.exe                 # End-to-end integration test, IDRAG=1 (20 checks)
 ./test_gmat.exe                # GMAT cross-validation + exact-model drag reference (14 checks)
 ./test_sw.exe                  # Space weather + 2-D atmosphere tests (12 checks)
+./test_tle_filter.exe           # TLE quality filtering: outliers, maneuvers, gaps (14 checks)
 ```
 
-**354 checks total**, all passing as of v1.23.
+**368 checks total**, all passing as of v1.24.
 
 ### test_propagate_ks
 Two-body energy conservation, orbit closure, multi-revolution propagation, re-entry detection, input preservation.
