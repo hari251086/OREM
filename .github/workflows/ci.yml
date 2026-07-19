@@ -12,10 +12,17 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Install gfortran
-        run: sudo apt-get update && sudo apt-get install -y gfortran
+      - name: Install Intel oneAPI Fortran (ifx)
+        run: |
+          wget -O- https://apt.repos.intel.com/intel-gpg-keys/GPG-PUB-KEY-INTEL-SW-PRODUCTS.PUB \
+            | gpg --dearmor | sudo tee /usr/share/keyrings/oneapi-archive-keyring.gpg > /dev/null
+          echo "deb [signed-by=/usr/share/keyrings/oneapi-archive-keyring.gpg] https://apt.repos.intel.com/oneapi all main" \
+            | sudo tee /etc/apt/sources.list.d/oneAPI.list
+          sudo apt-get update
+          sudo apt-get install -y intel-oneapi-compiler-fortran
 
       - name: Compile and run all test suites
         run: |
+          source /opt/intel/oneapi/setvars.sh
           chmod +x test_all.sh
           ./test_all.sh

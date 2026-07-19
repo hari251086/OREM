@@ -107,7 +107,7 @@ call propagate_ks(
 
 ## 4. Building
 
-Requires **Intel oneAPI Fortran** (`ifx`) or **GNU Fortran** (`gfortran`).
+Requires **Intel oneAPI Fortran** (`ifx`), on Windows or Linux — the only toolchain this project is actually validated against. `ksrop/propagate_ks.F` currently does **not** compile under `gfortran` (implicit-real array dimensions, a function/array name collision on `R`, non-standard function-result assignment syntax that gfortran 13 rejects outright — see issue #28) despite `gfortran` commands appearing in earlier revisions of this doc; those were never actually verified. CI (`.github/workflows/ci.yml`, issue #22) installs `ifx` on the Linux runner rather than `gfortran` for this reason.
 
 ### Windows (Intel oneAPI ifx 2025.0)
 
@@ -133,13 +133,16 @@ REM Standalone runner -- swx.F required since v1.23 (main_orem.F calls sw_load/a
 ifx /heap-arrays /F:16777216 main_orem.F orem.F report.F swx.F rsm.F ga.F tle_evolution.F zone_select.F ksrop/propagate_ks.F ksrop/Subrouts.F ksrop/TLEread.F ksrop/Legendre.F /exe:orem.exe
 ```
 
-### Unix / gfortran
+### Linux (Intel oneAPI ifx)
 
-Same source lists as above with `gfortran ... -o <name>.exe` (no `/heap-arrays` equivalent needed if the default stack suffices; otherwise `ulimit -s unlimited`). Example for the runner:
+Same source lists as above, `-heap-arrays` in place of `/heap-arrays`, `ulimit -s unlimited` in place of `/F:16777216` (Linux stack size is a shell/OS setting, not a linker flag), `-o <name>.exe` in place of `/exe:<name>.exe`. Example for the runner:
 
 ```bash
-gfortran main_orem.F orem.F report.F swx.F rsm.F ga.F tle_evolution.F zone_select.F ksrop/propagate_ks.F ksrop/Subrouts.F ksrop/TLEread.F ksrop/Legendre.F -o orem.exe
+ulimit -s unlimited
+ifx -heap-arrays main_orem.F orem.F report.F swx.F rsm.F ga.F tle_evolution.F zone_select.F ksrop/propagate_ks.F ksrop/Subrouts.F ksrop/TLEread.F ksrop/Legendre.F -o orem.exe
 ```
+
+See `test_all.sh` for the full build+test command list (used by CI).
 
 ---
 
@@ -156,8 +159,9 @@ ifx /heap-arrays /F:16777216 main_orem.F orem.F report.F swx.F rsm.F ga.F tle_ev
 ```
 
 ```bash
-# Unix — gfortran
-gfortran main_orem.F orem.F report.F swx.F rsm.F ga.F tle_evolution.F zone_select.F ksrop/propagate_ks.F ksrop/Subrouts.F ksrop/TLEread.F ksrop/Legendre.F -o orem.exe
+# Linux — Intel oneAPI ifx (not gfortran -- see SS4)
+ulimit -s unlimited
+ifx -heap-arrays main_orem.F orem.F report.F swx.F rsm.F ga.F tle_evolution.F zone_select.F ksrop/propagate_ks.F ksrop/Subrouts.F ksrop/TLEread.F ksrop/Legendre.F -o orem.exe
 ```
 
 ### Step 2: Create a config file
