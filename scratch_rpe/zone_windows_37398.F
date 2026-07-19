@@ -118,25 +118,29 @@ c     Compare against the 2015-2016 era that DID qualify.
 
 c     What does a wider max_zone_days (30 days) find recently?
       write(*,*) ''
-      write(*,*) '=== max_zone_days=30, min_pts=8, R2>=0.90 ==='
-      call zone_select(epochs, ha_o, npts,
-     &   8, 30.0d0, 0.90d0, -1.0d0,
-     &   nzones_max, zone_start, zone_end, nzones)
-      iz = 0
-      do n = 1, nzones
-         if (iz .eq. 0) then
-            iz = n
-         else if (epochs(zone_start(n)) .gt.
-     &            epochs(zone_start(iz))) then
-            iz = n
+      write(*,*) '=== max_zone_days=30 sweep: how big must'//
+     &   ' nzones_max be to ADMIT the 2026 zone? ==='
+      do itry = 1, 6
+         call zone_select(epochs, ha_o, npts,
+     &      8, 30.0d0, 0.90d0, -1.0d0,
+     &      try(itry), zone_start, zone_end, nzones)
+         iz = 0
+         do n = 1, nzones
+            if (iz .eq. 0) then
+               iz = n
+            else if (epochs(zone_start(n)) .gt.
+     &               epochs(zone_start(iz))) then
+               iz = n
+            end if
+         end do
+         write(*,'(A,I5,A,I5)') ' nzones_max=', try(itry),
+     &      '  -> nzones=', nzones
+         if (iz .gt. 0) then
+            call jd2cal(epochs(zone_start(iz)), cal)
+            write(*,'(A,I5,I3,I3)') '   latest zone starts ',
+     &         int(cal(1)), int(cal(2)), int(cal(3))
          end if
       end do
-      write(*,'(A,I5)') ' nzones=', nzones
-      if (iz .gt. 0) then
-         call jd2cal(epochs(zone_start(iz)), cal)
-         write(*,'(A,I5,I3,I3)') '   latest zone starts ',
-     &      int(cal(1)), int(cal(2)), int(cal(3))
-      end if
 
       stop
       end
