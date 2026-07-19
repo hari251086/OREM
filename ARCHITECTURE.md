@@ -1,6 +1,6 @@
 # OREM — Application & Physical Architecture
 
-*(current as of v1.25, 2026-07-19; the Version History in README.md is the authoritative changelog)*
+*(current as of v1.26, 2026-07-19; the Version History in README.md is the authoritative changelog)*
 
 ## 1. System Overview
 
