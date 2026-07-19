@@ -95,7 +95,12 @@ c     --- Output arguments ---
       integer ierr
 
 c     --- Internal arrays ---
-      parameter(maxpts = 10000, max_surf = 5000)
+c     maxpts raised 10000->15000: 11550's real TLE history is 11668
+c     entries (46 years, 1979-2025) -- the previous bound silently
+c     truncated tle_evolve's fill loop (npts .ge. maxpts) rather than
+c     erroring, so this would have quietly dropped the newest ~1700+
+c     points without any indication.
+      parameter(maxpts = 15000, max_surf = 5000)
       parameter(maxtle = 100000)
 
 c     TLE evolution

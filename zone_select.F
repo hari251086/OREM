@@ -114,7 +114,15 @@ c     ============================================================
       integer zone_start(nzones_max), zone_end(nzones_max)
 
 c     Candidate zones (internal buffer)
-      parameter(max_cand = 100)
+c     Raised 100->2000: Pass 1 is a single forward scan that stops
+c     RECORDING once ncand hits max_cand (it keeps scanning, so later
+c     candidates are silently dropped, not merely deprioritized). For
+c     an object with a long TLE history and many short quasi-linear
+c     windows (11550: 46 years, 10143 dedup points), the old 100-slot
+c     buffer filled entirely within 1980-2009 and never reached the
+c     2010-2025 span at all -- including the terminal decay zone
+c     where mean perigee altitude collapses to 96 km at the last TLE.
+      parameter(max_cand = 2000)
       integer cand_s(max_cand), cand_e(max_cand)
       double precision cand_r2(max_cand), cand_sl(max_cand)
       integer ncand

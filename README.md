@@ -127,8 +127,10 @@ ifx /heap-arrays /F:16777216 test_reentry.F orem.F rsm.F ga.F tle_evolution.F zo
 ifx /heap-arrays /F:16777216 test_e2e.F orem.F rsm.F ga.F tle_evolution.F zone_select.F ksrop/propagate_ks.F ksrop/Subrouts.F ksrop/Legendre.F ksrop/TLEread.F /exe:test_e2e.exe
 ifx /heap-arrays /F:16777216 test_gmat.F rsm.F tle_evolution.F zone_select.F ksrop/propagate_ks.F ksrop/Subrouts.F ksrop/Legendre.F ksrop/TLEread.F ga.F /exe:test_gmat.exe
 
-REM Standalone runner
-ifx /heap-arrays /F:16777216 main_orem.F orem.F report.F rsm.F ga.F tle_evolution.F zone_select.F ksrop/propagate_ks.F ksrop/Subrouts.F ksrop/TLEread.F ksrop/Legendre.F /exe:orem.exe
+ifx /heap-arrays /F:16777216 test_sw.F swx.F orem.F report.F rsm.F ga.F tle_evolution.F zone_select.F ksrop/propagate_ks.F ksrop/Subrouts.F ksrop/TLEread.F ksrop/Legendre.F /exe:test_sw.exe
+
+REM Standalone runner -- swx.F required since v1.23 (main_orem.F calls sw_load/atm2d_load)
+ifx /heap-arrays /F:16777216 main_orem.F orem.F report.F swx.F rsm.F ga.F tle_evolution.F zone_select.F ksrop/propagate_ks.F ksrop/Subrouts.F ksrop/TLEread.F ksrop/Legendre.F /exe:orem.exe
 ```
 
 ### Unix / gfortran
@@ -136,7 +138,7 @@ ifx /heap-arrays /F:16777216 main_orem.F orem.F report.F rsm.F ga.F tle_evolutio
 Same source lists as above with `gfortran ... -o <name>.exe` (no `/heap-arrays` equivalent needed if the default stack suffices; otherwise `ulimit -s unlimited`). Example for the runner:
 
 ```bash
-gfortran main_orem.F orem.F report.F rsm.F ga.F tle_evolution.F zone_select.F ksrop/propagate_ks.F ksrop/Subrouts.F ksrop/TLEread.F ksrop/Legendre.F -o orem.exe
+gfortran main_orem.F orem.F report.F swx.F rsm.F ga.F tle_evolution.F zone_select.F ksrop/propagate_ks.F ksrop/Subrouts.F ksrop/TLEread.F ksrop/Legendre.F -o orem.exe
 ```
 
 ---
@@ -150,12 +152,12 @@ REM Windows — Intel oneAPI
 call "C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Auxiliary\Build\vcvars64.bat"
 call "C:\Program Files (x86)\Intel\Fortran\compiler\2025.0\env\vars.bat"
 
-ifx /heap-arrays /F:16777216 main_orem.F orem.F report.F rsm.F ga.F tle_evolution.F zone_select.F ksrop/propagate_ks.F ksrop/Subrouts.F ksrop/TLEread.F ksrop/Legendre.F /exe:orem.exe
+ifx /heap-arrays /F:16777216 main_orem.F orem.F report.F swx.F rsm.F ga.F tle_evolution.F zone_select.F ksrop/propagate_ks.F ksrop/Subrouts.F ksrop/TLEread.F ksrop/Legendre.F /exe:orem.exe
 ```
 
 ```bash
 # Unix — gfortran
-gfortran main_orem.F orem.F report.F rsm.F ga.F tle_evolution.F zone_select.F ksrop/propagate_ks.F ksrop/Subrouts.F ksrop/TLEread.F ksrop/Legendre.F -o orem.exe
+gfortran main_orem.F orem.F report.F swx.F rsm.F ga.F tle_evolution.F zone_select.F ksrop/propagate_ks.F ksrop/Subrouts.F ksrop/TLEread.F ksrop/Legendre.F -o orem.exe
 ```
 
 ### Step 2: Create a config file
@@ -235,9 +237,10 @@ To run on a different object: copy the config, change lines 1-3 (TLE file, NORAD
 ./test_reentry.exe             # 7-object re-entry validation (35 checks)
 ./test_e2e.exe                 # End-to-end integration test, IDRAG=1 (20 checks)
 ./test_gmat.exe                # GMAT cross-validation + exact-model drag reference (14 checks)
+./test_sw.exe                  # Space weather + 2-D atmosphere tests (12 checks)
 ```
 
-**342 checks total**, all passing as of v1.21.
+**354 checks total**, all passing as of v1.23.
 
 ### test_propagate_ks
 Two-body energy conservation, orbit closure, multi-revolution propagation, re-entry detection, input preservation.

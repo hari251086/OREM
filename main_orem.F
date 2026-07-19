@@ -8,7 +8,14 @@ c     ============================================================
       implicit double precision (a-h, o-z)
       common /xy/ pi, d2r, r2d, amue, AU, R_Earth
 
-      parameter(ndim_a = 291, mxz = 10)
+c     mxz raised 10->50: zone_select picks its top-mxz candidates by
+c     R2 (not recency), so a small mxz can let a long TLE history's
+c     numerous old high-R2 windows crowd out the physically critical
+c     late-life zones entirely (11550: 46-yr history, top-10 was
+c     9 zones from 2006-2009 + one from 2024, nothing closer to the
+c     2025-04 terminal decay even though qualifying windows exist up
+c     to 2025-03 -- see issue tracker for the 11550 case).
+      parameter(ndim_a = 291, mxz = 50)
 
 c     Config
       character*200 cfg_file, tle_file
