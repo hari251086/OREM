@@ -1,18 +1,27 @@
-c     rpe_campaign.F — 7-object drag-enabled RPE campaign (issue #16)
+c     rpe_campaign.F — 10-object drag-enabled RPE campaign (issue #16)
 c     -------------------------------------------------------
 c     Runs orem_run with IDRAG=1 and the full force model (the
 c     test_e2e v1.11 config: geo=20, sun=2, moon=3, SRP on) on all
-c     seven validation objects, and reports per-zone RPE plus the
+c     ten validation objects, and reports per-zone RPE plus the
 c     per-object ensemble prediction (t_mean/t_std -> ensemble RPE).
 c     Purpose: quantify post-v1.18 accuracy across the whole set --
 c     test_e2e only exercises 42928 (+z0, 39615 z1, 35497 z2) and
 c     test_reentry runs IDRAG=0. Results feed #16 (<10% target) and
 c     the #13 ensemble-reporting design.
 c
+c     Extended from 7 to 10 objects (2026-07-19) with the three real-
+c     decay cases from the same day's earlier individual validation
+c     runs (11550/59347/40943, input/orem_<norad>.cfg) -- deliberately
+c     run through the SAME nzones_max=8 (mxz below) as the original 7,
+c     not the nzones_max=50 used for OREM-Watchlist's operational
+c     37398 case (issue #9 there): the point of this campaign is to
+c     test whether OREM's shipped production default generalizes
+c     beyond the curated original set, not to tune per object.
+c
 c     Compile:
 c       ifx /heap-arrays /F:16777216 scratch_rpe\rpe_campaign.F
-c           orem.F rsm.F ga.F tle_evolution.F zone_select.F
-c           ksrop\propagate_ks.F ksrop\Subrouts.F
+c           orem.F rsm.F ga.F tle_evolution.F tle_filter.F
+c           zone_select.F ksrop\propagate_ks.F ksrop\Subrouts.F
 c           ksrop\TLEread.F ksrop\Legendre.F
 c           /exe:scratch_rpe\rpe_campaign.exe
 c     Run from the OREM repo root:
@@ -29,7 +38,7 @@ c     candidates, so a higher cap admits LATER zones -- and v1.20
 c     showed the latest zone is the primary estimator. This run
 c     measures how much later the latest zone gets and what it does
 c     to the latest-zone RPE.
-      parameter(ndim_a = 291, mxz = 8, nobj = 7)
+      parameter(ndim_a = 291, mxz = 8, nobj = 10)
 
       double precision ALT_a(ndim_a), DEN_a(ndim_a), SCH_a(ndim_a)
       integer natm
@@ -47,11 +56,19 @@ c     to the latest-zone RPE.
       double precision t_obs_jd, horiz, rpe_ens
       integer io, iz, nre
 
-      data norad / 42928, 35497, 37151, 39615, 27526, 32007, 37819 /
+c     11550's date (2025 4 3) is INFERRED, not an official decay-date
+c     file -- its last TLE shows mean perigee altitude collapsed to
+c     96 km, the terminal-signature basis used throughout this
+c     session's 11550 work. 59347/40943 dates are real, confirmed
+c     (matching their individual input/orem_<norad>.cfg files).
+      data norad / 42928, 35497, 37151, 39615, 27526, 32007, 37819,
+     &             11550, 59347, 40943 /
       data oyr / 2019.d0, 2016.d0, 2015.d0, 2017.d0, 2012.d0,
-     &           2010.d0, 2013.d0 /
-      data omo / 3.d0, 10.d0, 12.d0, 9.d0, 5.d0, 6.d0, 9.d0 /
-      data ody / 3.d0, 31.d0, 3.d0, 15.d0, 9.d0, 6.d0, 12.d0 /
+     &           2010.d0, 2013.d0, 2025.d0, 2026.d0, 2020.d0 /
+      data omo / 3.d0, 10.d0, 12.d0, 9.d0, 5.d0, 6.d0, 9.d0,
+     &           4.d0, 6.d0, 2.d0 /
+      data ody / 3.d0, 31.d0, 3.d0, 15.d0, 9.d0, 6.d0, 12.d0,
+     &           3.d0, 8.d0, 20.d0 /
 
       tle_file(1) = 'input/example_42928.tle.txt'
       tle_file(2) = 'input/example_35497.tle.txt'
@@ -60,6 +77,9 @@ c     to the latest-zone RPE.
       tle_file(5) = 'input/example_27526.tle.txt'
       tle_file(6) = 'input/example_32007.tle.txt'
       tle_file(7) = 'input/example_37819.tle.txt'
+      tle_file(8) = 'input/example_11550.tle.txt'
+      tle_file(9) = 'input/example_59347.tle.txt'
+      tle_file(10) = 'input/example_40943.tle.txt'
       obj_name(1) = '42928 PSLV-C39'
       obj_name(2) = '35497 Ariane 5 ESC-A'
       obj_name(3) = '37151 Long March 3B'
@@ -67,6 +87,9 @@ c     to the latest-zone RPE.
       obj_name(5) = '27526 Ariane 5 R/B'
       obj_name(6) = '32007 GSLV R/B'
       obj_name(7) = '37819 Proton-M R/B'
+      obj_name(8) = '11550 Molniya debris'
+      obj_name(9) = '59347 GTO R/B'
+      obj_name(10) = '40943 GTO debris'
 
       call init_constants()
       call read_atm_c(ALT_a, DEN_a, SCH_a, ndim_a, natm)
