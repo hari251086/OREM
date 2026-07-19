@@ -1,6 +1,6 @@
 # OREM — Application & Physical Architecture
 
-*(current as of v1.23, 2026-07-17; the Version History in README.md is the authoritative changelog)*
+*(current as of v1.24, 2026-07-18; the Version History in README.md is the authoritative changelog)*
 
 ## 1. System Overview
 
@@ -19,7 +19,7 @@ OREM treats re-entry prediction as an optimization problem: per decay zone, find
 
 Latest-zone RPE **median 2.4%, mean 4.1%, worst object 10.4%** across the 7-object validation campaign (full force model, 8 zones, `scratch_rpe/rpe_campaign_8zone_gated.csv`). This required, in sequence: a working GA (population 20, v1.15), a correct atmosphere table (Jacchia-71, v1.17), a correct drag phase (v1.18), the latest-zone estimator (v1.20), and a trust-gated BN-range carryover (v1.21).
 
-That 7-object set is drag-dominated and moderate-inclination. Testing a new object outside that regime (33587, i=65° critical inclination, hp descending 616→341 km over 131 days, v1.22) exposed the next accuracy frontier: **epoch-resolved space weather (v1.23, §4.1)** replaced the static-atmosphere assumption, but a decisive GMAT cross-check (2026-07-17, issue #27) showed the object's *observed* TLE mean elements lose ~1900 km of semi-major axis with simultaneous circularization over the same window — the signature of substantial drag, not a missing lunisolar term — while both OREM and an independent GMAT full-force propagation predict almost none at the object's currently-assumed BN=55 kg/m². The open question is therefore **BN identifiability for this object/window** (§7), not gravity-model fidelity; the 7-object validation numbers above are unaffected.
+That 7-object set is drag-dominated and moderate-inclination. Testing a new object outside that regime (33587, i=65° critical inclination, hp descending 616→341 km over 131 days, v1.22) exposed the next accuracy frontier: **epoch-resolved space weather (v1.23, §4.1)** replaced the static-atmosphere assumption, but a decisive GMAT cross-check (2026-07-17, issue #27) showed the object's *observed* TLE mean elements lose ~1900 km of semi-major axis with simultaneous circularization over the same window — the signature of substantial drag, not a missing lunisolar term — while both OREM and an independent GMAT full-force propagation predict almost none at the object's currently-assumed BN=55 kg/m². A follow-up refit (v1.24, 2026-07-18) directly fit `(e, BN)` against the real TLE observations across that same window with a wide `[1,150]` search and found no physically plausible BN reproduces the observed collapse either (RMS ≈ 468 km, 10–100× worse than the validation set's good fits) — **both third-body truncation and simple BN misidentification are now ruled out** for this object/window (§7), leaving the actual mechanism an open question (possibly a TLE-quality/fitting-artifact issue rather than a physics gap — see #27). The 7-object validation numbers above are unaffected either way.
 
 ---
 
