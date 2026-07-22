@@ -652,7 +652,24 @@ c        Accumulate squared error
       end do
 
       sout = dsqrt(sout / dble(nobs))
-      ga_fitness = 1.d0 / (1.d0 + sout)
+
+c     Issue #30: a degenerate trial propagation (e.g. from a saturated
+c     terminal-TLE ndot -- see #27/#30) can leave NaN/Inf in surfaces,
+c     which propagates here via fout. An unguarded NaN/Inf fitness
+c     corrupts ga_stats' avg (NaN) and then ga_preselect's stochastic-
+c     remainder loops, which assume well-ordered finite floats --
+c     "int(NaN)" is undefined behavior (seen as both an out-of-bounds
+c     write and a genuine infinite loop in direct reproduction) and
+c     "x .gt. 0.d0" is always false for NaN, so the mating-pool loop
+c     never reaches ipopsize. Treat a non-finite fit here as simply
+c     the worst possible chromosome (fitness=0, same effect as a huge
+c     RMS) -- the GA already knows how to route around a bad
+c     individual; it just can't survive routing around a NaN one.
+      if (sout .ne. sout .or. dabs(sout) .gt. 1.d30) then
+         ga_fitness = 0.d0
+      else
+         ga_fitness = 1.d0 / (1.d0 + sout)
+      end if
 
       return
       end
@@ -782,6 +799,15 @@ c     Compute population statistics.
       end do
       avg = sumfit / dble(ipopsize)
 
+c     Issue #30 defense-in-depth: if every individual in this
+c     generation is the "worst possible" fitness=0 (ga_fitness's own
+c     non-finite guard), avg would be exactly 0 and ga_preselect's
+c     "oldfit(j)/avg" turns back into a 0/0 NaN. Should be reachable
+c     only if a search range is degenerate everywhere, not just at
+c     one boundary -- a tiny floor keeps preselection well-defined
+c     without changing behavior for any population with real signal.
+      if (avg .le. 0.d0) avg = 1.d-12
+
       return
       end
 
@@ -800,11 +826,22 @@ c     Stochastic remainder roulette wheel preselection.
 
       integer j, k, jassign, winner
 
+c     Issue #30: expected=oldfit(j)/avg is assumed to be a small
+c     well-ordered finite number (typically 0-3ish, since avg is a
+c     population mean). "int(expected)" is undefined behavior if
+c     expected is ever NaN/Inf despite the ga_stats avg floor -- e.g.
+c     a single non-finite oldfit(j) slipping through -- and has been
+c     observed as an out-of-bounds jassign in direct testing. Clamp
+c     jassign into [0,ipopsize] defensively; a legitimate expected
+c     value is never anywhere near that bound anyway.
       k = 0
       do j = 1, ipopsize
          expected = oldfit(j) / avg
          jassign = int(expected)
+         if (jassign .ne. jassign .or. jassign .lt. 0) jassign = 0
+         if (jassign .gt. ipopsize) jassign = ipopsize
          fraction(j) = expected - dble(jassign)
+         if (fraction(j) .ne. fraction(j)) fraction(j) = 0.d0
  42      if (jassign .le. 0) goto 43
          k = k + 1
          jassign = jassign - 1
@@ -813,8 +850,33 @@ c     Stochastic remainder roulette wheel preselection.
  43      continue
       end do
 
+c     Issue #30: this loop assumes some j eventually draws a positive
+c     stochastic remainder (fraction(j)>0) to fill the remaining
+c     ipopsize-k slots. That assumption breaks whenever every
+c     fraction(j) is exactly 0 -- not just from NaN, but legitimately
+c     whenever every individual's fitness is identical (e.g. every
+c     individual hit ga_fitness's own non-finite guard and landed on
+c     the same fitness=0 "worst possible" value, see ga_fitness) --
+c     and the loop would otherwise spin forever. Bounded attempt cap,
+c     matching the same hard-cap-on-a-possibly-non-terminating-search
+c     pattern already used by Kesolve elsewhere in this codebase:
+c     past the cap, fill any remaining slots by round-robin -- with
+c     every individual equally (un)fit, which exact one fills a slot
+c     is arbitrary and does not bias the search.
       j = 0
+      iattempt = 0
+      maxattempt = 1000 * ipopsize
  44   if (k .ge. ipopsize) goto 45
+      iattempt = iattempt + 1
+      if (iattempt .gt. maxattempt) then
+         j2 = 0
+ 46      if (k .ge. ipopsize) goto 45
+         j2 = j2 + 1
+         if (j2 .gt. ipopsize) j2 = 1
+         k = k + 1
+         choices(k) = j2
+         goto 46
+      end if
       j = j + 1
       if (j .gt. ipopsize) j = 1
       if (fraction(j) .gt. 0.d0) then
