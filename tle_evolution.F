@@ -6,8 +6,17 @@ c     orbital evolution time-series: epoch (JD), semi-major axis,
 c     eccentricity, inclination, RAAN, argument of perigee,
 c     mean apogee/perigee altitudes, and Sun azimuth angle.
 c
-c     Uses TLE mean elements directly (no osculating conversion
-c     needed for evolution tracking). Sun azimuth computed via
+c     Uses TLE mean elements directly (no osculating conversion here)
+c     -- this is deliberate: zone_select's R² linearity check needs to
+c     run on the smooth mean-element trend, not per-TLE osculating
+c     noise (issue #31 investigation found short-period J2 wobble adds
+c     ~5-6 km of point-to-point scatter that can flip a marginal
+c     window's R² below threshold). The GA/RSM fitness comparison
+c     downstream needs the opposite -- osculating apogee, to match
+c     propagate_ks's genuinely-osculating model output -- so that
+c     conversion happens separately, per zone-point, in orem.F
+c     (tle_find_osc), AFTER zone_select has already picked the window
+c     using this mean-element series. Sun azimuth computed via
 c     solarnpv + sun_azimuth from Subrouts.F.
 c
 c     Compile:

@@ -172,10 +172,20 @@ c     Working
       double precision bn_floor_est
       logical bn_floor_ok
 
+c     Issue #31: osculating IC seed for rsm_generate/estimate_bn_floor
+c     (only index-1 of smaz/ez/incz/raanz/aopz/maz is ever used as a
+c     propagation initial condition -- see tle_find_osc below)
+      double precision a_kep_osc1(7)
+      logical osc_ok
+
       ierr = 0
       nzones_used = 0
+      nzones_valid = 0
       t_mean = 0.d0
       t_std = 0.d0
+      do i = 1, nzones_max
+         zone_status(i) = 0
+      end do
 
 c     ============================================================
 c     Step 1: Load TLE evolution
@@ -289,6 +299,24 @@ c     entirely below the hardcoded default floor.
      &        ama_raw, ntle_raw, maxtle, maz(j))
       end do
 
+c     Issue #31: estimate_bn_floor's calibration trial propagation
+c     seeds from index 1 of smaz/ez/incz/raanz/aopz/maz -- overwrite
+c     just that point with a true SGP4-osculating state (falls back to
+c     the existing mean-element values if SGP4 fails).
+      call tle_find_osc(norad_id, epz(1),
+     &   norad_raw, epoch_yr_raw, epoch_day_raw,
+     &   ainc_raw, raan_raw, ecc_raw, aop_raw, ama_raw,
+     &   amm_raw, bstar_raw, ntle_raw, maxtle,
+     &   a_kep_osc1, osc_ok)
+      if (osc_ok) then
+         smaz(1)  = a_kep_osc1(1)
+         ez(1)    = a_kep_osc1(2)
+         incz(1)  = a_kep_osc1(3)
+         raanz(1) = a_kep_osc1(4)
+         aopz(1)  = a_kep_osc1(5)
+         maz(1)   = a_kep_osc1(6)
+      end if
+
       call estimate_bn_floor(epz, smaz, ez, incz, raanz, aopz, maz,
      &   nzone1, n_force, ngeo_deg, nsun_deg, nmoon_deg,
      &   WE_rot, EPS_f, FR_rot,
@@ -349,12 +377,49 @@ c        (#10) can shrink a zone after selection.
             smaz(i)  = a_tle(zone_start(iz) + i - 1)
          end do
 
+c        Issue #31: haz feeds rsm_generate's apobs, which ga_fitness
+c        RMS-compares directly against propagate_ks's genuinely-
+c        osculating surfaces -- overwrite it per-point with true
+c        SGP4-osculating apogee here, AFTER zone_select already picked
+c        this window using the mean-element ha_tle above (deliberately
+c        -- see tle_evolution.F). Falls back to the mean value already
+c        in haz(i) if SGP4 fails for a given point (e.g. deep-space
+c        edge case).
+         do i = 1, nzone
+            call tle_find_osc(norad_id, epz(i),
+     &         norad_raw, epoch_yr_raw, epoch_day_raw,
+     &         ainc_raw, raan_raw, ecc_raw, aop_raw, ama_raw,
+     &         amm_raw, bstar_raw, ntle_raw, maxtle,
+     &         a_kep_osc1, osc_ok)
+            if (osc_ok) then
+               haz(i) = a_kep_osc1(1)*(1.d0+a_kep_osc1(2)) - R_Earth
+            end if
+         end do
+
          do j = 1, nzone
             maz(j) = 0.d0
             call tle_find_ma(norad_id, epz(j),
      &           norad_raw, epoch_yr_raw, epoch_day_raw,
      &           ama_raw, ntle_raw, maxtle, maz(j))
          end do
+
+c        Issue #31: rsm_generate's propagation initial condition
+c        seeds from index 1 of smaz/ez/incz/raanz/aopz/maz -- overwrite
+c        just that point with a true SGP4-osculating state (falls back
+c        to the existing mean-element values if SGP4 fails).
+         call tle_find_osc(norad_id, epz(1),
+     &      norad_raw, epoch_yr_raw, epoch_day_raw,
+     &      ainc_raw, raan_raw, ecc_raw, aop_raw, ama_raw,
+     &      amm_raw, bstar_raw, ntle_raw, maxtle,
+     &      a_kep_osc1, osc_ok)
+         if (osc_ok) then
+            smaz(1)  = a_kep_osc1(1)
+            ez(1)    = a_kep_osc1(2)
+            incz(1)  = a_kep_osc1(3)
+            raanz(1) = a_kep_osc1(4)
+            aopz(1)  = a_kep_osc1(5)
+            maz(1)   = a_kep_osc1(6)
+         end if
 
          e_mid = ez(1)
          de = 0.d0
@@ -669,6 +734,59 @@ c     ============================================================
      &           epoch_day_raw(i), djd_tmp)
             if (dabs(djd_tmp - epoch_jd) .lt. 0.01d0) then
                ma_out = ama_raw(i)
+               return
+            end if
+         end if
+      end do
+
+      return
+      end
+
+c     ============================================================
+      subroutine tle_find_osc(norad_id, epoch_jd,
+     &   norad_raw, epoch_yr_raw, epoch_day_raw,
+     &   ainc_raw, raan_raw, ecc_raw, aop_raw, ama_raw,
+     &   amm_raw, bstar_raw, ntle_raw, maxtle,
+     &   a_kep_osc, ok)
+c
+c     Issue #31: find the raw TLE matching epoch_jd (same epoch-match
+c     tolerance as tle_find_ma) and convert its mean elements to a
+c     true osculating 6-element set via SGP4 (tle2sv) + car2oe, for
+c     seeding a propagation initial condition that isn't itself
+c     mean-element-biased.
+c
+c     Output
+c       a_kep_osc(7) : [a,e,i,RAAN,AOP,MA,EA] -- a in km, angles deg
+c       ok           : .true. if a match was found and SGP4 succeeded
+c     ============================================================
+      implicit double precision (a-h, o-z)
+      integer norad_id, ntle_raw, maxtle
+      integer norad_raw(maxtle), epoch_yr_raw(maxtle)
+      double precision epoch_day_raw(maxtle)
+      double precision ainc_raw(maxtle), raan_raw(maxtle)
+      double precision ecc_raw(maxtle), aop_raw(maxtle)
+      double precision ama_raw(maxtle), amm_raw(maxtle)
+      double precision bstar_raw(maxtle)
+      double precision epoch_jd, a_kep_osc(7)
+      logical ok
+
+      double precision r_osc(3), v_osc(3)
+      integer ierr_sv, i
+
+      ok = .false.
+      do i = 1, ntle_raw
+         if (norad_raw(i) .eq. norad_id) then
+            call tle_epoch2jd(epoch_yr_raw(i),
+     &           epoch_day_raw(i), djd_tmp)
+            if (dabs(djd_tmp - epoch_jd) .lt. 0.01d0) then
+               call tle2sv(epoch_yr_raw(i), epoch_day_raw(i),
+     &            ainc_raw(i), raan_raw(i), ecc_raw(i),
+     &            aop_raw(i), ama_raw(i), amm_raw(i),
+     &            bstar_raw(i), r_osc, v_osc, ierr_sv)
+               if (ierr_sv .eq. 0) then
+                  call car2oe(r_osc, v_osc, a_kep_osc)
+                  ok = .true.
+               end if
                return
             end if
          end if
