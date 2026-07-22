@@ -1,4 +1,4 @@
-c     rpe_campaign.F — 20-object drag-enabled RPE campaign (issue #16)
+c     rpe_campaign.F — 30-object drag-enabled RPE campaign (issue #16)
 c     -------------------------------------------------------
 c     Runs orem_run with IDRAG=1 and the full force model (the
 c     test_e2e v1.11 config: geo=20, sun=2, moon=3, SRP on) on all
@@ -36,6 +36,26 @@ c     different regime than GTO) and 2 with too few TLEs (64785: 5,
 c     60607: 21 -- not enough for min_pts=8 in any 10-day window),
 c     leaving exactly 10 with 72-3203 TLEs each.
 c
+c     Extended again 20 -> 30 objects (2026-07-22): the ROCKET BODY-
+c     only filter against the same on-disk satcat.csv snapshot (still
+c     dated 2026-07-18 -- no fresher pull) returned ZERO new
+c     candidates -- the 13-14 objects it matches were already all used
+c     or excluded by the 20-object round. Broadened OBJECT_TYPE to
+c     also include DEBRIS (same precedent as object 20, 48259, a
+c     Cosmos 1124 DEB) -- 45 candidates. Fetched 16 via
+c     fetch_object.py; excluded 2 for too few TLEs (40598: 2, 40777:
+c     14), 1 for a saturated terminal ndot (36518: .99999999, the
+c     exact issue #30 hang pattern -- not risked), and 2 for a
+c     multi-decade tracking gap making the catalogued DECAY date
+c     unreachable from any tracked TLE (38587: last TLE 2013 vs decay
+c     2025; 27900: last TLE 2004 vs decay 2020) -- leaving exactly 10.
+c     Several of the 10 kept still have real, non-trivial gaps between
+c     their last tracked TLE and catalogued decay (28572: ~6 yr;
+c     23647: ~2.8 yr; 44591: ~1.8 yr; 46429/39802: ~1 yr) -- kept
+c     deliberately rather than cherry-picked away, since sparse
+c     terminal tracking is exactly the real-world failure mode issue
+c     #29 is about, not a reason to curate a rosier set.
+c
 c     Compile:
 c       ifx /heap-arrays /F:16777216 scratch_rpe\rpe_campaign.F
 c           orem.F rsm.F ga.F tle_evolution.F tle_filter.F
@@ -56,7 +76,7 @@ c     candidates, so a higher cap admits LATER zones -- and v1.20
 c     showed the latest zone is the primary estimator. This run
 c     measures how much later the latest zone gets and what it does
 c     to the latest-zone RPE.
-      parameter(ndim_a = 291, mxz = 8, nobj = 20)
+      parameter(ndim_a = 291, mxz = 8, nobj = 30)
 
       double precision ALT_a(ndim_a), DEN_a(ndim_a), SCH_a(ndim_a)
       integer natm
@@ -99,19 +119,27 @@ c     own issue.
       data norad / 42928, 35497, 37151, 39615, 27526, 32007, 37819,
      &             11550, 59347, 40943,
      &             66587, 60328, 61734, 57804, 56758,
-     &             30799, 44187, 35009, 41553, 48259 /
+     &             30799, 44187, 35009, 41553, 48259,
+     &             27906, 27882, 39802, 28572, 46429,
+     &             44591, 41695, 52205, 45349, 23647 /
       data oyr / 2019.d0, 2016.d0, 2015.d0, 2017.d0, 2012.d0,
      &           2010.d0, 2013.d0, 2025.d0, 2026.d0, 2020.d0,
      &           2026.d0, 2025.d0, 2025.d0, 2025.d0, 2024.d0,
-     &           2024.d0, 2021.d0, 2020.d0, 2019.d0, 2026.d0 /
+     &           2024.d0, 2021.d0, 2020.d0, 2019.d0, 2026.d0,
+     &           2018.d0, 2019.d0, 2019.d0, 2020.d0, 2021.d0,
+     &           2022.d0, 2022.d0, 2022.d0, 2022.d0, 2024.d0 /
       data omo / 3.d0, 10.d0, 12.d0, 9.d0, 5.d0, 6.d0, 9.d0,
      &           4.d0, 6.d0, 2.d0,
      &           2.d0, 4.d0, 3.d0, 1.d0, 8.d0,
-     &           5.d0, 6.d0, 8.d0, 1.d0, 6.d0 /
+     &           5.d0, 6.d0, 8.d0, 1.d0, 6.d0,
+     &           11.d0, 4.d0, 11.d0, 10.d0, 10.d0,
+     &           3.d0, 5.d0, 6.d0, 10.d0, 1.d0 /
       data ody / 3.d0, 31.d0, 3.d0, 15.d0, 9.d0, 6.d0, 12.d0,
      &           10.d0, 8.d0, 20.d0,
      &           10.d0, 14.d0, 22.d0, 3.d0, 25.d0,
-     &           12.d0, 15.d0, 31.d0, 6.d0, 18.d0 /
+     &           12.d0, 15.d0, 31.d0, 6.d0, 18.d0,
+     &           19.d0, 7.d0, 5.d0, 4.d0, 18.d0,
+     &           3.d0, 15.d0, 26.d0, 9.d0, 28.d0 /
 
       tle_file(1) = 'input/example_42928.tle.txt'
       tle_file(2) = 'input/example_35497.tle.txt'
@@ -133,6 +161,16 @@ c     own issue.
       tle_file(18) = 'input/example_35009.tle.txt'
       tle_file(19) = 'input/example_41553.tle.txt'
       tle_file(20) = 'input/example_48259.tle.txt'
+      tle_file(21) = 'input/example_27906.tle.txt'
+      tle_file(22) = 'input/example_27882.tle.txt'
+      tle_file(23) = 'input/example_39802.tle.txt'
+      tle_file(24) = 'input/example_28572.tle.txt'
+      tle_file(25) = 'input/example_46429.tle.txt'
+      tle_file(26) = 'input/example_44591.tle.txt'
+      tle_file(27) = 'input/example_41695.tle.txt'
+      tle_file(28) = 'input/example_52205.tle.txt'
+      tle_file(29) = 'input/example_45349.tle.txt'
+      tle_file(30) = 'input/example_23647.tle.txt'
       obj_name(1) = '42928 PSLV-C39'
       obj_name(2) = '35497 Ariane 5 ESC-A'
       obj_name(3) = '37151 Long March 3B'
@@ -153,6 +191,16 @@ c     own issue.
       obj_name(18) = '35009 Fregat R/B'
       obj_name(19) = '41553 Falcon9 R/B'
       obj_name(20) = '48259 Cosmos1124 deb'
+      obj_name(21) = '27906 Cosmos1481 deb'
+      obj_name(22) = '27882 Cosmos903 deb'
+      obj_name(23) = '39802 SL-12 deb'
+      obj_name(24) = '28572 SL-12 deb'
+      obj_name(25) = '46429 SL-12 deb'
+      obj_name(26) = '44591 CZ-3A deb'
+      obj_name(27) = '41695 SL-12 deb'
+      obj_name(28) = '52205 Cosmos917 deb'
+      obj_name(29) = '45349 SL-12 deb'
+      obj_name(30) = '23647 Titan34B deb'
 
       call init_constants()
       call read_atm_c(ALT_a, DEN_a, SCH_a, ndim_a, natm)

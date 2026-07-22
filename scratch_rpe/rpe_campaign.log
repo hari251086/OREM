@@ -382,4 +382,203 @@
   [WARN] tle_filter: epoch gap at point   979 (********** -> **********,     48.6 days)
   pipeline error ierr=  2
 
+ ===== 27906 Cosmos1481 deb    
+  [WARN] tle_filter: epoch gap at point     2 (********** -> **********,     67.8 days)
+  [WARN] tle_filter: epoch gap at point  2036 (********** -> **********,     42.9 days)
+  [INFO] G2 BN floor estimate=  114.30 -> bn_lo=   57.15
+  Z 1: exit= 0 pts=  3746 BN=  117.86
+  Z 2: exit= 0 pts=  3745 BN=  142.74
+  [WARN] Z 3: RSM envelope does not bound   6 of   8 observations -- proceeding anyway
+  [WARN] Z 3: GA optimum at search boundary -- true value may lie outside the search range
+  Z 3: exit= 1 pts=   589 BN=   74.05
+  [WARN] Z 4: RSM envelope does not bound   5 of   9 observations -- proceeding anyway
+  [WARN] Z 4: GA optimum at search boundary -- true value may lie outside the search range
+  Z 4: exit= 1 pts=   728 BN=   56.79
+  Z1: e=  0.6574 BN= 117.86 (no re-entry)  zstat= 0
+  Z2: e=  0.6589 BN= 142.74 (no re-entry)  zstat= 0
+  Z3: e=  0.7447 BN=  74.05 RPE=   36.28%  zstat= 2
+  Z4: e=  0.7451 BN=  56.79 RPE=   96.85%  zstat= 2
+  ensemble (2 of 4 zones): mean JD=  2458537.731 std=   45.8 d
+  ENSEMBLE RPE =     2.20%
+
+ ===== 27882 Cosmos903 deb     
+  [WARN] tle_filter: epoch gap at point     2 (********** -> **********,     32.9 days)
+  [WARN] tle_filter: epoch gap at point  1804 (********** -> **********,     31.9 days)
+  [INFO] G2 BN floor estimate=    5.00 -> bn_lo=    2.50
+  [WARN] Z 1: RSM envelope does not bound   8 of  12 observations -- proceeding anyway
+  [WARN] Z 1: GA optimum at search boundary -- true value may lie outside the search range
+  Z 1: exit= 1 pts=   761 BN=   28.38
+  [WARN] Z 2: RSM envelope does not bound   7 of  13 observations -- proceeding anyway
+  [WARN] Z 2: GA optimum at search boundary -- true value may lie outside the search range
+  Z 2: exit= 1 pts=   679 BN=   19.49
+  [WARN] Z 3: RSM envelope does not bound   5 of   8 observations -- proceeding anyway
+  [WARN] Z 3: GA optimum at search boundary -- true value may lie outside the search range
+  Z 3: exit= 1 pts=   712 BN=   13.93
+  [WARN] Z 4: RSM envelope does not bound   3 of  11 observations -- proceeding anyway
+  [WARN] Z 4: GA optimum at search boundary -- true value may lie outside the search range
+  Z 4: exit= 1 pts=   668 BN=   10.02
+  [WARN] Z 5: RSM envelope does not bound   2 of   9 observations -- proceeding anyway
+  [WARN] Z 5: GA optimum at search boundary -- true value may lie outside the search range
+  Z 5: exit= 1 pts=  1095 BN=   10.05
+  [WARN] Z 6: RSM envelope does not bound   2 of  12 observations -- proceeding anyway
+  [WARN] Z 6: GA optimum at search boundary -- true value may lie outside the search range
+  Z 6: exit= 1 pts=   926 BN=   10.20
+  [WARN] Z 7: GA optimum at search boundary -- true value may lie outside the search range
+  Z 7: exit= 1 pts=   286 BN=   10.11
+  [WARN] Z 8: GA optimum at search boundary -- true value may lie outside the search range
+  Z 8: exit= 1 pts=   269 BN=   10.11
+  Z1: e=  0.7490 BN=  28.38 RPE=   10.55%  zstat= 2
+  Z2: e=  0.7485 BN=  19.49 RPE=    6.10%  zstat= 2
+  Z3: e=  0.7484 BN=  13.93 RPE=    5.33%  zstat= 2
+  Z4: e=  0.7461 BN=  10.02 RPE=   43.97%  zstat= 2
+  Z5: e=  0.7430 BN=  10.05 RPE=  124.23%  zstat= 2
+  Z6: e=  0.7418 BN=  10.20 RPE=  105.39%  zstat= 2
+  Z7: e=  0.7310 BN=  10.11 RPE=   20.93%  zstat= 2
+  Z8: e=  0.7238 BN=  10.11 RPE=   21.38%  zstat= 2
+  ensemble (8 of 8 zones): mean JD=  2458638.213 std=   60.6 d
+  ENSEMBLE RPE =    18.31%
+
+ ===== 39802 SL-12 deb         
+  [INFO] G2 BN floor estimate=    5.00 -> bn_lo=    2.50
+  [WARN] Z 1: GA optimum at search boundary -- true value may lie outside the search range
+  Z 1: exit= 1 pts=  6747 BN=   24.62
+  [WARN] Z 2: RSM envelope does not bound   3 of  13 observations -- proceeding anyway
+  [WARN] Z 2: GA optimum at search boundary -- true value may lie outside the search range
+  Z 2: exit= 1 pts=  7386 BN=   23.97
+  [WARN] Z 3: RSM envelope does not bound   6 of  10 observations -- proceeding anyway
+  [WARN] Z 3: GA optimum at search boundary -- true value may lie outside the search range
+  Z 3: exit= 1 pts=  8133 BN=   28.66
+  [WARN] Z 4: RSM envelope does not bound   6 of  11 observations -- proceeding anyway
+  [WARN] Z 4: GA optimum at search boundary -- true value may lie outside the search range
+  Z 4: exit= 1 pts=  7465 BN=   17.73
+  [WARN] Z 5: RSM envelope does not bound  12 of  13 observations -- proceeding anyway
+  [WARN] Z 5: GA optimum at search boundary -- true value may lie outside the search range
+  Z 5: exit= 1 pts=  6787 BN=   13.89
+  [WARN] Z 6: RSM envelope does not bound   4 of  11 observations -- proceeding anyway
+  [WARN] Z 6: GA optimum at search boundary -- true value may lie outside the search range
+  Z 6: exit= 1 pts=  5983 BN=   11.44
+  [WARN] Z 7: RSM envelope does not bound   2 of   8 observations -- proceeding anyway
+  Z 7: exit= 1 pts=  5141 BN=   10.63
+  Z 8: exit= 1 pts=  3763 BN=   10.31
+  Z1: e=  0.5752 BN=  24.62 RPE=   43.17%  zstat= 2
+  Z2: e=  0.5751 BN=  23.97 RPE=   57.19%  zstat= 2
+  Z3: e=  0.5715 BN=  28.66 RPE=  111.47%  zstat= 2
+  Z4: e=  0.5715 BN=  17.73 RPE=   92.70%  zstat= 2
+  Z5: e=  0.5714 BN=  13.89 RPE=   74.59%  zstat= 2
+  Z6: e=  0.5714 BN=  11.44 RPE=   55.09%  zstat= 2
+  Z7: e=  0.5710 BN=  10.63 RPE=   39.36%  zstat= 3
+  Z8: e=  0.5684 BN=  10.31 RPE=   12.17%  zstat= 0
+  ensemble (8 of 8 zones): mean JD=  2459228.748 std=  222.5 d
+  ENSEMBLE RPE =    49.40%
+
+ ===== 28572 SL-12 deb         
+  [WARN] tle_filter: epoch gap at point     2 (********** -> **********,     31.9 days)
+  [WARN] tle_filter: epoch gap at point    43 (********** -> **********,    462.3 days)
+  [WARN] tle_filter: epoch gap at point   230 (********** -> **********,    108.7 days)
+  [WARN] tle_filter: epoch gap at point   231 (********** -> **********,     65.6 days)
+  [WARN] tle_filter: epoch gap at point   232 (********** -> **********,    304.0 days)
+  [WARN] tle_filter: epoch gap at point   454 (********** -> **********,     40.8 days)
+  [WARN] tle_filter: epoch gap at point   461 (********** -> **********,    414.4 days)
+  [WARN] tle_filter: epoch gap at point   491 (********** -> **********,     50.4 days)
+  [WARN] tle_filter: epoch gap at point   501 (********** -> **********,    137.8 days)
+  [WARN] tle_filter: epoch gap at point   517 (********** -> **********,     71.9 days)
+  [WARN] tle_filter: epoch gap at point   526 (********** -> **********,     41.5 days)
+  [WARN] tle_filter: epoch gap at point   527 (********** -> **********,     55.7 days)
+  [WARN] tle_filter: epoch gap at point   528 (********** -> **********,    522.2 days)
+  pipeline error ierr=  2
+
+ ===== 46429 SL-12 deb         
+  pipeline error ierr=  2
+
+ ===== 44591 CZ-3A deb         
+  [WARN] tle_filter: epoch gap at point    40 (********** -> **********,     52.7 days)
+  [WARN] tle_filter: epoch gap at point    69 (********** -> **********,     55.9 days)
+  pipeline error ierr=  2
+
+ ===== 41695 SL-12 deb         
+  [WARN] tle_filter: epoch gap at point    20 (********** -> **********,    134.5 days)
+  [WARN] tle_filter: epoch gap at point    97 (********** -> **********,    410.3 days)
+  [WARN] tle_filter: epoch gap at point   122 (********** -> **********,     46.6 days)
+  [WARN] tle_filter: epoch gap at point   129 (********** -> **********,    390.5 days)
+  [WARN] tle_filter: epoch gap at point   139 (********** -> **********,     93.6 days)
+  [WARN] tle_filter: epoch gap at point   182 (********** -> **********,     41.8 days)
+  [WARN] tle_filter: epoch gap at point   215 (********** -> **********,     40.8 days)
+  [WARN] tle_filter: epoch gap at point   237 (********** -> **********,     30.7 days)
+  [WARN] tle_filter: epoch gap at point   311 (********** -> **********,    121.6 days)
+  [INFO] G2 BN floor estimate=    5.00 -> bn_lo=    2.50
+  Z 1: exit= 0 pts=  8132 BN=   28.06
+  Z 2: exit= 1 pts=  7989 BN=  107.96
+  [WARN] Z 3: RSM envelope does not bound   5 of   8 observations -- proceeding anyway
+  [WARN] Z 3: GA optimum at search boundary -- true value may lie outside the search range
+  Z 3: exit= 1 pts=  3554 BN=  103.30
+  Z 4: exit= 1 pts=  4130 BN=   92.05
+  [WARN] Z 5: GA optimum at search boundary -- true value may lie outside the search range
+  Z 5: exit= 0 pts=  8481 BN=   99.71
+  [WARN] Z 6: RSM envelope does not bound   7 of  11 observations -- proceeding anyway
+  [WARN] Z 6: GA optimum at search boundary -- true value may lie outside the search range
+  Z 6: exit= 0 pts=  8495 BN=   85.45
+  Z1: e=  0.5603 BN=  28.06 (no re-entry)  zstat= 0
+  Z2: e=  0.5453 BN= 107.96 RPE=   32.80%  zstat= 0
+  Z3: e=  0.5587 BN= 103.30 RPE=   42.23%  zstat= 2
+  Z4: e=  0.5543 BN=  92.05 RPE=   73.00%  zstat= 0
+  Z5: e=  0.5464 BN=  99.71 (no re-entry)  zstat= 2
+  Z6: e=  0.5468 BN=  85.45 (no re-entry)  zstat= 2
+  ensemble (3 of 6 zones): mean JD=  2460046.977 std=  104.5 d
+  ENSEMBLE RPE =    15.70%
+
+ ===== 52205 Cosmos917 deb     
+  [INFO] G2 BN floor estimate=   19.88 -> bn_lo=    9.94
+  Z 1: exit= 1 pts=   192 BN=   64.44
+  [WARN] Z 2: GA optimum at search boundary -- true value may lie outside the search range
+  Z 2: exit= 1 pts=   181 BN=   27.30
+  Z 3: exit= 1 pts=   155 BN=   40.95
+  Z 4: exit= 1 pts=   137 BN=   36.74
+  [WARN] Z 5: GA optimum at search boundary -- true value may lie outside the search range
+  Z 5: exit= 1 pts=   140 BN=   27.70
+  [WARN] Z 6: GA optimum at search boundary -- true value may lie outside the search range
+  Z 6: exit= 1 pts=   181 BN=   13.91
+  Z1: e=  0.7506 BN=  64.44 RPE=   -6.07%  zstat= 0
+  Z2: e=  0.7502 BN=  27.30 RPE=   -8.60%  zstat= 2
+  Z3: e=  0.7491 BN=  40.95 RPE=   -7.37%  zstat= 0
+  Z4: e=  0.7470 BN=  36.74 RPE=   -7.78%  zstat= 0
+  Z5: e=  0.7413 BN=  27.70 RPE=   10.50%  zstat= 2
+  Z6: e=  0.7184 BN=  13.91 RPE=   76.71%  zstat= 2
+  ensemble (6 of 6 zones): mean JD=  2459756.867 std=    8.3 d
+  ENSEMBLE RPE =     0.49%
+
+ ===== 45349 SL-12 deb         
+  [INFO] G2 BN floor estimate=    5.00 -> bn_lo=    2.50
+  [WARN] Z 1: RSM envelope does not bound   2 of  11 observations -- proceeding anyway
+  [WARN] Z 1: GA optimum at search boundary -- true value may lie outside the search range
+  Z 1: exit= 0 pts=  7926 BN=    8.29
+  [WARN] Z 2: RSM envelope does not bound   2 of  17 observations -- proceeding anyway
+  [WARN] Z 2: GA optimum at search boundary -- true value may lie outside the search range
+  Z 2: exit= 0 pts=  7976 BN=    5.34
+  [WARN] Z 3: GA optimum at search boundary -- true value may lie outside the search range
+  Z 3: exit= 1 pts=  8026 BN=   23.11
+  [WARN] Z 4: GA optimum at search boundary -- true value may lie outside the search range
+  Z 4: exit= 1 pts=  7756 BN=   29.18
+  [WARN] Z 5: RSM envelope does not bound   5 of  10 observations -- proceeding anyway
+  [WARN] Z 5: GA optimum at search boundary -- true value may lie outside the search range
+  Z 5: exit= 1 pts=  5603 BN=   29.32
+  [WARN] Z 6: GA optimum at search boundary -- true value may lie outside the search range
+  Z 6: exit= 1 pts=  4619 BN=   10.97
+  [WARN] Z 7: GA optimum at search boundary -- true value may lie outside the search range
+  Z 7: exit= 1 pts=  4802 BN=   12.12
+  [WARN] Z 8: GA optimum at search boundary -- true value may lie outside the search range
+  Z 8: exit= 1 pts=  6169 BN=   10.37
+  Z1: e=  0.5784 BN=   8.29 (no re-entry)  zstat= 2
+  Z2: e=  0.5770 BN=   5.34 (no re-entry)  zstat= 2
+  Z3: e=  0.5723 BN=  23.11 RPE=  208.00%  zstat= 2
+  Z4: e=  0.5635 BN=  29.18 RPE=  280.36%  zstat= 2
+  Z5: e=  0.5595 BN=  29.32 RPE=  226.50%  zstat= 2
+  Z6: e=  0.5040 BN=  10.97 RPE=  176.08%  zstat= 2
+  Z7: e=  0.4874 BN=  12.12 RPE=  188.11%  zstat= 2
+  Z8: e=  0.4281 BN=  10.37 RPE=  276.90%  zstat= 2
+  ensemble (6 of 8 zones): mean JD=  2460545.800 std=  284.4 d
+  ENSEMBLE RPE =   132.94%
+
+ ===== 23647 Titan34B deb      
+  pipeline error ierr=  2
+
  campaign complete -> scratch_rpe/rpe_campaign.csv
