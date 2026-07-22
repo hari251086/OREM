@@ -283,6 +283,12 @@ c        Ensemble RPE: t_mean vs observed, horizon from zone 1 epoch
          end if
 
  90      continue
+c        Progress sentinel: a Monitor watching this log can grep
+c        "^ \[PROGRESS\]" for a clean, unambiguous percent-complete
+c        marker without polling -- covers both the normal-completion
+c        and early-error (goto 90) exits per object.
+         write(*,'(A,I3,A,I2,A,I2,A)') ' [PROGRESS] ',
+     &      (io*100)/nobj, '% (', io, ' of ', nobj, ' objects done)'
       end do
 
       close(33)

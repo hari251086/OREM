@@ -134,6 +134,12 @@ c     -------------------------------------------------------
          end if
 
  90      continue
+c        Progress sentinel: a Monitor watching this log can grep
+c        "^ \[PROGRESS\]" for a clean percent-complete marker without
+c        polling -- covers both normal-completion and early-error
+c        (goto 90) exits per object.
+         write(*,'(A,I3,A,I2,A,I2,A)') ' [PROGRESS] ',
+     &      (io*100)/nobj, '% (', io, ' of ', nobj, ' objects done)'
       end do
 
       close(33)
