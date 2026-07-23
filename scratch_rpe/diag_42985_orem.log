@@ -1,0 +1,18 @@
+ calling orem_run for 42985...
+  [WARN] Z 1: GA optimum at search boundary -- true value may lie outside the search range
+  Z 1: exit= 1 pts=   272 BN=   82.32
+  [WARN] Z 2: GA optimum at search boundary -- true value may lie outside the search range
+  Z 2: exit= 1 pts=   217 BN=   29.63
+  Z 3: exit= 1 pts=   200 BN=   50.77
+  Z 4: exit= 1 pts=   208 BN=   49.75
+  [WARN] Z 5: GA optimum at search boundary -- true value may lie outside the search range
+  Z 5: exit= 1 pts=   138 BN=   62.11
+  [WARN] Z 6: GA optimum at search boundary -- true value may lie outside the search range
+  Z 6: exit= 1 pts=   148 BN=   82.01
+  [WARN] Z 7: RSM envelope does not bound   6 of  12 observations -- proceeding anyway
+  [WARN] Z 7: GA optimum at search boundary -- true value may lie outside the search range
+  Z 7: exit= 1 pts=   102 BN=  109.76
+ Kesolve did not converge
+ Kesolve did not converge
+ Kesolve did not converge
+  [WARN] Z 8: RSM envelope does not bound   1 of  35 observations -- proceeding anyway

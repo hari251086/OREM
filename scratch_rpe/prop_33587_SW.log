@@ -1,0 +1,7 @@
+ [SW] epoch-resolved density ENABLED
+ 33587 direct long propagation from last TLE
+ epoch JD  2459917.3566 (2022-12-03), observed decay JD 2460787.5 (2025-04-22)
+ BN=  40.0: re-entry JD  2464267.4373  (epoch+  4350.1 d)  RPE=  399.93 %
+ BN=  55.0: re-entry JD  2464424.1017  (epoch+  4506.7 d)  RPE=  417.93 %
+ BN=  80.0: re-entry JD  2464615.9804  (epoch+  4698.6 d)  RPE=  439.98 %
+ BN= 120.0: re-entry JD  2464821.4023  (epoch+  4904.0 d)  RPE=  463.59 %

@@ -1,0 +1,19 @@
+OREM Re-entry Prediction Report
+================================
+Object (NORAD):  33587
+Generated:      2026-07-17 09:44    
+BN search:      [   80.0,  160.0] kg/m2 (initial; G2 floor may extend zone 1 downward)
+IDRAG:           1
+Zones:           5 processed,  3 clean (zone_status=0)
+Observed:       JD  2460787.5000  ( 2025  4 22 )
+
+Zone  Epoch (JD)      e_opt     BN(kg/m2)  Re-entry (JD)   Re-entry (UTC)   RPE(%)    status
+   1   2459785.9361   0.37105     54.91      no re-entry within cap        --   ok        
+   2   2459795.9416   0.36920     53.25      no re-entry within cap        --   ok        
+   3   2459851.4164   0.37670     61.08      no re-entry within cap        --   ok        
+   4   2459858.6609   0.37774     28.38      no re-entry within cap        --   boundary  
+   5   2459869.3047   0.37598     11.10      no re-entry within cap        --   boundary  
+
+Ensemble: no zone predicted a re-entry within the propagation cap
+
+zone_status legend: 0=ok, 1=skip_propfail, 2=GA_boundary, 3=RSM_nobound, 4=skip_toofewpts

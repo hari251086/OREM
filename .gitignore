@@ -14,3 +14,10 @@ debug_*.F
 
 # Large multi-satellite catalog (94k entries, not needed for tests)
 input/example_multi.tle.txt
+
+# Credentials -- never commit these
+.env
+.env.*
+*.netrc
+*_credentials.*
+secrets.*

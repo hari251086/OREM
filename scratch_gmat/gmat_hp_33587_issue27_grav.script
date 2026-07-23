@@ -1,0 +1,52 @@
+%General Mission Analysis Tool(GMAT) Script
+%  OREM issue #27 -- decisive experiment, GRAVITY-ONLY run (SCgrav only).
+%  Companion to gmat_hp_33587_issue27_full.script -- see that file for
+%  the full context/state/rationale. This run isolates the third-body/
+%  oblateness secular signal cleanly (drag & SRP off) and independently
+%  checks the issue's "drag is negligible at these altitudes" claim.
+%  Same state, same single-Propagate-command Add-list pattern (safe for
+%  the same reason: exactly one spacecraft, one Propagate command).
+
+Create ForceModel FMgrav;
+GMAT FMgrav.CentralBody = Earth;
+GMAT FMgrav.PrimaryBodies = {Earth};
+GMAT FMgrav.PointMasses = {Sun, Luna};
+GMAT FMgrav.GravityField.Earth.Degree = 20;
+GMAT FMgrav.GravityField.Earth.Order = 0;
+GMAT FMgrav.GravityField.Earth.PotentialFile = 'C:\Users\hari2\OneDrive\Documents\GitHub\KSROP\scratch_gmat\EGM2008_72x72.cof';
+GMAT FMgrav.Drag = None;
+GMAT FMgrav.SRP = Off;
+
+Create Propagator Propgrav;
+GMAT Propgrav.FM = FMgrav;
+GMAT Propgrav.Type = RungeKutta89;
+GMAT Propgrav.InitialStepSize = 60;
+GMAT Propgrav.Accuracy = 1e-12;
+GMAT Propgrav.MinStep = 0.001;
+GMAT Propgrav.MaxStep = 600;
+
+Create Spacecraft SCgrav;
+
+GMAT SCgrav.DateFormat = UTCGregorian;
+GMAT SCgrav.Epoch = '25 Jul 2022 10:28:10.560';
+GMAT SCgrav.CoordinateSystem = EarthMJ2000Eq;
+GMAT SCgrav.DisplayStateType = Keplerian;
+GMAT SCgrav.SMA = 11128.043;
+GMAT SCgrav.ECC = 0.3714527;
+GMAT SCgrav.INC = 65.0291;
+GMAT SCgrav.RAAN = 250.9049;
+GMAT SCgrav.AOP = 105.5241;
+GMAT SCgrav.TA = 254.56581;
+GMAT SCgrav.Cd = 1;
+GMAT SCgrav.DragArea = 1;
+GMAT SCgrav.DryMass = 55;
+
+Create ReportFile Repgrav;
+GMAT Repgrav.Filename = 'gmat_hp_33587_issue27_grav.txt';
+GMAT Repgrav.Add = {SCgrav.UTCModJulian, SCgrav.ElapsedDays, SCgrav.Earth.RadPer, SCgrav.Earth.ECC};
+GMAT Repgrav.Precision = 16;
+GMAT Repgrav.WriteHeaders = true;
+
+BeginMissionSequence;
+
+Propagate Propgrav(SCgrav) {SCgrav.ElapsedDays = 131};

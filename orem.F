@@ -95,7 +95,12 @@ c     --- Output arguments ---
       integer ierr
 
 c     --- Internal arrays ---
-      parameter(maxpts = 10000, max_surf = 5000)
+c     maxpts raised 10000->15000: 11550's real TLE history is 11668
+c     entries (46 years, 1979-2025) -- the previous bound silently
+c     truncated tle_evolve's fill loop (npts .ge. maxpts) rather than
+c     erroring, so this would have quietly dropped the newest ~1700+
+c     points without any indication.
+      parameter(maxpts = 15000, max_surf = 5000)
       parameter(maxtle = 100000)
 
 c     TLE evolution
@@ -105,6 +110,11 @@ c     TLE evolution
       double precision ha_tle(maxpts), hp_tle(maxpts)
       double precision ls_tle(maxpts)
       integer npts, ierr_tle
+
+c     Issue #10: TLE quality filtering (tle_filter.F)
+      integer mask_tle(maxpts)
+      integer nfiltered_tle, nremoved_tle, ngaps_tle
+      integer i_filt, j_filt
 
 c     Raw TLE for mean anomaly extraction
       character*24 names_raw(maxtle)
@@ -162,10 +172,20 @@ c     Working
       double precision bn_floor_est
       logical bn_floor_ok
 
+c     Issue #31: osculating IC seed for rsm_generate/estimate_bn_floor
+c     (only index-1 of smaz/ez/incz/raanz/aopz/maz is ever used as a
+c     propagation initial condition -- see tle_find_osc below)
+      double precision a_kep_osc1(7)
+      logical osc_ok
+
       ierr = 0
       nzones_used = 0
+      nzones_valid = 0
       t_mean = 0.d0
       t_std = 0.d0
+      do i = 1, nzones_max
+         zone_status(i) = 0
+      end do
 
 c     ============================================================
 c     Step 1: Load TLE evolution
@@ -179,6 +199,37 @@ c     ============================================================
       if (ierr_tle .ne. 0) then
          ierr = 1
          return
+      end if
+
+c     ============================================================
+c     Step 1b: TLE quality filtering (issue #10). Tuned params
+c     (sigma_ha=4, sigma_e=6, gap_days=30, nwin=20) per
+c     tle_filter.F's header comment -- validated against real TLE
+c     histories (42928, 35497, 37151) at a ~1.5% false-positive rate.
+c     Compacts the 9 parallel evolution arrays in place, dropping
+c     flagged points before zone_select ever sees them.
+c     ============================================================
+      call tle_filter(epochs, ha_tle, e_tle, npts,
+     &   4.0d0, 6.0d0, 30.0d0, 20,
+     &   mask_tle, nfiltered_tle, nremoved_tle, ngaps_tle)
+
+      if (nremoved_tle .gt. 0) then
+         j_filt = 0
+         do i_filt = 1, npts
+            if (mask_tle(i_filt) .eq. 1) then
+               j_filt = j_filt + 1
+               epochs(j_filt)   = epochs(i_filt)
+               a_tle(j_filt)    = a_tle(i_filt)
+               e_tle(j_filt)    = e_tle(i_filt)
+               inc_tle(j_filt)  = inc_tle(i_filt)
+               raan_tle(j_filt) = raan_tle(i_filt)
+               aop_tle(j_filt)  = aop_tle(i_filt)
+               ha_tle(j_filt)   = ha_tle(i_filt)
+               hp_tle(j_filt)   = hp_tle(i_filt)
+               ls_tle(j_filt)   = ls_tle(i_filt)
+            end if
+         end do
+         npts = j_filt
       end if
 
 c     ============================================================
@@ -248,6 +299,24 @@ c     entirely below the hardcoded default floor.
      &        ama_raw, ntle_raw, maxtle, maz(j))
       end do
 
+c     Issue #31: estimate_bn_floor's calibration trial propagation
+c     seeds from index 1 of smaz/ez/incz/raanz/aopz/maz -- overwrite
+c     just that point with a true SGP4-osculating state (falls back to
+c     the existing mean-element values if SGP4 fails).
+      call tle_find_osc(norad_id, epz(1),
+     &   norad_raw, epoch_yr_raw, epoch_day_raw,
+     &   ainc_raw, raan_raw, ecc_raw, aop_raw, ama_raw,
+     &   amm_raw, bstar_raw, ntle_raw, maxtle,
+     &   a_kep_osc1, osc_ok)
+      if (osc_ok) then
+         smaz(1)  = a_kep_osc1(1)
+         ez(1)    = a_kep_osc1(2)
+         incz(1)  = a_kep_osc1(3)
+         raanz(1) = a_kep_osc1(4)
+         aopz(1)  = a_kep_osc1(5)
+         maz(1)   = a_kep_osc1(6)
+      end if
+
       call estimate_bn_floor(epz, smaz, ez, incz, raanz, aopz, maz,
      &   nzone1, n_force, ngeo_deg, nsun_deg, nmoon_deg,
      &   WE_rot, EPS_f, FR_rot,
@@ -308,12 +377,59 @@ c        (#10) can shrink a zone after selection.
             smaz(i)  = a_tle(zone_start(iz) + i - 1)
          end do
 
+c        Issue #31: haz feeds rsm_generate's apobs, which ga_fitness
+c        RMS-compares directly against propagate_ks's genuinely-
+c        osculating surfaces -- overwrite it per-point with true
+c        SGP4-osculating apogee here, AFTER zone_select already picked
+c        this window using the mean-element ha_tle above (deliberately
+c        -- see tle_evolution.F). Falls back to the mean value already
+c        in haz(i) if SGP4 fails for a given point (e.g. deep-space
+c        edge case).
+         do i = 1, nzone
+            call tle_find_osc(norad_id, epz(i),
+     &         norad_raw, epoch_yr_raw, epoch_day_raw,
+     &         ainc_raw, raan_raw, ecc_raw, aop_raw, ama_raw,
+     &         amm_raw, bstar_raw, ntle_raw, maxtle,
+     &         a_kep_osc1, osc_ok)
+            if (osc_ok) then
+               haz(i) = a_kep_osc1(1)*(1.d0+a_kep_osc1(2)) - R_Earth
+            end if
+         end do
+
          do j = 1, nzone
             maz(j) = 0.d0
             call tle_find_ma(norad_id, epz(j),
      &           norad_raw, epoch_yr_raw, epoch_day_raw,
      &           ama_raw, ntle_raw, maxtle, maz(j))
          end do
+
+c        Issue #31: rsm_generate's propagation initial condition
+c        seeds from index 1 of smaz/ez/incz/raanz/aopz/maz -- overwrite
+c        just that point with a true SGP4-osculating state (falls back
+c        to the existing mean-element values if SGP4 fails).
+c        (Zone-to-zone trajectory-continuity seeding was tried here
+c        and measurably WORSENED RPE on both the curated 7-object and
+c        broader 30-object campaigns -- mean |RPE| 22.9%->27.4% and
+c        22.0%->32.9% respectively, with two objects blowing up over
+c        100 points. Root cause: chaining lets one zone's own fit
+c        uncertainty compound into the next zone's starting geometry,
+c        instead of every zone independently re-anchoring to fresh
+c        SGP4 data the way this fallback-only version does. Reverted
+c        per user direction; see project memory for the full
+c        investigation.)
+         call tle_find_osc(norad_id, epz(1),
+     &      norad_raw, epoch_yr_raw, epoch_day_raw,
+     &      ainc_raw, raan_raw, ecc_raw, aop_raw, ama_raw,
+     &      amm_raw, bstar_raw, ntle_raw, maxtle,
+     &      a_kep_osc1, osc_ok)
+         if (osc_ok) then
+            smaz(1)  = a_kep_osc1(1)
+            ez(1)    = a_kep_osc1(2)
+            incz(1)  = a_kep_osc1(3)
+            raanz(1) = a_kep_osc1(4)
+            aopz(1)  = a_kep_osc1(5)
+            maz(1)   = a_kep_osc1(6)
+         end if
 
          e_mid = ez(1)
          de = 0.d0
@@ -479,31 +595,18 @@ c        Re-entry propagation with optimal (e, BN)
             end if
          end if
 
-c        Narrow BN bounds for next zone -- unless this zone's GA
-c        optimum saturated the BN search bound (issue #12), in which
-c        case widen instead: the true BN likely lies outside what was
-c        just searched, and narrowing further would only entrench it.
-c        v1.21 trust gate: only chain from a zone whose fit carries
-c        real drag signal -- with drag on, that means it actually
-c        predicted a re-entry (a no-re-entry fit's BN is weak-signal
-c        noise: 37151's 8-zone chain re-centered through seven such
-c        zones, marching the range from [12.5,160] to [17.2,24.9] and
-c        imprisoning the one zone with signal, Z8: latest-zone RPE
-c        -38% vs -14% at the 4-zone cap). With drag off there is no
-c        prediction to gate on, so chain from unflagged zones only.
-c        Untrusted zones leave the range unchanged for the next zone.
-         if ((idrag_flag .eq. 1 .and. reentry_jd(iz) .gt. 0.d0)
-     &       .or.
-     &       (idrag_flag .eq. 0 .and. zone_status(iz) .eq. 0)) then
-            if (bn_at_bound) then
-               bn_range = (bn_hi - bn_lo) * 1.5d0
-            else
-               bn_range = (bn_hi - bn_lo) * 0.5d0
-            end if
-            bn_lo = bn_opt_out(iz) - bn_range / 2.d0
-            bn_hi = bn_opt_out(iz) + bn_range / 2.d0
-            if (bn_lo .lt. 10.d0) bn_lo = 10.d0
-         end if
+c        BN search range: deliberately left untouched here (no per-
+c        zone narrowing/widening) -- every zone always searches the
+c        full original [bn_min_init, bn_max_init] range from
+c        bn_lo/bn_hi's one-time setup before this loop (plus the G2
+c        floor adjustment, also one-time). Confirmed with user: BN
+c        may genuinely drift zone to zone, so the search itself
+c        should stay wide/agnostic rather than re-centering on any
+c        single zone's own fit. This replaces the old per-zone
+c        narrow/widen-on-boundary logic that used to live here (see
+c        git history) -- e_at_bound/bn_at_bound above still flag
+c        boundary-saturated fits, that diagnostic is unchanged, only
+c        the range-resizing action on it was removed.
 
  50      continue
       end do
@@ -628,6 +731,59 @@ c     ============================================================
      &           epoch_day_raw(i), djd_tmp)
             if (dabs(djd_tmp - epoch_jd) .lt. 0.01d0) then
                ma_out = ama_raw(i)
+               return
+            end if
+         end if
+      end do
+
+      return
+      end
+
+c     ============================================================
+      subroutine tle_find_osc(norad_id, epoch_jd,
+     &   norad_raw, epoch_yr_raw, epoch_day_raw,
+     &   ainc_raw, raan_raw, ecc_raw, aop_raw, ama_raw,
+     &   amm_raw, bstar_raw, ntle_raw, maxtle,
+     &   a_kep_osc, ok)
+c
+c     Issue #31: find the raw TLE matching epoch_jd (same epoch-match
+c     tolerance as tle_find_ma) and convert its mean elements to a
+c     true osculating 6-element set via SGP4 (tle2sv) + car2oe, for
+c     seeding a propagation initial condition that isn't itself
+c     mean-element-biased.
+c
+c     Output
+c       a_kep_osc(7) : [a,e,i,RAAN,AOP,MA,EA] -- a in km, angles deg
+c       ok           : .true. if a match was found and SGP4 succeeded
+c     ============================================================
+      implicit double precision (a-h, o-z)
+      integer norad_id, ntle_raw, maxtle
+      integer norad_raw(maxtle), epoch_yr_raw(maxtle)
+      double precision epoch_day_raw(maxtle)
+      double precision ainc_raw(maxtle), raan_raw(maxtle)
+      double precision ecc_raw(maxtle), aop_raw(maxtle)
+      double precision ama_raw(maxtle), amm_raw(maxtle)
+      double precision bstar_raw(maxtle)
+      double precision epoch_jd, a_kep_osc(7)
+      logical ok
+
+      double precision r_osc(3), v_osc(3)
+      integer ierr_sv, i
+
+      ok = .false.
+      do i = 1, ntle_raw
+         if (norad_raw(i) .eq. norad_id) then
+            call tle_epoch2jd(epoch_yr_raw(i),
+     &           epoch_day_raw(i), djd_tmp)
+            if (dabs(djd_tmp - epoch_jd) .lt. 0.01d0) then
+               call tle2sv(epoch_yr_raw(i), epoch_day_raw(i),
+     &            ainc_raw(i), raan_raw(i), ecc_raw(i),
+     &            aop_raw(i), ama_raw(i), amm_raw(i),
+     &            bstar_raw(i), r_osc, v_osc, ierr_sv)
+               if (ierr_sv .eq. 0) then
+                  call car2oe(r_osc, v_osc, a_kep_osc)
+                  ok = .true.
+               end if
                return
             end if
          end if

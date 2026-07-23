@@ -1,6 +1,6 @@
 # OREM — Application & Physical Architecture
 
-*(current as of v1.21, 2026-07-14; the Version History in README.md is the authoritative changelog)*
+*(current as of v1.26, 2026-07-19; the Version History in README.md is the authoritative changelog)*
 
 ## 1. System Overview
 
@@ -15,9 +15,11 @@ RSO in HEO (GTO, Molniya, SSTO) experience complex orbital evolution under luni-
 
 OREM treats re-entry prediction as an optimization problem: per decay zone, find the (eccentricity, ballistic number) pair that best fits the observed TLE apogee evolution, then propagate each zone's fit forward to re-entry. The **latest zone's prediction is the primary estimate** — it carries the shortest extrapolation and the freshest attitude/altitude regime.
 
-### Achieved Accuracy (v1.21)
+### Achieved Accuracy (v1.21) and the v1.22–v1.23 Frontier
 
 Latest-zone RPE **median 2.4%, mean 4.1%, worst object 10.4%** across the 7-object validation campaign (full force model, 8 zones, `scratch_rpe/rpe_campaign_8zone_gated.csv`). This required, in sequence: a working GA (population 20, v1.15), a correct atmosphere table (Jacchia-71, v1.17), a correct drag phase (v1.18), the latest-zone estimator (v1.20), and a trust-gated BN-range carryover (v1.21).
+
+That 7-object set is drag-dominated and moderate-inclination. Testing a new object outside that regime (33587, i=65° critical inclination, hp descending 616→341 km over 131 days, v1.22) exposed the next accuracy frontier: **epoch-resolved space weather (v1.23, §4.1)** replaced the static-atmosphere assumption, but a decisive GMAT cross-check (2026-07-17, issue #27) showed the object's *observed* TLE mean elements lose ~1900 km of semi-major axis with simultaneous circularization over the same window — the signature of substantial drag, not a missing lunisolar term — while both OREM and an independent GMAT full-force propagation predict almost none at the object's currently-assumed BN=55 kg/m². A follow-up refit (v1.24, 2026-07-18) directly fit `(e, BN)` against the real TLE observations across that same window with a wide `[1,150]` search and found no physically plausible BN reproduces the observed collapse either (RMS ≈ 468 km, 10–100× worse than the validation set's good fits) — **both third-body truncation and simple BN misidentification are now ruled out** for this object/window (§7), leaving the actual mechanism an open question (possibly a TLE-quality/fitting-artifact issue rather than a physics gap — see #27). The 7-object validation numbers above are unaffected either way.
 
 ---
 
@@ -158,12 +160,43 @@ c  exit_code: 0=normal, 1=reentry (alt<80 km), 2=divergence (NaN)
 |---|---|---|
 | Earth gravity | EGM2008 zonal harmonics, configurable degree | `geo_coeff` reads J2..Jn from `EGM2008_to2190_TideFree` |
 | Luni-solar | Third-body Legendre expansion (degree 2–3) | M&G analytic ephemerides (KSROP sync v1.8) |
-| Atmospheric drag | Per-revolution King-Hele: ρ_p at the oblate perigee altitude from ATM.DAT, exp(−βae(1−cosE)) along the rev, co-rotation factor F | Density phase keyed to the **true eccentric anomaly of the state** (v1.18 — the analytic sweep it replaced dephased along decay arcs) |
-| Atmosphere table | **Jacchia-71** static profile (Roberts-1971 anchors), F10.7=72, Kp=1.0, nighttime-min T∞=626.3 K | `KSROP/gen_atm_jr71.F`; validated 0.80–0.95× GMAT JacchiaRoberts over 102–300 km (v1.17). SCH column = local −dz/dlnρ |
+| Atmospheric drag | Per-revolution King-Hele: ρ_p at the oblate perigee altitude, exp(−βae(1−cosE)) along the rev, co-rotation factor F | Density phase keyed to the **true eccentric anomaly of the state** (v1.18 — the analytic sweep it replaced dephased along decay arcs) |
+| Atmosphere reference | **Static**: Jacchia-71 profile (Roberts-1971 anchors) from `input/ATM.DAT`, F10.7=72, Kp=1.0, nighttime-min T∞=626.3 K. **Epoch-resolved** (opt-in, v1.23): 2-D ρ(h,T∞)/H(h,T∞) table from `input/ATM2D.DAT`, looked up at the exospheric temperature implied by real F10.7/Kp history for the revolution's own epoch | `KSROP/gen_atm_jr71.F` (static, validated 0.80–0.95× GMAT JacchiaRoberts over 102–300 km, v1.17) / `KSROP/gen_atm2d_jr71.F` + `swx.F` (epoch-resolved, §4.1). SCH column = local −dz/dlnρ in both |
 | Solar radiation pressure | Cannonball + cylindrical/conical shadow | |
 | TLE conversion | SGP4/SDP4 → J2000 | `TLEread.F` |
 
-Validation lineage: two-body/zonal/third-body/SRP validated against GMAT R2026a in the KSROP campaign; OREM-side drag magnitude validated to ~1% against an exact RK4 integration of the same drag model (`scratch_gmat/drag_ref.py`); the re-entry arc cross-checked against GMAT JacchiaRoberts (`scratch_gmat/gmat_reentry_42928z0.script`).
+Validation lineage: two-body/zonal/third-body/SRP validated against GMAT R2026a in the KSROP campaign; OREM-side drag magnitude validated to ~1% against an exact RK4 integration of the same drag model (`scratch_gmat/drag_ref.py`); the re-entry arc cross-checked against GMAT JacchiaRoberts (`scratch_gmat/gmat_reentry_42928z0.script`); the epoch-resolved weather mechanism hand-verified against a G5-storm exospheric temperature and a storm-vs-quiet decay smoke test (`test_sw.F`); the 33587 in-record dynamics cross-checked against an independent GMAT full-force + gravity-only propagation (`scratch_gmat/gmat_hp_33587_issue27_{full,grav}.script`, issue #27).
+
+### 4.1 Epoch-Resolved Space Weather (v1.23, issue #26)
+
+```
+input/SW-All.csv (CelesTrak, 1957→present, ~3×/day updates,        ┐
+  observed F10.7/Kp daily + PRM/PRD predicted rows to ~2041)         │  sw_load()
+input/ATM2D.DAT (KSROP gen_atm2d_jr71.F: ρ(h,T∞)/H(h,T∞) over        │  atm2d_load()
+  h=90–1500 km × T∞=550–1500 K grid, 291×39, shares jr71_profile.F   │  (swx.F)
+  with the static generator — bit-identical 1-D profile after split) ┘
+                    │                              │
+                    ▼                              ▼
+         common /swdat/                   common /atm2dc/
+    (JD, F10.7_ADJ, F10.7_ADJ_81, Kp)      (ρ, H tables, legacy-scaled
+    binary-searched by JD; predicted        internal units — drag math
+    rows are monthly, Kp defaults to 2.0    downstream is untouched)
+    when absent)
+                    │                              │
+                    └──────────────┬───────────────┘
+                                   ▼
+              propagate_ks (ksrop/propagate_ks.F, per-rev hook, ~line 288):
+                sw_tinf(JD) → T∞ for this revolution's epoch
+                atm2d_interp(h_perigee, T∞) → ρ_p, H   [istat=0]
+                falls back to the legacy static ALT/DEN/SCH table
+                lookup whenever nothing is loaded, T∞≤0, or the point
+                falls outside the 2-D table [istat≠0] — computed ONCE
+                per revolution, same slot the static path always filled
+```
+
+**Opt-in, zero-cost when unused**: `sw_tinf`/`atm2d_interp` live inside `propagate_ks.F` itself (not `swx.F`) so that executables which never call `sw_load`/`atm2d_load` link without `swx.F` and run the legacy single-table path bit-unchanged — every pre-v1.23 build, result, and test is unaffected. `main_orem.F` auto-detects both files at startup and prints ENABLED/DISABLED loudly; only opt-in executables (`orem.exe`, `test_sw.exe`) link `swx.F`.
+
+**Status**: mechanism-validated (`test_sw.F`, 12 checks — G5-storm T∞=1216.56 K hand-verified against the Jacchia formula; W12 smoke test shows storm-epoch decay 55.4 km vs quiet-epoch 31.1 km over 7 days, correct direction and rough magnitude). Not yet regression-tested across the 7-object validation campaign (issue #26 stays open pending that run — expected neutral-to-better since those objects' fit windows sit in solar-quiet periods close to the static table's own F10.7=72 assumption).
 
 ---
 
@@ -232,7 +265,17 @@ Zone k : IF zone k−1 is TRUSTED (drag on: it predicted a re-entry;
 
 ## 7. Development Status
 
-Core algorithm **complete** (all closed): #1–#8 pipeline, #12 diagnostics/identifiability, #13 report, #16 E2E + accuracy target, #25 drag audit, KSROP #24. Open: #9 (inclination as third variable), #10 (TLE quality filtering), #11 (GMAT re-check when lunisolar enabled), #14 (dynamic solar activity), #22 (CI), and the P4 operational backlog (#15, #17–#21, #23–#24). 342 tests across 9 suites.
+Core algorithm **complete** (all closed): #1–#8 pipeline, #12 diagnostics/identifiability, #13 report, #16 E2E + accuracy target, #25 drag audit, KSROP #24. Open, priority order: **#27** (P1/critical — see below), **#26** (P1 — space weather implemented, §4.1, open pending 7-object regression), #14 (P2 — dynamic solar activity, largely superseded by #26's mechanism), #10/#11/#22 (P3 — TLE quality filtering, GMAT re-check pending lunisolar, CI), #9 (P4 — inclination as third variable), and the P4 operational backlog (#15, #17–#21, #23–#24). **354 tests across 10 suites** (added `test_sw.F`, 12 checks, v1.23).
+
+### Open problem: critical-inclination decay (#27) — BN identifiability, not gravity fidelity
+
+33587 (i=65°, hp 616→341 km over 131 days in-record) motivated #26, but a decisive GMAT cross-check (2026-07-17) found:
+
+- **GMAT's full-force run** (exact point-mass Sun/Moon — not degree-truncated like OREM's qsun/qmoon — EGM2008 J2–J20, real 2022 CSSI flux, SRP) reproduces OREM's own flat hp(t) (616→~620 km), **not** the observed descent. A gravity-only companion run (drag/SRP off) gives nearly the same curve — third-body/oblateness truncation is not the gap.
+- **Independently re-deriving hp(t) from the raw TLE mean elements** (bypassing OREM/GMAT entirely) shows semi-major axis collapsing 11128→9211 km with simultaneous circularization (e: 0.37→0.27) over the same window — the signature of atmospheric drag removing orbital energy, not a conservative lunisolar term (which cannot secularly change SMA).
+- This contradicts the issue's original premise that drag is negligible there (that check only compared weather-on vs weather-off at a fixed, likely-wrong BN=55 kg/m² — a value inherited from an earlier weak-signal zone fit, not a validated physical estimate for this object).
+
+**Working hypothesis**: the true ballistic coefficient during this arc is far lower (draggier) than 55 kg/m², and re-fitting BN against the in-record TLE window — rather than any gravity-model change — is the next step (not yet run; flagged in the issue, `#27` comment 2026-07-17). See `scratch_gmat/gmat_hp_33587_issue27_{full,grav}.script`.
 
 ---
 
@@ -261,7 +304,7 @@ The `ksrop/` directory contains files copied from the KSROP repo. When KSROP is 
 
 1. Copy updated files: `cp $KSROP/{Subrouts.F,Legendre.F,TLEread.F} ksrop/`
 2. If `driver_KS.F` changes, re-apply the refactoring to `propagate_ks.F` (the two carry the same physics; fixes flow in both directions — e.g. the v1.18 drag-phase fix was ported back as KSROP #24)
-3. `input/ATM.DAT` is generated by `KSROP/gen_atm_jr71.F` — regenerate there and copy
-4. Run the full OREM suite to verify
+3. `input/ATM.DAT` (static) is generated by `KSROP/gen_atm_jr71.F`; `input/ATM2D.DAT` (epoch-resolved, v1.23) by `KSROP/gen_atm2d_jr71.F` — both share the 1-D profile code in `KSROP/jr71_profile.F`, so the two stay physically consistent by construction. Regenerate in KSROP and copy.
+4. Run the full OREM suite to verify (10 executables — see README §4/§6 for the `test_sw.exe` build line, added v1.23)
 
 The common block `/xy/` (pi, d2r, r2d, amue, AU, R_Earth) is the interface contract between KSROP files and OREM modules. `init_constants()` must be called before any KSROP subroutine.

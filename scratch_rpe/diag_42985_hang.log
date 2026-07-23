@@ -1,0 +1,13 @@
+ npts=         328  ierr_tle=           0
+ nzones=           8
+  zone  1 start=  103 end=  115 npts= 13
+  zone  2 start=  129 end=  141 npts= 13
+  zone  3 start=  142 end=  157 npts= 16
+  zone  4 start=  158 end=  170 npts= 13
+  zone  5 start=  207 end=  216 npts= 10
+  zone  6 start=  246 end=  257 npts= 12
+  zone  7 start=  290 end=  301 npts= 12
+  zone  8 start=  302 end=  328 npts= 27
+ Inspecting zone            8
+ calling rsm_generate, nzone=          27  e_mid=  0.572372200000000       de=
+  0.413505000000000     

@@ -50,7 +50,8 @@ c     ============================================================
 
       character*10 zslab(0:4)
       character*20 datestr
-      double precision cal(6), t_obs_jd, horiz, rpe_ens, rel_spread
+      double precision cal(6), calz(6), t_obs_jd, horiz, rpe_ens
+      double precision rel_spread
       integer iz, nre, izl, ivals(8)
 
       zslab(0) = 'ok        '
@@ -89,20 +90,26 @@ c     ============================================================
       end if
 
       write(44,'(A)') ''
-      write(44,'(A)') 'Zone  Epoch (JD)      e_opt     BN(kg/m2)'//
-     &   '  Re-entry (JD)   Re-entry (UTC)   RPE(%)    status'
+      write(44,'(A)') 'Zone  Epoch (JD)   Epoch (UTC)     e_opt   '//
+     &   'BN(kg/m2)  Re-entry (JD)   Re-entry (UTC)   RPE(%)'//
+     &   '    status'
       do iz = 1, nzones_used
+         call jd2cal(zone_epoch(iz), calz)
          if (reentry_jd(iz) .gt. 0.d0) then
             call jd2cal(reentry_jd(iz), cal)
-            write(44,'(I4,F15.4,F10.5,F10.2,F15.4,I7,I3,I3,F11.2,
-     &         3X,A)')
-     &         iz, zone_epoch(iz), e_opt(iz), bn_opt(iz),
+            write(44,'(I4,F15.4,I7,I3,I3,F10.5,F10.2,F15.4,I7,I3,I3,
+     &         F11.2,3X,A)')
+     &         iz, zone_epoch(iz),
+     &         int(calz(1)), int(calz(2)), int(calz(3)),
+     &         e_opt(iz), bn_opt(iz),
      &         reentry_jd(iz),
      &         int(cal(1)), int(cal(2)), int(cal(3)),
      &         rpe(iz), zslab(zone_status(iz))
          else
-            write(44,'(I4,F15.4,F10.5,F10.2,A,3X,A)')
-     &         iz, zone_epoch(iz), e_opt(iz), bn_opt(iz),
+            write(44,'(I4,F15.4,I7,I3,I3,F10.5,F10.2,A,3X,A)')
+     &         iz, zone_epoch(iz),
+     &         int(calz(1)), int(calz(2)), int(calz(3)),
+     &         e_opt(iz), bn_opt(iz),
      &         '      no re-entry within cap        --',
      &         zslab(zone_status(iz))
          end if

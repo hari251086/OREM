@@ -107,7 +107,7 @@ call propagate_ks(
 
 ## 4. Building
 
-Requires **Intel oneAPI Fortran** (`ifx`) or **GNU Fortran** (`gfortran`).
+Requires **Intel oneAPI Fortran** (`ifx`), on Windows or Linux — the only toolchain this project is actually validated against. `ksrop/propagate_ks.F` currently does **not** compile under `gfortran` (implicit-real array dimensions, a function/array name collision on `R`, non-standard function-result assignment syntax that gfortran 13 rejects outright — see issue #28) despite `gfortran` commands appearing in earlier revisions of this doc; those were never actually verified. CI (`.github/workflows/ci.yml`, issue #22) installs `ifx` on the Linux runner rather than `gfortran` for this reason.
 
 ### Windows (Intel oneAPI ifx 2025.0)
 
@@ -122,22 +122,28 @@ ifx /heap-arrays /F:16777216 test_tle_evolution.F tle_evolution.F ksrop/TLEread.
 ifx /heap-arrays /F:16777216 test_zone_select.F zone_select.F tle_evolution.F ksrop/TLEread.F ksrop/Subrouts.F ksrop/Legendre.F /exe:test_zone_select.exe
 ifx /heap-arrays /F:16777216 test_ga.F ga.F rsm.F tle_evolution.F zone_select.F ksrop/propagate_ks.F ksrop/Subrouts.F ksrop/Legendre.F ksrop/TLEread.F /exe:test_ga.exe
 ifx /heap-arrays /F:16777216 test_rsm.F rsm.F tle_evolution.F zone_select.F ksrop/propagate_ks.F ksrop/Subrouts.F ksrop/Legendre.F ksrop/TLEread.F ga.F /exe:test_rsm.exe
-ifx /heap-arrays /F:16777216 test_orem.F orem.F report.F rsm.F ga.F tle_evolution.F zone_select.F ksrop/propagate_ks.F ksrop/Subrouts.F ksrop/Legendre.F ksrop/TLEread.F /exe:test_orem.exe
-ifx /heap-arrays /F:16777216 test_reentry.F orem.F rsm.F ga.F tle_evolution.F zone_select.F ksrop/propagate_ks.F ksrop/Subrouts.F ksrop/Legendre.F ksrop/TLEread.F /exe:test_reentry.exe
-ifx /heap-arrays /F:16777216 test_e2e.F orem.F rsm.F ga.F tle_evolution.F zone_select.F ksrop/propagate_ks.F ksrop/Subrouts.F ksrop/Legendre.F ksrop/TLEread.F /exe:test_e2e.exe
+ifx /heap-arrays /F:16777216 test_orem.F orem.F report.F rsm.F ga.F tle_evolution.F tle_filter.F zone_select.F ksrop/propagate_ks.F ksrop/Subrouts.F ksrop/Legendre.F ksrop/TLEread.F /exe:test_orem.exe
+ifx /heap-arrays /F:16777216 test_reentry.F orem.F rsm.F ga.F tle_evolution.F tle_filter.F zone_select.F ksrop/propagate_ks.F ksrop/Subrouts.F ksrop/Legendre.F ksrop/TLEread.F /exe:test_reentry.exe
+ifx /heap-arrays /F:16777216 test_e2e.F orem.F rsm.F ga.F tle_evolution.F tle_filter.F zone_select.F ksrop/propagate_ks.F ksrop/Subrouts.F ksrop/Legendre.F ksrop/TLEread.F /exe:test_e2e.exe
 ifx /heap-arrays /F:16777216 test_gmat.F rsm.F tle_evolution.F zone_select.F ksrop/propagate_ks.F ksrop/Subrouts.F ksrop/Legendre.F ksrop/TLEread.F ga.F /exe:test_gmat.exe
 
-REM Standalone runner
-ifx /heap-arrays /F:16777216 main_orem.F orem.F report.F rsm.F ga.F tle_evolution.F zone_select.F ksrop/propagate_ks.F ksrop/Subrouts.F ksrop/TLEread.F ksrop/Legendre.F /exe:orem.exe
+ifx /heap-arrays /F:16777216 test_sw.F swx.F orem.F report.F rsm.F ga.F tle_evolution.F tle_filter.F zone_select.F ksrop/propagate_ks.F ksrop/Subrouts.F ksrop/TLEread.F ksrop/Legendre.F /exe:test_sw.exe
+ifx /heap-arrays /F:16777216 test_tle_filter.F tle_filter.F zone_select.F tle_evolution.F ksrop/TLEread.F ksrop/Subrouts.F ksrop/Legendre.F /exe:test_tle_filter.exe
+
+REM Standalone runner -- swx.F required since v1.23 (main_orem.F calls sw_load/atm2d_load)
+ifx /heap-arrays /F:16777216 main_orem.F orem.F report.F swx.F rsm.F ga.F tle_evolution.F tle_filter.F zone_select.F ksrop/propagate_ks.F ksrop/Subrouts.F ksrop/TLEread.F ksrop/Legendre.F /exe:orem.exe
 ```
 
-### Unix / gfortran
+### Linux (Intel oneAPI ifx)
 
-Same source lists as above with `gfortran ... -o <name>.exe` (no `/heap-arrays` equivalent needed if the default stack suffices; otherwise `ulimit -s unlimited`). Example for the runner:
+Same source lists as above, `-heap-arrays` in place of `/heap-arrays`, `ulimit -s unlimited` in place of `/F:16777216` (Linux stack size is a shell/OS setting, not a linker flag), `-o <name>.exe` in place of `/exe:<name>.exe`. Example for the runner:
 
 ```bash
-gfortran main_orem.F orem.F report.F rsm.F ga.F tle_evolution.F zone_select.F ksrop/propagate_ks.F ksrop/Subrouts.F ksrop/TLEread.F ksrop/Legendre.F -o orem.exe
+ulimit -s unlimited
+ifx -heap-arrays main_orem.F orem.F report.F swx.F rsm.F ga.F tle_evolution.F tle_filter.F zone_select.F ksrop/propagate_ks.F ksrop/Subrouts.F ksrop/TLEread.F ksrop/Legendre.F -o orem.exe
 ```
+
+See `test_all.sh` for the full build+test command list (used by CI).
 
 ---
 
@@ -150,12 +156,13 @@ REM Windows — Intel oneAPI
 call "C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Auxiliary\Build\vcvars64.bat"
 call "C:\Program Files (x86)\Intel\Fortran\compiler\2025.0\env\vars.bat"
 
-ifx /heap-arrays /F:16777216 main_orem.F orem.F report.F rsm.F ga.F tle_evolution.F zone_select.F ksrop/propagate_ks.F ksrop/Subrouts.F ksrop/TLEread.F ksrop/Legendre.F /exe:orem.exe
+ifx /heap-arrays /F:16777216 main_orem.F orem.F report.F swx.F rsm.F ga.F tle_evolution.F tle_filter.F zone_select.F ksrop/propagate_ks.F ksrop/Subrouts.F ksrop/TLEread.F ksrop/Legendre.F /exe:orem.exe
 ```
 
 ```bash
-# Unix — gfortran
-gfortran main_orem.F orem.F report.F rsm.F ga.F tle_evolution.F zone_select.F ksrop/propagate_ks.F ksrop/Subrouts.F ksrop/TLEread.F ksrop/Legendre.F -o orem.exe
+# Linux — Intel oneAPI ifx (not gfortran -- see SS4)
+ulimit -s unlimited
+ifx -heap-arrays main_orem.F orem.F report.F swx.F rsm.F ga.F tle_evolution.F tle_filter.F zone_select.F ksrop/propagate_ks.F ksrop/Subrouts.F ksrop/TLEread.F ksrop/Legendre.F -o orem.exe
 ```
 
 ### Step 2: Create a config file
@@ -235,9 +242,11 @@ To run on a different object: copy the config, change lines 1-3 (TLE file, NORAD
 ./test_reentry.exe             # 7-object re-entry validation (35 checks)
 ./test_e2e.exe                 # End-to-end integration test, IDRAG=1 (20 checks)
 ./test_gmat.exe                # GMAT cross-validation + exact-model drag reference (14 checks)
+./test_sw.exe                  # Space weather + 2-D atmosphere tests (12 checks)
+./test_tle_filter.exe           # TLE quality filtering: outliers, maneuvers, gaps (14 checks)
 ```
 
-**342 checks total**, all passing as of v1.21.
+**368 checks total**, all passing as of v1.24.
 
 ### test_propagate_ks
 Two-body energy conservation, orbit closure, multi-revolution propagation, re-entry detection, input preservation.
@@ -271,7 +280,7 @@ Two-body energy conservation, orbit closure, multi-revolution propagation, re-en
 - Degenerate: identical epochs, 2 points, very steep decay
 - Repeatability, robustness (nzones_max=0, large nzones_max)
 
-### test_ga (71 tests)
+### test_ga (74 tests)
 - TWOINT bilinear interpolation: constant, linear, corners, center, edges, quadratic, boundary
 - Chromosome decode: all-zeros, all-ones, single-bit, asymmetric bits (60+20), non-zero lower bound
 - RNG: range [0,1), different seeds, reproducibility
@@ -305,7 +314,7 @@ Full pipeline with IDRAG=1, **full force model** (geo=20, sun=2, moon=3, SRP on:
 - E6–E10: 42928 zone-0 (14 TLEs, e≈0.32, epoch 2017-09-22): bn_opt physical, re-entry detected
 - E11–E15: 39615 Proton-M Briz-M (re-entry 2017-09-15): pipeline, zones, e_opt, per-zone BN in [50,500]; E15 informational — the dedicated zone-1 file (e=0.68) is a weak-signal window whose honest fit can predict beyond the 5-year cap
 - E16–E20: 35497 Ariane 5 ESC-A (re-entry 2016-10-31): pipeline, zones, e_opt, per-zone BN; E20 informational (same rationale)
-- BN range carryover between zones is trust-gated (v1.21): only zones that actually predicted a re-entry re-center the search range
+- BN search range is fixed at `[bn_min_init, bn_max_init]` for every zone (no per-zone narrowing/widening) — a v1.21 trust-gated narrow/widen scheme was tried and, separately, a zone-to-zone propagated-trajectory IC-seeding scheme was also tried; both were measured against the 7- and 30-object campaigns and the propagated-IC version measurably worsened mean \|RPE\| (22.9%→27.4% on 7 objects, 22.0%→32.9% on 30, two objects blowing up over 100 points) by letting one zone's own fit uncertainty compound into the next zone's starting geometry. Reverted to always-wide search + independent per-zone SGP4-osculating seeding (`tle_find_osc`, unchanged since #31) for every zone — see issue tracking for the full investigation
 - RPE printed as diagnostic; the enforced accuracy evidence lives in the 7-object campaigns (`scratch_rpe/`): latest-zone RPE median 2.4% / mean 4.1% / max 10.4% at 8 zones
 
 ### test_gmat (14 tests) — Issue #11
@@ -572,6 +581,51 @@ cp ../KSROP/Legendre.F ksrop/
 - Fix in `orem.F`: the carryover now chains **only from zones whose fit carries real signal** — with drag on, a zone that actually predicted a re-entry; with drag off, an unflagged (`zone_status=0`) zone. Untrusted zones leave the range unchanged. Objects whose zones all predict (42928, 35497, 37819) chain exactly as before — bit-identical e2e results
 - Gated 8-zone campaign (`rpe_campaign_8zone_gated.csv`; 4-zone and ungated-8-zone runs preserved alongside): 42928 0.0%, 35497 0.6%, 39615 2.0%, 32007 2.4%, 37819 −5.3%, 37151 **−8.1%** (recovered), 27526 10.4% — **all seven at or under ~10%**
 - Shipped configs raised to `nzones_max=8`. 342/342 tests pass (test suites unchanged — they run 4-zone IDRAG=0 paths whose chains are gated on `zone_status` and unaffected in practice)
+
+**1.22 — 2026-07-17**
+- **New-object case study: 33587 (1989-039EF, i=65.2° Molniya-class fragment; analysis only, no pipeline code changed).** 306 TLEs spanning 2009 → 2022-12-03, observed decay 2025-04-22 — the prediction must extrapolate 2.4 years past the last TLE, across the 2023–2025 solar maximum. Artifacts: `input/example_33587.tle.txt`, `input/orem_33587.cfg`, `scratch_rpe/*33587*`
+- Pipeline result (honest): five zones found (Jul–Oct 2022), **no zone predicts re-entry within the 5-year cap** — under both the shipped F10.7=72 table and a regenerated F10.7=150 variant (`scratch_rpe/ATM_F150.DAT`, T∞=879 K)
+- Diagnosis, part 1 — **no drag signal in any fit window**: zone perigees sit at 440–640 km, where a ≤10-day window carries essentially no BN information (fits are table-invariant GA noise; only Z5, hp≈444 km, responded to the 1.5× table change). This object's decay was driven by **lunisolar perigee cycling** (hp 616→341 km in the last five TLE months — far too fast for drag), which hands the orbit to the atmosphere only after the TLE record ends
+- Diagnosis, part 2 — **static-atmosphere lifetime error across a solar maximum**: direct long propagation from the last TLE state (`scratch_rpe/prop_33587.F`, 60k-rev cap, full force, F150 table) does re-enter — the modeled lunisolar cycling works — but 4.6–5.7× too slowly: 4044–4929 days vs the observed 870 (RPE +365% to +467% across BN 40–120). The 2023–2025 arc averaged F10.7 ≈ 160–180 with major geomagnetic storms; a static quiet-condition table cannot represent it
+- Conclusion: 33587 is **out of scope for the static-atmosphere OREM** — it is the concrete motivating case for #14 (dynamic space-weather along the arc) and exercises the object class where zone selection needs a drag-signal criterion (hp-aware zone quality). The 7-object validation set's accuracy (median 2.4%) is unaffected: those objects' windows are drag-dominated and their arcs mostly avoid solar-max crossings
+
+**1.23 — 2026-07-17**
+- **Epoch-resolved space weather implemented (issue #26)**: `input/SW-All.csv` (CelesTrak daily history 1957→present + monthly predicts to 2041; refresh via curl) + `input/ATM2D.DAT` (new `KSROP/gen_atm2d_jr71.F`: the J71 profile over a 550–1500 K T∞ grid, 291×39; profile functions shared via new `KSROP/jr71_profile.F`, 1-D generator verified bit-identical after the split)
+- Runtime: `sw_tinf` (JD → T∞, binary-searched — predicted era is monthly) and `atm2d_interp` (bilinear ρ/H in legacy scaled units) live **inside `ksrop/propagate_ks.F`**, hooked into the per-revolution drag reference; loaders (`sw_load`/`atm2d_load`, new `swx.F`) are linked only by opt-in executables, so all legacy builds and results are bit-unchanged. `orem.exe` auto-detects both files and states ENABLED/DISABLED loudly
+- New `test_sw.F` (12 checks incl. the hand-verified 2024-05-11 G5-storm T∞=1216.56 K and the W12 smoke test: 55.4 vs 31.1 km 7-day decay at storm vs minimum epochs). **354 tests total**, 342 legacy checks unchanged
+- **33587 verdict overturned on attribution**: weather-enabled arcs are nearly identical to the F150-static arcs (T∞=879 K was already a fair proxy for the 2023–2025 average) — the 5× lifetime error is **not density**. The in-record diagnostic (`scratch_rpe/prop_33587_hp.F`) proves it: over the record's last 131 days the observed perigee descends 616→341 km (lunisolar cycle) while the modeled perigee stays flat (±20 km, wrong direction). Secular third-body eccentricity evolution is missing for this critical-inclination orbit — per-rev GMAT validations could never see it. Filed as **#27** (P1) with the ±30% acceptance transferred; GMAT hp(t) comparison specified as the decisive next experiment
+- Follow-up before #26 closes: 7-object weather-mode regression campaign
+
+**1.24 — 2026-07-18**
+- **Three array-bound bugs fixed**, exposed by validation objects with much longer TLE histories than the original 7-object set (11550: 46-year record, 10,143 deduped TLEs): `orem.F` `maxpts` 10000→15000 (silently truncated the TLE fill loop for long-history objects, no error); `zone_select.F` `max_cand` 100→2000 (Pass-1's candidate buffer silently *stopped recording* — not just deprioritizing — once 100 windows were found; for 11550 the entire 2010–2025 terminal-decay region, including the zone where mean perigee collapses to 96 km at the last TLE, was invisible to the algorithm); `main_orem.F` `mxz` 10→50 (workaround, not a structural fix — recency-biased zone selection is a real open design gap for long-history objects). `report.F` gained an Epoch (UTC) column. 354/354 tests pass.
+- **Three new real-decay validation cases** (11550/59347/40943, all real ground-truth decay dates except 11550's inferred one): 59347 and 40943 landed within 1–3 days of the true date (RPE 0.17%/0.23%); 11550 is the **first clear counterexample** to the latest-zone-as-primary heuristic (v1.20) — it underperformed the ensemble mean on both a full-history run and a genuine out-of-sample run withholding all of 2025.
+- **Issue #26 (7-object weather regression campaign) run — mixed result, kept open.** 4/7 objects improve under epoch-resolved weather (32007 17.3%→5.6%), 2/7 regress notably (42928 0.02%→−18.3%, 37151 10.0%→31.9%), aggregate mean/median |RPE| both tick up slightly. Not a clean "no regression" pass. Also surfaced: the *static* baseline itself no longer reproduces the 1.21-era published numbers (median 2.4%→10.0%) against the current tree — most visibly 37151, whose zone-8 selection changed once the `max_cand` fix stopped hiding candidate windows. That drift is real and unexplained; flagged, not resolved, here.
+- **Issue #27 BN-refit experiment run — deepens rather than resolves the question, kept open.** Fit `(e, BN)` directly against 33587's real TLE observations across the exact 131-day in-record window the GMAT decisive experiment used, wide BN search `[1,150]`. Result: `bn_opt=126` (unremarkable, not boundary-pinned) with RMS ≈ 468 km — 10–100× worse than the validation set's good fits — i.e. **no physically plausible BN explains the observed collapse via King-Hele drag either**, on top of the prior GMAT finding already ruling out third-body truncation. New lead: the record's last TLE has a mean-motion derivative ~143× the first TLE's — possibly a TLE-quality/fitting-artifact question (→ #10), not a physics gap at all.
+
+**1.25 — 2026-07-19**
+- **CI pipeline added (issue #22, closes it)**: `.github/workflows/ci.yml` + `test_all.sh` run all 11 suites on every push/PR to `main`/`HS-dev`. Installs Intel oneAPI `ifx` on the Linux runner rather than `gfortran` — the first real CI run found `ksrop/propagate_ks.F` doesn't compile under gfortran at all (implicit-real array dimensions, a function/array name collision on `R`; filed as **#28**, P4, since ifx is the only toolchain this project is actually validated against). A second real CI-only failure: `input/const_new.DAT` vs. the source's `'input/const_new.dat'` — silently fine on case-insensitive Windows, hard failure on case-sensitive Linux (the identical bug KSROP already hit and fixed in its own copy). `test_tle_evolution.F`'s T42-T50 (large-catalog checks) now skip gracefully via an `INQUIRE` guard when the 13 MB gitignored catalog file isn't present, rather than hard-failing on a fresh checkout.
+- **Issue #11 closed**: verified `test_gmat.exe` already runs with lunisolar enabled (`geo=4, sun=2, moon=2`) and all 14/14 checks pass, including the tight ±10% exact-model magnitude check (N13/N14) — the "pending lunisolar re-check" this issue was left open for is satisfied.
+- **TLE quality filtering implemented (issue #10)**: new `tle_filter.F` — trailing-window outlier rejection (apogee altitude vs local mean) and maneuver detection (eccentricity vs local linear trend, `linfit`), with gap-aware window clipping so points right after a real epoch gap aren't judged against stale pre-gap context. Real data tuning was the actual work: the issue's own suggested 3-sigma/5-10-point defaults flagged ~20% of well-tracked validation objects (42928, 35497) as false positives — real orbital eccentricity has more local curvature than a short strict linear fit tolerates. Tuned to `sigma_ha=4, sigma_e=6, nwin=20` → ~1.5% false-positive rate across 3 real objects. 14 new tests (`test_tle_filter.F`). **Not wired into `orem_run`'s default path** — that's a separate decision needing its own 7-object re-validation.
+- **Issue #14 reconciled, re-triaged P2→P3**: its 4 scope items are substantially covered by work done since it was filed (J71-vs-GMAT-JacchiaRoberts validation, v1.17; epoch-resolved weather, v1.23/#26; the 10-object RPE campaign) via a different path than originally specified (GMAT cross-check rather than NRLMSISE-00). The literal NRLMSISE-00 comparison and a dedicated density-sensitivity study remain undone but are no longer a P2 accuracy blocker.
+- **368/368 tests pass** (354 + 14 new `test_tle_filter.F` checks), verified both locally (`ifx` on Windows) and on CI (`ifx` on Linux).
+
+**1.26 — 2026-07-19**
+- **Issue #23 (Production Roadmap) closed, reconciled rather than executed.** A 2026-06-23 planning doc, substantially stale by the time it was revisited: 17/22 referenced issues were already done, but via a different architecture than planned (the ops layer became a separate repo, `OREM-Watchlist`, not embedded scripts) and with major unplanned accuracy work (#25/#26/#27) the original plan never anticipated. The project reached operational status — `OREM-Watchlist` produced a real `IMMINENT` prediction for a real TIP-listed satellite the same day. README's Version History (this document) is the authoritative record going forward, not a forward-looking roadmap.
+- **`tle_filter` wired into `orem_run`'s default pipeline (issue #10, closes it).** The deferred decision from #10's original implementation. Re-ran the 7-object campaign to check for regression: result is a genuine, substantial improvement, not just "no regression" — **mean latest-zone \|RPE\| across the 7-object set drops from 17.6% to 8.3%** (more than halved). 27526 goes from a barely-useful 59.4% to a good 3.5%; 4/7 objects improve, 2/7 unaffected, 1/7 (42928) regresses mildly on an already-near-perfect object (0.02%→9.15%). Every executable linking `orem.F` needed `tle_filter.F` added to its build command — CI caught the missing link immediately. `scratch_rpe/rpe_campaign_prefilter_backup.csv` preserves the before state.
+- **Cross-repo: `OREM-Watchlist` issue #9 fixed** using this repo's own tooling (`scratch_rpe/zone_windows_37398.F`) — a real TIP-listed candidate (37398) was getting `NO_PREDICTION` not because of a stale `nzones_max`, but because its TLE tracking cadence dropped from ~92/60days (2015-2016) to ~6/60days recently, so `zone_select`'s default `max_zone_days=10` couldn't form any qualifying window in the last 4 years at any R2 threshold — a real-world illustration of a design gap the 8-zone/10-day defaults have for sparsely-tracked objects outside this repo's densely-tracked 7-object validation set.
+- **Issue #14, remaining items dispositioned.** Perigee-altitude density-sensitivity study (`scratch_rpe/density_sensitivity_42928.F`): 42928's own real first-tracked state (2017-08-31, hp=166 km) at ATM.DAT scaled 0.5x/1.0x/2.0x shows real, monotonic sensitivity (~30-60 days shift in time-to-a-fixed-decay-state per density-doubling), though none of the three fully re-entered within the tested window. The literal NRLMSISE-00 comparison remains genuinely infeasible with available tooling (NASA CCMC's Instant Run tool needs interactive form submission, not a GET-able endpoint) — recommended formally accepting the existing GMAT JacchiaRoberts comparison (v1.17) as the practical substitute instead.
+
+**1.27 — 2026-07-22**
+- **RPE campaign extended 20→30 objects.** The original ROCKET-BODY-only satcat filter returned zero new candidates against the same catalog snapshot; broadened to also include DEBRIS (precedent: object 20, 48259) to find the next 10. Result deepens issue #29 rather than resolving it: only 6/10 new objects form any valid zone at all, and mean \|RPE\| across all 30 roughly doubles vs. the 20-object baseline (20.0%→43.0%).
+- **Issue #31 (GA/RSM mean-vs-osculating fitness mismatch) found, fixed, and empirically characterized.** `tle_evolution.F`'s `ha_out` fed `rsm.F`'s `apobs` straight from raw TLE mean elements, while `propagate_ks`'s `surfaces` are genuinely osculating — `ga.F` was RMS-comparing two different physical bases every zone, every object, since the pipeline's inception. Fixed via a new `tle_find_osc` helper (SGP4 `tle2sv` + `car2oe`) that converts each zone-point to a true osculating state, applied *after* `zone_select`'s own R² linearity check (which deliberately stays on the smooth mean-element series — using the noisier osculating series there dropped several already-marginal test zones below threshold). Also fixes `rsm_generate`'s propagation initial condition, previously seeded from a raw mean anomaly mixed with other mean elements.
+- **Investigated the fix's real-world impact before shipping it, not after.** A direct git-stash A/B on 37151 (all 8 zones, same window, only the fitness basis changed) shows per-zone fit RMS gets uniformly worse — 2× to 32× — not better. Root cause: TLE mean elements are themselves a least-squares smoothing of several days of tracking; converting each TLE *independently* to osculating recovers a correct-in-isolation short-period correction, but consecutive TLEs are independently-fit snapshots at essentially random, uncorrelated orbital phases. The resulting `apobs` series carries point-to-point noise with a different statistical character than `propagate_ks`'s own smoothly-evolving continuous trajectory — comparing them is *more* correct in kind but noisier in practice. 7-object mean \|RPE\| moves 8.3%→14.2%. Kept anyway, as a deliberate call: the fix corrects a real, previously-undocumented basis error that had been silently present in every fitted BN in this project's history, and 14.2% is treated as the honest current number rather than reverting to an implementation known to be comparing the wrong things. A noise-matched implementation (e.g. a short local propagation across the zone instead of independent per-TLE conversion) is the natural follow-up, not yet done.
+- **358/358 tests pass** (full suite re-verified clean after the fix, including previously-latent failures the fix exposed and fixed along the way: `orem_run`'s `ierr=2` early return wasn't initializing `nzones_valid`/`zone_status`, invisible until zone-selection behavior changed enough to actually hit that path in existing tests).
+- **30-object campaign regenerated against the fix (same day).** Result is genuinely mixed, not a uniform win or loss: full-30 mean \|RPE\| ticks slightly better (43.0%→39.4%), median ticks slightly worse; the curated original 7 gets worse (matches the direct 37151 finding above) while the less-tuned 20/30-object set is closer to neutral-to-improved (8 objects improved, 7 regressed, 4 flat). Object counts unchanged (19/30 predicting), confirming `zone_select` stability at scale. Pre-fix baseline preserved at `scratch_rpe/rpe_campaign_30obj_prefix31_backup.csv`.
+- **Issue #30 (`ga_optimize` hang/crash on a NaN/Inf-contaminated RSM surface) fixed and closed.** A degenerate trial propagation (e.g. from the same saturated terminal-TLE `ndot` pattern found on 33587/issue #27) can leave NaN/Inf in `rsm.F`'s `surfaces` array; `ga_fitness` propagated that into a NaN fitness, which corrupted `ga_preselect`'s stochastic-remainder selection two distinct ways — `int(NaN)` is undefined behavior (reproduced directly as an out-of-bounds array write), and even after flooring the population average away from literal NaN, an all-identical-fitness population still leaves every stochastic remainder exactly 0, spinning the mating-pool loop forever (reproduced directly as the originally-reported indefinite hang on object 42985, same zone, same symptom). Three layered fixes in `ga.F`: `ga_fitness` treats non-finite fit as the worst-possible chromosome instead of passing NaN downstream; `ga_stats` floors the population average away from exactly 0; `ga_preselect` gets a bounded attempt cap with a round-robin fallback, mirroring the same hard-cap pattern `Kesolve` already uses elsewhere in this codebase. 3 new regression tests (G72-G74). **371/371 tests pass.** Verified against a direct reproduction of the original 42985 hang.
+- Progress sentinel added to all three `scratch_rpe/*campaign*.F` multi-object loop scripts: `[PROGRESS] NN% (io of nobj objects done)` after each object, letting a log-tailing Monitor report percent-complete without polling.
+
+**1.28 — 2026-07-23**
+- **Zone-to-zone IC chaining + always-wide BN search tried, measured, one reverted.** Motivated by the global RPE investigation's (#32) literature finding that ballistic coefficient shouldn't be treated as independent-per-zone. Two changes to `orem_run`'s per-zone loop: (a) propagate a trusted zone's fitted (e, BN) forward via `propagate_ks` to the next zone's first TLE epoch and use that as the next zone's RSM initial-condition seed, replacing a fresh `tle_find_osc` lookup; (b) remove the v1.21 trust-gated BN-range narrow/widen-on-boundary logic, so every zone always searches the full original `[bn_min_init, bn_max_init]` range. **Both regressed RPE**: (a)+(b) combined moved mean \|RPE\| 22.9%→27.4% (7-object) and 22.0%→32.9% (30-object), with two objects (60328, 61734) blowing up over 100 points. Root cause: chaining lets one zone's own fit uncertainty compound into the next zone's starting geometry, instead of every zone independently re-anchoring to fresh SGP4 data. **(a) reverted**, back to unconditional `tle_find_osc` for every zone. **(b) shipped anyway** per explicit user direction to isolate and measure it standalone — still a regression on its own (22.9%→26.2% / 22.0%→23.2%, notably smaller than combined and without the catastrophic per-object blowups) but not yet root-caused as thoroughly as (a); not blocking. `zone_chain.F`/`test_zone_chain.F` (the chaining implementation, verified correct via a 9-test unit suite before the campaign regression was found) were deleted along with (a). Also found and documented (not fixed, out of scope): `propagate_ks`'s own `car2ks`/`ks2car` round-trip at initialization introduces a small, stable, one-time inclination/RAAN/AOP offset from the analytical input elements — harmless for this codebase's magnitude-based apogee fitting, previously undetected since nothing else ever checked orientation fidelity out of a `propagate_ks` call. Full writeup: issue #33. **354 tests passed during development (345 after `zone_chain.F`'s removal), zero regressions, zero new pipeline failures on either campaign.**
 
 ---
 

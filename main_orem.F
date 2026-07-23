@@ -8,7 +8,14 @@ c     ============================================================
       implicit double precision (a-h, o-z)
       common /xy/ pi, d2r, r2d, amue, AU, R_Earth
 
-      parameter(ndim_a = 291, mxz = 10)
+c     mxz raised 10->50: zone_select picks its top-mxz candidates by
+c     R2 (not recency), so a small mxz can let a long TLE history's
+c     numerous old high-R2 windows crowd out the physically critical
+c     late-life zones entirely (11550: 46-yr history, top-10 was
+c     9 zones from 2006-2009 + one from 2024, nothing closer to the
+c     2025-04 terminal decay even though qualifying windows exist up
+c     to 2025-03 -- see issue tracker for the 11550 case).
+      parameter(ndim_a = 291, mxz = 50)
 
 c     Config
       character*200 cfg_file, tle_file
@@ -40,6 +47,7 @@ c     Output
       double precision cal_out(6)
       integer iarg, ierr_rep, ivals(8)
       character*60 rep_file
+      integer ierr_sw, ierr_a2
 
 c     ============================================================
 c     Parse command line argument
@@ -131,6 +139,24 @@ c     ============================================================
       write(*,'(A,F6.1,A,F6.1,A)')
      &   '  BN:        [', bn_min, ', ', bn_max, ']'
       write(*,'(A,I1)') '  Drag:      ', idrag_flag
+      write(*,*) ''
+
+c     ============================================================
+c     Issue #26: epoch-resolved space weather (auto-detect).
+c     Both files present -> per-revolution Tinf(t) density; either
+c     missing -> legacy static ATM.DAT, stated loudly either way.
+c     ============================================================
+      call sw_load('input/SW-All.csv', ierr_sw)
+      call atm2d_load('input/ATM2D.DAT', ierr_a2)
+      if (ierr_sw .eq. 0 .and. ierr_a2 .eq. 0) then
+         write(*,'(A)') '  [SW] epoch-resolved density: ENABLED'//
+     &      ' (SW-All.csv + ATM2D.DAT)'
+      else
+         write(*,'(A,I2,A,I2,A)') '  [SW] epoch-resolved density:'//
+     &      ' DISABLED (sw_load ierr=', ierr_sw,
+     &      ', atm2d_load ierr=', ierr_a2,
+     &      ') -- using static ATM.DAT'
+      end if
       write(*,*) ''
 
 c     ============================================================

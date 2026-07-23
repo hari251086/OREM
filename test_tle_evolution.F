@@ -21,6 +21,7 @@ c     -------------------------------------------------------
       integer npts, ierr, npass, nfail
       double precision ls1, ls_min, ls_max
       integer npts1, iall_ok
+      logical multi_exists
 
       call init_constants()
 
@@ -452,10 +453,23 @@ c     T41: 42928 RAAN is decreasing (J2 regression for i<90)
       end if
 
 c     ==============================================================
-c     Large catalog test
+c     Large catalog test (T42-T50) -- input/example_multi.tle.txt is
+c     a real 94597-entry catalog (13 MB), deliberately gitignored
+c     (issue #22): skip gracefully rather than fail when it's absent,
+c     e.g. a fresh CI checkout. Full local coverage is unaffected --
+c     these 9 checks only run (and count toward pass/fail) when the
+c     file is actually present on disk.
 c     ==============================================================
       write(*,*) ''
       write(*,*) '  --- Large catalog ---'
+
+      inquire(file='input/example_multi.tle.txt', exist=multi_exists)
+      if (.not. multi_exists) then
+         write(*,*) '  [SKIP] T42-T50: input/example_multi.tle.txt'//
+     &      ' not present (gitignored, 13 MB -- run locally with'//
+     &      ' the full catalog for this coverage)'
+         goto 539
+      end if
 
 c     T42: Read multi-satellite catalog (94597 entries)
       call tle_evolve('input/example_multi.tle.txt',
@@ -537,6 +551,7 @@ c     T50: Vanguard-1 high eccentricity (e ≈ 0.184)
      &                 0, 1, npass, nfail)
       end if
 
+ 539  continue
 c     ==============================================================
 c     Repeatability
 c     ==============================================================

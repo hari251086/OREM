@@ -1284,6 +1284,124 @@ c     G70: ga_irnd produces varied output (not constant)
 c     G71: ga_fitness with perfect match â†’ fitness â‰ˆ 1
       call test_fitness_perfect(npass, nfail)
 
+c     Issue #30: NaN/Inf-contaminated RSM surface (from a degenerate
+c     trial propagation, e.g. a saturated terminal-TLE ndot) used to
+c     hang or crash ga_optimize -- ga_fitness's non-finite guard and
+c     ga_stats' avg floor should route around it cleanly instead.
+      call test_ga_nan_surface(npass, nfail)
+
+      return
+      end
+
+c     ============================================================
+      subroutine test_ga_nan_surface(npass, nfail)
+c     Issue #30 regression: a NaN/Inf-contaminated RSM surface must
+c     not hang or crash ga_optimize -- it should converge to a finite
+c     (if poor) answer, same as any other bad-but-valid fitness case.
+      implicit double precision (a-h, o-z)
+      integer npass, nfail
+
+      parameter(ne = 3, na = 3, npts = 5, nob = 5)
+      double precision surf(npts, ne, na)
+      double precision eg(ne), ag(na)
+      double precision tob(nob), apob(nob)
+      double precision xvec(2)
+      double precision nan_val
+
+      eg(1) = 0.30d0
+      eg(2) = 0.32d0
+      eg(3) = 0.34d0
+      ag(1) = 80.d0
+      ag(2) = 120.d0
+      ag(3) = 160.d0
+
+c     Construct a real NaN the portable way (0/0 at runtime -- a
+c     literal NaN constant is not standard Fortran 77/90)
+      zero_a = 0.d0
+      zero_b = 0.d0
+      nan_val = zero_a / zero_b
+
+      do i = 1, nob
+         tob(i) = dble(i-1) / dble(npts-1)
+         apob(i) = 10000.d0
+      end do
+
+c     G72: ga_fitness itself returns exactly 0 (not NaN) when the
+c     interpolated surface value is NaN
+      do k = 1, na
+         do j = 1, ne
+            do i = 1, npts
+               surf(i, j, k) = nan_val
+            end do
+         end do
+      end do
+      xvec(1) = 0.32d0
+      xvec(2) = 120.d0
+      fit = ga_fitness(xvec, surf, npts, eg, ag,
+     &                 ne, na, npts, tob, apob, nob)
+      if (fit .eq. 0.d0) then
+         call assert_i('G72 NaN surface -> fitness=0 (not NaN)',
+     &                 1, 1, npass, nfail)
+      else
+         call assert_i('G72 NaN surface -> fitness=0 (not NaN)',
+     &                 0, 1, npass, nfail)
+      end if
+
+c     G73: ga_optimize completes (does not hang) and returns finite
+c     outputs when ONE of the 9 grid corners is entirely NaN -- the
+c     realistic case, where only some RSM grid points come from a
+c     degenerate trial propagation
+      do k = 1, na
+         do j = 1, ne
+            do i = 1, npts
+               t = dble(i-1) / dble(npts-1)
+               surf(i, j, k) = 10000.d0 - 100.d0*t
+     &            - 500.d0*(eg(j) - 0.32d0)
+            end do
+         end do
+      end do
+      do i = 1, npts
+         surf(i, 3, 3) = nan_val
+      end do
+
+      call ga_optimize(surf, npts, eg, ag, ne, na, npts,
+     &   tob, apob, nob,
+     &   0.30d0, 0.34d0, 80.d0, 160.d0,
+     &   4, 50, 40, 16, 0.8d0, 0.01d0, 0.123d0,
+     &   e_opt, a_opt, rms_opt)
+
+      iall_ok = 1
+      if (e_opt .ne. e_opt) iall_ok = 0
+      if (a_opt .ne. a_opt) iall_ok = 0
+      if (rms_opt .ne. rms_opt) iall_ok = 0
+      call assert_i('G73 one NaN grid corner -> finite outputs',
+     &              iall_ok, 1, npass, nfail)
+
+c     G74: ga_optimize still completes (does not hang) even when the
+c     ENTIRE surface is NaN -- exercises ga_stats' avg=0 floor, the
+c     degenerate case where every individual in a generation is the
+c     worst-possible fitness=0
+      do k = 1, na
+         do j = 1, ne
+            do i = 1, npts
+               surf(i, j, k) = nan_val
+            end do
+         end do
+      end do
+
+      call ga_optimize(surf, npts, eg, ag, ne, na, npts,
+     &   tob, apob, nob,
+     &   0.30d0, 0.34d0, 80.d0, 160.d0,
+     &   4, 50, 40, 16, 0.8d0, 0.01d0, 0.123d0,
+     &   e_opt, a_opt, rms_opt)
+
+      iall_ok = 1
+      if (e_opt .ne. e_opt) iall_ok = 0
+      if (a_opt .ne. a_opt) iall_ok = 0
+      if (rms_opt .ne. rms_opt) iall_ok = 0
+      call assert_i('G74 all-NaN surface -> finite outputs',
+     &              iall_ok, 1, npass, nfail)
+
       return
       end
 

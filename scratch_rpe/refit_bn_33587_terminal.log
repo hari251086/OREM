@@ -1,0 +1,16 @@
+[SW] epoch-resolved density: ENABLED
+tle_evolve npts=  214
+window i0=  63 i1= 214 nzone= 152 epoch0=********** epoch1=**********
+e range in window:   0.3715 ->   0.2706
+apogee alt range:    8883.45 ->    5325.84
+calling rsm_generate over the full 131-day window as one zone...
+ierr_rsm=  0 nsurf_pts=  152 nobs= 152
+===================================
+FITTED e_opt  =    0.36733
+FITTED bn_opt =    126.032
+RMS           =     4.6784
+BN search range was [    1.00,   150.00
+]
+===================================
+re-propagation exit= 0 revs=  1300
+wrote scratch_rpe/hp_model_33587_refit.txt
