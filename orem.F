@@ -407,6 +407,16 @@ c        Issue #31: rsm_generate's propagation initial condition
 c        seeds from index 1 of smaz/ez/incz/raanz/aopz/maz -- overwrite
 c        just that point with a true SGP4-osculating state (falls back
 c        to the existing mean-element values if SGP4 fails).
+c        (Zone-to-zone trajectory-continuity seeding was tried here
+c        and measurably WORSENED RPE on both the curated 7-object and
+c        broader 30-object campaigns -- mean |RPE| 22.9%->27.4% and
+c        22.0%->32.9% respectively, with two objects blowing up over
+c        100 points. Root cause: chaining lets one zone's own fit
+c        uncertainty compound into the next zone's starting geometry,
+c        instead of every zone independently re-anchoring to fresh
+c        SGP4 data the way this fallback-only version does. Reverted
+c        per user direction; see project memory for the full
+c        investigation.)
          call tle_find_osc(norad_id, epz(1),
      &      norad_raw, epoch_yr_raw, epoch_day_raw,
      &      ainc_raw, raan_raw, ecc_raw, aop_raw, ama_raw,
@@ -585,31 +595,18 @@ c        Re-entry propagation with optimal (e, BN)
             end if
          end if
 
-c        Narrow BN bounds for next zone -- unless this zone's GA
-c        optimum saturated the BN search bound (issue #12), in which
-c        case widen instead: the true BN likely lies outside what was
-c        just searched, and narrowing further would only entrench it.
-c        v1.21 trust gate: only chain from a zone whose fit carries
-c        real drag signal -- with drag on, that means it actually
-c        predicted a re-entry (a no-re-entry fit's BN is weak-signal
-c        noise: 37151's 8-zone chain re-centered through seven such
-c        zones, marching the range from [12.5,160] to [17.2,24.9] and
-c        imprisoning the one zone with signal, Z8: latest-zone RPE
-c        -38% vs -14% at the 4-zone cap). With drag off there is no
-c        prediction to gate on, so chain from unflagged zones only.
-c        Untrusted zones leave the range unchanged for the next zone.
-         if ((idrag_flag .eq. 1 .and. reentry_jd(iz) .gt. 0.d0)
-     &       .or.
-     &       (idrag_flag .eq. 0 .and. zone_status(iz) .eq. 0)) then
-            if (bn_at_bound) then
-               bn_range = (bn_hi - bn_lo) * 1.5d0
-            else
-               bn_range = (bn_hi - bn_lo) * 0.5d0
-            end if
-            bn_lo = bn_opt_out(iz) - bn_range / 2.d0
-            bn_hi = bn_opt_out(iz) + bn_range / 2.d0
-            if (bn_lo .lt. 10.d0) bn_lo = 10.d0
-         end if
+c        BN search range: deliberately left untouched here (no per-
+c        zone narrowing/widening) -- every zone always searches the
+c        full original [bn_min_init, bn_max_init] range from
+c        bn_lo/bn_hi's one-time setup before this loop (plus the G2
+c        floor adjustment, also one-time). Confirmed with user: BN
+c        may genuinely drift zone to zone, so the search itself
+c        should stay wide/agnostic rather than re-centering on any
+c        single zone's own fit. This replaces the old per-zone
+c        narrow/widen-on-boundary logic that used to live here (see
+c        git history) -- e_at_bound/bn_at_bound above still flag
+c        boundary-saturated fits, that diagnostic is unchanged, only
+c        the range-resizing action on it was removed.
 
  50      continue
       end do
