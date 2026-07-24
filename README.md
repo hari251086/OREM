@@ -25,11 +25,21 @@ Accuracy (v1.21, 7-object validation campaign, full force model): latest-zone RP
 
 ```
 OREM/
-├── ksrop/                          Propagator engine (from KSROP repo)
-│   ├── propagate_ks.F              KS propagator as callable subroutine
-│   ├── Subrouts.F                  Coordinate transforms, I/O, utilities
-│   ├── Legendre.F                  Zonal Legendre polynomial evaluation
-│   └── TLEread.F                   TLE reader + SGP4/SDP4 conversion
+├── fpm.toml                         fpm package manifest; depends on KSROP (git, pinned tag)
+├── src/
+│   ├── propagate_ks.F               KS propagator as callable subroutine (OREM's own fork of
+│   │                                KSROP's driver_KS.F core, not vendored KSROP code)
+│   ├── tle_evolution.F              Batch TLE → orbital evolution
+│   ├── zone_select.F                Zone selection — linear apogee decay, top-R² candidates
+│   ├── ga.F                         Binary-coded GA optimizer (pop=20; trajectory-matching fitness)
+│   ├── rsm.F                        RSM surface generation (9 surfaces per zone)
+│   ├── orem.F                       OREM driver: pipeline + G2 BN floor + zone diagnostics
+│   │                                + trust-gated BN carryover + compute_rpe
+│   ├── report.F                     Prediction report writer (latest-zone primary + ensemble)
+│   ├── tle_filter.F                 TLE outlier/maneuver/gap filtering (issue #10)
+│   └── swx.F                        Space weather / ATM2D lookup (issue #26)
+├── app/
+│   └── main_orem.F                  Standalone runner (reads orem.cfg, writes the report)
 │
 ├── input/
 │   ├── const_new.dat               Physical constants
@@ -57,33 +67,31 @@ OREM/
 ├── scratch_rpe/                    7-object RPE campaigns (4-zone / 8-zone / 8-zone gated)
 │                                   + ensemble_eval.py estimator comparison
 │
-├── tle_evolution.F                 Batch TLE → orbital evolution
-├── zone_select.F                   Zone selection — linear apogee decay, top-R² candidates
-├── ga.F                            Binary-coded GA optimizer (pop=20; trajectory-matching fitness)
-├── rsm.F                           RSM surface generation (9 surfaces per zone)
-├── orem.F                          OREM driver: pipeline + G2 BN floor + zone diagnostics
-│                                   + trust-gated BN carryover + compute_rpe
-├── report.F                        Prediction report writer (latest-zone primary + ensemble)
-├── main_orem.F                     Standalone runner (reads orem.cfg, writes the report)
-│
-├── test_propagate_ks.F             Propagator tests (10)
-├── test_tle_evolution.F            TLE evolution tests (56)
-├── test_zone_select.F              Zone selection tests (68)
-├── test_ga.F                       GA optimizer tests (71)
-├── test_ga_sensitivity.F           GA parameter sensitivity study (not in test suite)
-├── test_rsm.F                      RSM integration tests (39)
-├── test_orem.F                     Driver + diagnostics + G2 + report tests (29)
-├── test_reentry.F                  7-object re-entry validation (35)
-├── test_e2e.F                      End-to-end integration, IDRAG=1 + full force (20)
-├── test_gmat.F                     GMAT cross-validation + exact-model drag reference (14)
-└── README.md                       (342 tests total)
+├── test/
+│   ├── test_propagate_ks.F          Propagator tests (10)
+│   ├── test_tle_evolution.F         TLE evolution tests (56)
+│   ├── test_zone_select.F           Zone selection tests (68)
+│   ├── test_ga.F                    GA optimizer tests (74)
+│   ├── test_ga_sensitivity.F        GA parameter sensitivity study (not in test suite)
+│   ├── test_rsm.F                   RSM integration tests (39)
+│   ├── test_sw.F                    Space weather / ATM2D tests (12)
+│   ├── test_tle_filter.F            TLE filter tests (14)
+│   ├── test_orem.F                  Driver + diagnostics + G2 + report tests (29)
+│   ├── test_reentry.F               7-object re-entry validation (35)
+│   ├── test_e2e.F                   End-to-end integration, IDRAG=1 + full force (20)
+│   └── test_gmat.F                  GMAT cross-validation + exact-model drag reference (14)
+└── README.md                        (371 tests total)
 ```
 
 ---
 
 ## 3. Propagator Interface
 
-The core propagator is `propagate_ks` — a callable subroutine refactored from KSROP's `driver_KS.F`:
+The core propagator is `propagate_ks` (`src/propagate_ks.F`) — a callable subroutine forked from
+KSROP's `driver_KS.F` core, with OREM-specific re-entry-detection logic layered on top. It is
+**not** vendored KSROP code — KSROP itself has no file by this name. Everything it calls into
+(`Subrouts.F`, `Legendre.F`, `TLEread.F`) comes from KSROP as a real fpm dependency (see §4), not
+from copied-and-drifted local files as in earlier revisions of this repo.
 
 ```fortran
 call propagate_ks(
@@ -107,43 +115,40 @@ call propagate_ks(
 
 ## 4. Building
 
-Requires **Intel oneAPI Fortran** (`ifx`), on Windows or Linux — the only toolchain this project is actually validated against. `ksrop/propagate_ks.F` currently does **not** compile under `gfortran` (implicit-real array dimensions, a function/array name collision on `R`, non-standard function-result assignment syntax that gfortran 13 rejects outright — see issue #28) despite `gfortran` commands appearing in earlier revisions of this doc; those were never actually verified. CI (`.github/workflows/ci.yml`, issue #22) installs `ifx` on the Linux runner rather than `gfortran` for this reason.
+Requires **Intel oneAPI Fortran** (`ifx`), on Windows or Linux — the only toolchain this project is actually validated against. `propagate_ks.F` currently does **not** compile under plain `gfortran` (implicit-real array dimensions, a function/array name collision on `R`, non-standard function-result assignment syntax that gfortran 13 rejects outright — see issue #28). CI (`.github/workflows/ci.yml`, issue #22) installs `ifx` on the Linux runner rather than `gfortran` for this reason.
 
-### Windows (Intel oneAPI ifx 2025.0)
+### fpm (Fortran Package Manager) — recommended
 
-`/heap-arrays /F:16777216` (16 MB stack) is required for every executable that links `rsm.F`/`ga.F` — the `surfaces(5000,3,3)` arrays overflow the default stack without it. `test_orem.exe` and `orem.exe` additionally link `report.F` (since v1.19).
+KSROP (`Subrouts.F`, `Legendre.F`, `TLEread.F`) is no longer vendored locally — it's declared as a
+real git dependency in `fpm.toml`, pinned to a KSROP release tag:
+
+```bash
+fpm build --compiler ifx --flag "-heap-arrays"
+fpm test  --compiler ifx --flag "-heap-arrays"
+fpm run orem --compiler ifx --flag "-heap-arrays"
+```
+
+`-heap-arrays` (16 MB stack) is required for every target that links `rsm.F`/`ga.F` — the
+`surfaces(5000,3,3)` arrays overflow the default stack without it. `fpm.toml` sets
+`[fortran] source-form = "fixed"` (fpm defaults `.F` to free-form). On first build, fpm clones
+KSROP into `build/dependencies/ksrop/` at the pinned tag automatically (needs network access once,
+then it's cached).
+
+### Manual (without fpm)
+
+Only needed if you're not using fpm — e.g. testing against an unpublished local KSROP checkout.
+Since KSROP's library files are no longer present under this repo, point at wherever KSROP is
+checked out (`../KSROP` if it's a sibling directory, matching `fpm.toml`'s dependency path during
+local development):
 
 ```bat
 call "C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Auxiliary\Build\vcvars64.bat"
 call "C:\Program Files (x86)\Intel\Fortran\compiler\2025.0\env\vars.bat"
 
-ifx /heap-arrays /F:16777216 test_propagate_ks.F ksrop/propagate_ks.F ksrop/Subrouts.F ksrop/Legendre.F /exe:test_propagate_ks.exe
-ifx /heap-arrays /F:16777216 test_tle_evolution.F tle_evolution.F ksrop/TLEread.F ksrop/Subrouts.F ksrop/Legendre.F /exe:test_tle_evolution.exe
-ifx /heap-arrays /F:16777216 test_zone_select.F zone_select.F tle_evolution.F ksrop/TLEread.F ksrop/Subrouts.F ksrop/Legendre.F /exe:test_zone_select.exe
-ifx /heap-arrays /F:16777216 test_ga.F ga.F rsm.F tle_evolution.F zone_select.F ksrop/propagate_ks.F ksrop/Subrouts.F ksrop/Legendre.F ksrop/TLEread.F /exe:test_ga.exe
-ifx /heap-arrays /F:16777216 test_rsm.F rsm.F tle_evolution.F zone_select.F ksrop/propagate_ks.F ksrop/Subrouts.F ksrop/Legendre.F ksrop/TLEread.F ga.F /exe:test_rsm.exe
-ifx /heap-arrays /F:16777216 test_orem.F orem.F report.F rsm.F ga.F tle_evolution.F tle_filter.F zone_select.F ksrop/propagate_ks.F ksrop/Subrouts.F ksrop/Legendre.F ksrop/TLEread.F /exe:test_orem.exe
-ifx /heap-arrays /F:16777216 test_reentry.F orem.F rsm.F ga.F tle_evolution.F tle_filter.F zone_select.F ksrop/propagate_ks.F ksrop/Subrouts.F ksrop/Legendre.F ksrop/TLEread.F /exe:test_reentry.exe
-ifx /heap-arrays /F:16777216 test_e2e.F orem.F rsm.F ga.F tle_evolution.F tle_filter.F zone_select.F ksrop/propagate_ks.F ksrop/Subrouts.F ksrop/Legendre.F ksrop/TLEread.F /exe:test_e2e.exe
-ifx /heap-arrays /F:16777216 test_gmat.F rsm.F tle_evolution.F zone_select.F ksrop/propagate_ks.F ksrop/Subrouts.F ksrop/Legendre.F ksrop/TLEread.F ga.F /exe:test_gmat.exe
-
-ifx /heap-arrays /F:16777216 test_sw.F swx.F orem.F report.F rsm.F ga.F tle_evolution.F tle_filter.F zone_select.F ksrop/propagate_ks.F ksrop/Subrouts.F ksrop/TLEread.F ksrop/Legendre.F /exe:test_sw.exe
-ifx /heap-arrays /F:16777216 test_tle_filter.F tle_filter.F zone_select.F tle_evolution.F ksrop/TLEread.F ksrop/Subrouts.F ksrop/Legendre.F /exe:test_tle_filter.exe
-
-REM Standalone runner -- swx.F required since v1.23 (main_orem.F calls sw_load/atm2d_load)
-ifx /heap-arrays /F:16777216 main_orem.F orem.F report.F swx.F rsm.F ga.F tle_evolution.F tle_filter.F zone_select.F ksrop/propagate_ks.F ksrop/Subrouts.F ksrop/TLEread.F ksrop/Legendre.F /exe:orem.exe
+ifx /heap-arrays /F:16777216 test\test_propagate_ks.F src\propagate_ks.F ..\KSROP\src\Subrouts.F ..\KSROP\src\Legendre.F /exe:test_propagate_ks.exe
 ```
 
-### Linux (Intel oneAPI ifx)
-
-Same source lists as above, `-heap-arrays` in place of `/heap-arrays`, `ulimit -s unlimited` in place of `/F:16777216` (Linux stack size is a shell/OS setting, not a linker flag), `-o <name>.exe` in place of `/exe:<name>.exe`. Example for the runner:
-
-```bash
-ulimit -s unlimited
-ifx -heap-arrays main_orem.F orem.F report.F swx.F rsm.F ga.F tle_evolution.F tle_filter.F zone_select.F ksrop/propagate_ks.F ksrop/Subrouts.F ksrop/TLEread.F ksrop/Legendre.F -o orem.exe
-```
-
-See `test_all.sh` for the full build+test command list (used by CI).
+`/heap-arrays /F:16777216` on Windows, `-heap-arrays` + `ulimit -s unlimited` on Linux (stack size is a shell/OS setting there, not a linker flag). See `test_all.sh` for the complete manual source-list-per-executable table (used by CI's non-fpm job) and `fpm.toml` for the fpm target list.
 
 ---
 
@@ -151,19 +156,14 @@ See `test_all.sh` for the full build+test command list (used by CI).
 
 ### Step 1: Compile
 
-```bat
-REM Windows — Intel oneAPI
+```bash
 call "C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Auxiliary\Build\vcvars64.bat"
 call "C:\Program Files (x86)\Intel\Fortran\compiler\2025.0\env\vars.bat"
 
-ifx /heap-arrays /F:16777216 main_orem.F orem.F report.F swx.F rsm.F ga.F tle_evolution.F tle_filter.F zone_select.F ksrop/propagate_ks.F ksrop/Subrouts.F ksrop/TLEread.F ksrop/Legendre.F /exe:orem.exe
+fpm build --compiler ifx --flag "-heap-arrays"
 ```
 
-```bash
-# Linux — Intel oneAPI ifx (not gfortran -- see SS4)
-ulimit -s unlimited
-ifx -heap-arrays main_orem.F orem.F report.F swx.F rsm.F ga.F tle_evolution.F tle_filter.F zone_select.F ksrop/propagate_ks.F ksrop/Subrouts.F ksrop/TLEread.F ksrop/Legendre.F -o orem.exe
-```
+See §4 for the manual (non-fpm) build path and the Linux/`ulimit` equivalent.
 
 ### Step 2: Create a config file
 
@@ -189,6 +189,8 @@ input/example_42928.tle.txt          <- TLE file path
 ### Step 3: Run
 
 ```bash
+fpm run orem --compiler ifx --flag "-heap-arrays" -- input/orem_42928.cfg
+# or, after a manual (non-fpm) build per §4:
 ./orem.exe input/orem_42928.cfg
 ```
 
@@ -231,6 +233,9 @@ To run on a different object: copy the config, change lines 1-3 (TLE file, NORAD
 ---
 
 ## 6. Running Tests
+
+`fpm test --compiler ifx --flag "-heap-arrays"` runs all suites below in one command. Or,
+after a manual (non-fpm) build per §4, each binary individually:
 
 ```bash
 ./test_propagate_ks.exe        # Propagator tests (10 checks)
@@ -340,15 +345,22 @@ Cross-validates propagate_ks against GMAT R2026a reference runs (`scratch_gmat/g
 
 ---
 
-## 7. KSROP Source Files
+## 7. KSROP Dependency
 
-Files in `ksrop/` are copied from [hari251086/KSROP](https://github.com/hari251086/KSROP). To update after KSROP changes:
+`Subrouts.F`, `Legendre.F`, `TLEread.F` are no longer copied into this repo — they come from
+[hari251086/KSROP](https://github.com/hari251086/KSROP) as a real `fpm` dependency, pinned to a
+release tag in `fpm.toml`:
 
-```bash
-cp ../KSROP/Subrouts.F ksrop/
-cp ../KSROP/Legendre.F ksrop/
-# propagate_ks.F is a refactored version of driver_KS.F — manual sync
+```toml
+[dependencies]
+ksrop = { git = "https://github.com/hari251086/KSROP", tag = "v2.1.0" }
 ```
+
+To pick up a newer KSROP release, bump the `tag` here (and re-run the full test suite —
+`fpm test --compiler ifx --flag "-heap-arrays"` — to confirm nothing regressed before committing).
+
+`propagate_ks.F` (`src/propagate_ks.F`) is **not** part of this dependency — it's OREM's own fork
+of KSROP's `driver_KS.F` core with re-entry-specific logic added, and evolves independently.
 
 ---
 
