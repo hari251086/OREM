@@ -18,7 +18,13 @@ Three sub-analyses:
      i.e. RMS there is NOT hitting the raw per-point noise floor, it's a
      fitted regression average over ~8-10 points).
 """
-import csv, math
+import csv, math, re
+
+NORAD_ORDER = [
+    42928, 35497, 37151, 39615, 27526, 32007, 37819, 11550, 59347, 40943,
+    66587, 60328, 61734, 57804, 56758, 30799, 44187, 35009, 41553, 48259,
+    27906, 27882, 39802, 28572, 46429, 44591, 41695, 52205, 45349, 23647,
+]
 
 NORAD_FILE = {
     42928: 'input/example_42928.tle.txt', 35497: 'input/example_35497.tle.txt',
@@ -251,6 +257,50 @@ def main():
     r_rms_rpe = pearson(rms_all, rpe_all)
     print(f'\n  r(rms_fit, |RPE|) across all predicting zones (n={len(rms_all)}) '
           f'= {r_rms_rpe:+.3f}' if r_rms_rpe is not None else '')
+
+    # ---------------- D: TLE noise character (averaging-reducible or floor?) ----------------
+    print()
+    print('=' * 70)
+    print('D. TLE noise character: does rms_fit fall with more points per zone?')
+    print('=' * 70)
+    npts_map = {}
+    obj_idx = -1
+    with open('scratch_rpe/rpe_campaign.log') as f:
+        for line in f:
+            if line.startswith(' ===== '):
+                obj_idx += 1
+                zone_idx = 0
+                continue
+            m = re.match(r'\s*Z\s*(\d+): exit=\s*-?\d+ pts=\s*(\d+)', line)
+            if m and 0 <= obj_idx < len(NORAD_ORDER):
+                zone_idx = int(m.group(1))
+                npts_map[(NORAD_ORDER[obj_idx], zone_idx)] = int(m.group(2))
+
+    joined = []
+    for r in rows:
+        key = (r['norad'], r['zone'])
+        if key in npts_map:
+            joined.append((npts_map[key], r['rms_fit'], r['zstat']))
+
+    trusted_j = [(p, rms) for p, rms, z in joined if z == 0]
+    print(f'  n={len(joined)} zones joined to a point count '
+          f'({len(trusted_j)} zstat=0/trusted)')
+    if trusted_j:
+        r_pts_rms = pearson([p for p, _ in trusted_j], [rms for _, rms in trusted_j])
+        r_invpts_rms = pearson([1.0 / p for p, _ in trusted_j],
+                                [rms for _, rms in trusted_j])
+        print(f'  r(pts, rms_fit)      = {r_pts_rms:+.3f}  '
+              f'(trusted zones only, n={len(trusted_j)})' if r_pts_rms is not None else '')
+        print(f'  r(1/sqrt(pts)-ish via 1/pts, rms_fit) = {r_invpts_rms:+.3f}'
+              if r_invpts_rms is not None else '')
+        # bucket by point count to show the trend directly
+        buckets = [(0, 2000), (2000, 4000), (4000, 6000), (6000, 20000)]
+        print(f'\n  {"pts range":>14}  {"n":>4}  {"median rms":>11}')
+        for lo, hi in buckets:
+            vals = sorted(rms for p, rms in trusted_j if lo <= p < hi)
+            if vals:
+                print(f'  [{lo:5d},{hi:5d})  {len(vals):4d}  '
+                      f'{vals[len(vals)//2]:11.4f}')
 
 
 if __name__ == '__main__':
