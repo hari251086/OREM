@@ -208,7 +208,7 @@ c     own issue.
       open(unit=33, file='scratch_rpe/rpe_campaign.csv',
      &     status='unknown')
       write(33,'(A)') 'norad,zone,e_opt,bn_opt,reentry_jd,rpe_pct,'//
-     &   'zstat,t_mean,t_std,ens_rpe_pct'
+     &   'zstat,t_mean,t_std,ens_rpe_pct,zepoch,rms_fit'
 
       do io = 1, nobj
          write(*,'(/,A,A)') ' ===== ', obj_name(io)
@@ -237,7 +237,7 @@ c     own issue.
 
          if (ierr .ne. 0 .and. ierr .ne. 3) then
             write(*,'(A,I3)') '  pipeline error ierr=', ierr
-            write(33,'(I5,A,I3)') norad(io), ',ERR,,,,,,,,', ierr
+            write(33,'(I5,A,I3)') norad(io), ',ERR,,,,,,,,,,', ierr
             goto 90
          end if
 
@@ -265,10 +265,11 @@ c        Ensemble RPE: t_mean vs observed, horizon from zone 1 epoch
      &            ' (no re-entry)  zstat=', zstat(iz)
             end if
             write(33,'(I5,A,I1,A,F9.6,A,F8.3,A,F13.4,A,F9.3,A,I2,
-     &         A,F13.4,A,F8.2,A,F9.3)')
+     &         A,F13.4,A,F8.2,A,F9.3,A,F13.4,A,F9.4)')
      &         norad(io), ',', iz, ',', e_opt(iz), ',', bn_opt(iz),
      &         ',', reentry(iz), ',', rpe(iz), ',', zstat(iz),
-     &         ',', t_mean, ',', t_std, ',', rpe_ens
+     &         ',', t_mean, ',', t_std, ',', rpe_ens,
+     &         ',', zepoch(iz), ',', rms_o(iz)
          end do
 
          if (nre .ge. 1) then
