@@ -1,16 +1,21 @@
 #!/bin/bash
 # test_all.sh -- issue #22: compile every OREM test suite with Intel
-# ifx (Linux) and run them all. Used both locally and by
-# .github/workflows/ci.yml. Exits nonzero on the first compile or
-# test failure (set -e).
+# ifx (Linux) and run them all. Manual/local fallback only as of the
+# fpm packaging migration (CLAUDE.md architecture section 5) --
+# .github/workflows/ci.yml now uses `fpm build`/`fpm test` instead,
+# since this script's ../KSROP/src/*.F references assume a sibling
+# KSROP checkout that a CI runner doesn't have (fpm resolves it as a
+# real git dependency instead). Prefer `fpm test --compiler ifx
+# --flag "-heap-arrays"` unless you specifically need this script
+# (e.g. no fpm installed locally). Exits nonzero on the first compile
+# or test failure (set -e).
 #
-# ifx, not gfortran: ksrop/propagate_ks.F relies on several ifx-
-# specific tolerances (implicit-real array dimensions, a function/
-# array name collision on `R`, non-standard function-result syntax)
-# that gfortran 13 rejects outright. Making that file portable is
-# real, separate surgery on the most validated file in the repo --
-# tracked as its own issue (#28), not bundled into CI setup. CI tests
-# what the project actually builds and validates with.
+# ifx, not gfortran: propagate_ks.F relies on several ifx-specific
+# tolerances (implicit-real array dimensions, a function/array name
+# collision on `R`, non-standard function-result syntax) that
+# gfortran 13 rejects outright. Making that file portable is real,
+# separate surgery on the most validated file in the repo -- tracked
+# as its own issue (#28), not bundled into CI setup.
 #
 # input/example_multi.tle.txt (94597-entry catalog, 13 MB) is
 # deliberately gitignored -- test_tle_evolution.F's T42-T50 skip
@@ -21,17 +26,17 @@ set -e
 ulimit -s unlimited 2>/dev/null || true
 
 echo "=== Compiling ==="
-ifx -heap-arrays test/test_propagate_ks.F src/propagate_ks.F src/Subrouts.F src/Legendre.F -o test_propagate_ks.exe
-ifx -heap-arrays test/test_tle_evolution.F src/tle_evolution.F src/TLEread.F src/Subrouts.F src/Legendre.F -o test_tle_evolution.exe
-ifx -heap-arrays test/test_zone_select.F src/zone_select.F src/tle_evolution.F src/TLEread.F src/Subrouts.F src/Legendre.F -o test_zone_select.exe
-ifx -heap-arrays test/test_ga.F src/ga.F src/rsm.F src/tle_evolution.F src/zone_select.F src/propagate_ks.F src/Subrouts.F src/Legendre.F src/TLEread.F -o test_ga.exe
-ifx -heap-arrays test/test_rsm.F src/rsm.F src/tle_evolution.F src/zone_select.F src/propagate_ks.F src/Subrouts.F src/Legendre.F src/TLEread.F src/ga.F -o test_rsm.exe
-ifx -heap-arrays test/test_orem.F src/orem.F src/report.F src/rsm.F src/ga.F src/tle_evolution.F src/tle_filter.F src/zone_select.F src/propagate_ks.F src/Subrouts.F src/Legendre.F src/TLEread.F -o test_orem.exe
-ifx -heap-arrays test/test_reentry.F src/orem.F src/rsm.F src/ga.F src/tle_evolution.F src/tle_filter.F src/zone_select.F src/propagate_ks.F src/Subrouts.F src/Legendre.F src/TLEread.F -o test_reentry.exe
-ifx -heap-arrays test/test_e2e.F src/orem.F src/rsm.F src/ga.F src/tle_evolution.F src/tle_filter.F src/zone_select.F src/propagate_ks.F src/Subrouts.F src/Legendre.F src/TLEread.F -o test_e2e.exe
-ifx -heap-arrays test/test_gmat.F src/rsm.F src/tle_evolution.F src/zone_select.F src/propagate_ks.F src/Subrouts.F src/Legendre.F src/TLEread.F src/ga.F -o test_gmat.exe
-ifx -heap-arrays test/test_sw.F src/swx.F src/orem.F src/report.F src/rsm.F src/ga.F src/tle_evolution.F src/tle_filter.F src/zone_select.F src/propagate_ks.F src/Subrouts.F src/TLEread.F src/Legendre.F -o test_sw.exe
-ifx -heap-arrays test/test_tle_filter.F src/tle_filter.F src/zone_select.F src/tle_evolution.F src/TLEread.F src/Subrouts.F src/Legendre.F -o test_tle_filter.exe
+ifx -heap-arrays test/test_propagate_ks.F src/propagate_ks.F ../KSROP/src/Subrouts.F ../KSROP/src/Legendre.F -o test_propagate_ks.exe
+ifx -heap-arrays test/test_tle_evolution.F src/tle_evolution.F ../KSROP/src/TLEread.F ../KSROP/src/Subrouts.F ../KSROP/src/Legendre.F -o test_tle_evolution.exe
+ifx -heap-arrays test/test_zone_select.F src/zone_select.F src/tle_evolution.F ../KSROP/src/TLEread.F ../KSROP/src/Subrouts.F ../KSROP/src/Legendre.F -o test_zone_select.exe
+ifx -heap-arrays test/test_ga.F src/ga.F src/rsm.F src/tle_evolution.F src/zone_select.F src/propagate_ks.F ../KSROP/src/Subrouts.F ../KSROP/src/Legendre.F ../KSROP/src/TLEread.F -o test_ga.exe
+ifx -heap-arrays test/test_rsm.F src/rsm.F src/tle_evolution.F src/zone_select.F src/propagate_ks.F ../KSROP/src/Subrouts.F ../KSROP/src/Legendre.F ../KSROP/src/TLEread.F src/ga.F -o test_rsm.exe
+ifx -heap-arrays test/test_orem.F src/orem.F src/report.F src/rsm.F src/ga.F src/tle_evolution.F src/tle_filter.F src/zone_select.F src/propagate_ks.F ../KSROP/src/Subrouts.F ../KSROP/src/Legendre.F ../KSROP/src/TLEread.F -o test_orem.exe
+ifx -heap-arrays test/test_reentry.F src/orem.F src/rsm.F src/ga.F src/tle_evolution.F src/tle_filter.F src/zone_select.F src/propagate_ks.F ../KSROP/src/Subrouts.F ../KSROP/src/Legendre.F ../KSROP/src/TLEread.F -o test_reentry.exe
+ifx -heap-arrays test/test_e2e.F src/orem.F src/rsm.F src/ga.F src/tle_evolution.F src/tle_filter.F src/zone_select.F src/propagate_ks.F ../KSROP/src/Subrouts.F ../KSROP/src/Legendre.F ../KSROP/src/TLEread.F -o test_e2e.exe
+ifx -heap-arrays test/test_gmat.F src/rsm.F src/tle_evolution.F src/zone_select.F src/propagate_ks.F ../KSROP/src/Subrouts.F ../KSROP/src/Legendre.F ../KSROP/src/TLEread.F src/ga.F -o test_gmat.exe
+ifx -heap-arrays test/test_sw.F src/swx.F src/orem.F src/report.F src/rsm.F src/ga.F src/tle_evolution.F src/tle_filter.F src/zone_select.F src/propagate_ks.F ../KSROP/src/Subrouts.F ../KSROP/src/TLEread.F ../KSROP/src/Legendre.F -o test_sw.exe
+ifx -heap-arrays test/test_tle_filter.F src/tle_filter.F src/zone_select.F src/tle_evolution.F ../KSROP/src/TLEread.F ../KSROP/src/Subrouts.F ../KSROP/src/Legendre.F -o test_tle_filter.exe
 
 echo "=== Running ==="
 fail=0

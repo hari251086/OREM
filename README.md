@@ -148,7 +148,7 @@ call "C:\Program Files (x86)\Intel\Fortran\compiler\2025.0\env\vars.bat"
 ifx /heap-arrays /F:16777216 test\test_propagate_ks.F src\propagate_ks.F ..\KSROP\src\Subrouts.F ..\KSROP\src\Legendre.F /exe:test_propagate_ks.exe
 ```
 
-`/heap-arrays /F:16777216` on Windows, `-heap-arrays` + `ulimit -s unlimited` on Linux (stack size is a shell/OS setting there, not a linker flag). See `test_all.sh` for the complete manual source-list-per-executable table (used by CI's non-fpm job) and `fpm.toml` for the fpm target list.
+`/heap-arrays /F:16777216` on Windows, `-heap-arrays` + `ulimit -s unlimited` on Linux (stack size is a shell/OS setting there, not a linker flag). See `test_all.sh` for the complete manual source-list-per-executable table (local/manual fallback only — needs a sibling `../KSROP` checkout, which a CI runner doesn't have; CI uses `fpm` instead, see `.github/workflows/ci.yml`) and `fpm.toml` for the fpm target list.
 
 ---
 
