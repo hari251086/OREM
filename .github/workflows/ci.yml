@@ -21,8 +21,19 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y intel-oneapi-compiler-fortran
 
-      - name: Compile and run all test suites
+      - name: Install fpm
+        run: |
+          curl -L -o fpm https://github.com/fortran-lang/fpm/releases/download/v0.13.0/fpm-0.13.0-linux-x86_64-gcc-12
+          chmod +x fpm
+          sudo mv fpm /usr/local/bin/fpm
+
+      - name: fpm build (resolves KSROP as a real git dependency)
         run: |
           source /opt/intel/oneapi/setvars.sh
-          chmod +x test_all.sh
-          ./test_all.sh
+          fpm build --compiler ifx --flag "-heap-arrays"
+
+      - name: fpm test
+        run: |
+          source /opt/intel/oneapi/setvars.sh
+          ulimit -s unlimited
+          fpm test --compiler ifx --flag "-heap-arrays"

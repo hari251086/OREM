@@ -25,11 +25,21 @@ Accuracy (v1.21, 7-object validation campaign, full force model): latest-zone RP
 
 ```
 OREM/
-├── ksrop/                          Propagator engine (from KSROP repo)
-│   ├── propagate_ks.F              KS propagator as callable subroutine
-│   ├── Subrouts.F                  Coordinate transforms, I/O, utilities
-│   ├── Legendre.F                  Zonal Legendre polynomial evaluation
-│   └── TLEread.F                   TLE reader + SGP4/SDP4 conversion
+├── fpm.toml                         fpm package manifest; depends on KSROP (git, pinned tag)
+├── src/
+│   ├── propagate_ks.F               KS propagator as callable subroutine (OREM's own fork of
+│   │                                KSROP's driver_KS.F core, not vendored KSROP code)
+│   ├── tle_evolution.F              Batch TLE → orbital evolution
+│   ├── zone_select.F                Zone selection — linear apogee decay, top-R² candidates
+│   ├── ga.F                         Binary-coded GA optimizer (pop=20; trajectory-matching fitness)
+│   ├── rsm.F                        RSM surface generation (9 surfaces per zone)
+│   ├── orem.F                       OREM driver: pipeline + G2 BN floor + zone diagnostics
+│   │                                + trust-gated BN carryover + compute_rpe
+│   ├── report.F                     Prediction report writer (latest-zone primary + ensemble)
+│   ├── tle_filter.F                 TLE outlier/maneuver/gap filtering (issue #10)
+│   └── swx.F                        Space weather / ATM2D lookup (issue #26)
+├── app/
+│   └── main_orem.F                  Standalone runner (reads orem.cfg, writes the report)
 │
 ├── input/
 │   ├── const_new.dat               Physical constants
@@ -57,33 +67,31 @@ OREM/
 ├── scratch_rpe/                    7-object RPE campaigns (4-zone / 8-zone / 8-zone gated)
 │                                   + ensemble_eval.py estimator comparison
 │
-├── tle_evolution.F                 Batch TLE → orbital evolution
-├── zone_select.F                   Zone selection — linear apogee decay, top-R² candidates
-├── ga.F                            Binary-coded GA optimizer (pop=20; trajectory-matching fitness)
-├── rsm.F                           RSM surface generation (9 surfaces per zone)
-├── orem.F                          OREM driver: pipeline + G2 BN floor + zone diagnostics
-│                                   + trust-gated BN carryover + compute_rpe
-├── report.F                        Prediction report writer (latest-zone primary + ensemble)
-├── main_orem.F                     Standalone runner (reads orem.cfg, writes the report)
-│
-├── test_propagate_ks.F             Propagator tests (10)
-├── test_tle_evolution.F            TLE evolution tests (56)
-├── test_zone_select.F              Zone selection tests (68)
-├── test_ga.F                       GA optimizer tests (71)
-├── test_ga_sensitivity.F           GA parameter sensitivity study (not in test suite)
-├── test_rsm.F                      RSM integration tests (39)
-├── test_orem.F                     Driver + diagnostics + G2 + report tests (29)
-├── test_reentry.F                  7-object re-entry validation (35)
-├── test_e2e.F                      End-to-end integration, IDRAG=1 + full force (20)
-├── test_gmat.F                     GMAT cross-validation + exact-model drag reference (14)
-└── README.md                       (342 tests total)
+├── test/
+│   ├── test_propagate_ks.F          Propagator tests (10)
+│   ├── test_tle_evolution.F         TLE evolution tests (56)
+│   ├── test_zone_select.F           Zone selection tests (68)
+│   ├── test_ga.F                    GA optimizer tests (74)
+│   ├── test_ga_sensitivity.F        GA parameter sensitivity study (not in test suite)
+│   ├── test_rsm.F                   RSM integration tests (39)
+│   ├── test_sw.F                    Space weather / ATM2D tests (12)
+│   ├── test_tle_filter.F            TLE filter tests (14)
+│   ├── test_orem.F                  Driver + diagnostics + G2 + report tests (29)
+│   ├── test_reentry.F               7-object re-entry validation (35)
+│   ├── test_e2e.F                   End-to-end integration, IDRAG=1 + full force (20)
+│   └── test_gmat.F                  GMAT cross-validation + exact-model drag reference (14)
+└── README.md                        (371 tests total)
 ```
 
 ---
 
 ## 3. Propagator Interface
 
-The core propagator is `propagate_ks` — a callable subroutine refactored from KSROP's `driver_KS.F`:
+The core propagator is `propagate_ks` (`src/propagate_ks.F`) — a callable subroutine forked from
+KSROP's `driver_KS.F` core, with OREM-specific re-entry-detection logic layered on top. It is
+**not** vendored KSROP code — KSROP itself has no file by this name. Everything it calls into
+(`Subrouts.F`, `Legendre.F`, `TLEread.F`) comes from KSROP as a real fpm dependency (see §4), not
+from copied-and-drifted local files as in earlier revisions of this repo.
 
 ```fortran
 call propagate_ks(
@@ -107,43 +115,40 @@ call propagate_ks(
 
 ## 4. Building
 
-Requires **Intel oneAPI Fortran** (`ifx`), on Windows or Linux — the only toolchain this project is actually validated against. `ksrop/propagate_ks.F` currently does **not** compile under `gfortran` (implicit-real array dimensions, a function/array name collision on `R`, non-standard function-result assignment syntax that gfortran 13 rejects outright — see issue #28) despite `gfortran` commands appearing in earlier revisions of this doc; those were never actually verified. CI (`.github/workflows/ci.yml`, issue #22) installs `ifx` on the Linux runner rather than `gfortran` for this reason.
+Requires **Intel oneAPI Fortran** (`ifx`), on Windows or Linux — the only toolchain this project is actually validated against. `propagate_ks.F` currently does **not** compile under plain `gfortran` (implicit-real array dimensions, a function/array name collision on `R`, non-standard function-result assignment syntax that gfortran 13 rejects outright — see issue #28). CI (`.github/workflows/ci.yml`, issue #22) installs `ifx` on the Linux runner rather than `gfortran` for this reason.
 
-### Windows (Intel oneAPI ifx 2025.0)
+### fpm (Fortran Package Manager) — recommended
 
-`/heap-arrays /F:16777216` (16 MB stack) is required for every executable that links `rsm.F`/`ga.F` — the `surfaces(5000,3,3)` arrays overflow the default stack without it. `test_orem.exe` and `orem.exe` additionally link `report.F` (since v1.19).
+KSROP (`Subrouts.F`, `Legendre.F`, `TLEread.F`) is no longer vendored locally — it's declared as a
+real git dependency in `fpm.toml`, pinned to a KSROP release tag:
+
+```bash
+fpm build --compiler ifx --flag "-heap-arrays"
+fpm test  --compiler ifx --flag "-heap-arrays"
+fpm run orem --compiler ifx --flag "-heap-arrays"
+```
+
+`-heap-arrays` (16 MB stack) is required for every target that links `rsm.F`/`ga.F` — the
+`surfaces(5000,3,3)` arrays overflow the default stack without it. `fpm.toml` sets
+`[fortran] source-form = "fixed"` (fpm defaults `.F` to free-form). On first build, fpm clones
+KSROP into `build/dependencies/ksrop/` at the pinned tag automatically (needs network access once,
+then it's cached).
+
+### Manual (without fpm)
+
+Only needed if you're not using fpm — e.g. testing against an unpublished local KSROP checkout.
+Since KSROP's library files are no longer present under this repo, point at wherever KSROP is
+checked out (`../KSROP` if it's a sibling directory, matching `fpm.toml`'s dependency path during
+local development):
 
 ```bat
 call "C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Auxiliary\Build\vcvars64.bat"
 call "C:\Program Files (x86)\Intel\Fortran\compiler\2025.0\env\vars.bat"
 
-ifx /heap-arrays /F:16777216 test_propagate_ks.F ksrop/propagate_ks.F ksrop/Subrouts.F ksrop/Legendre.F /exe:test_propagate_ks.exe
-ifx /heap-arrays /F:16777216 test_tle_evolution.F tle_evolution.F ksrop/TLEread.F ksrop/Subrouts.F ksrop/Legendre.F /exe:test_tle_evolution.exe
-ifx /heap-arrays /F:16777216 test_zone_select.F zone_select.F tle_evolution.F ksrop/TLEread.F ksrop/Subrouts.F ksrop/Legendre.F /exe:test_zone_select.exe
-ifx /heap-arrays /F:16777216 test_ga.F ga.F rsm.F tle_evolution.F zone_select.F ksrop/propagate_ks.F ksrop/Subrouts.F ksrop/Legendre.F ksrop/TLEread.F /exe:test_ga.exe
-ifx /heap-arrays /F:16777216 test_rsm.F rsm.F tle_evolution.F zone_select.F ksrop/propagate_ks.F ksrop/Subrouts.F ksrop/Legendre.F ksrop/TLEread.F ga.F /exe:test_rsm.exe
-ifx /heap-arrays /F:16777216 test_orem.F orem.F report.F rsm.F ga.F tle_evolution.F tle_filter.F zone_select.F ksrop/propagate_ks.F ksrop/Subrouts.F ksrop/Legendre.F ksrop/TLEread.F /exe:test_orem.exe
-ifx /heap-arrays /F:16777216 test_reentry.F orem.F rsm.F ga.F tle_evolution.F tle_filter.F zone_select.F ksrop/propagate_ks.F ksrop/Subrouts.F ksrop/Legendre.F ksrop/TLEread.F /exe:test_reentry.exe
-ifx /heap-arrays /F:16777216 test_e2e.F orem.F rsm.F ga.F tle_evolution.F tle_filter.F zone_select.F ksrop/propagate_ks.F ksrop/Subrouts.F ksrop/Legendre.F ksrop/TLEread.F /exe:test_e2e.exe
-ifx /heap-arrays /F:16777216 test_gmat.F rsm.F tle_evolution.F zone_select.F ksrop/propagate_ks.F ksrop/Subrouts.F ksrop/Legendre.F ksrop/TLEread.F ga.F /exe:test_gmat.exe
-
-ifx /heap-arrays /F:16777216 test_sw.F swx.F orem.F report.F rsm.F ga.F tle_evolution.F tle_filter.F zone_select.F ksrop/propagate_ks.F ksrop/Subrouts.F ksrop/TLEread.F ksrop/Legendre.F /exe:test_sw.exe
-ifx /heap-arrays /F:16777216 test_tle_filter.F tle_filter.F zone_select.F tle_evolution.F ksrop/TLEread.F ksrop/Subrouts.F ksrop/Legendre.F /exe:test_tle_filter.exe
-
-REM Standalone runner -- swx.F required since v1.23 (main_orem.F calls sw_load/atm2d_load)
-ifx /heap-arrays /F:16777216 main_orem.F orem.F report.F swx.F rsm.F ga.F tle_evolution.F tle_filter.F zone_select.F ksrop/propagate_ks.F ksrop/Subrouts.F ksrop/TLEread.F ksrop/Legendre.F /exe:orem.exe
+ifx /heap-arrays /F:16777216 test\test_propagate_ks.F src\propagate_ks.F ..\KSROP\src\Subrouts.F ..\KSROP\src\Legendre.F /exe:test_propagate_ks.exe
 ```
 
-### Linux (Intel oneAPI ifx)
-
-Same source lists as above, `-heap-arrays` in place of `/heap-arrays`, `ulimit -s unlimited` in place of `/F:16777216` (Linux stack size is a shell/OS setting, not a linker flag), `-o <name>.exe` in place of `/exe:<name>.exe`. Example for the runner:
-
-```bash
-ulimit -s unlimited
-ifx -heap-arrays main_orem.F orem.F report.F swx.F rsm.F ga.F tle_evolution.F tle_filter.F zone_select.F ksrop/propagate_ks.F ksrop/Subrouts.F ksrop/TLEread.F ksrop/Legendre.F -o orem.exe
-```
-
-See `test_all.sh` for the full build+test command list (used by CI).
+`/heap-arrays /F:16777216` on Windows, `-heap-arrays` + `ulimit -s unlimited` on Linux (stack size is a shell/OS setting there, not a linker flag). See `test_all.sh` for the complete manual source-list-per-executable table (local/manual fallback only — needs a sibling `../KSROP` checkout, which a CI runner doesn't have; CI uses `fpm` instead, see `.github/workflows/ci.yml`) and `fpm.toml` for the fpm target list.
 
 ---
 
@@ -151,19 +156,14 @@ See `test_all.sh` for the full build+test command list (used by CI).
 
 ### Step 1: Compile
 
-```bat
-REM Windows — Intel oneAPI
+```bash
 call "C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Auxiliary\Build\vcvars64.bat"
 call "C:\Program Files (x86)\Intel\Fortran\compiler\2025.0\env\vars.bat"
 
-ifx /heap-arrays /F:16777216 main_orem.F orem.F report.F swx.F rsm.F ga.F tle_evolution.F tle_filter.F zone_select.F ksrop/propagate_ks.F ksrop/Subrouts.F ksrop/TLEread.F ksrop/Legendre.F /exe:orem.exe
+fpm build --compiler ifx --flag "-heap-arrays"
 ```
 
-```bash
-# Linux — Intel oneAPI ifx (not gfortran -- see SS4)
-ulimit -s unlimited
-ifx -heap-arrays main_orem.F orem.F report.F swx.F rsm.F ga.F tle_evolution.F tle_filter.F zone_select.F ksrop/propagate_ks.F ksrop/Subrouts.F ksrop/TLEread.F ksrop/Legendre.F -o orem.exe
-```
+See §4 for the manual (non-fpm) build path and the Linux/`ulimit` equivalent.
 
 ### Step 2: Create a config file
 
@@ -189,6 +189,8 @@ input/example_42928.tle.txt          <- TLE file path
 ### Step 3: Run
 
 ```bash
+fpm run orem --compiler ifx --flag "-heap-arrays" -- input/orem_42928.cfg
+# or, after a manual (non-fpm) build per §4:
 ./orem.exe input/orem_42928.cfg
 ```
 
@@ -231,6 +233,9 @@ To run on a different object: copy the config, change lines 1-3 (TLE file, NORAD
 ---
 
 ## 6. Running Tests
+
+`fpm test --compiler ifx --flag "-heap-arrays"` runs all suites below in one command. Or,
+after a manual (non-fpm) build per §4, each binary individually:
 
 ```bash
 ./test_propagate_ks.exe        # Propagator tests (10 checks)
@@ -340,15 +345,22 @@ Cross-validates propagate_ks against GMAT R2026a reference runs (`scratch_gmat/g
 
 ---
 
-## 7. KSROP Source Files
+## 7. KSROP Dependency
 
-Files in `ksrop/` are copied from [hari251086/KSROP](https://github.com/hari251086/KSROP). To update after KSROP changes:
+`Subrouts.F`, `Legendre.F`, `TLEread.F` are no longer copied into this repo — they come from
+[hari251086/KSROP](https://github.com/hari251086/KSROP) as a real `fpm` dependency, pinned to a
+release tag in `fpm.toml`:
 
-```bash
-cp ../KSROP/Subrouts.F ksrop/
-cp ../KSROP/Legendre.F ksrop/
-# propagate_ks.F is a refactored version of driver_KS.F — manual sync
+```toml
+[dependencies]
+ksrop = { git = "https://github.com/hari251086/KSROP", tag = "v2.1.0" }
 ```
+
+To pick up a newer KSROP release, bump the `tag` here (and re-run the full test suite —
+`fpm test --compiler ifx --flag "-heap-arrays"` — to confirm nothing regressed before committing).
+
+`propagate_ks.F` (`src/propagate_ks.F`) is **not** part of this dependency — it's OREM's own fork
+of KSROP's `driver_KS.F` core with re-entry-specific logic added, and evolves independently.
 
 ---
 
@@ -626,6 +638,21 @@ cp ../KSROP/Legendre.F ksrop/
 
 **1.28 — 2026-07-23**
 - **Zone-to-zone IC chaining + always-wide BN search tried, measured, one reverted.** Motivated by the global RPE investigation's (#32) literature finding that ballistic coefficient shouldn't be treated as independent-per-zone. Two changes to `orem_run`'s per-zone loop: (a) propagate a trusted zone's fitted (e, BN) forward via `propagate_ks` to the next zone's first TLE epoch and use that as the next zone's RSM initial-condition seed, replacing a fresh `tle_find_osc` lookup; (b) remove the v1.21 trust-gated BN-range narrow/widen-on-boundary logic, so every zone always searches the full original `[bn_min_init, bn_max_init]` range. **Both regressed RPE**: (a)+(b) combined moved mean \|RPE\| 22.9%→27.4% (7-object) and 22.0%→32.9% (30-object), with two objects (60328, 61734) blowing up over 100 points. Root cause: chaining lets one zone's own fit uncertainty compound into the next zone's starting geometry, instead of every zone independently re-anchoring to fresh SGP4 data. **(a) reverted**, back to unconditional `tle_find_osc` for every zone. **(b) shipped anyway** per explicit user direction to isolate and measure it standalone — still a regression on its own (22.9%→26.2% / 22.0%→23.2%, notably smaller than combined and without the catastrophic per-object blowups) but not yet root-caused as thoroughly as (a); not blocking. `zone_chain.F`/`test_zone_chain.F` (the chaining implementation, verified correct via a 9-test unit suite before the campaign regression was found) were deleted along with (a). Also found and documented (not fixed, out of scope): `propagate_ks`'s own `car2ks`/`ks2car` round-trip at initialization introduces a small, stable, one-time inclination/RAAN/AOP offset from the analytical input elements — harmless for this codebase's magnitude-based apogee fitting, previously undetected since nothing else ever checked orientation fidelity out of a `propagate_ks` call. Full writeup: issue #33. **354 tests passed during development (345 after `zone_chain.F`'s removal), zero regressions, zero new pipeline failures on either campaign.**
+
+**1.29 — 2026-07-24**
+- **RPE investigation Phase 2: cheap, correlational error-budget decomposition** (`scratch_rpe/phase2_error_budget.py`, issue #32). Reused the existing 30-object campaign — `rpe_campaign.F` now also logs `zepoch`/`rms_fit` per zone (both already computed by `orem_run`, so this is a zero-new-propagation, additive change; the rerun reproduced every `e_opt`/`bn_opt`/`rpe_pct` bit-for-bit, confirming no regression). Three findings:
+  1. **Fitted BN and each TLE's own published BSTAR are strongly anti-correlated within an object** (median r=-0.70 across 20 objects with ≥3 zones; survives a zone-to-zone first-difference check guarding against a shared-trend artifact, median Δr=-0.58). Physically expected — BSTAR≈Cd·A/m while BN≈m/(Cd·A), approximate reciprocals — and confirms the GA's independent per-zone refit is tracking real, independently-derived drag-term variation (SGP4's own BSTAR fit vs. OREM's own apogee-trajectory fit), not just noise. Supports #33's literature premise (BC genuinely isn't constant) while reinforcing that *how* to exploit it matters — trajectory-chaining already failed; using each zone's nearby BSTAR as an informative prior on the BN search range (not yet built) is a more promising next candidate.
+  2. **RPE is not a horizon-length artifact.** \|RPE\| vs. prediction horizon shows ~zero correlation (r=-0.06; r=-0.10 vs. 1/horizon) across 101 zone-level predictions, and mean \|RPE\| is statistically indistinguishable for short (<100 d, 67.9%) vs. long (≥100 d, 74.2%) horizons. The large scatter in RPE reflects genuine per-zone fit/extrapolation problems, not a metric artifact — no reason to replace RPE as the project's core accuracy metric.
+  3. **Fit RMS predicts boundary-pinned degeneracy but not re-entry-date accuracy.** Boundary-pinned zones (`zstat=2`) have ~9x worse median RMS than trusted zones (0.282 vs. 0.032) — RMS is a good structural-degeneracy signal. But `r(rms_fit, |RPE|) = +0.003` across all 101 predicting zones — essentially zero. A zone can fit its own short observed window very tightly and still be wildly wrong about the extrapolated re-entry date: the window is fundamentally underdetermined for long extrapolation. This directly implies the long-standing "G4 signal-weighted zone selection" idea (#12/#16 history — weight zones by fit quality) would not help RPE, since fit RMS carries no information about extrapolation accuracy.
+
+**1.30 — 2026-07-24**
+- **RPE investigation Phase 2 closed out: the last two items (TLE noise, density-model error).** Both cheap — no new propagation.
+  1. **TLE noise has a real floor, not fully averaging-reducible.** Extended `scratch_rpe/phase2_error_budget.py` to join each zone's fit RMS against its TLE point count (already printed per-zone, just not previously extracted): median RMS falls 0.070→0.035→0.023 km as points-per-zone go <2000→2000-4000→4000-6000, then **flattens at ~0.02 km beyond ~4000-6000 points** — more tracking data stops helping. Matches #31's own diagnosis that independent per-TLE SGP4 conversion carries a systematic, not purely random, noise component. Consistent with the literature (Frueh & Schildknecht 2012): intrinsic TLE self-consistency noise for HEO (0.8-1.4 km/24h) is ~30-40x smaller than the ~35 km near-epoch error vs. independent optical truth — most real-world TLE error is SGP4/SDP4 model bias, not OD noise, and no amount of extra data removes it.
+  2. **Density-model error is already well-characterized and is likely the largest remaining physics gap — but fixing it is a project, not a diagnostic.** Three independent literature sources (Sharma 1997a: `propagate_ks.F` confirmed missing the diurnal density-bulge term, validated to <1% error if added; Swinerd & Boulton 1983: real-tracking-fit scale height runs ~11% high vs. J77 with a 7% fit-residual cost from dropping oblateness, though this is a near-circular validation that may not transfer proportionally to OREM's e=0.3-0.85 regime; ISO/CD 27852: industry-standard statement that atmospheric error dominates propagator fidelity, plus a direct critique of the exponential density form `propagate_ks.F:345` uses) all point the same direction. Posted to #14 rather than implemented here — out of scope for Phase 2's cheap/correlational mandate.
+- **Phase 2 is now fully closed (all 5 items).** Next candidates: Phase 3 (#27's Wang & Gurfil resonance test) or the BSTAR-as-prior BN-search idea from v1.29 finding 1.
+
+**1.31 — 2026-07-24**
+- **RPE investigation Phase 3: Wang & Gurfil solar-apsidal-resonance test against 33587 (issue #27).** Both previously-tested hypotheses for 33587's unexplained 131-day hp collapse (616→341 km) were already ruled out (GMAT third-body predicts flat hp like OREM's own model; a direct BN refit across the whole window finds no physically plausible constant BN). New `scratch_rpe/phase3_resonance_33587.py` computes `a(t)/e(t)/i(t)` directly from all 306 real TLEs (Kepler's third law on the TLE's own mean motion, no propagation) and evaluates Wang & Gurfil's (2017, *Adv. Space Res.* 59, Eq. 12) resonance criterion — the GTO's combined RAAN+perigee J2 drift rate becoming commensurate with the Sun's apparent motion, at which point the normal ~180-day periodic perigee oscillation turns monotonic. **Result: a genuine crossing on 2022-10-25**, 11 days before the previously-documented multi-point acceleration onset (2022-11-05) and 39 days before the record's last TLE — a real, well-timed candidate mechanism, neither of the two already-ruled-out explanations. **Caveats, stated plainly**: 33587's ~65° inclination sits well outside the paper's own validated low-inclination (6°) numerical examples and near the classical critical inclination, where the criterion's underlying term changes sign (handled via the correct real odd-root branch, `abs(x)**(2/7)`, but still an extrapolation); and the match found is on crossing *timing*, not a magnitude reproduction (would need Wang & Gurfil's SAOD model actually implemented and integrated to check that). An exploratory sweep across all 30 campaign objects finds 8/30 show a crossing at all, several landing within days of the object's own decay (44187: 0-1 days; 60328: 0-10 days; 59347: 28-30 days) while several other near-65° objects show no crossing at all (so it isn't firing on inclination alone) — a real, testable pattern, not yet independently confirmed against a naive-baseline check. **Not proposing to close #27** on this alone; recommend keeping it open with this as a documented, credible lead. Full writeup: #27 and #32 comments.
 
 ---
 
