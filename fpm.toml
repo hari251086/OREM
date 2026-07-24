@@ -1,0 +1,79 @@
+name = "orem"
+version = "0.1.0"
+license = "license"
+author = "Harishkumar Sellamuthu"
+description = "Re-entry prediction: RSM/GA fitting over KS-regularized propagation"
+
+[library]
+source-dir = "src"
+
+[fortran]
+source-form = "fixed"
+
+[[executable]]
+name = "orem"
+source-dir = "app"
+main = "main_orem.F"
+
+[[test]]
+name = "test_propagate_ks"
+source-dir = "test"
+main = "test_propagate_ks.F"
+
+[[test]]
+name = "test_tle_evolution"
+source-dir = "test"
+main = "test_tle_evolution.F"
+
+[[test]]
+name = "test_tle_filter"
+source-dir = "test"
+main = "test_tle_filter.F"
+
+[[test]]
+name = "test_zone_select"
+source-dir = "test"
+main = "test_zone_select.F"
+
+[[test]]
+name = "test_ga"
+source-dir = "test"
+main = "test_ga.F"
+
+[[test]]
+name = "test_ga_sensitivity"
+source-dir = "test"
+main = "test_ga_sensitivity.F"
+
+[[test]]
+name = "test_rsm"
+source-dir = "test"
+main = "test_rsm.F"
+
+[[test]]
+name = "test_sw"
+source-dir = "test"
+main = "test_sw.F"
+
+[[test]]
+name = "test_orem"
+source-dir = "test"
+main = "test_orem.F"
+
+[[test]]
+name = "test_reentry"
+source-dir = "test"
+main = "test_reentry.F"
+
+[[test]]
+name = "test_e2e"
+source-dir = "test"
+main = "test_e2e.F"
+
+[[test]]
+name = "test_gmat"
+source-dir = "test"
+main = "test_gmat.F"
+
+[dependencies]
+ksrop = { path = "../KSROP" }
