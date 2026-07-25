@@ -738,6 +738,18 @@ of KSROP's `driver_KS.F` core with re-entry-specific logic added, and evolves in
   - **Not applicable to OREM at all**: the standard's §5.2 (bulk of its remaining technical content) is about *forecasting* solar/geomagnetic activity uncertainty over an unknown 20-30-year future window via random historical-triad draws — OREM's short-horizon predictions use already-observed real history, never a multi-decade forecast, so this entire section doesn't transfer.
   - **Net assessment**: no new actionable gap found beyond what #26/#14 already track — the main value of this exercise was correcting an overstated prior claim (OREM's atmosphere model isn't in the standard's "avoid" category) and confirming #26's weather work already satisfies the standard's central concern. This closes out Phase 5's second candidate. Full writeup: #32 comment.
 
+**1.40 — 2026-07-25**
+- **RPE campaign extended 30 → 50 objects (issue #29).** 20 new objects filtered from a fresh `satcat.csv` pull (APOGEE>8000, PERIGEE<3000, ROCKET BODY/DEBRIS, decay after 2015, excluding all 30 already used) — 41 raw candidates, screened down using the exact same criteria every prior expansion round established (already-known saturated-ndot/too-few-TLE/multi-decade-gap exclusions, plus 3 new anomalous-apogee CZ-5-class exclusions likely to be trans-lunar-injection stages, not GTO). A large SL-12 debris cluster shared near-identical 2025-05-07/08 decay dates (likely one breakup/catalog-processing batch, not independent events) — kept only a representative subset rather than the whole cluster. **Reproducibility verified**: the original 30 objects reproduce bit-identical `bn_opt` across all 148 predicting zones — the expansion adds data without perturbing anything existing.
+  - **Result is genuinely mixed, not a clean win or loss**:
+
+    | Set | mean\|latest-zone RPE\| | mean\|ensemble RPE\| | predict rate |
+    |---|---|---|---|
+    | 30-object (unchanged) | 35.5% | 21.5% | 63% (19/30) |
+    | 20 new objects only | 47.4% (worse) | 15.6% (**better**) | 45% (9/20, lower) |
+    | 50-object combined | 39.3% | 19.0% | 56% (28/50) |
+
+  - The new 20 predict *less often* (45% vs 63%) — consistent with #29's core generalization concern — but the ones that *do* predict do notably better on the ensemble metric than the curated 30, while doing worse on latest-zone. Not a uniform "broader sets are worse" story on every axis. Pre-expansion 30-object baseline preserved at `scratch_rpe/rpe_campaign_30obj_pre50_backup.{csv,log}`. Full writeup: #29 and #32 comments.
+
 ---
 
 ## 9. References
