@@ -716,6 +716,19 @@ of KSROP's `driver_KS.F` core with re-entry-specific logic added, and evolves in
   - **Correct interpretation, not "OREM is wrong": BN is a `propagate_ks`-specific calibrated parameter, not a transferable physical ballistic coefficient.** OREM's GA fits BN specifically so `propagate_ks`'s own density profile reproduces the observed TLE decay — the same numeric BN plugged into a *different* atmosphere model (JacchiaRoberts) doesn't preserve equivalent drag acceleration if the two models' density-vs-altitude profiles differ. This cross-check quantifies, for the first time with a real number, the density-model gap already flagged in Phase 0/2 literature (Swinerd & Boulton 1983: real-tracking-fit scale height ~11% high vs J77; ISO/CD 27852's direct critique of `propagate_ks.F`'s exponential density form) — `propagate_ks`'s implied density is apparently understated enough that JacchiaRoberts decays the same nominal state 42% faster over this horizon.
   - Not a regression or a bug to fix here — a credibility/context finding for the whole RPE campaign: OREM's internal self-consistency (fitting BN to match TLEs, then extrapolating with the same model) is what the RPE metric measures, and this cross-check is evidence that self-consistency is doing real work masking a real, sizeable density-model discrepancy from any *external* physical ballistic-coefficient interpretation. Full writeup: #32 comment.
 - **Extended to a second object (39615, Proton-M Briz-M) — the gap is consistent, not object-specific.** Same methodology (`scratch_gmat/gmat_xval_39615z8_2026.script`), a very different case: inclination 48.4° vs 42928's 19.1°, eccentricity 0.28 vs 0.13, BN 53.1 vs 93.5, six-month-different epoch. OREM predicts 150.2 days to re-entry (RPE +9.4% vs the 137.3-day observed horizon); GMAT's independent propagation of the identical fitted state reaches 102 km in 80.3 days — **46.5% sooner**, remarkably close to 42928's 44.1% gap despite the objects sharing almost nothing else. Strong evidence this is a systematic `propagate_ks`-vs-JacchiaRoberts density-model offset, not an object- or altitude-specific artifact (n=2, both perigee ~130-140 km at fit time — a third check at a different perigee regime would further test that boundary). Full writeup: #32 comment.
+- **Extended to the full curated 7-object set — a more nuanced picture than n=2 suggested, one real reversal found.** Same methodology on the remaining 5 (35497, 37151, 27526, 32007, 37819):
+
+  | norad | perigee alt (km) | inc (deg) | OREM (days) | GMAT (days) | GMAT vs OREM |
+  |---|---|---|---|---|---|
+  | 27526 | 118.5 | 17.6 | 11.6 | 3.7 | -67.9% |
+  | 37151 | 130.5 | 24.8 | 137.5 | 47.6 | -65.4% |
+  | 39615 | 130.7 | 48.4 | 150.2 | 80.3 | -46.5% |
+  | 42928 | 140.6 | 19.1 | 86.4 | 48.3 | -44.1% |
+  | 35497 | 109.0 | 5.7 | 34.2 | 20.6 | -39.6% |
+  | 32007 | 169.4 | 25.8 | 133.2 | 85.0 | -36.2% |
+  | 37819 | 139.7 | **63.2** | 96.3 | 101.3 | **+5.2%** |
+
+  6 of 7 objects still show GMAT decaying faster (direction consistent), but the *magnitude* ranges widely (-36% to -68%), not the tight ~45% band the first two suggested — the earlier framing was accurate as far as it went but didn't yet have enough data to see the real spread. **37819 reverses the direction entirely** — notably the only object with inclination above 50° (63.2° vs everyone else's <50°), a plausible but unconfirmed candidate explanation (n=1 for that regime, not established). No clean single-variable trend against perigee altitude either (169km gives the smallest gap among the 6 consistent cases, but 109km gives a smaller gap than 118-130km, not a monotonic relationship). **Honest summary: real, substantial, mostly-one-directional density-model disagreement between `propagate_ks` and JacchiaRoberts, but not a single fixed correction factor — inclination (and possibly other factors) modulates it, not yet characterized precisely.** Full writeup: #32 comment.
 
 ---
 
