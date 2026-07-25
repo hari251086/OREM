@@ -1,0 +1,76 @@
+%General Mission Analysis Tool(GMAT) Script
+%  OREM issue #32 Phase 5, cross-check #2 (39615, Proton-M Briz-M --
+%  different object/inclination than the first check on 42928, same
+%  methodology). Independently propagates OREM's current (2026-07-25)
+%  fitted state for zone 8 (latest zone, primary estimator) through
+%  GMAT's own JacchiaRoberts drag model, checking whether the ~40%
+%  disagreement found for 42928 is a consistent offset or specific to
+%  that object/altitude.
+%
+%  Zone-8 IC (SGP4-osculating, epoch 2457874.216764 JD = 30 Apr 2017
+%  17:12:08.41 UTC): sma=9062.574412, e=0.281788, inc=48.423028,
+%  raan=357.047476, aop=84.139621, ma=306.778863 (from orem.F's own
+%  internal state via a temporary debug dump, reverted, not shipped).
+%  Fitted (Z8, GA): e_opt=0.281798, bn_opt=53.064 -- perigee radius
+%  preserved (rp=6508.849694 km, perigee alt 130.7 km, comparable to
+%  42928's 140.6 km) -> SMA=9062.700596, TA=275.726675 (MA resolved
+%  via Kepler's equation using e_opt, matching oe2car).
+%
+%  OREM prediction (Z8, today's fit): JD 2458024.4494, RPE=+9.433% vs
+%  observed 2017-09-15 decay (137.28-day horizon from zone start).
+%
+%  Force model identical to the 42928 cross-check (same campaign
+%  config): EGM2008 zonal Degree=20/Order=0, Sun+Luna point mass, SRP
+%  on, JacchiaRoberts with CONSTANT F107=72/F107A=72/Kp=1.0 (matches
+%  the static campaign this fit came from). Stop threshold 102 km.
+
+Create ForceModel FMc;
+GMAT FMc.CentralBody = Earth;
+GMAT FMc.PrimaryBodies = {Earth};
+GMAT FMc.PointMasses = {Sun, Luna};
+GMAT FMc.GravityField.Earth.Degree = 20;
+GMAT FMc.GravityField.Earth.Order = 0;
+GMAT FMc.GravityField.Earth.PotentialFile = 'C:\Users\hari2\OneDrive\Documents\GitHub\KSROP\scratch_gmat\EGM2008_72x72.cof';
+GMAT FMc.Drag.AtmosphereModel = JacchiaRoberts;
+GMAT FMc.Drag.HistoricWeatherSource = 'ConstantFluxAndGeoMag';
+GMAT FMc.Drag.PredictedWeatherSource = 'ConstantFluxAndGeoMag';
+GMAT FMc.Drag.F107 = 72;
+GMAT FMc.Drag.F107A = 72;
+GMAT FMc.Drag.MagneticIndex = 1.0;
+GMAT FMc.SRP = On;
+
+Create Propagator Propc;
+GMAT Propc.FM = FMc;
+GMAT Propc.Type = RungeKutta89;
+GMAT Propc.InitialStepSize = 10;
+GMAT Propc.Accuracy = 1e-12;
+GMAT Propc.MinStep = 0.001;
+GMAT Propc.MaxStep = 300;
+
+Create Spacecraft SCc;
+GMAT SCc.DateFormat = UTCGregorian;
+GMAT SCc.Epoch = '30 Apr 2017 17:12:08.410';
+GMAT SCc.CoordinateSystem = EarthMJ2000Eq;
+GMAT SCc.DisplayStateType = Keplerian;
+GMAT SCc.SMA = 9062.700596;
+GMAT SCc.ECC = 0.281798;
+GMAT SCc.INC = 48.423028;
+GMAT SCc.RAAN = 357.047476;
+GMAT SCc.AOP = 84.139621;
+GMAT SCc.TA = 275.726675;
+GMAT SCc.Cd = 1;
+GMAT SCc.DragArea = 1;
+GMAT SCc.DryMass = 53.064;
+GMAT SCc.Cr = 1.2;
+GMAT SCc.SRPArea = 0.530640;
+
+Create ReportFile Repxv;
+GMAT Repxv.Filename = 'gmat_xval_39615z8_2026_results.txt';
+GMAT Repxv.Precision = 16;
+GMAT Repxv.WriteHeaders = true;
+
+BeginMissionSequence;
+
+Report Repxv SCc.UTCModJulian SCc.ElapsedDays SCc.Earth.Altitude;
+Propagate Propc(SCc) {SCc.Earth.Altitude = 102, SCc.ElapsedDays = 1200};
+Report Repxv SCc.UTCModJulian SCc.ElapsedDays SCc.Earth.Altitude;

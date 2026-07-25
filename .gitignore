@@ -15,6 +15,10 @@ debug_*.F
 # Large multi-satellite catalog (94k entries, not needed for tests)
 input/example_multi.tle.txt
 
+# Generated test/run reports (output/.gitkeep marks the dir as tracked, contents are not)
+output/*.txt
+!output/.gitkeep
+
 # Credentials -- never commit these
 .env
 .env.*

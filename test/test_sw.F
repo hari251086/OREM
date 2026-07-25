@@ -17,6 +17,8 @@ c     -------------------------------------------------------
       double precision cal(6), jd, tinf, tinf2, rho, hs
       double precision rho72, hs72, rho_hi
       integer ist
+c     Issue #32 Phase 5 follow-up: diurnal density bulge
+      double precision tbmax, tbmin, ts_bulge(3), xb(3), cphi
 
       call init_constants()
       npass = 0
@@ -132,6 +134,63 @@ c     epoch at solar minimum (2019) vs one at the 2024 maximum:
 c     7-day apogee decay must be substantially larger at the max.
 c     ---------------------------------------------------------
       call smoke_prop(npass, nfail)
+
+c     ---------------------------------------------------------
+c     W13-W15: jacchia_bulge_extrema (issue #32 Phase 5 diurnal
+c     bulge). At the equinox (decl_sun=0), phi_max=phi_min=0 exactly
+c     (atan(0)=0), so the formula collapses to an exact closed form
+c     with no transcendental-function rounding risk:
+c       Tmax = Tmean*(1 + 0.24*Kmax) = Tmean*1.130992
+c       Tmin = Tmean*(1 + 0.24*Kmin) = Tmean*0.862672
+c     ---------------------------------------------------------
+      call jacchia_bulge_extrema(1000.d0, 0.d0, tbmax, tbmin)
+      call asrt_d('W13 bulge extrema: equinox Tmax',
+     &            tbmax, 1130.992d0, 1.d-3, npass, nfail)
+      call asrt_d('W14 bulge extrema: equinox Tmin',
+     &            tbmin, 862.672d0, 1.d-3, npass, nfail)
+
+c     At any nonzero declination the extrema must still bracket the
+c     mean (qualitative sanity, not a specific transcendental value)
+      call jacchia_bulge_extrema(1000.d0, 23.439d0, tbmax, tbmin)
+      if (tbmax .gt. 1000.d0 .and. tbmin .lt. 1000.d0) then
+         call asrt_i('W15 bulge extrema: solstice brackets mean',
+     &               1, 1, npass, nfail)
+      else
+         call asrt_i('W15 bulge extrema: solstice brackets mean',
+     &               0, 1, npass, nfail)
+      end if
+
+c     ---------------------------------------------------------
+c     W16-W18: bulge_cosphi (issue #32 Phase 5 diurnal bulge).
+c     Sun fixed on the equatorial x-axis (dec_sun=0, ra_sun=0) ->
+c     bulge direction is dec=0, ra=37deg exactly. Three exact
+c     geometric cases: satellite AT the bulge direction, at its
+c     antipode, and 90deg away.
+c     ---------------------------------------------------------
+      ts_bulge(1) = 1.d0
+      ts_bulge(2) = 0.d0
+      ts_bulge(3) = 0.d0
+
+      xb(1) = dcos(37.d0*d2r)
+      xb(2) = dsin(37.d0*d2r)
+      xb(3) = 0.d0
+      call bulge_cosphi(xb, ts_bulge, 37.d0, cphi)
+      call asrt_d('W16 bulge_cosphi: at bulge direction',
+     &            cphi, 1.d0, 1.d-10, npass, nfail)
+
+      xb(1) = -dcos(37.d0*d2r)
+      xb(2) = -dsin(37.d0*d2r)
+      xb(3) = 0.d0
+      call bulge_cosphi(xb, ts_bulge, 37.d0, cphi)
+      call asrt_d('W17 bulge_cosphi: antipodal',
+     &            cphi, -1.d0, 1.d-10, npass, nfail)
+
+      xb(1) = dcos(127.d0*d2r)
+      xb(2) = dsin(127.d0*d2r)
+      xb(3) = 0.d0
+      call bulge_cosphi(xb, ts_bulge, 37.d0, cphi)
+      call asrt_d('W18 bulge_cosphi: 90deg away',
+     &            cphi, 0.d0, 1.d-10, npass, nfail)
 
       write(*,*) ''
       write(*,*) '=============================================='

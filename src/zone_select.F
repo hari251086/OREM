@@ -216,10 +216,36 @@ c        Jump past this zone to find next one
  50   continue
 
 c     ---------------------------------------------------------
-c     Pass 2: Select best zones from candidates
+c     Pass 1.5: guarantee the most recent candidate a slot before
+c     the R²-greedy pass below runs. Candidates are already stored
+c     in chronological order by Pass 1 (every acceptance jumps the
+c     scan past the whole window before the next start is tried,
+c     so cand_s/cand_e are strictly increasing) -- the most recent
+c     candidate is simply index ncand, no search needed.
+c
+c     Without this, a long TLE history's numerous older high-R²
+c     windows can crowd out the physically critical terminal-decay
+c     zone before nzones_max is reached, even when a qualifying
+c     late window exists (see main_orem.F's mxz=50 comment for the
+c     motivating case, object 11550 -- that fix only raised the
+c     zone-count cap so more zones fit, it never changed Pass 2's
+c     selection criterion, so the same crowding can still occur at
+c     the cap the caller actually configures). This never removes a
+c     candidate the old R²-greedy pass would have kept -- it only
+c     spends one of nzones_max slots differently.
+c     ---------------------------------------------------------
+      if (ncand .ge. 1 .and. nzones_max .ge. 1) then
+         nzones = nzones + 1
+         zone_start(nzones) = cand_s(ncand)
+         zone_end(nzones)   = cand_e(ncand)
+         cand_r2(ncand) = -1.d0
+      end if
+
+c     ---------------------------------------------------------
+c     Pass 2: Select remaining best zones from candidates
 c     Prefer higher R², earlier epochs. No overlaps.
 c     ---------------------------------------------------------
-      do k = 1, nzones_max
+      do k = nzones + 1, nzones_max
          if (ncand .eq. 0) goto 60
 
 c        Find candidate with best R²

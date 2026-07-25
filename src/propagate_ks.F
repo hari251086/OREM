@@ -93,6 +93,16 @@ c     referenced to perigee conditions)
 c     Issue #26: per-revolution space-weather state
       double precision tinf_wx
       integer ist_wx
+c     Issue #32 Phase 5 follow-up: diurnal density bulge (only
+c     computable when weather mode is active, since it needs the
+c     atm2d T-to-density mapping). f_bulge refreshed once per
+c     revolution (same cadence as RHOPI_dg/H_dg/F_dg/C_dg above);
+c     cosphi_dg refreshed every step since the satellite's own
+c     position relative to the bulge direction changes fast.
+      double precision tmax_wx, tmin_wx, decl_sun_dg
+      double precision rho_max_wx, rho_min_wx, h_dum_wx
+      double precision f_bulge, cosphi_dg
+      integer ist_bulge
 c     SRP: cannonball SRP perturbation
       dimension p_srp(3), qsrp(4), r_srp(3)
       double precision PSR_loc
@@ -297,6 +307,34 @@ c     0 and the legacy path below runs unchanged.
      &                     HSQ_dg, H_dg)
             end if
             if (H_dg .le. 0.d0) H_dg = 1.d0
+
+c           Issue #32 Phase 5 follow-up: diurnal density bulge
+c           amplitude, only derivable when weather mode succeeded
+c           (needs the atm2d T-to-density mapping at this same
+c           perigee altitude, from the same table already loaded).
+c           Inactive (f_bulge=0, a pure no-op) whenever weather mode
+c           is off or either extremum lookup falls outside the
+c           loaded table -- same auto-detect philosophy as issue #26
+c           itself. Refreshed once per revolution (Sun declination
+c           barely changes within one orbit); the geometric factor
+c           that multiplies it (cosphi_dg) is refreshed every step.
+            f_bulge = 0.d0
+            if (tinf_wx .gt. 0.d0 .and. ist_wx .eq. 0) then
+               decl_sun_dg = dasin(ts(3)/dsqrt(ts(1)**2+ts(2)**2
+     &                       +ts(3)**2)) * r2d
+               call jacchia_bulge_extrema(tinf_wx, decl_sun_dg,
+     &                                    tmax_wx, tmin_wx)
+               call atm2d_interp(HSQ_dg, tmax_wx,
+     &                           rho_max_wx, h_dum_wx, ist_bulge)
+               if (ist_bulge .eq. 0) then
+                  call atm2d_interp(HSQ_dg, tmin_wx,
+     &                              rho_min_wx, h_dum_wx, ist_bulge)
+                  if (ist_bulge .eq. 0 .and. rho_min_wx .gt. 0.d0)
+     &               f_bulge = (rho_max_wx/rho_min_wx - 1.d0)
+     &                       / (rho_max_wx/rho_min_wx + 1.d0)
+               end if
+            end if
+
             BETA_dg = 1.d0/H_dg
             RPO_dg  = SQ_dg
             VPO_dg  = dsqrt(amue*1.d9
@@ -344,8 +382,19 @@ c              perigee density bump.
                else
                   TER_dg = dexp(exp_arg)
                end if
-               DENS = -F_dg*RHOPI_dg*TER_dg
-     &              *V/(BN*2.d0)*1.d-7
+c              Issue #32 Phase 5 follow-up: diurnal density bulge --
+c              geometric factor evaluated at the satellite's CURRENT
+c              stage position (unlike f_bulge, this genuinely varies
+c              fast within one revolution, since that's the whole
+c              point of a day/night bulge). f_bulge=0 (weather mode
+c              off, the common case) makes this an exact no-op
+c              regardless of cosphi_dg's value.
+               cosphi_dg = 0.d0
+               if (f_bulge .ne. 0.d0)
+     &            call bulge_cosphi(x, ts, 37.d0, cosphi_dg)
+
+               DENS = -F_dg*RHOPI_dg*(1.d0 + f_bulge*cosphi_dg)
+     &              *TER_dg*V/(BN*2.d0)*1.d-7
                do i = 1,3
                   p_drag(i) = DENS * xd(i)
                end do
@@ -712,6 +761,89 @@ c     ============================================================
       s2 = sch2d(ia,it+1) + fa*(sch2d(ia+1,it+1) - sch2d(ia,it+1))
       h_s = s1 + ft*(s2 - s1)
       if (h_s .le. 0.d0) h_s = 1.d0
+
+      return
+      end
+
+c     ============================================================
+c     jacchia_bulge_extrema — exospheric temperature extrema (issue
+c     #32 Phase 5 diurnal-bulge follow-up). Implements Swinerd &
+c     Boulton 1983 eq. (28)-(29) (their own real-tracking best fit
+c     against satellite 1963-27A found k_F=1.02 vs this J77-lineage
+c     formula, i.e. the real diurnal amplitude is within 2% of what
+c     this predicts): given the mean exospheric temperature (from
+c     sw_tinf) and the Sun's current declination, returns the
+c     GLOBAL max/min of the diurnal temperature distribution — the
+c     inputs to the diurnal density bulge amplitude (mapped through
+c     atm2d_interp by the caller; see bulge_cosphi for the separate
+c     geometric factor). K_max/K_min and the 0.15/0.24 coefficients
+c     are the paper's own literature-cited constants, not fitted
+c     here.
+c
+c     tmean       : mean exospheric temperature, K (sw_tinf output)
+c     decl_sun_deg: Sun declination, degrees
+c     tmax, tmin  : output temperature extrema, K
+c     ============================================================
+      subroutine jacchia_bulge_extrema(tmean, decl_sun_deg,
+     &                                  tmax, tmin)
+      implicit none
+      double precision tmean, decl_sun_deg, tmax, tmin
+
+      double precision eps_ecl, ratio, kmax, kmin
+      double precision phi_max, phi_min
+      parameter (eps_ecl = 23.439d0)
+      parameter (kmax = 0.5458d0, kmin = -0.5722d0)
+
+      ratio = decl_sun_deg / eps_ecl
+
+      phi_max = datan((5.d0/8.d0)*ratio/kmax)
+      tmax = tmean*(1.d0 + 0.15d0*ratio*dsin(phi_max)
+     &     + 0.24d0*kmax*dcos(phi_max))
+
+      phi_min = datan((5.d0/8.d0)*ratio/kmin)
+      tmin = tmean*(1.d0 + 0.15d0*ratio*dsin(phi_min)
+     &     + 0.24d0*kmin*dcos(phi_min))
+
+      return
+      end
+
+c     ============================================================
+c     bulge_cosphi — geocentric angular factor for the diurnal
+c     density bulge (issue #32 Phase 5 diurnal-bulge follow-up).
+c     Returns cos(phi), phi = angular distance from the satellite's
+c     current position to the bulge-maximum direction: same
+c     declination as the Sun, right ascension lagging the Sun by
+c     lam_deg (Swinerd & Boulton 1983's real-tracking fit,
+c     lam=37deg, matching CIRA 1972's independent 14.1h
+c     local-solar-time estimate almost exactly).
+c
+c     x(3)    : satellite geocentric position (any consistent units)
+c     ts(3)   : Sun geocentric position (same frame as x — already
+c               computed via solarnpv for third-body/SRP physics)
+c     lam_deg : bulge lag angle, degrees
+c     ============================================================
+      subroutine bulge_cosphi(x, ts, lam_deg, cosphi)
+      implicit none
+      double precision x(3), ts(3), lam_deg, cosphi
+
+      double precision d2r_loc
+      parameter (d2r_loc = 0.017453292519943295d0)
+
+      double precision r_sat, r_sun, dec_sat, ra_sat
+      double precision dec_sun, ra_sun, ra_bulge
+
+      r_sat = dsqrt(x(1)**2 + x(2)**2 + x(3)**2)
+      r_sun = dsqrt(ts(1)**2 + ts(2)**2 + ts(3)**2)
+
+      dec_sat = dasin(x(3)/r_sat)
+      ra_sat  = datan2(x(2), x(1))
+
+      dec_sun = dasin(ts(3)/r_sun)
+      ra_sun  = datan2(ts(2), ts(1))
+      ra_bulge = ra_sun + lam_deg*d2r_loc
+
+      cosphi = dsin(dec_sat)*dsin(dec_sun)
+     &       + dcos(dec_sat)*dcos(dec_sun)*dcos(ra_sat - ra_bulge)
 
       return
       end

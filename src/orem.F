@@ -164,7 +164,7 @@ c     Force model
 
 c     Working
       double precision bn_lo, bn_hi, e_mid, de
-      double precision bn_val, t_obs_jd
+      double precision bn_val, t_obs_jd, bn_range
       double precision a_kep(7), x0(3), xd0(3), cal0(6)
       integer iz, i, nzone, nvalid, nzone1
       double precision smin, smax
@@ -177,6 +177,18 @@ c     (only index-1 of smaz/ez/incz/raanz/aopz/maz is ever used as a
 c     propagation initial condition -- see tle_find_osc below)
       double precision a_kep_osc1(7)
       logical osc_ok
+
+c     Issue #32 (G3): BSTAR-informed BN search-range prior, per zone
+      double precision bn_lo_zone, bn_hi_zone
+      logical bn_prior_ok
+
+c     Issue #31 follow-up: smooth (linfit-trend) mean/osculating bias
+c     correction for haz -- see the noise-matched apobs comment below.
+c     Revisited 2026-07-25 alongside G3+trust-gate (see project memory
+c     for the earlier flat result measured before those existed).
+      double precision bias_t(500), bias_y(500)
+      double precision bias_slope, bias_intcpt, bias_r2
+      integer nbias
 
       ierr = 0
       nzones_used = 0
@@ -377,14 +389,25 @@ c        (#10) can shrink a zone after selection.
             smaz(i)  = a_tle(zone_start(iz) + i - 1)
          end do
 
-c        Issue #31: haz feeds rsm_generate's apobs, which ga_fitness
-c        RMS-compares directly against propagate_ks's genuinely-
-c        osculating surfaces -- overwrite it per-point with true
-c        SGP4-osculating apogee here, AFTER zone_select already picked
-c        this window using the mean-element ha_tle above (deliberately
-c        -- see tle_evolution.F). Falls back to the mean value already
-c        in haz(i) if SGP4 fails for a given point (e.g. deep-space
-c        edge case).
+c        Issue #31 follow-up (noise-matched apobs, revisited 2026-07-25
+c        alongside G3+trust-gate): haz feeds rsm_generate's apobs,
+c        which ga_fitness RMS-compares directly against propagate_ks's
+c        genuinely-osculating surfaces. An earlier version overwrote
+c        haz(i) per-point with an INDEPENDENT SGP4-osculating
+c        conversion of that TLE alone -- correct in isolation, but
+c        each TLE is its own independently least-squares-fit snapshot,
+c        so consecutive points' true/mean anomaly phases are
+c        effectively uncorrelated, and the resulting series carried
+c        phase-dependent noise that doesn't match propagate_ks's own
+c        smoothly-evolving trajectory (measured flat/no-help against
+c        the pre-G3 baseline; see project memory). Fix: keep the
+c        smooth mean-element ha_tle trend (already in haz(i) from the
+c        copy loop above) as the base signal, and add back only the
+c        SMOOTH (linear-in-time) part of the mean/osculating bias, fit
+c        via the same linfit() zone_select.F already uses. Falls back
+c        to the unmodified mean-element haz(i) if fewer than 2 points
+c        in the zone get a successful SGP4 conversion to fit against.
+         nbias = 0
          do i = 1, nzone
             call tle_find_osc(norad_id, epz(i),
      &         norad_raw, epoch_yr_raw, epoch_day_raw,
@@ -392,9 +415,19 @@ c        edge case).
      &         amm_raw, bstar_raw, ntle_raw, maxtle,
      &         a_kep_osc1, osc_ok)
             if (osc_ok) then
-               haz(i) = a_kep_osc1(1)*(1.d0+a_kep_osc1(2)) - R_Earth
+               nbias = nbias + 1
+               bias_t(nbias) = epz(i)
+               bias_y(nbias) = a_kep_osc1(1)*(1.d0+a_kep_osc1(2))
+     &                         - R_Earth - haz(i)
             end if
          end do
+         if (nbias .ge. 2) then
+            call linfit(bias_t, bias_y, nbias,
+     &         bias_slope, bias_intcpt, bias_r2)
+            do i = 1, nzone
+               haz(i) = haz(i) + bias_slope*epz(i) + bias_intcpt
+            end do
+         end if
 
          do j = 1, nzone
             maz(j) = 0.d0
@@ -439,11 +472,26 @@ c        investigation.)
          end do
          if (de .lt. 1.d-5) de = 5.d-4
 
+c        Issue #32 (G3): narrow this zone's BN search range using its
+c        own TLE-published BSTAR as an informative prior (intersection
+c        only -- never widens beyond bn_lo/bn_hi). Falls back to the
+c        unmodified bn_lo/bn_hi if this zone's BSTAR is unavailable or
+c        the prior window doesn't overlap the caller's range at all.
+         call estimate_bn_bstar_prior(norad_id, epz, nzone,
+     &      norad_raw, epoch_yr_raw, epoch_day_raw, bstar_raw,
+     &      ntle_raw, maxtle,
+     &      bn_lo, bn_hi, bn_lo_zone, bn_hi_zone, bn_prior_ok)
+         if (bn_prior_ok) then
+            write(*,'(A,I2,A,F7.2,A,F7.2,A)')
+     &         '  [INFO] Z', iz, ': G3 BSTAR prior narrows BN to [',
+     &         bn_lo_zone, ',', bn_hi_zone, ']'
+         end if
+
          call rsm_generate(
      &      epz, haz, ez, incz, raanz, aopz, maz, smaz,
      &      nzone,
      &      e_mid - de, e_mid + de,
-     &      bn_lo, bn_hi,
+     &      bn_lo_zone, bn_hi_zone,
      &      200, 360, 1.d-10,
      &      n_force, ngeo_deg, nsun_deg, nmoon_deg,
      &      WE_rot, EPS_f, FR_rot,
@@ -595,18 +643,33 @@ c        Re-entry propagation with optimal (e, BN)
             end if
          end if
 
-c        BN search range: deliberately left untouched here (no per-
-c        zone narrowing/widening) -- every zone always searches the
-c        full original [bn_min_init, bn_max_init] range from
-c        bn_lo/bn_hi's one-time setup before this loop (plus the G2
-c        floor adjustment, also one-time). Confirmed with user: BN
-c        may genuinely drift zone to zone, so the search itself
-c        should stay wide/agnostic rather than re-centering on any
-c        single zone's own fit. This replaces the old per-zone
-c        narrow/widen-on-boundary logic that used to live here (see
-c        git history) -- e_at_bound/bn_at_bound above still flag
-c        boundary-saturated fits, that diagnostic is unchanged, only
-c        the range-resizing action on it was removed.
+c        Issue #33 revisit: restore the v1.21 trust-gated BN-range
+c        narrow/widen-on-boundary logic (removed in #33 as an
+c        isolated experiment; removing it measurably regressed RPE
+c        22.9%->26.2%/22.0%->23.2% on its own, but that was tested
+c        BEFORE G3 (issue #32) existed). This adjusts the GLOBAL
+c        bn_lo/bn_hi carried into the next zone -- composes with G3
+c        naturally, since G3 intersects its own per-zone BSTAR prior
+c        against whatever bn_lo/bn_hi currently is at call time. Same
+c        v1.21 trust gate as before: only chain from a zone whose fit
+c        carries real drag signal (drag on: it predicted a re-entry;
+c        drag off: zone_status(iz)==0) -- an untrusted zone's BN is
+c        weak-signal noise, chaining from it previously imprisoned
+c        later zones (37151's 8-zone chain marched [12.5,160] to
+c        [17.2,24.9] through seven untrusted zones). Untrusted zones
+c        leave the range unchanged for the next zone.
+         if ((idrag_flag .eq. 1 .and. reentry_jd(iz) .gt. 0.d0)
+     &       .or.
+     &       (idrag_flag .eq. 0 .and. zone_status(iz) .eq. 0)) then
+            if (bn_at_bound) then
+               bn_range = (bn_hi - bn_lo) * 1.5d0
+            else
+               bn_range = (bn_hi - bn_lo) * 0.5d0
+            end if
+            bn_lo = bn_opt_out(iz) - bn_range / 2.d0
+            bn_hi = bn_opt_out(iz) + bn_range / 2.d0
+            if (bn_lo .lt. 10.d0) bn_lo = 10.d0
+         end if
 
  50      continue
       end do
@@ -788,6 +851,149 @@ c     ============================================================
             end if
          end if
       end do
+
+      return
+      end
+
+c     ============================================================
+      subroutine tle_find_bstar(norad_id, epoch_jd,
+     &   norad_raw, epoch_yr_raw, epoch_day_raw, bstar_raw,
+     &   ntle_raw, maxtle, bstar_out)
+c     Find BSTAR from raw TLE array matching epoch (same epoch-match
+c     tolerance/pattern as tle_find_ma).
+c     ============================================================
+      implicit double precision (a-h, o-z)
+      integer norad_id, ntle_raw, maxtle
+      integer norad_raw(maxtle), epoch_yr_raw(maxtle)
+      double precision epoch_day_raw(maxtle), bstar_raw(maxtle)
+      double precision epoch_jd, bstar_out
+      integer i
+
+      bstar_out = 0.d0
+      do i = 1, ntle_raw
+         if (norad_raw(i) .eq. norad_id) then
+            call tle_epoch2jd(epoch_yr_raw(i),
+     &           epoch_day_raw(i), djd_tmp)
+            if (dabs(djd_tmp - epoch_jd) .lt. 0.01d0) then
+               bstar_out = bstar_raw(i)
+               return
+            end if
+         end if
+      end do
+
+      return
+      end
+
+c     ============================================================
+      subroutine estimate_bn_bstar_prior(norad_id, epz, nzone,
+     &   norad_raw, epoch_yr_raw, epoch_day_raw, bstar_raw,
+     &   ntle_raw, maxtle,
+     &   bn_lo_in, bn_hi_in, bn_lo_out, bn_hi_out, ok)
+c
+c     Issue #32 (G3): BSTAR-informed BN search-range prior. Fitted BN
+c     anti-correlates with each TLE's own published BSTAR (project
+c     memory, Phase 2 finding: median r=-0.70 across 20 objects with
+c     >=3 zones) -- expected by construction, since BSTAR~Cd*A/(2m)
+c     and BN~m/(Cd*A) are approximate reciprocals in different unit
+c     conventions. Calibrated (not first-principles) via a pooled
+c     log10(BN)=SLOPE*log10(BSTAR)+INTCPT regression over the
+c     30-object campaign's zone-level (BSTAR, fitted BN) pairs
+c     (scratch_rpe/phase2b_bstar_bn_calibration.py, all-zones fit,
+c     n=147, R2=0.49, rmse=0.31 dex) -- provisional, same status as
+c     this project's other measurement-calibrated constants (G2 floor,
+c     LOFT-style correction factors). Window is +/-2*RMSE_DEX (~4x
+c     each side in linear BN) around the prior center -- wide enough
+c     to stay genuinely a PRIOR, not a forced answer; the GA still
+c     does the real fitting inside it.
+c
+c     Narrows [bn_lo_in,bn_hi_in] by INTERSECTION only -- never widens
+c     beyond the caller's own range (same floor-only spirit as G2).
+c     Falls back to the caller's unmodified range (ok=.false.) if this
+c     zone's BSTAR data is missing/non-positive, or if the prior
+c     window doesn't overlap the caller's range at all.
+c
+c     Output
+c       bn_lo_out, bn_hi_out : narrowed range (= bn_lo_in/bn_hi_in
+c                              unmodified if ok=.false.)
+c       ok                   : .true. if narrowing was applied
+c     ============================================================
+      implicit double precision (a-h, o-z)
+      integer norad_id, nzone, ntle_raw, maxtle
+      double precision epz(nzone)
+      integer norad_raw(maxtle), epoch_yr_raw(maxtle)
+      double precision epoch_day_raw(maxtle), bstar_raw(maxtle)
+      double precision bn_lo_in, bn_hi_in, bn_lo_out, bn_hi_out
+      logical ok
+
+      double precision SLOPE, INTCPT, RMSE_DEX
+      parameter(SLOPE = -0.4105d0, INTCPT = 0.5782d0)
+c     Issue #32 Phase 4 (2026-07-25): re-verified this relationship
+c     against current (post-G3+trust-gate+noise-matched-apobs) data,
+c     same pooled-regression methodology -- held up, if anything
+c     slightly tighter (R2 0.491->0.509, rmse 0.3096->0.2689 dex).
+c     Center (SLOPE/INTCPT) left unchanged -- single-variable test of
+c     the narrower window alone, not compounded with a center shift.
+      parameter(RMSE_DEX = 0.2689d0)
+
+      double precision bvals(500), btmp
+      double precision bstar_i, bstar_med, log_bn_ctr
+      double precision bn_lo_prior, bn_hi_prior
+      integer nb, i, j
+
+      bn_lo_out = bn_lo_in
+      bn_hi_out = bn_hi_in
+      ok = .false.
+
+      nb = 0
+      do i = 1, nzone
+         call tle_find_bstar(norad_id, epz(i),
+     &      norad_raw, epoch_yr_raw, epoch_day_raw, bstar_raw,
+     &      ntle_raw, maxtle, bstar_i)
+         if (bstar_i .gt. 0.d0) then
+            nb = nb + 1
+            bvals(nb) = bstar_i
+         end if
+      end do
+
+      if (nb .lt. 1) return
+
+c     Insertion sort (nb is a per-zone TLE count, always small)
+      do i = 2, nb
+         btmp = bvals(i)
+         j = i - 1
+         do while (j .ge. 1 .and. bvals(j) .gt. btmp)
+            bvals(j+1) = bvals(j)
+            j = j - 1
+         end do
+         bvals(j+1) = btmp
+      end do
+
+      if (mod(nb,2) .eq. 1) then
+         bstar_med = bvals((nb+1)/2)
+      else
+         bstar_med = 0.5d0*(bvals(nb/2) + bvals(nb/2+1))
+      end if
+
+      log_bn_ctr = SLOPE*dlog10(bstar_med) + INTCPT
+      bn_lo_prior = 10.d0**(log_bn_ctr - 2.d0*RMSE_DEX)
+      bn_hi_prior = 10.d0**(log_bn_ctr + 2.d0*RMSE_DEX)
+
+      bn_lo_out = max(bn_lo_in, bn_lo_prior)
+      bn_hi_out = min(bn_hi_in, bn_hi_prior)
+
+      if (bn_lo_out .ge. bn_hi_out) then
+         bn_lo_out = bn_lo_in
+         bn_hi_out = bn_hi_in
+         return
+      end if
+
+c     Only report success if the prior actually narrowed at least one
+c     side -- the intersection above can trivially equal the caller's
+c     own range when the prior window is wider than it (correct
+c     behavior, but not something the caller should log as "applied").
+      if (bn_lo_out .gt. bn_lo_in .or. bn_hi_out .lt. bn_hi_in) then
+         ok = .true.
+      end if
 
       return
       end
