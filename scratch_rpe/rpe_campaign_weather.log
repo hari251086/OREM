@@ -1,171 +1,169 @@
 [SW] epoch-resolved density: ENABLED
 
  ===== 42928 PSLV-C39          
-  [INFO] G2 BN floor estimate=   59.26 -> bn_lo=   29.63
-  Z 1: exit= 1 pts=  8120 BN=   80.79
-  Z 2: exit= 1 pts=  5891 BN=   62.29
-  Z 3: exit= 1 pts=  5228 BN=   56.19
-  Z 4: exit= 1 pts=  4078 BN=   59.03
-  [WARN] Z 5: GA optimum at search boundary -- true value may lie outside the search range
-  Z 5: exit= 1 pts=  3506 BN=   62.83
-  [WARN] Z 6: GA optimum at search boundary -- true value may lie outside the search range
-  Z 6: exit= 1 pts=  3284 BN=   57.24
-  [WARN] Z 7: GA optimum at search boundary -- true value may lie outside the search range
-  Z 7: exit= 1 pts=  1968 BN=   48.40
-  Z 8: exit= 1 pts=  1423 BN=   42.47
-  Z1: e=  0.2797 BN=  80.79 RPE=   65.32%  zstat= 0
-  Z2: e=  0.2766 BN=  62.29 RPE=   23.10%  zstat= 0
-  Z3: e=  0.2701 BN=  56.19 RPE=   13.91%  zstat= 0
-  Z4: e=  0.2440 BN=  59.03 RPE=    4.01%  zstat= 0
-  Z5: e=  0.2212 BN=  62.83 RPE=    8.47%  zstat= 2
-  Z6: e=  0.2078 BN=  57.24 RPE=   13.70%  zstat= 2
-  Z7: e=  0.1889 BN=  48.40 RPE=  -17.52%  zstat= 2
-  Z8: e=  0.1584 BN=  42.47 RPE=  -18.30%  zstat= 0
-  ensemble (8 of 8 zones): mean JD=  2458597.468 std=   93.9 d
-  ENSEMBLE RPE =    12.88%
+  [INFO] G2 BN floor estimate=  100.62 -> bn_lo=   50.31
+  Z 1: exit= 1 pts=  6143 BN=   96.20
+  [WARN] Z 2: GA optimum at search boundary -- true value may lie outside the search range
+  Z 2: exit= 1 pts=  5823 BN=  146.94
+  [WARN] Z 3: GA optimum at search boundary -- true value may lie outside the search range
+  Z 3: exit= 1 pts=  5346 BN=  146.58
+  Z 4: exit= 1 pts=  3625 BN=   99.90
+  Z 5: exit= 1 pts=  4271 BN=   97.18
+  Z 6: exit= 1 pts=  3972 BN=   75.60
+  Z 7: exit= 1 pts=  1910 BN=   77.42
+  Z 8: exit= 1 pts=  1327 BN=   99.12
+  Z1: e=  0.2789 BN=  96.20 RPE=   25.77%  zstat= 0
+  Z2: e=  0.2732 BN= 146.94 RPE=   24.48%  zstat= 2
+  Z3: e=  0.2699 BN= 146.58 RPE=   16.48%  zstat= 2
+  Z4: e=  0.2616 BN=  99.90 RPE=  -16.47%  zstat= 0
+  Z5: e=  0.2356 BN=  97.18 RPE=   15.62%  zstat= 0
+  Z6: e=  0.2107 BN=  75.60 RPE=   33.00%  zstat= 0
+  Z7: e=  0.1635 BN=  77.42 RPE=    3.55%  zstat= 0
+  Z8: e=  0.1336 BN=  99.12 RPE=    2.34%  zstat= 0
+  ensemble (8 of 8 zones): mean JD=  2458586.282 std=   54.4 d
+  ENSEMBLE RPE =    10.17%
+ [PROGRESS]  14% ( 1 of  7 objects done)
 
  ===== 35497 Ariane 5 ESC-A    
-  [INFO] G2 BN floor estimate=   55.09 -> bn_lo=   27.54
-  Z 1: exit= 1 pts=  5638 BN=   74.77
-  Z 2: exit= 1 pts=  6610 BN=   59.98
-  Z 3: exit= 1 pts=  6123 BN=   59.72
-  Z 4: exit= 1 pts=  5073 BN=   64.78
-  [WARN] Z 5: GA optimum at search boundary -- true value may lie outside the search range
-  Z 5: exit= 1 pts=  2112 BN=   68.27
+  [INFO] G2 BN floor estimate=  102.10 -> bn_lo=   51.05
+  Z 1: exit= 0 pts=  7609 BN=   87.76
+  Z 2: exit= 1 pts=  5088 BN=   71.35
+  Z 3: exit= 1 pts=  7087 BN=   84.16
+  Z 4: exit= 1 pts=  7292 BN=   99.28
+  Z 5: exit= 1 pts=  6272 BN=  135.32
   [WARN] Z 6: GA optimum at search boundary -- true value may lie outside the search range
-  Z 6: exit= 1 pts=   460 BN=   74.08
+  Z 6: exit= 1 pts=  1334 BN=  159.98
   [WARN] Z 7: GA optimum at search boundary -- true value may lie outside the search range
-  Z 7: exit= 1 pts=   329 BN=   83.37
+  Z 7: exit= 1 pts=   435 BN=  159.78
   [WARN] Z 8: GA optimum at search boundary -- true value may lie outside the search range
-  Z 8: exit= 1 pts=   301 BN=   93.68
-  Z1: e=  0.5946 BN=  74.77 RPE=  258.79%  zstat= 0
-  Z2: e=  0.5791 BN=  59.98 RPE=  381.77%  zstat= 0
-  Z3: e=  0.5750 BN=  59.72 RPE=  361.34%  zstat= 0
-  Z4: e=  0.5651 BN=  64.78 RPE=  322.12%  zstat= 0
-  Z5: e=  0.5449 BN=  68.27 RPE=  112.73%  zstat= 2
-  Z6: e=  0.4998 BN=  74.08 RPE=  -26.06%  zstat= 2
-  Z7: e=  0.3817 BN=  83.37 RPE=  -11.39%  zstat= 2
-  Z8: e=  0.3253 BN=  93.68 RPE=    6.49%  zstat= 2
-  ensemble (8 of 8 zones): mean JD=  2457996.229 std=  304.9 d
-  ENSEMBLE RPE =   128.76%
+  Z 8: exit= 1 pts=   265 BN=  159.39
+  Z1: e=  0.5993 BN=  87.76 (no re-entry)  zstat= 0
+  Z2: e=  0.5940 BN=  71.35 RPE=  214.92%  zstat= 0
+  Z3: e=  0.5781 BN=  84.16 RPE=  415.39%  zstat= 0
+  Z4: e=  0.5742 BN=  99.28 RPE=  448.39%  zstat= 0
+  Z5: e=  0.5648 BN= 135.32 RPE=  415.53%  zstat= 0
+  Z6: e=  0.5468 BN= 159.98 RPE=   33.45%  zstat= 2
+  Z7: e=  0.4989 BN= 159.78 RPE=  -30.03%  zstat= 2
+  Z8: e=  0.3863 BN= 159.39 RPE=  -28.12%  zstat= 2
+  ensemble (7 of 8 zones): mean JD=  2458058.401 std=  349.1 d
+  ENSEMBLE RPE =   131.73%
+ [PROGRESS]  28% ( 2 of  7 objects done)
 
  ===== 37151 Long March 3B     
-  [INFO] G2 BN floor estimate=   50.10 -> bn_lo=   25.05
-  Z 1: exit= 0 pts=  8275 BN=   69.97
+  [WARN] Z 1: GA optimum at search boundary -- true value may lie outside the search range
+  Z 1: exit= 0 pts=  8301 BN=   80.58
   [WARN] Z 2: GA optimum at search boundary -- true value may lie outside the search range
-  Z 2: exit= 0 pts=  9597 BN=   45.03
-  Z 3: exit= 1 pts=  4210 BN=   80.62
-  Z 4: exit= 0 pts= 10646 BN=   63.08
-  Z 5: exit= 1 pts=  5220 BN=   65.52
+  Z 2: exit= 0 pts=  9641 BN=   86.96
+  [WARN] Z 3: GA optimum at search boundary -- true value may lie outside the search range
+  Z 3: exit= 1 pts=  3710 BN=   86.22
+  [WARN] Z 4: GA optimum at search boundary -- true value may lie outside the search range
+  Z 4: exit= 0 pts= 10667 BN=   80.60
+  [WARN] Z 5: GA optimum at search boundary -- true value may lie outside the search range
+  Z 5: exit= 1 pts=  4559 BN=   80.68
   [WARN] Z 6: GA optimum at search boundary -- true value may lie outside the search range
-  Z 6: exit= 1 pts=  4153 BN=   48.77
-  Z 7: exit= 1 pts=  9132 BN=   57.60
-  Z 8: exit= 1 pts=  2214 BN=   65.52
-  Z1: e=  0.5749 BN=  69.97 (no re-entry)  zstat= 0
-  Z2: e=  0.5320 BN=  45.03 (no re-entry)  zstat= 2
-  Z3: e=  0.5091 BN=  80.62 RPE=   -1.13%  zstat= 0
-  Z4: e=  0.4991 BN=  63.08 (no re-entry)  zstat= 0
-  Z5: e=  0.4859 BN=  65.52 RPE=   35.59%  zstat= 0
-  Z6: e=  0.4826 BN=  48.77 RPE=    9.91%  zstat= 2
-  Z7: e=  0.4619 BN=  57.60 RPE=  143.75%  zstat= 0
-  Z8: e=  0.3177 BN=  65.52 RPE=   31.85%  zstat= 0
-  ensemble (5 of 8 zones): mean JD=  2457517.646 std=  226.7 d
-  ENSEMBLE RPE =    15.43%
+  Z 6: exit= 1 pts=  4295 BN=   81.95
+  [WARN] Z 7: GA optimum at search boundary -- true value may lie outside the search range
+  Z 7: exit= 1 pts= 10005 BN=   80.25
+  Z 8: exit= 1 pts=  2220 BN=  114.35
+  Z1: e=  0.5746 BN=  80.58 (no re-entry)  zstat= 2
+  Z2: e=  0.5315 BN=  86.96 (no re-entry)  zstat= 2
+  Z3: e=  0.5089 BN=  86.22 RPE=  -12.94%  zstat= 2
+  Z4: e=  0.4987 BN=  80.60 (no re-entry)  zstat= 2
+  Z5: e=  0.4859 BN=  80.68 RPE=   18.37%  zstat= 2
+  Z6: e=  0.4823 BN=  81.95 RPE=   15.43%  zstat= 2
+  Z7: e=  0.4613 BN=  80.25 RPE=  166.88%  zstat= 2
+  Z8: e=  0.3176 BN= 114.35 RPE=   32.04%  zstat= 0
+  ensemble (5 of 8 zones): mean JD=  2457512.383 std=  277.2 d
+  ENSEMBLE RPE =    14.92%
+ [PROGRESS]  42% ( 3 of  7 objects done)
 
  ===== 39615 Proton-M Briz-M   
-  [INFO] G2 BN floor estimate=   93.19 -> bn_lo=   46.60
-  Z 1: exit= 1 pts=  1782 BN=   97.26
-  Z 2: exit= 1 pts=  9495 BN=   85.42
-  [WARN] Z 3: GA optimum at search boundary -- true value may lie outside the search range
-  Z 3: exit= 0 pts= 11644 BN=   72.17
-  [WARN] Z 4: GA optimum at search boundary -- true value may lie outside the search range
-  Z 4: exit= 1 pts=  3610 BN=   71.26
-  Z 5: exit= 1 pts=  3280 BN=   65.82
-  [WARN] Z 6: GA optimum at search boundary -- true value may lie outside the search range
-  Z 6: exit= 1 pts=  1971 BN=   55.29
-  Z 7: exit= 1 pts=  1692 BN=   44.22
-  [WARN] Z 8: GA optimum at search boundary -- true value may lie outside the search range
-  Z 8: exit= 1 pts=  1791 BN=   37.00
-  Z1: e=  0.5481 BN=  97.26 RPE=  -61.43%  zstat= 0
-  Z2: e=  0.5266 BN=  85.42 RPE=   76.62%  zstat= 0
-  Z3: e=  0.4693 BN=  72.17 (no re-entry)  zstat= 2
-  Z4: e=  0.4419 BN=  71.26 RPE=   -2.58%  zstat= 2
-  Z5: e=  0.3304 BN=  65.82 RPE=   47.60%  zstat= 0
-  Z6: e=  0.3129 BN=  55.29 RPE=   -0.60%  zstat= 2
-  Z7: e=  0.3023 BN=  44.22 RPE=   -9.76%  zstat= 0
-  Z8: e=  0.2811 BN=  37.00 RPE=    7.29%  zstat= 2
-  ensemble (7 of 8 zones): mean JD=  2458031.513 std=  234.3 d
-  ENSEMBLE RPE =     3.35%
+  [INFO] G2 BN floor estimate=   61.65 -> bn_lo=   30.82
+  Z 1: exit= 1 pts=  2013 BN=   75.68
+  Z 2: exit= 0 pts=  9858 BN=   69.32
+  Z 3: exit= 0 pts= 11633 BN=   79.79
+  Z 4: exit= 1 pts=  3117 BN=   78.52
+  Z 5: exit= 1 pts=  4901 BN=   77.27
+  Z 6: exit= 1 pts=  2304 BN=   74.20
+  Z 7: exit= 1 pts=  2158 BN=   74.30
+  Z 8: exit= 1 pts=  2518 BN=   74.46
+  Z1: e=  0.5478 BN=  75.68 RPE=  -56.10%  zstat= 0
+  Z2: e=  0.5260 BN=  69.32 (no re-entry)  zstat= 0
+  Z3: e=  0.4696 BN=  79.79 (no re-entry)  zstat= 0
+  Z4: e=  0.4432 BN=  78.52 RPE=  -16.53%  zstat= 0
+  Z5: e=  0.3302 BN=  77.27 RPE=  118.44%  zstat= 0
+  Z6: e=  0.3136 BN=  74.20 RPE=   15.98%  zstat= 0
+  Z7: e=  0.3027 BN=  74.30 RPE=   14.95%  zstat= 0
+  Z8: e=  0.2816 BN=  74.46 RPE=   50.12%  zstat= 0
+  ensemble (6 of 8 zones): mean JD=  2458001.874 std=  185.9 d
+  ENSEMBLE RPE =    -1.61%
+ [PROGRESS]  57% ( 4 of  7 objects done)
 
  ===== 27526 Ariane 5 R/B      
-  [INFO] G2 BN floor estimate=   33.47 -> bn_lo=   16.74
-  Z 1: exit= 0 pts=  8630 BN=   59.12
-  Z 2: exit= 1 pts=  2613 BN=   54.85
-  Z 3: exit= 1 pts=  9669 BN=   40.56
-  Z 4: exit= 1 pts=  5769 BN=   39.06
-  [WARN] Z 5: GA optimum at search boundary -- true value may lie outside the search range
-  Z 5: exit= 1 pts=  1997 BN=   47.93
-  Z 6: exit= 1 pts=  1845 BN=   51.75
-  [WARN] Z 7: GA optimum at search boundary -- true value may lie outside the search range
-  Z 7: exit= 1 pts=  1913 BN=   45.04
-  Z 8: exit= 1 pts=  1742 BN=   45.39
-  Z1: e=  0.5641 BN=  59.12 (no re-entry)  zstat= 0
-  Z2: e=  0.5556 BN=  54.85 RPE=  -30.07%  zstat= 0
-  Z3: e=  0.5116 BN=  40.56 RPE=  188.12%  zstat= 0
-  Z4: e=  0.4947 BN=  39.06 RPE=   94.17%  zstat= 0
-  Z5: e=  0.4173 BN=  47.93 RPE=    2.37%  zstat= 2
-  Z6: e=  0.4079 BN=  51.75 RPE=    0.01%  zstat= 0
-  Z7: e=  0.3596 BN=  45.04 RPE=   27.91%  zstat= 2
-  Z8: e=  0.3056 BN=  45.39 RPE=   54.43%  zstat= 0
-  ensemble (7 of 8 zones): mean JD=  2456195.206 std=  294.9 d
-  ENSEMBLE RPE =    24.04%
+  [INFO] G2 BN floor estimate=   44.72 -> bn_lo=   22.36
+  Z 1: exit= 0 pts=  8641 BN=   48.53
+  Z 2: exit= 0 pts= 10271 BN=   58.83
+  Z 3: exit= 1 pts=  6734 BN=   81.63
+  Z 4: exit= 1 pts=  2069 BN=   84.56
+  Z 5: exit= 1 pts=  1927 BN=   75.23
+  Z 6: exit= 1 pts=  1482 BN=   86.44
+  Z 7: exit= 1 pts=  1825 BN=   94.13
+  [WARN] Z 8: GA optimum at search boundary -- true value may lie outside the search range
+  Z 8: exit= 1 pts=   207 BN=  146.62
+  Z1: e=  0.5637 BN=  48.53 (no re-entry)  zstat= 0
+  Z2: e=  0.5106 BN=  58.83 (no re-entry)  zstat= 0
+  Z3: e=  0.4952 BN=  81.63 RPE=  128.63%  zstat= 0
+  Z4: e=  0.4075 BN=  84.56 RPE=   11.72%  zstat= 0
+  Z5: e=  0.3611 BN=  75.23 RPE=   29.01%  zstat= 0
+  Z6: e=  0.3481 BN=  86.44 RPE=    5.25%  zstat= 0
+  Z7: e=  0.3057 BN=  94.13 RPE=   61.19%  zstat= 0
+  Z8: e=  0.1193 BN= 146.62 RPE=   11.99%  zstat= 2
+  ensemble (6 of 8 zones): mean JD=  2456149.161 std=  166.1 d
+  ENSEMBLE RPE =    15.96%
+ [PROGRESS]  71% ( 5 of  7 objects done)
 
  ===== 32007 GSLV R/B          
-  [INFO] G2 BN floor estimate=   39.16 -> bn_lo=   19.58
-  Z 1: exit= 0 pts= 17928 BN=   56.23
-  Z 2: exit= 1 pts= 15164 BN=   53.56
-  Z 3: exit= 1 pts=  7785 BN=   40.45
-  Z 4: exit= 1 pts=  6762 BN=   33.69
-  Z 5: exit= 1 pts=  4673 BN=   34.86
-  [WARN] Z 6: GA optimum at search boundary -- true value may lie outside the search range
-  Z 6: exit= 1 pts=  3251 BN=   39.19
-  Z 7: exit= 1 pts=  2801 BN=   37.93
-  [WARN] Z 8: GA optimum at search boundary -- true value may lie outside the search range
-  Z 8: exit= 1 pts=  1665 BN=   35.57
-  Z1: e=  0.2881 BN=  56.23 (no re-entry)  zstat= 0
-  Z2: e=  0.2540 BN=  53.56 RPE=   58.14%  zstat= 0
-  Z3: e=  0.2516 BN=  40.45 RPE=  -16.74%  zstat= 0
-  Z4: e=  0.2227 BN=  33.69 RPE=   -8.27%  zstat= 0
-  Z5: e=  0.1820 BN=  34.86 RPE=   -6.10%  zstat= 0
-  Z6: e=  0.1414 BN=  39.19 RPE=   13.46%  zstat= 2
-  Z7: e=  0.1382 BN=  37.93 RPE=    2.72%  zstat= 0
-  Z8: e=  0.1094 BN=  35.57 RPE=    5.64%  zstat= 2
-  ensemble (7 of 8 zones): mean JD=  2455394.775 std=  186.1 d
-  ENSEMBLE RPE =     4.24%
+  [INFO] G2 BN floor estimate=   50.19 -> bn_lo=   25.09
+  Z 1: exit= 0 pts= 17976 BN=   57.55
+  Z 2: exit= 1 pts= 14746 BN=   55.66
+  Z 3: exit= 1 pts= 10902 BN=   85.79
+  Z 4: exit= 1 pts= 10087 BN=   73.77
+  Z 5: exit= 1 pts=  7193 BN=   64.42
+  Z 6: exit= 1 pts=  4160 BN=   71.91
+  Z 7: exit= 1 pts=  4743 BN=   70.47
+  Z 8: exit= 1 pts=  2664 BN=   65.44
+  Z1: e=  0.2870 BN=  57.55 (no re-entry)  zstat= 0
+  Z2: e=  0.2528 BN=  55.66 RPE=   53.40%  zstat= 0
+  Z3: e=  0.2508 BN=  85.79 RPE=   17.33%  zstat= 0
+  Z4: e=  0.2227 BN=  73.77 RPE=   36.58%  zstat= 0
+  Z5: e=  0.1814 BN=  64.42 RPE=   44.31%  zstat= 0
+  Z6: e=  0.1412 BN=  71.91 RPE=   44.95%  zstat= 0
+  Z7: e=  0.1370 BN=  70.47 RPE=   73.98%  zstat= 0
+  Z8: e=  0.1085 BN=  65.44 RPE=   68.97%  zstat= 0
+  ensemble (7 of 8 zones): mean JD=  2455528.020 std=  113.5 d
+  ENSEMBLE RPE =    17.93%
+ [PROGRESS]  85% ( 6 of  7 objects done)
 
  ===== 37819 Proton-M R/B      
-  [INFO] G2 BN floor estimate=   60.37 -> bn_lo=   30.18
-  Z 1: exit= 1 pts=  2493 BN=   78.70
-  Z 2: exit= 1 pts=  4190 BN=   75.45
-  Z 3: exit= 1 pts=  2457 BN=   82.10
-  [WARN] Z 4: GA optimum at search boundary -- true value may lie outside the search range
-  Z 4: exit= 1 pts=  1895 BN=   73.99
-  Z 5: exit= 1 pts=  1813 BN=   75.79
-  [WARN] Z 6: GA optimum at search boundary -- true value may lie outside the search range
-  Z 6: exit= 1 pts=  1659 BN=   81.34
-  [WARN] Z 7: GA optimum at search boundary -- true value may lie outside the search range
-  Z 7: exit= 1 pts=  1463 BN=   74.60
-  [WARN] Z 8: GA optimum at search boundary -- true value may lie outside the search range
-  Z 8: exit= 1 pts=  1435 BN=   86.91
-  Z1: e=  0.4461 BN=  78.70 RPE=  -46.23%  zstat= 0
-  Z2: e=  0.4091 BN=  75.45 RPE=    2.49%  zstat= 0
-  Z3: e=  0.3422 BN=  82.10 RPE=  -15.25%  zstat= 0
-  Z4: e=  0.3175 BN=  73.99 RPE=  -24.95%  zstat= 2
-  Z5: e=  0.3104 BN=  75.79 RPE=  -25.49%  zstat= 0
-  Z6: e=  0.2958 BN=  81.34 RPE=  -26.51%  zstat= 2
-  Z7: e=  0.2678 BN=  74.60 RPE=  -25.92%  zstat= 2
-  Z8: e=  0.2354 BN=  86.91 RPE=  -13.47%  zstat= 2
-  ensemble (8 of 8 zones): mean JD=  2456485.807 std=   77.2 d
-  ENSEMBLE RPE =   -11.65%
+  [INFO] G2 BN floor estimate=   45.56 -> bn_lo=   22.78
+  Z 1: exit= 1 pts=  2752 BN=   70.53
+  Z 2: exit= 1 pts=  3045 BN=   79.76
+  Z 3: exit= 1 pts=  2494 BN=   75.42
+  Z 4: exit= 1 pts=  2197 BN=   81.03
+  Z 5: exit= 1 pts=  2014 BN=   74.23
+  Z 6: exit= 1 pts=  2103 BN=   69.72
+  Z 7: exit= 1 pts=  1999 BN=   82.83
+  Z 8: exit= 1 pts=  1883 BN=   73.47
+  Z1: e=  0.4458 BN=  70.53 RPE=  -40.55%  zstat= 0
+  Z2: e=  0.3418 BN=  79.76 RPE=    5.63%  zstat= 0
+  Z3: e=  0.3169 BN=  75.42 RPE=   -0.97%  zstat= 0
+  Z4: e=  0.2951 BN=  81.03 RPE=   -2.58%  zstat= 0
+  Z5: e=  0.2768 BN=  74.23 RPE=   -2.01%  zstat= 0
+  Z6: e=  0.2659 BN=  69.72 RPE=    7.22%  zstat= 0
+  Z7: e=  0.2339 BN=  82.83 RPE=   20.72%  zstat= 0
+  Z8: e=  0.2235 BN=  73.47 RPE=   22.16%  zstat= 0
+  ensemble (8 of 8 zones): mean JD=  2456529.240 std=   80.4 d
+  ENSEMBLE RPE =    -3.45%
+ [PROGRESS] 100% ( 7 of  7 objects done)
 
  campaign complete -> scratch_rpe/rpe_campaign_weather.csv
