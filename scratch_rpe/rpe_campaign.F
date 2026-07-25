@@ -62,14 +62,37 @@ c           orem.F rsm.F ga.F tle_evolution.F tle_filter.F
 c           zone_select.F ksrop\propagate_ks.F ksrop\Subrouts.F
 c           ksrop\TLEread.F ksrop\Legendre.F
 c           /exe:scratch_rpe\rpe_campaign.exe
-c     Run from the OREM repo root:
+c     Run from the OREM repo root, full 30-object run (unchanged
+c     default, backward compatible with every prior invocation):
 c       scratch_rpe\rpe_campaign.exe
 c     Output: scratch_rpe\rpe_campaign.csv
+c
+c     Optional 4-core-capped parallel run (repo-wide max-4-cores rule,
+c     GitHub\CLAUDE.md #1): orem.F/rsm.F/propagate_ks.F use SAVE'd
+c     arrays and common blocks throughout, so this is NOT safe to
+c     thread (e.g. OpenMP) within one process -- objects are instead
+c     partitioned across up to 4 independent OS PROCESSES, each a
+c     separate address space. Pass <io_start> <io_end> (1-based,
+c     inclusive) to process only that object slice, writing to
+c     scratch_rpe\rpe_campaign_part_<start>_<end>.csv instead of the
+c     shared default file:
+c       scratch_rpe\rpe_campaign.exe 1 8
+c       scratch_rpe\rpe_campaign.exe 9 15
+c       scratch_rpe\rpe_campaign.exe 16 23
+c       scratch_rpe\rpe_campaign.exe 24 30
+c     Run at most 4 of these concurrently, then concatenate the 4
+c     rpe_campaign_part_*.csv files (drop the repeated header lines)
+c     into rpe_campaign.csv.
 c     -------------------------------------------------------
       program rpe_campaign
 
       implicit double precision (a-h, o-z)
       common /xy/ pi, d2r, r2d, amue, AU, R_Earth
+
+c     Issue: 4-core-capped parallel partitioning (see header comment)
+      integer io_start, io_end, iarg
+      character*80 csv_name
+      character*16 arg_str
 
 c     mxz=8 (v1.21 experiment; was 4): zone_select returns the top-R2
 c     candidates, so a higher cap admits LATER zones -- and v1.20
@@ -202,15 +225,31 @@ c     own issue.
       obj_name(29) = '45349 SL-12 deb'
       obj_name(30) = '23647 Titan34B deb'
 
+c     Issue: 4-core-capped parallel partitioning (see header comment).
+c     No args (the default, every prior invocation) -> full 1..nobj
+c     range, unchanged output filename.
+      io_start = 1
+      io_end = nobj
+      csv_name = 'scratch_rpe/rpe_campaign.csv'
+      iarg = iargc()
+      if (iarg .ge. 2) then
+         call getarg(1, arg_str)
+         read(arg_str, *) io_start
+         call getarg(2, arg_str)
+         read(arg_str, *) io_end
+         write(csv_name, '(A,I2.2,A,I2.2,A)')
+     &      'scratch_rpe/rpe_campaign_part_', io_start, '_',
+     &      io_end, '.csv'
+      end if
+
       call init_constants()
       call read_atm_c(ALT_a, DEN_a, SCH_a, ndim_a, natm)
 
-      open(unit=33, file='scratch_rpe/rpe_campaign.csv',
-     &     status='unknown')
+      open(unit=33, file=csv_name, status='unknown')
       write(33,'(A)') 'norad,zone,e_opt,bn_opt,reentry_jd,rpe_pct,'//
      &   'zstat,t_mean,t_std,ens_rpe_pct,zepoch,rms_fit'
 
-      do io = 1, nobj
+      do io = io_start, io_end
          write(*,'(/,A,A)') ' ===== ', obj_name(io)
 
          t_obs(1) = oyr(io)
@@ -289,12 +328,12 @@ c        "^ \[PROGRESS\]" for a clean, unambiguous percent-complete
 c        marker without polling -- covers both the normal-completion
 c        and early-error (goto 90) exits per object.
          write(*,'(A,I3,A,I2,A,I2,A)') ' [PROGRESS] ',
-     &      (io*100)/nobj, '% (', io, ' of ', nobj, ' objects done)'
+     &      ((io-io_start+1)*100)/(io_end-io_start+1), '% (',
+     &      io, ' of ', io_end, ' objects done, this chunk)'
       end do
 
       close(33)
-      write(*,'(/,A)') ' campaign complete -> scratch_rpe/'//
-     &   'rpe_campaign.csv'
+      write(*,'(/,A,A)') ' campaign complete -> ', trim(csv_name)
 
       stop
       end
