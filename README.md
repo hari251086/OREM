@@ -689,6 +689,9 @@ of KSROP's `driver_KS.F` core with re-entry-specific logic added, and evolves in
 
   Small, consistent improvement on the primary (latest-zone) metric on both sets; small, consistent regression on the secondary (ensemble) metric on both sets. Nowhere near #33's magnitude either direction. **Kept per explicit user direction** — net positive on the metric this project treats as primary. 371/371 tests pass. Full writeup: #31 comment.
 
+**1.37 — 2026-07-25**
+- **Issue #26 revisited against the current shipped state (G3 + trust-gate + noise-matched apobs).** The earlier weather-mode regression (37151 Z7 newly predicting a badly-off re-entry, dragging that object's ensemble RPE from 4.3%→14.9%) no longer appears at meaningful magnitude — the BN-search changes since then evidently changed which zones converge where. Fresh static-vs-weather comparison: mean\|latest-zone RPE\| 11.59%→11.08%, mean\|ensemble RPE\| 23.39%→23.33%, both flat-to-slightly-better, no per-object outlier this time (largest ensemble delta is 35497, the already-known unrelated resonance case, at +6.2 points). **"No regression" DoD now cleanly met on both metrics**, not just the primary one as before. Full writeup: #26 comment.
+
 ---
 
 ## 9. References
