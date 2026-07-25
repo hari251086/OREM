@@ -698,6 +698,17 @@ of KSROP's `driver_KS.F` core with re-entry-specific logic added, and evolves in
   - **Changed: RPE now shows a real horizon-dependence Phase 2 didn't find.** Mean\|RPE\| for horizon<100d is 33.2% vs 69.6% for horizon≥100d, a large gap — Phase 2 (pre-G3) found these "statistically indistinguishable" (67.9% vs 74.2%). Raw linear correlations stay weak (r=+0.01, r=-0.14 vs 1/horizon), so this reads as a threshold/bucket effect rather than a clean linear one, but suggests the improved fitting disproportionately helps short-horizon (later-zone, more-TLE-history) predictions while long-horizon extrapolation stays fundamentally hard — reinforces the latest-zone-as-primary design logic rather than undermining it.
   - **Unchanged: fit RMS still doesn't predict extrapolation accuracy** (r(rms_fit,\|RPE\|)=+0.01, boundary-pinned zones still ~9x worse median RMS) and **TLE noise floor still flattens around 4000-6000 points/zone** — both Phase 2 conclusions hold up against the new pipeline.
   - Full output: `scratch_rpe/phase4_error_budget_current.log`. Full writeup: #32 comment.
+- **Correction to finding 1 above**: the "-0.70→-0.43 weakened" claim compared two different statistics — Phase 2's per-object within-zone correlation vs. G3's actual calibration basis, a pooled cross-object regression, never recomputed against current data before writing the original comment. Redone correctly (`scratch_rpe/phase2b_bstar_bn_calibration.py`, unchanged, rerun against current data): **R² 0.491→0.509, rmse 0.3096→0.2689 dex — the relationship held up, if anything slightly tighter, not weaker.** Also verified directly: splitting the current data by whether G3 actually bound for that zone, both subsets remain strongly correlated (bound r=-0.64 n=42, unbound r=-0.70 n=105) — no sign of degradation.
+- **G3's window tightened accordingly** (`RMSE_DEX` 0.3096→0.2689 in `estimate_bn_bstar_prior`, center/`SLOPE`/`INTCPT` unchanged — single-variable test of the narrower window alone). Measured, another clean improvement:
+
+  | Metric | Wide window | Tight window |
+  |---|---|---|
+  | 7-obj latest-zone | 11.59% | **9.89%** |
+  | 7-obj ensemble | 23.39% | 23.53% (flat) |
+  | 30-obj latest-zone | 38.71% | **35.49%** |
+  | 30-obj ensemble | 22.20% | **21.53%** |
+
+  3 of 4 metrics improve, the 4th is flat (noise-level). 371/371 tests pass. Shipped.
 
 ---
 

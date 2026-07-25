@@ -927,7 +927,13 @@ c     ============================================================
 
       double precision SLOPE, INTCPT, RMSE_DEX
       parameter(SLOPE = -0.4105d0, INTCPT = 0.5782d0)
-      parameter(RMSE_DEX = 0.3096d0)
+c     Issue #32 Phase 4 (2026-07-25): re-verified this relationship
+c     against current (post-G3+trust-gate+noise-matched-apobs) data,
+c     same pooled-regression methodology -- held up, if anything
+c     slightly tighter (R2 0.491->0.509, rmse 0.3096->0.2689 dex).
+c     Center (SLOPE/INTCPT) left unchanged -- single-variable test of
+c     the narrower window alone, not compounded with a center shift.
+      parameter(RMSE_DEX = 0.2689d0)
 
       double precision bvals(500), btmp
       double precision bstar_i, bstar_med, log_bn_ctr
