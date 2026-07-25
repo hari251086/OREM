@@ -662,7 +662,20 @@ of KSROP's `driver_KS.F` core with re-entry-specific logic added, and evolves in
 
 **1.34 — 2026-07-25**
 - **4-core-capped parallel partitioning added to the 30-object campaign** (`scratch_rpe/rpe_campaign.F`, per `GitHub\CLAUDE.md` §1's repo-wide max-4-cores rule). `orem.F`/`rsm.F`/`propagate_ks.F` use `SAVE`d arrays and common blocks throughout, so this is not safe to thread within one process — instead, optional `<io_start> <io_end>` CLI args partition the object loop across up to 4 independent OS processes, each writing its own `rpe_campaign_part_<start>_<end>.csv`. No-args behavior (every prior invocation) is unchanged.
-- **G3's improvement confirmed to generalize to the full 30-object set — directly answers #29's "doesn't generalize beyond the curated 7" concern in G3's favor.** Ran via 4 concurrent processes (objects 1-8/9-16/17-23/24-30), merged: mean\|latest-zone RPE\| 39.04%→34.33%, mean\|ensemble RPE\| 23.22%→22.99%, object counts unchanged (22/30 predicting, no new failures). Driven mainly by two large single-object wins — 40943 (latest-zone RPE 240.8%→125.9%) and 37819 (35.9%→14.8%, matching the 7-object finding) — with most other objects flat and a few small mixed movements (45349 worse on latest-zone, better on ensemble; not a uniform win but a real net positive). Pre-G3 baseline preserved at `scratch_rpe/rpe_campaign_30obj_preg3_backup.{csv,log}`. Full writeup: #32 and #29 comments.
+- **G3's improvement confirmed to generalize to the full 30-object set — directly answers #29's "doesn't generalize beyond the curated 7" concern in G3's favor.** Ran via 4 concurrent processes (objects 1-8/9-16/17-23/24-30), merged: mean\|latest-zone RPE\| 48.94%→43.29%, mean\|ensemble RPE\| 23.22%→22.99%, object counts unchanged (22/30 predicting, no new failures). Driven mainly by two large single-object wins — 40943 and 37819 (matching the 7-object finding) — with most other objects flat and a few small mixed movements; not a uniform win but a real net positive. Pre-G3 baseline preserved at `scratch_rpe/rpe_campaign_30obj_preg3_backup.{csv,log}`. **Correction (v1.35): the originally-posted 39.04%/34.33% figures had a methodology bug — a zone with no predicted re-entry (`reentry_jd=0`) was wrongly counted as a perfect 0%-error prediction whenever it was an object's most recent zone; only the 30-object latest-zone metric was affected (ensemble RPE and the 7-object set were not), same direction, wrong magnitude.** Full writeup: #32 and #29 comments.
+
+**1.35 — 2026-07-25**
+- **Issue #33 revisit: v1.21's trust-gated BN-range narrow/widen logic restored alongside G3.** #33 shipped an always-wide BN search only because the alternative (narrow/widen the *global* range toward the previous zone's own fitted BN, gated on that zone actually carrying real drag signal) measurably regressed RPE when tested *before* G3 existed. G3 changes the calculus: it narrows each zone's range from that zone's own BSTAR, independent of zone-to-zone history, so the two mechanisms compose rather than conflict — restored logic adjusts the persistent `bn_lo`/`bn_hi` between zones, G3 then intersects its own per-zone prior against whatever that currently is.
+- **Real, substantial further improvement on top of G3 alone**, corrected methodology throughout:
+
+  | Metric | Pre-G3 | G3-only | G3+trust-gate |
+  |---|---|---|---|
+  | 7-obj mean\|latest-zone RPE\| | 32.6% | 29.6% | **14.0%** |
+  | 7-obj mean\|ensemble RPE\| | 26.2% | 26.6% | **22.9%** |
+  | 30-obj mean\|latest-zone RPE\| | 48.9% | 43.3% | **39.4%** |
+  | 30-obj mean\|ensemble RPE\| | 23.2% | 23.0% | **22.1%** |
+
+  Every metric on both sets moves the right direction, none regress. 371/371 tests pass. Full writeup: #33 comment.
 
 ---
 

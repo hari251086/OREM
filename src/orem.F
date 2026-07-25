@@ -164,7 +164,7 @@ c     Force model
 
 c     Working
       double precision bn_lo, bn_hi, e_mid, de
-      double precision bn_val, t_obs_jd
+      double precision bn_val, t_obs_jd, bn_range
       double precision a_kep(7), x0(3), xd0(3), cal0(6)
       integer iz, i, nzone, nvalid, nzone1
       double precision smin, smax
@@ -614,18 +614,33 @@ c        Re-entry propagation with optimal (e, BN)
             end if
          end if
 
-c        BN search range: deliberately left untouched here (no per-
-c        zone narrowing/widening) -- every zone always searches the
-c        full original [bn_min_init, bn_max_init] range from
-c        bn_lo/bn_hi's one-time setup before this loop (plus the G2
-c        floor adjustment, also one-time). Confirmed with user: BN
-c        may genuinely drift zone to zone, so the search itself
-c        should stay wide/agnostic rather than re-centering on any
-c        single zone's own fit. This replaces the old per-zone
-c        narrow/widen-on-boundary logic that used to live here (see
-c        git history) -- e_at_bound/bn_at_bound above still flag
-c        boundary-saturated fits, that diagnostic is unchanged, only
-c        the range-resizing action on it was removed.
+c        Issue #33 revisit: restore the v1.21 trust-gated BN-range
+c        narrow/widen-on-boundary logic (removed in #33 as an
+c        isolated experiment; removing it measurably regressed RPE
+c        22.9%->26.2%/22.0%->23.2% on its own, but that was tested
+c        BEFORE G3 (issue #32) existed). This adjusts the GLOBAL
+c        bn_lo/bn_hi carried into the next zone -- composes with G3
+c        naturally, since G3 intersects its own per-zone BSTAR prior
+c        against whatever bn_lo/bn_hi currently is at call time. Same
+c        v1.21 trust gate as before: only chain from a zone whose fit
+c        carries real drag signal (drag on: it predicted a re-entry;
+c        drag off: zone_status(iz)==0) -- an untrusted zone's BN is
+c        weak-signal noise, chaining from it previously imprisoned
+c        later zones (37151's 8-zone chain marched [12.5,160] to
+c        [17.2,24.9] through seven untrusted zones). Untrusted zones
+c        leave the range unchanged for the next zone.
+         if ((idrag_flag .eq. 1 .and. reentry_jd(iz) .gt. 0.d0)
+     &       .or.
+     &       (idrag_flag .eq. 0 .and. zone_status(iz) .eq. 0)) then
+            if (bn_at_bound) then
+               bn_range = (bn_hi - bn_lo) * 1.5d0
+            else
+               bn_range = (bn_hi - bn_lo) * 0.5d0
+            end if
+            bn_lo = bn_opt_out(iz) - bn_range / 2.d0
+            bn_hi = bn_opt_out(iz) + bn_range / 2.d0
+            if (bn_lo .lt. 10.d0) bn_lo = 10.d0
+         end if
 
  50      continue
       end do
