@@ -151,6 +151,8 @@ c     ============================================================
       if (ierr_sw .eq. 0 .and. ierr_a2 .eq. 0) then
          write(*,'(A)') '  [SW] epoch-resolved density: ENABLED'//
      &      ' (SW-All.csv + ATM2D.DAT)'
+         write(*,'(A)') '  [SW] diurnal bulge: ENABLED'//
+     &      ' (lambda=37deg, extends epoch-resolved density)'
       else
          write(*,'(A,I2,A,I2,A)') '  [SW] epoch-resolved density:'//
      &      ' DISABLED (sw_load ierr=', ierr_sw,
