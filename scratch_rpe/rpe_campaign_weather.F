@@ -105,7 +105,7 @@ c     report loaded data, per propagate_ks.F's existing auto-detect.
 
          call orem_run(
      &      tle_file(io), norad(io),
-     &      t_obs, mxz, 8, 10.d0, 0.90d0, -1.d0,
+     &      t_obs, mxz, 8, 20.d0, 0.90d0, -1.d0,
      &      80.d0, 160.d0, 1,
      &      20, 500, 40, 16, 0.8d0, 0.01d0, 0.123d0,
      &      20, 2, 3,
