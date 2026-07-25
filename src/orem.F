@@ -178,6 +178,10 @@ c     propagation initial condition -- see tle_find_osc below)
       double precision a_kep_osc1(7)
       logical osc_ok
 
+c     Issue #32 (G3): BSTAR-informed BN search-range prior, per zone
+      double precision bn_lo_zone, bn_hi_zone
+      logical bn_prior_ok
+
       ierr = 0
       nzones_used = 0
       nzones_valid = 0
@@ -439,11 +443,26 @@ c        investigation.)
          end do
          if (de .lt. 1.d-5) de = 5.d-4
 
+c        Issue #32 (G3): narrow this zone's BN search range using its
+c        own TLE-published BSTAR as an informative prior (intersection
+c        only -- never widens beyond bn_lo/bn_hi). Falls back to the
+c        unmodified bn_lo/bn_hi if this zone's BSTAR is unavailable or
+c        the prior window doesn't overlap the caller's range at all.
+         call estimate_bn_bstar_prior(norad_id, epz, nzone,
+     &      norad_raw, epoch_yr_raw, epoch_day_raw, bstar_raw,
+     &      ntle_raw, maxtle,
+     &      bn_lo, bn_hi, bn_lo_zone, bn_hi_zone, bn_prior_ok)
+         if (bn_prior_ok) then
+            write(*,'(A,I2,A,F7.2,A,F7.2,A)')
+     &         '  [INFO] Z', iz, ': G3 BSTAR prior narrows BN to [',
+     &         bn_lo_zone, ',', bn_hi_zone, ']'
+         end if
+
          call rsm_generate(
      &      epz, haz, ez, incz, raanz, aopz, maz, smaz,
      &      nzone,
      &      e_mid - de, e_mid + de,
-     &      bn_lo, bn_hi,
+     &      bn_lo_zone, bn_hi_zone,
      &      200, 360, 1.d-10,
      &      n_force, ngeo_deg, nsun_deg, nmoon_deg,
      &      WE_rot, EPS_f, FR_rot,
@@ -788,6 +807,143 @@ c     ============================================================
             end if
          end if
       end do
+
+      return
+      end
+
+c     ============================================================
+      subroutine tle_find_bstar(norad_id, epoch_jd,
+     &   norad_raw, epoch_yr_raw, epoch_day_raw, bstar_raw,
+     &   ntle_raw, maxtle, bstar_out)
+c     Find BSTAR from raw TLE array matching epoch (same epoch-match
+c     tolerance/pattern as tle_find_ma).
+c     ============================================================
+      implicit double precision (a-h, o-z)
+      integer norad_id, ntle_raw, maxtle
+      integer norad_raw(maxtle), epoch_yr_raw(maxtle)
+      double precision epoch_day_raw(maxtle), bstar_raw(maxtle)
+      double precision epoch_jd, bstar_out
+      integer i
+
+      bstar_out = 0.d0
+      do i = 1, ntle_raw
+         if (norad_raw(i) .eq. norad_id) then
+            call tle_epoch2jd(epoch_yr_raw(i),
+     &           epoch_day_raw(i), djd_tmp)
+            if (dabs(djd_tmp - epoch_jd) .lt. 0.01d0) then
+               bstar_out = bstar_raw(i)
+               return
+            end if
+         end if
+      end do
+
+      return
+      end
+
+c     ============================================================
+      subroutine estimate_bn_bstar_prior(norad_id, epz, nzone,
+     &   norad_raw, epoch_yr_raw, epoch_day_raw, bstar_raw,
+     &   ntle_raw, maxtle,
+     &   bn_lo_in, bn_hi_in, bn_lo_out, bn_hi_out, ok)
+c
+c     Issue #32 (G3): BSTAR-informed BN search-range prior. Fitted BN
+c     anti-correlates with each TLE's own published BSTAR (project
+c     memory, Phase 2 finding: median r=-0.70 across 20 objects with
+c     >=3 zones) -- expected by construction, since BSTAR~Cd*A/(2m)
+c     and BN~m/(Cd*A) are approximate reciprocals in different unit
+c     conventions. Calibrated (not first-principles) via a pooled
+c     log10(BN)=SLOPE*log10(BSTAR)+INTCPT regression over the
+c     30-object campaign's zone-level (BSTAR, fitted BN) pairs
+c     (scratch_rpe/phase2b_bstar_bn_calibration.py, all-zones fit,
+c     n=147, R2=0.49, rmse=0.31 dex) -- provisional, same status as
+c     this project's other measurement-calibrated constants (G2 floor,
+c     LOFT-style correction factors). Window is +/-2*RMSE_DEX (~4x
+c     each side in linear BN) around the prior center -- wide enough
+c     to stay genuinely a PRIOR, not a forced answer; the GA still
+c     does the real fitting inside it.
+c
+c     Narrows [bn_lo_in,bn_hi_in] by INTERSECTION only -- never widens
+c     beyond the caller's own range (same floor-only spirit as G2).
+c     Falls back to the caller's unmodified range (ok=.false.) if this
+c     zone's BSTAR data is missing/non-positive, or if the prior
+c     window doesn't overlap the caller's range at all.
+c
+c     Output
+c       bn_lo_out, bn_hi_out : narrowed range (= bn_lo_in/bn_hi_in
+c                              unmodified if ok=.false.)
+c       ok                   : .true. if narrowing was applied
+c     ============================================================
+      implicit double precision (a-h, o-z)
+      integer norad_id, nzone, ntle_raw, maxtle
+      double precision epz(nzone)
+      integer norad_raw(maxtle), epoch_yr_raw(maxtle)
+      double precision epoch_day_raw(maxtle), bstar_raw(maxtle)
+      double precision bn_lo_in, bn_hi_in, bn_lo_out, bn_hi_out
+      logical ok
+
+      double precision SLOPE, INTCPT, RMSE_DEX
+      parameter(SLOPE = -0.4105d0, INTCPT = 0.5782d0)
+      parameter(RMSE_DEX = 0.3096d0)
+
+      double precision bvals(500), btmp
+      double precision bstar_i, bstar_med, log_bn_ctr
+      double precision bn_lo_prior, bn_hi_prior
+      integer nb, i, j
+
+      bn_lo_out = bn_lo_in
+      bn_hi_out = bn_hi_in
+      ok = .false.
+
+      nb = 0
+      do i = 1, nzone
+         call tle_find_bstar(norad_id, epz(i),
+     &      norad_raw, epoch_yr_raw, epoch_day_raw, bstar_raw,
+     &      ntle_raw, maxtle, bstar_i)
+         if (bstar_i .gt. 0.d0) then
+            nb = nb + 1
+            bvals(nb) = bstar_i
+         end if
+      end do
+
+      if (nb .lt. 1) return
+
+c     Insertion sort (nb is a per-zone TLE count, always small)
+      do i = 2, nb
+         btmp = bvals(i)
+         j = i - 1
+         do while (j .ge. 1 .and. bvals(j) .gt. btmp)
+            bvals(j+1) = bvals(j)
+            j = j - 1
+         end do
+         bvals(j+1) = btmp
+      end do
+
+      if (mod(nb,2) .eq. 1) then
+         bstar_med = bvals((nb+1)/2)
+      else
+         bstar_med = 0.5d0*(bvals(nb/2) + bvals(nb/2+1))
+      end if
+
+      log_bn_ctr = SLOPE*dlog10(bstar_med) + INTCPT
+      bn_lo_prior = 10.d0**(log_bn_ctr - 2.d0*RMSE_DEX)
+      bn_hi_prior = 10.d0**(log_bn_ctr + 2.d0*RMSE_DEX)
+
+      bn_lo_out = max(bn_lo_in, bn_lo_prior)
+      bn_hi_out = min(bn_hi_in, bn_hi_prior)
+
+      if (bn_lo_out .ge. bn_hi_out) then
+         bn_lo_out = bn_lo_in
+         bn_hi_out = bn_hi_in
+         return
+      end if
+
+c     Only report success if the prior actually narrowed at least one
+c     side -- the intersection above can trivially equal the caller's
+c     own range when the prior window is wider than it (correct
+c     behavior, but not something the caller should log as "applied").
+      if (bn_lo_out .gt. bn_lo_in .or. bn_hi_out .lt. bn_hi_in) then
+         ok = .true.
+      end if
 
       return
       end
