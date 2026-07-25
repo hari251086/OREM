@@ -1,0 +1,4 @@
+SCc.UTCModJulian          SCc.ElapsedDays           SCc.Earth.Altitude        
+25246.23831900463         0                         171.5521090717421         
+SCc.UTCModJulian          SCc.ElapsedDays           SCc.Earth.Altitude        
+25331.21880023066         84.98048122602631         101.9999999521979         
