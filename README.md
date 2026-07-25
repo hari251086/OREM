@@ -692,6 +692,13 @@ of KSROP's `driver_KS.F` core with re-entry-specific logic added, and evolves in
 **1.37 — 2026-07-25**
 - **Issue #26 revisited against the current shipped state (G3 + trust-gate + noise-matched apobs).** The earlier weather-mode regression (37151 Z7 newly predicting a badly-off re-entry, dragging that object's ensemble RPE from 4.3%→14.9%) no longer appears at meaningful magnitude — the BN-search changes since then evidently changed which zones converge where. Fresh static-vs-weather comparison: mean\|latest-zone RPE\| 11.59%→11.08%, mean\|ensemble RPE\| 23.39%→23.33%, both flat-to-slightly-better, no per-object outlier this time (largest ensemble delta is 35497, the already-known unrelated resonance case, at +6.2 points). **"No regression" DoD now cleanly met on both metrics**, not just the primary one as before. Full writeup: #26 comment.
 
+**1.38 — 2026-07-25**
+- **Issue #32 Phase 4: re-ran Phase 2's error-budget decomposition (`scratch_rpe/phase2_error_budget.py`, unchanged) against the current shipped state (G3 + trust-gate + noise-matched apobs).** Pure re-analysis of the already-current 30-object campaign CSV, no code change. Two findings shifted, two held up:
+  - **Changed: BSTAR↔BN correlation weakened substantially** (median r=-0.70 pre-G3 → **-0.43** now) — expected mechanically, since G3 explicitly pulls fitted BN toward the BSTAR-predicted value where it binds, so the *residual* correlation left over is naturally smaller. Not a red flag; flags that G3 has partially "used up" the very signal it was built to exploit.
+  - **Changed: RPE now shows a real horizon-dependence Phase 2 didn't find.** Mean\|RPE\| for horizon<100d is 33.2% vs 69.6% for horizon≥100d, a large gap — Phase 2 (pre-G3) found these "statistically indistinguishable" (67.9% vs 74.2%). Raw linear correlations stay weak (r=+0.01, r=-0.14 vs 1/horizon), so this reads as a threshold/bucket effect rather than a clean linear one, but suggests the improved fitting disproportionately helps short-horizon (later-zone, more-TLE-history) predictions while long-horizon extrapolation stays fundamentally hard — reinforces the latest-zone-as-primary design logic rather than undermining it.
+  - **Unchanged: fit RMS still doesn't predict extrapolation accuracy** (r(rms_fit,\|RPE\|)=+0.01, boundary-pinned zones still ~9x worse median RMS) and **TLE noise floor still flattens around 4000-6000 points/zone** — both Phase 2 conclusions hold up against the new pipeline.
+  - Full output: `scratch_rpe/phase4_error_budget_current.log`. Full writeup: #32 comment.
+
 ---
 
 ## 9. References
