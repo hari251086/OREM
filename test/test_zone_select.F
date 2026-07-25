@@ -1113,6 +1113,74 @@ c     Z65: Very steep decay (-10000 km/day)
       end if
 
 c     ==============================================================
+c     Recency guarantee (Pass 1.5) -- issue #29/#32
+c     Three perfect-linear (R2=1.0) old windows + one noisier but
+c     still-valid (R2~0.95) most-recent window, well-separated so
+c     Pass 1 can't merge them. With nzones_max smaller than the
+c     candidate count, a pure R2-greedy Pass 2 would always pick the
+c     perfect-R2 windows and never the most recent one -- exactly the
+c     11550 crowding failure mode this fix targets.
+c     ==============================================================
+      write(*,*) ''
+      write(*,*) '  --- Recency guarantee (Pass 1.5) ---'
+
+      do i = 1, 8
+         epochs(i) = 2460000.d0 + dble(i-1)
+         ha(i) = 30000.d0 - 100.d0*dble(i-1)
+      end do
+      do i = 9, 16
+         epochs(i) = 2460030.d0 + dble(i-9)
+         ha(i) = 27000.d0 - 100.d0*dble(i-9)
+      end do
+      do i = 17, 24
+         epochs(i) = 2460060.d0 + dble(i-17)
+         ha(i) = 24000.d0 - 100.d0*dble(i-17)
+      end do
+c     Window D (most recent): R2~0.948, slope~-4.90 -- clears
+c     r2_threshold=0.90/slope_threshold=-1.0 but far below A/B/C's
+c     perfect R2=1.0, so pure R2-greedy selection always loses it.
+      ha(25) = 21300.d0
+      ha(26) = 21295.d0
+      ha(27) = 21290.d0
+      ha(28) = 21285.d0
+      ha(29) = 21288.d0
+      ha(30) = 21275.d0
+      ha(31) = 21270.d0
+      ha(32) = 21265.d0
+      do i = 25, 32
+         epochs(i) = 2460090.d0 + dble(i-25)
+      end do
+
+c     Z66: nzones_max=2 -- both a recent and an older zone present
+      call zone_select(epochs, ha, 32,
+     &                 8, 10.d0, 0.90d0, -1.d0, 2,
+     &                 zone_start, zone_end, nzones)
+      call assert_i('Z66 recency: nzones_max=2 fills both slots',
+     &              nzones, 2, npass, nfail)
+
+      iall_ok = 0
+      do i = 1, nzones
+         if (zone_start(i) .ge. 25 .and. zone_start(i) .le. 32)
+     &      iall_ok = 1
+      end do
+      call assert_i('Z67 recency: most recent window survives (n=2)',
+     &              iall_ok, 1, npass, nfail)
+
+c     Z68: nzones_max=1 -- only one slot exists; pure R2-greedy would
+c     pick window A (first perfect-R2 tie), but the guarantee means
+c     the MOST RECENT window (D) must win instead.
+      call zone_select(epochs, ha, 32,
+     &                 8, 10.d0, 0.90d0, -1.d0, 1,
+     &                 zone_start, zone_end, nzones)
+      iall_ok = 0
+      if (nzones .eq. 1) then
+         if (zone_start(1) .ge. 25 .and. zone_start(1) .le. 32)
+     &      iall_ok = 1
+      end if
+      call assert_i('Z68 recency: sole slot goes to most recent',
+     &              iall_ok, 1, npass, nfail)
+
+c     ==============================================================
 c     Summary
 c     ==============================================================
       write(*,*) ''
