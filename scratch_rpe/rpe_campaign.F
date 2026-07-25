@@ -1,4 +1,4 @@
-c     rpe_campaign.F — 30-object drag-enabled RPE campaign (issue #16)
+c     rpe_campaign.F — 50-object drag-enabled RPE campaign (issue #16)
 c     -------------------------------------------------------
 c     Runs orem_run with IDRAG=1 and the full force model (the
 c     test_e2e v1.11 config: geo=20, sun=2, moon=3, SRP on) on all
@@ -99,7 +99,7 @@ c     candidates, so a higher cap admits LATER zones -- and v1.20
 c     showed the latest zone is the primary estimator. This run
 c     measures how much later the latest zone gets and what it does
 c     to the latest-zone RPE.
-      parameter(ndim_a = 291, mxz = 8, nobj = 30)
+      parameter(ndim_a = 291, mxz = 8, nobj = 50)
 
       double precision ALT_a(ndim_a), DEN_a(ndim_a), SCH_a(ndim_a)
       integer natm
@@ -139,30 +139,73 @@ c     debris, decay 2026-06-18, 1473 TLEs, clean non-saturated
 c     terminal ndot=0.157) instead of chasing the ga_optimize bug in
 c     the middle of this campaign; that hang is real and worth its
 c     own issue.
+c     Extended 30 -> 50 objects (2026-07-25), same sourcing method as
+c     every prior expansion: filter the freshest satcat.csv snapshot
+c     for APOGEE>8000km, PERIGEE<3000km, OBJECT_TYPE in (ROCKET BODY,
+c     DEBRIS), DECAY not null, decay after 2015, excluding every NORAD
+c     ID already in this campaign -- 41 raw candidates. Screened out,
+c     matching prior-round precedent exactly: 42985/40598/40777/36518/
+c     38587/27900 (already-known saturated-ndot/too-few-TLE/multi-
+c     decade-gap exclusions from the 10/20/30-object rounds) and
+c     47098/59628/62718 (anomalous >280,000km apogee -- almost
+c     certainly trans-lunar-injection stages, same regime-mismatch
+c     reasoning as the two CZ-5 R/Bs excluded from the 20-object
+c     round). Of the 31 remaining, many are SL-12 (Proton upper stage)
+c     debris fragments sharing near-identical 2025-05-07/08 SATCAT
+c     DECAY dates -- likely a common breakup/catalog-processing batch,
+c     not fully independent decay events -- so only a representative
+c     subset was kept rather than all of them, to avoid the 50-object
+c     set being dominated by one non-independent cluster. Final 20
+c     spans 7 source families (SL-12, Cosmos 1261/1109/1024, Titan
+c     3C Transtage, CZ-3A, Ariane 2) and inclination 8.2-66.8 deg.
+c     All 20 pass the same quality screen as every prior round (no
+c     saturated terminal ndot, no near-empty TLE history). Several
+c     have real, non-trivial last-TLE-to-decay gaps (worst: 27976 at
+c     ~8.7 yr) -- kept deliberately per the 20-object round's own
+c     precedent (28572's ~6yr gap was kept there too): sparse terminal
+c     tracking IS the real-world failure mode issue #29 is about, not
+c     a reason to curate it away. Only gaps in the 12-16yr range
+c     (38587, 27900) have ever been judged genuinely unreachable.
       data norad / 42928, 35497, 37151, 39615, 27526, 32007, 37819,
      &             11550, 59347, 40943,
      &             66587, 60328, 61734, 57804, 56758,
      &             30799, 44187, 35009, 41553, 48259,
      &             27906, 27882, 39802, 28572, 46429,
-     &             44591, 41695, 52205, 45349, 23647 /
+     &             44591, 41695, 52205, 45349, 23647,
+     &             41693, 21935, 48264, 28589, 29202,
+     &             32977, 41561, 43670, 27790, 27976,
+     &             44590, 45493, 48090, 27035, 27902,
+     &             27901, 41679, 44892, 45036, 44563 /
       data oyr / 2019.d0, 2016.d0, 2015.d0, 2017.d0, 2012.d0,
      &           2010.d0, 2013.d0, 2025.d0, 2026.d0, 2020.d0,
      &           2026.d0, 2025.d0, 2025.d0, 2025.d0, 2024.d0,
      &           2024.d0, 2021.d0, 2020.d0, 2019.d0, 2026.d0,
      &           2018.d0, 2019.d0, 2019.d0, 2020.d0, 2021.d0,
-     &           2022.d0, 2022.d0, 2022.d0, 2022.d0, 2024.d0 /
+     &           2022.d0, 2022.d0, 2022.d0, 2022.d0, 2024.d0,
+     &           2023.d0, 2024.d0, 2025.d0, 2025.d0, 2025.d0,
+     &           2025.d0, 2025.d0, 2025.d0, 2025.d0, 2025.d0,
+     &           2025.d0, 2025.d0, 2025.d0, 2025.d0, 2025.d0,
+     &           2025.d0, 2025.d0, 2025.d0, 2025.d0, 2025.d0 /
       data omo / 3.d0, 10.d0, 12.d0, 9.d0, 5.d0, 6.d0, 9.d0,
      &           4.d0, 6.d0, 2.d0,
      &           2.d0, 4.d0, 3.d0, 1.d0, 8.d0,
      &           5.d0, 6.d0, 8.d0, 1.d0, 6.d0,
      &           11.d0, 4.d0, 11.d0, 10.d0, 10.d0,
-     &           3.d0, 5.d0, 6.d0, 10.d0, 1.d0 /
+     &           3.d0, 5.d0, 6.d0, 10.d0, 1.d0,
+     &           5.d0, 6.d0, 4.d0, 5.d0, 5.d0,
+     &           5.d0, 5.d0, 5.d0, 5.d0, 5.d0,
+     &           5.d0, 5.d0, 5.d0, 5.d0, 6.d0,
+     &           7.d0, 5.d0, 5.d0, 5.d0, 5.d0 /
       data ody / 3.d0, 31.d0, 3.d0, 15.d0, 9.d0, 6.d0, 12.d0,
      &           10.d0, 8.d0, 20.d0,
      &           10.d0, 14.d0, 22.d0, 3.d0, 25.d0,
      &           12.d0, 15.d0, 31.d0, 6.d0, 18.d0,
      &           19.d0, 7.d0, 5.d0, 4.d0, 18.d0,
-     &           3.d0, 15.d0, 26.d0, 9.d0, 28.d0 /
+     &           3.d0, 15.d0, 26.d0, 9.d0, 28.d0,
+     &           9.d0, 6.d0, 25.d0, 7.d0, 7.d0,
+     &           7.d0, 7.d0, 7.d0, 8.d0, 8.d0,
+     &           8.d0, 8.d0, 8.d0, 9.d0, 26.d0,
+     &           18.d0, 7.d0, 8.d0, 8.d0, 8.d0 /
 
       tle_file(1) = 'input/example_42928.tle.txt'
       tle_file(2) = 'input/example_35497.tle.txt'
@@ -194,6 +237,26 @@ c     own issue.
       tle_file(28) = 'input/example_52205.tle.txt'
       tle_file(29) = 'input/example_45349.tle.txt'
       tle_file(30) = 'input/example_23647.tle.txt'
+      tle_file(31) = 'input/example_41693.tle.txt'
+      tle_file(32) = 'input/example_21935.tle.txt'
+      tle_file(33) = 'input/example_48264.tle.txt'
+      tle_file(34) = 'input/example_28589.tle.txt'
+      tle_file(35) = 'input/example_29202.tle.txt'
+      tle_file(36) = 'input/example_32977.tle.txt'
+      tle_file(37) = 'input/example_41561.tle.txt'
+      tle_file(38) = 'input/example_43670.tle.txt'
+      tle_file(39) = 'input/example_27790.tle.txt'
+      tle_file(40) = 'input/example_27976.tle.txt'
+      tle_file(41) = 'input/example_44590.tle.txt'
+      tle_file(42) = 'input/example_45493.tle.txt'
+      tle_file(43) = 'input/example_48090.tle.txt'
+      tle_file(44) = 'input/example_27035.tle.txt'
+      tle_file(45) = 'input/example_27902.tle.txt'
+      tle_file(46) = 'input/example_27901.tle.txt'
+      tle_file(47) = 'input/example_41679.tle.txt'
+      tle_file(48) = 'input/example_44892.tle.txt'
+      tle_file(49) = 'input/example_45036.tle.txt'
+      tle_file(50) = 'input/example_44563.tle.txt'
       obj_name(1) = '42928 PSLV-C39'
       obj_name(2) = '35497 Ariane 5 ESC-A'
       obj_name(3) = '37151 Long March 3B'
@@ -224,6 +287,26 @@ c     own issue.
       obj_name(28) = '52205 Cosmos917 deb'
       obj_name(29) = '45349 SL-12 deb'
       obj_name(30) = '23647 Titan34B deb'
+      obj_name(31) = '41693 SL-12 deb'
+      obj_name(32) = '21935 SL-12 deb'
+      obj_name(33) = '48264 Cosmos1261 deb'
+      obj_name(34) = '28589 SL-12 deb'
+      obj_name(35) = '29202 Cosmos1261 deb'
+      obj_name(36) = '32977 Cosmos1109 deb'
+      obj_name(37) = '41561 SL-12 deb'
+      obj_name(38) = '43670 SL-12 deb'
+      obj_name(39) = '27790 Titan3C TS deb'
+      obj_name(40) = '27976 SL-12 deb'
+      obj_name(41) = '44590 CZ-3A deb'
+      obj_name(42) = '45493 SL-12 deb'
+      obj_name(43) = '48090 Cosmos1024 deb'
+      obj_name(44) = '27035 Ariane2 deb'
+      obj_name(45) = '27902 Cosmos1261 deb'
+      obj_name(46) = '27901 Cosmos1261 deb'
+      obj_name(47) = '41679 SL-12 deb'
+      obj_name(48) = '44892 SL-12 deb'
+      obj_name(49) = '45036 SL-12 deb'
+      obj_name(50) = '44563 SL-12 deb'
 
 c     Issue: 4-core-capped parallel partitioning (see header comment).
 c     No args (the default, every prior invocation) -> full 1..nobj
