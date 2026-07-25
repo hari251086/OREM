@@ -182,6 +182,14 @@ c     Issue #32 (G3): BSTAR-informed BN search-range prior, per zone
       double precision bn_lo_zone, bn_hi_zone
       logical bn_prior_ok
 
+c     Issue #31 follow-up: smooth (linfit-trend) mean/osculating bias
+c     correction for haz -- see the noise-matched apobs comment below.
+c     Revisited 2026-07-25 alongside G3+trust-gate (see project memory
+c     for the earlier flat result measured before those existed).
+      double precision bias_t(500), bias_y(500)
+      double precision bias_slope, bias_intcpt, bias_r2
+      integer nbias
+
       ierr = 0
       nzones_used = 0
       nzones_valid = 0
@@ -381,14 +389,25 @@ c        (#10) can shrink a zone after selection.
             smaz(i)  = a_tle(zone_start(iz) + i - 1)
          end do
 
-c        Issue #31: haz feeds rsm_generate's apobs, which ga_fitness
-c        RMS-compares directly against propagate_ks's genuinely-
-c        osculating surfaces -- overwrite it per-point with true
-c        SGP4-osculating apogee here, AFTER zone_select already picked
-c        this window using the mean-element ha_tle above (deliberately
-c        -- see tle_evolution.F). Falls back to the mean value already
-c        in haz(i) if SGP4 fails for a given point (e.g. deep-space
-c        edge case).
+c        Issue #31 follow-up (noise-matched apobs, revisited 2026-07-25
+c        alongside G3+trust-gate): haz feeds rsm_generate's apobs,
+c        which ga_fitness RMS-compares directly against propagate_ks's
+c        genuinely-osculating surfaces. An earlier version overwrote
+c        haz(i) per-point with an INDEPENDENT SGP4-osculating
+c        conversion of that TLE alone -- correct in isolation, but
+c        each TLE is its own independently least-squares-fit snapshot,
+c        so consecutive points' true/mean anomaly phases are
+c        effectively uncorrelated, and the resulting series carried
+c        phase-dependent noise that doesn't match propagate_ks's own
+c        smoothly-evolving trajectory (measured flat/no-help against
+c        the pre-G3 baseline; see project memory). Fix: keep the
+c        smooth mean-element ha_tle trend (already in haz(i) from the
+c        copy loop above) as the base signal, and add back only the
+c        SMOOTH (linear-in-time) part of the mean/osculating bias, fit
+c        via the same linfit() zone_select.F already uses. Falls back
+c        to the unmodified mean-element haz(i) if fewer than 2 points
+c        in the zone get a successful SGP4 conversion to fit against.
+         nbias = 0
          do i = 1, nzone
             call tle_find_osc(norad_id, epz(i),
      &         norad_raw, epoch_yr_raw, epoch_day_raw,
@@ -396,9 +415,19 @@ c        edge case).
      &         amm_raw, bstar_raw, ntle_raw, maxtle,
      &         a_kep_osc1, osc_ok)
             if (osc_ok) then
-               haz(i) = a_kep_osc1(1)*(1.d0+a_kep_osc1(2)) - R_Earth
+               nbias = nbias + 1
+               bias_t(nbias) = epz(i)
+               bias_y(nbias) = a_kep_osc1(1)*(1.d0+a_kep_osc1(2))
+     &                         - R_Earth - haz(i)
             end if
          end do
+         if (nbias .ge. 2) then
+            call linfit(bias_t, bias_y, nbias,
+     &         bias_slope, bias_intcpt, bias_r2)
+            do i = 1, nzone
+               haz(i) = haz(i) + bias_slope*epz(i) + bias_intcpt
+            end do
+         end if
 
          do j = 1, nzone
             maz(j) = 0.d0

@@ -677,6 +677,18 @@ of KSROP's `driver_KS.F` core with re-entry-specific logic added, and evolves in
 
   Every metric on both sets moves the right direction, none regress. 371/371 tests pass. Full writeup: #33 comment.
 
+**1.36 — 2026-07-25**
+- **Issue #31 revisited: the noise-matched-apobs follow-up, retested alongside G3+trust-gate.** The earlier attempt (smooth linfit-trend correction to the mean/osculating bias, replacing the fully independent per-point SGP4 conversion) measured flat against the pre-G3 baseline and was reverted. Retested unchanged against the new G3+trust-gate baseline, on the theory that a narrower, more history-informed BN search might respond differently to the observation-side noise character. Result is genuinely mixed, not a repeat of either extreme:
+
+  | Metric | G3+trust-gate | +noise-matched apobs |
+  |---|---|---|
+  | 7-obj latest-zone | 14.0% | **11.6%** |
+  | 7-obj ensemble | 22.9% | 23.4% |
+  | 30-obj latest-zone | 39.4% | **38.7%** |
+  | 30-obj ensemble | 22.1% | 22.2% |
+
+  Small, consistent improvement on the primary (latest-zone) metric on both sets; small, consistent regression on the secondary (ensemble) metric on both sets. Nowhere near #33's magnitude either direction. **Kept per explicit user direction** — net positive on the metric this project treats as primary. 371/371 tests pass. Full writeup: #31 comment.
+
 ---
 
 ## 9. References
