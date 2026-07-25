@@ -1,0 +1,83 @@
+%General Mission Analysis Tool(GMAT) Script
+%  OREM issue #32 Phase 5: GMAT cross-check of the CURRENT (2026-07-25)
+%  fitted state for 42928's latest zone (Z8, the primary estimator),
+%  after today's G3(tightened)+trust-gate+noise-matched-apobs session.
+%  Independently propagates OREM's own fitted (e, BN) grid point --
+%  perigee-preserving SMA from the zone's SGP4-osculating IC, MA held
+%  fixed and resolved against the fitted eccentricity (exactly what
+%  oe2car does inside rsm_generate/propagate_ks) -- through GMAT's own
+%  JacchiaRoberts drag model, to check whether an independent
+%  propagator agrees with OREM's re-entry date.
+%
+%  Zone-8 IC (SGP4-osculating, epoch 2458455.471721 JD = 02 Dec 2018
+%  23:19:16.69 UTC): sma=7524.293124, e=0.133643, inc=19.094467,
+%  raan=210.267993, aop=73.147372, ma=301.305632 (all from a debug
+%  dump of orem.F's own internal state, not re-derived by hand).
+%  Fitted (Z8, GA): e_opt=0.133748, bn_opt=93.491 -- perigee radius
+%  preserved (rp=6518.724018 km) -> SMA=7525.205157, TA=287.117995
+%  (MA resolved via Kepler's equation using e_opt, matching oe2car).
+%
+%  OREM prediction (Z8, today's fit): JD 2458541.9016 (14 Feb 2019
+%  09:38 UTC, ~86.4 days after zone start), RPE=-3.997% vs the
+%  observed 2019-03-03 decay (a 524-day arc from zone start).
+%
+%  Force model matches the campaign's own config (ngeo_deg=20/
+%  nsun_deg=2/nmoon_deg=3, CR_srp=1.2, AM_srp=0.01 -> SRPArea=
+%  AM_srp*BN): EGM2008 zonal Degree=20/Order=0, Sun+Luna point mass,
+%  SRP on, JacchiaRoberts with CONSTANT F107=72/F107A=72/Kp=1.0 --
+%  matches the STATIC (no epoch-resolved weather) campaign this fit
+%  came from, same static-flux convention as the original v1.15
+%  cross-check (gmat_reentry_42928z0.script).
+%  Stop threshold 102 km, not KSROP's 80 km: GMAT's JacchiaRoberts
+%  throws below 100 km (established in the v1.15 script).
+
+Create ForceModel FMc;
+GMAT FMc.CentralBody = Earth;
+GMAT FMc.PrimaryBodies = {Earth};
+GMAT FMc.PointMasses = {Sun, Luna};
+GMAT FMc.GravityField.Earth.Degree = 20;
+GMAT FMc.GravityField.Earth.Order = 0;
+GMAT FMc.GravityField.Earth.PotentialFile = 'C:\Users\hari2\OneDrive\Documents\GitHub\KSROP\scratch_gmat\EGM2008_72x72.cof';
+GMAT FMc.Drag.AtmosphereModel = JacchiaRoberts;
+GMAT FMc.Drag.HistoricWeatherSource = 'ConstantFluxAndGeoMag';
+GMAT FMc.Drag.PredictedWeatherSource = 'ConstantFluxAndGeoMag';
+GMAT FMc.Drag.F107 = 72;
+GMAT FMc.Drag.F107A = 72;
+GMAT FMc.Drag.MagneticIndex = 1.0;
+GMAT FMc.SRP = On;
+
+Create Propagator Propc;
+GMAT Propc.FM = FMc;
+GMAT Propc.Type = RungeKutta89;
+GMAT Propc.InitialStepSize = 10;
+GMAT Propc.Accuracy = 1e-12;
+GMAT Propc.MinStep = 0.001;
+GMAT Propc.MaxStep = 300;
+
+Create Spacecraft SCc;
+GMAT SCc.DateFormat = UTCGregorian;
+GMAT SCc.Epoch = '02 Dec 2018 23:19:16.694';
+GMAT SCc.CoordinateSystem = EarthMJ2000Eq;
+GMAT SCc.DisplayStateType = Keplerian;
+GMAT SCc.SMA = 7525.205157;
+GMAT SCc.ECC = 0.133748;
+GMAT SCc.INC = 19.094467;
+GMAT SCc.RAAN = 210.267993;
+GMAT SCc.AOP = 73.147372;
+GMAT SCc.TA = 287.117995;
+GMAT SCc.Cd = 1;
+GMAT SCc.DragArea = 1;
+GMAT SCc.DryMass = 93.491;
+GMAT SCc.Cr = 1.2;
+GMAT SCc.SRPArea = 0.93491;
+
+Create ReportFile Repxv;
+GMAT Repxv.Filename = 'gmat_xval_42928z8_2026_results.txt';
+GMAT Repxv.Precision = 16;
+GMAT Repxv.WriteHeaders = true;
+
+BeginMissionSequence;
+
+Report Repxv SCc.UTCModJulian SCc.ElapsedDays SCc.Earth.Altitude;
+Propagate Propc(SCc) {SCc.Earth.Altitude = 102, SCc.ElapsedDays = 1200};
+Report Repxv SCc.UTCModJulian SCc.ElapsedDays SCc.Earth.Altitude;
