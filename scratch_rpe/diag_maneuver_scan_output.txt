@@ -1,0 +1,136 @@
+Part 1: object type check (50 objects)
+All objects sourced under 'ROCKET BODY or DEBRIS' catalog filter (issue #29 sourcing criteria). No PAYLOAD-classified objects expected by construction -- spot-checked all 50 names below.
+
+  11550: Molniya debris
+  21935: SL-12 deb
+  23647: Titan34B deb
+  27035: Ariane2 deb
+  27526: Ariane 5 R/B
+  27790: Titan3C TS deb
+  27882: Cosmos903 deb
+  27901: Cosmos1261 deb
+  27902: Cosmos1261 deb
+  27906: Cosmos1481 deb
+  27976: SL-12 deb
+  28572: SL-12 deb
+  28589: SL-12 deb
+  29202: Cosmos1261 deb
+  30799: Delta2 R/B
+  32007: GSLV R/B
+  32977: Cosmos1109 deb
+  35009: Fregat R/B
+  35497: Ariane 5 ESC-A
+  36518: Breeze-M deb tank
+  37151: Long March 3B
+  37819: Proton-M R/B
+  39615: Proton-M Briz-M
+  39802: SL-12 deb
+  40777: Ariane 1 deb
+  40943: GTO debris
+  41561: SL-12 deb
+  41679: SL-12 deb
+  41688: SL-12 deb
+  41693: SL-12 deb
+  41695: SL-12 deb
+  42928: PSLV-C39
+  43670: SL-12 deb
+  44563: SL-12 deb
+  44590: CZ-3A deb
+  44591: CZ-3A deb
+  44892: SL-12 deb
+  45036: SL-12 deb
+  45349: SL-12 deb
+  45493: SL-12 deb
+  46429: SL-12 deb
+  48090: Cosmos1024 deb
+  48259: Cosmos1124 deb
+  48264: Cosmos1261 deb
+  52205: Cosmos917 deb
+  57804: H-2A R/B
+  59347: GTO R/B
+  60328: CZ-3B R/B
+  61734: H-3 R/B
+  66587: CZ-3B R/B
+
+Part 2: isolated apogee-jump scan (candidate maneuvers)
+
+  norad name                     t_days  dt_gap  apo_before  apo_after    delta       note
+  27882 Cosmos903 deb            5661.7    2.08     34447.0    33902.6   -544.3      noisy
+  27882 Cosmos903 deb            5662.9    1.23     33902.6    33555.1   -347.5      noisy
+  27882 Cosmos903 deb            5664.9    2.03     33555.1    33031.8   -523.3      noisy
+  27882 Cosmos903 deb            5666.1    1.19     33031.8    32701.9   -329.9      noisy
+  27882 Cosmos903 deb            5667.7    1.58     32701.9    32204.8   -497.1      noisy
+  27901 Cosmos1261 deb           8019.6    2.72     37166.5    36774.7   -391.8      noisy
+  27976 SL-12 deb                2119.8    0.79     10808.0    11131.6   +323.6      noisy
+  30799 Delta2 R/B                561.0    1.07     86872.4    86251.3   -621.1      noisy
+  30799 Delta2 R/B                568.7    2.62     86856.5    86237.7   -618.8      noisy
+  30799 Delta2 R/B               3188.0    0.00     86244.3    86551.1   +306.9      noisy
+  30799 Delta2 R/B               3189.2    1.28     86551.1    86220.6   -330.5      noisy
+  30799 Delta2 R/B               3196.9    1.28     86281.6    86598.0   +316.3      noisy
+  30799 Delta2 R/B               3199.5    2.56     86598.0    86244.3   -353.6      noisy
+  30799 Delta2 R/B               3200.7    0.00     86200.9    86514.4   +313.5      noisy
+  30799 Delta2 R/B               3203.3    2.56     86514.4    86210.2   -304.3      noisy
+  30799 Delta2 R/B               3209.6    1.27     86190.8    85821.1   -369.7      noisy
+  30799 Delta2 R/B               3210.9    1.27     85821.1    86157.3   +336.2      noisy
+  30799 Delta2 R/B               3234.0    0.00     85942.8    86252.2   +309.4      noisy
+  30799 Delta2 R/B               3248.0    0.00     85911.6    86217.9   +306.3      noisy
+  30799 Delta2 R/B               3249.3    1.27     86217.9    85915.7   -302.2      noisy
+  30799 Delta2 R/B               3566.2    2.51     85226.0    84892.8   -333.3      noisy
+  30799 Delta2 R/B               3568.7    2.51     84892.8    85224.6   +331.8      noisy
+  30799 Delta2 R/B               3583.8    1.25     84890.4    85199.1   +308.7      noisy
+  30799 Delta2 R/B               3586.8    1.25     85295.8    84845.3   -450.5      noisy
+  30799 Delta2 R/B               3591.8    1.25     85205.1    85546.2   +341.1      noisy
+  30799 Delta2 R/B               3603.1    1.25     85224.0    85564.1   +340.2      noisy
+  30799 Delta2 R/B               3603.1    0.00     85564.1    85123.0   -441.1      noisy
+  30799 Delta2 R/B               3605.6    2.50     85123.0    85644.2   +521.1      noisy
+  30799 Delta2 R/B               3605.6    0.00     85644.2    85113.6   -530.6      noisy
+  30799 Delta2 R/B               3611.8    1.25     85166.4    85599.1   +432.7      noisy
+  30799 Delta2 R/B               3611.8    0.00     85599.1    85163.3   -435.9      noisy
+  30799 Delta2 R/B               3616.8    1.25     85146.6    85648.4   +501.7      noisy
+  30799 Delta2 R/B               3616.8    0.00     85648.4    85155.4   -493.0      noisy
+  30799 Delta2 R/B               3621.8    0.00     85407.7    85092.6   -315.0      noisy
+  30799 Delta2 R/B               3626.8    1.25     85147.2    85474.2   +327.0      noisy
+  30799 Delta2 R/B               3626.8    0.00     85474.2    85138.3   -335.9      noisy
+  30799 Delta2 R/B               3636.9    0.00     85521.6    85116.4   -405.3      noisy
+  30799 Delta2 R/B               4406.7    1.26     85399.6    85099.5   -300.1      noisy
+  30799 Delta2 R/B               4408.0    0.00     85165.3    85495.6   +330.2      noisy
+  30799 Delta2 R/B               6070.3    0.00     84776.1    85084.2   +308.1      noisy
+  30799 Delta2 R/B               6071.5    1.25     85084.2    84736.2   -348.0      noisy
+  30799 Delta2 R/B               6096.5    0.00     84852.0    85163.9   +311.9      noisy
+  30799 Delta2 R/B               6096.5    0.00     85163.9    84808.7   -355.2      noisy
+  30799 Delta2 R/B               6105.3    0.00     84805.1    85221.8   +416.7      noisy
+  30799 Delta2 R/B               6106.5    1.25     85221.8    84840.2   -381.7      noisy
+  30799 Delta2 R/B               6106.5    0.00     84773.7    85143.3   +369.7      noisy
+  30799 Delta2 R/B               6106.5    0.00     85143.3    84822.8   -320.5      noisy
+  30799 Delta2 R/B               6110.3    0.00     85144.8    84831.5   -313.3      noisy
+  30799 Delta2 R/B               6116.6    0.00     84636.6    85049.1   +412.5      noisy
+  35497 Ariane 5 ESC-A           1081.5    2.00      7576.9     7253.4   -323.5      noisy
+  35497 Ariane 5 ESC-A           1091.2    2.18      6034.5     5640.3   -394.2      noisy
+  35497 Ariane 5 ESC-A           1094.1    1.99      5474.4     5104.7   -369.7      noisy
+  36518 Breeze-M deb tank        3103.9    1.05     17369.1    16453.4   -915.7      noisy
+  36518 Breeze-M deb tank        3104.9    0.99     16453.4    15659.1   -794.2      noisy
+  39615 Proton-M Briz-M            45.7    2.53     23004.0    22684.8   -319.2      noisy
+  57804 H-2A R/B                   10.7    2.28     98676.2    98256.0   -420.3      noisy
+  57804 H-2A R/B                   12.2    1.52     98256.0    98650.4   +394.5      noisy
+  59347 GTO R/B                   630.5    1.52     57616.2    57288.9   -327.3      noisy
+  59347 GTO R/B                   632.0    1.49     57288.9    56778.3   -510.6      noisy
+  59347 GTO R/B                   634.3    0.76     56591.3    56285.7   -305.5      noisy
+  59347 GTO R/B                   638.0    2.95     56171.3    55677.7   -493.6  MANEUVER?
+  59347 GTO R/B                   640.4    1.71     55823.0    55267.1   -555.9  MANEUVER?
+  59347 GTO R/B                   668.0    1.74     46397.5    45600.1   -797.4      noisy
+  59347 GTO R/B                   676.9    1.61     43141.5    42766.4   -375.1      noisy
+  59347 GTO R/B                   685.1    1.49     40373.1    39836.9   -536.2      noisy
+  59347 GTO R/B                   711.3    2.30     32358.9    31165.2  -1193.7      noisy
+  59347 GTO R/B                   712.0    0.75     31165.2    30798.5   -366.7      noisy
+  59347 GTO R/B                   714.9    2.90     30798.5    29520.8  -1277.7      noisy
+  59347 GTO R/B                   736.7    0.75     20718.7    20381.9   -336.8      noisy
+  59347 GTO R/B                   737.9    0.73     20166.6    19834.0   -332.6      noisy
+  59347 GTO R/B                   740.0    1.63     19592.9    18794.8   -798.1      noisy
+  59347 GTO R/B                   741.0    0.91     18794.8    18384.6   -410.2      noisy
+  59347 GTO R/B                   743.8    2.84     18384.6    17204.3  -1180.4      noisy
+  60328 CZ-3B R/B                 208.9    2.24     26765.2    26419.0   -346.2      noisy
+  60328 CZ-3B R/B                 211.1    1.89     26361.7    25989.9   -371.9      noisy
+  60328 CZ-3B R/B                 213.0    1.86     25989.9    25532.5   -457.4      noisy
+  60328 CZ-3B R/B                 217.5    1.48     24823.3    24503.4   -319.9      noisy
+  60328 CZ-3B R/B                 220.1    1.45     24248.9    23905.6   -343.2      noisy
+  60328 CZ-3B R/B                 222.6    1.12     23556.4    23180.5   -375.9      noisy

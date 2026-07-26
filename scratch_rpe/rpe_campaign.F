@@ -166,10 +166,37 @@ c     precedent (28572's ~6yr gap was kept there too): sparse terminal
 c     tracking IS the real-world failure mode issue #29 is about, not
 c     a reason to curate it away. Only gaps in the 12-16yr range
 c     (38587, 27900) have ever been judged genuinely unreachable.
+c     Issue #29 follow-up (2026-07-26): 56758/44187/41553 (all Falcon 9
+c     R/B) replaced with 36518/40777/41688 -- OREM has no thrust/
+c     maneuver modeling at all (propagate_ks is gravity+drag+SRP only),
+c     and SpaceX is documented to perform active post-separation
+c     passivation/deorbit burns on Falcon 9 second stages, unlike the
+c     purely passive expendable stages (Ariane/Proton/CZ/GSLV/H-series)
+c     this campaign otherwise uses. The theory and this whole zone-fit
+c     methodology only holds for non-maneuverable objects; three Falcon
+c     9 R/Bs in a 50-object validation set risked masking that
+c     assumption's violation as ordinary fit noise. Replacements sourced
+c     the same way as every prior round (freshest satcat.csv, ROCKET
+c     BODY/DEBRIS, APOGEE>8000km, PERIGEE<3000km, decay after 2012,
+c     excluding every already-used NORAD ID and the anomalous->280,000km
+c     CZ-5 TLI-stage regime): 36518 (Breeze-M deb tank) and 40777
+c     (Ariane 1 deb) were flagged excluded in the original 30-object
+c     comment above ("already-known...exclusions") but that predates
+c     issue #30's ga_optimize NaN/Inf hang fix -- re-tested directly
+c     this round (scratch_rpe/diag_zone_data.exe) and both now produce
+c     clean, well-conditioned zone_select windows (36518: 8 zones,
+c     R2 0.994-0.999; 40777: 1 zone, R2=0.9996). 41688 (SL-12 deb) is a
+c     second member of the 2025-05-07/08 debris cluster already
+c     represented once by 45493 in this set -- a deliberate, disclosed
+c     exception to the "avoid cluster duplication" precedent above,
+c     accepted after 6 other non-cluster candidates (60607/40598/27900/
+c     38587/40006/34201/29462) all failed on TLE density or the same
+c     multi-decade last-TLE-to-decay gap already known to be
+c     unreachable, not on any new criterion.
       data norad / 42928, 35497, 37151, 39615, 27526, 32007, 37819,
      &             11550, 59347, 40943,
-     &             66587, 60328, 61734, 57804, 56758,
-     &             30799, 44187, 35009, 41553, 48259,
+     &             66587, 60328, 61734, 57804, 36518,
+     &             30799, 40777, 35009, 41688, 48259,
      &             27906, 27882, 39802, 28572, 46429,
      &             44591, 41695, 52205, 45349, 23647,
      &             41693, 21935, 48264, 28589, 29202,
@@ -178,8 +205,8 @@ c     (38587, 27900) have ever been judged genuinely unreachable.
      &             27901, 41679, 44892, 45036, 44563 /
       data oyr / 2019.d0, 2016.d0, 2015.d0, 2017.d0, 2012.d0,
      &           2010.d0, 2013.d0, 2025.d0, 2026.d0, 2020.d0,
-     &           2026.d0, 2025.d0, 2025.d0, 2025.d0, 2024.d0,
-     &           2024.d0, 2021.d0, 2020.d0, 2019.d0, 2026.d0,
+     &           2026.d0, 2025.d0, 2025.d0, 2025.d0, 2018.d0,
+     &           2024.d0, 2016.d0, 2020.d0, 2025.d0, 2026.d0,
      &           2018.d0, 2019.d0, 2019.d0, 2020.d0, 2021.d0,
      &           2022.d0, 2022.d0, 2022.d0, 2022.d0, 2024.d0,
      &           2023.d0, 2024.d0, 2025.d0, 2025.d0, 2025.d0,
@@ -188,8 +215,8 @@ c     (38587, 27900) have ever been judged genuinely unreachable.
      &           2025.d0, 2025.d0, 2025.d0, 2025.d0, 2025.d0 /
       data omo / 3.d0, 10.d0, 12.d0, 9.d0, 5.d0, 6.d0, 9.d0,
      &           4.d0, 6.d0, 2.d0,
-     &           2.d0, 4.d0, 3.d0, 1.d0, 8.d0,
-     &           5.d0, 6.d0, 8.d0, 1.d0, 6.d0,
+     &           2.d0, 4.d0, 3.d0, 1.d0, 11.d0,
+     &           5.d0, 2.d0, 8.d0, 5.d0, 6.d0,
      &           11.d0, 4.d0, 11.d0, 10.d0, 10.d0,
      &           3.d0, 5.d0, 6.d0, 10.d0, 1.d0,
      &           5.d0, 6.d0, 4.d0, 5.d0, 5.d0,
@@ -198,8 +225,8 @@ c     (38587, 27900) have ever been judged genuinely unreachable.
      &           7.d0, 5.d0, 5.d0, 5.d0, 5.d0 /
       data ody / 3.d0, 31.d0, 3.d0, 15.d0, 9.d0, 6.d0, 12.d0,
      &           10.d0, 8.d0, 20.d0,
-     &           10.d0, 14.d0, 22.d0, 3.d0, 25.d0,
-     &           12.d0, 15.d0, 31.d0, 6.d0, 18.d0,
+     &           10.d0, 14.d0, 22.d0, 3.d0, 8.d0,
+     &           12.d0, 8.d0, 31.d0, 8.d0, 18.d0,
      &           19.d0, 7.d0, 5.d0, 4.d0, 18.d0,
      &           3.d0, 15.d0, 26.d0, 9.d0, 28.d0,
      &           9.d0, 6.d0, 25.d0, 7.d0, 7.d0,
@@ -221,11 +248,11 @@ c     (38587, 27900) have ever been judged genuinely unreachable.
       tle_file(12) = 'input/example_60328.tle.txt'
       tle_file(13) = 'input/example_61734.tle.txt'
       tle_file(14) = 'input/example_57804.tle.txt'
-      tle_file(15) = 'input/example_56758.tle.txt'
+      tle_file(15) = 'input/example_36518.tle.txt'
       tle_file(16) = 'input/example_30799.tle.txt'
-      tle_file(17) = 'input/example_44187.tle.txt'
+      tle_file(17) = 'input/example_40777.tle.txt'
       tle_file(18) = 'input/example_35009.tle.txt'
-      tle_file(19) = 'input/example_41553.tle.txt'
+      tle_file(19) = 'input/example_41688.tle.txt'
       tle_file(20) = 'input/example_48259.tle.txt'
       tle_file(21) = 'input/example_27906.tle.txt'
       tle_file(22) = 'input/example_27882.tle.txt'
@@ -271,11 +298,11 @@ c     (38587, 27900) have ever been judged genuinely unreachable.
       obj_name(12) = '60328 CZ-3B R/B'
       obj_name(13) = '61734 H-3 R/B'
       obj_name(14) = '57804 H-2A R/B'
-      obj_name(15) = '56758 Falcon9 R/B'
+      obj_name(15) = '36518 Breeze-M deb tank'
       obj_name(16) = '30799 Delta2 R/B'
-      obj_name(17) = '44187 Falcon9 R/B'
+      obj_name(17) = '40777 Ariane 1 deb'
       obj_name(18) = '35009 Fregat R/B'
-      obj_name(19) = '41553 Falcon9 R/B'
+      obj_name(19) = '41688 SL-12 deb'
       obj_name(20) = '48259 Cosmos1124 deb'
       obj_name(21) = '27906 Cosmos1481 deb'
       obj_name(22) = '27882 Cosmos903 deb'
