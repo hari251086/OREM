@@ -721,7 +721,30 @@ c     ============================================================
 c
 c     RPE metric — two modes:
 c     Mode 1 (t_obs > 0): RPE vs observed re-entry
-c     Mode 2 (t_obs = 0): RPE vs ensemble mean
+c     Mode 2 (t_obs = 0): RPE vs ensemble median
+c
+c     Issue #29 (61734 zone-1 investigation, 2026-07-26): t_mean is the
+c     MEDIAN of valid per-zone predictions, not the arithmetic mean --
+c     parameter name kept as t_mean since every caller (report.F,
+c     campaign scripts, tests) references it positionally, not by name.
+c     Root cause for 61734's own 759.7%/181.7% ensemble RPE: zone 1 is a
+c     genuinely well-fitted (R2=0.994) 19-day window at ~35,000 km
+c     apogee, only 138 days before the object's true re-entry -- a
+c     confirmed non-G3 effect (a no-G3 test still lands the fit at a
+c     non-boundary BN=26.3 with RPE unchanged at 763.9%): the local
+c     decay rate this window measures cannot be linearly extrapolated
+c     the ~1000+ days a constant-BN propagation implies, because the
+c     real object's decay accelerates far faster than that. The
+c     arithmetic mean lets this one early, long-horizon outlier
+c     dominate the ensemble; the median does not. Re-verified against
+c     the current 50-object campaign (scratch_rpe/
+c     ensemble_eval_50obj.py, current codebase state, not the v1.20
+c     figures): median beats uniform mean on every aggregate stat
+c     (median|RPE| 26.9%->20.1%, mean 49.5%->40.4%) though both remain
+c     behind the already-shipped latest-zone PRIMARY estimate
+c     (12.4%/36.2%) -- this changes the SECONDARY ensemble indicator
+c     only, per report.F's v1.20 "PRIMARY (latest zone) + ensemble
+c     spread" structure, not the primary metric itself.
 c     ============================================================
       implicit double precision (a-h, o-z)
       integer nzones, maxz
@@ -729,15 +752,15 @@ c     ============================================================
       double precision t_obs_jd
       double precision rpe(maxz), t_mean, t_std
 
-      integer i, nvalid
+      double precision vals(maxz), vtmp
+      integer i, j, nvalid
 
-c     Compute mean of valid predictions
-      t_mean = 0.d0
+c     Gather valid predictions
       nvalid = 0
       do i = 1, nzones
          if (reentry_jd(i) .gt. 0.d0) then
-            t_mean = t_mean + reentry_jd(i)
             nvalid = nvalid + 1
+            vals(nvalid) = reentry_jd(i)
          end if
       end do
 
@@ -750,14 +773,28 @@ c     Compute mean of valid predictions
          return
       end if
 
-      t_mean = t_mean / dble(nvalid)
+c     Insertion sort (nvalid <= nzones_max, always small) then median
+      do i = 2, nvalid
+         vtmp = vals(i)
+         j = i - 1
+         do while (j .ge. 1 .and. vals(j) .gt. vtmp)
+            vals(j+1) = vals(j)
+            j = j - 1
+         end do
+         vals(j+1) = vtmp
+      end do
 
-c     Compute std deviation
+      if (mod(nvalid,2) .eq. 1) then
+         t_mean = vals((nvalid+1)/2)
+      else
+         t_mean = 0.5d0*(vals(nvalid/2) + vals(nvalid/2+1))
+      end if
+
+c     Std deviation around the median (same spread semantics as
+c     before, just centered on the new estimator)
       t_std = 0.d0
-      do i = 1, nzones
-         if (reentry_jd(i) .gt. 0.d0) then
-            t_std = t_std + (reentry_jd(i) - t_mean)**2
-         end if
+      do i = 1, nvalid
+         t_std = t_std + (vals(i) - t_mean)**2
       end do
       if (nvalid .gt. 1) then
          t_std = dsqrt(t_std / dble(nvalid - 1))
@@ -779,7 +816,7 @@ c           Mode 1: vs observed
                rpe(i) = 0.d0
             end if
          else
-c           Mode 2: vs ensemble mean
+c           Mode 2: vs ensemble median
             denom = t_mean - zone_epoch(i)
             if (dabs(denom) .gt. 0.1d0) then
                rpe(i) = (reentry_jd(i) - t_mean)

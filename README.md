@@ -70,17 +70,17 @@ OREM/
 ├── test/
 │   ├── test_propagate_ks.F          Propagator tests (10)
 │   ├── test_tle_evolution.F         TLE evolution tests (56)
-│   ├── test_zone_select.F           Zone selection tests (68)
+│   ├── test_zone_select.F           Zone selection tests (71)
 │   ├── test_ga.F                    GA optimizer tests (74)
 │   ├── test_ga_sensitivity.F        GA parameter sensitivity study (not in test suite)
 │   ├── test_rsm.F                   RSM integration tests (39)
-│   ├── test_sw.F                    Space weather / ATM2D tests (12)
+│   ├── test_sw.F                    Space weather / ATM2D tests (18)
 │   ├── test_tle_filter.F            TLE filter tests (14)
-│   ├── test_orem.F                  Driver + diagnostics + G2 + report tests (29)
+│   ├── test_orem.F                  Driver + diagnostics + G2 + report tests (31)
 │   ├── test_reentry.F               7-object re-entry validation (35)
 │   ├── test_e2e.F                   End-to-end integration, IDRAG=1 + full force (20)
 │   └── test_gmat.F                  GMAT cross-validation + exact-model drag reference (14)
-└── README.md                        (371 tests total)
+└── README.md                        (382 tests total)
 ```
 
 ---
@@ -777,6 +777,12 @@ of KSROP's `driver_KS.F` core with re-entry-specific logic added, and evolves in
   - **Aggregate effect across the 50-object campaign: a wash**, not a win. Curated-7 mean\|ens RPE\| 12.03%→12.01% (unchanged), all-50 mean 37.54%→37.52% (unchanged), max unchanged at 565.16% (44187, a separate marginal-fit problem, untouched by this). Only 6 objects move by more than 1pp, split roughly evenly: 42928 improves (8.94%→5.08%, the original v1.41 regression finally reversing) but 32007 gets notably worse (7.30%→11.55%).
   - **Kept per explicit user decision** despite the wash: the fix is real, mechanistically correct for the specific pathology it targets (boundary-value escalation), harmless to every aggregate metric, and does help at least one previously-regressed object. Not shipped as "the" fix for the carryover chain's sensitivity — that remains open. 61734's own defect (why zone 1's fit is so bad under `max_zone_days=20`) is a distinct, uninvestigated question.
   - Pre-fix baselines preserved at `scratch_rpe/rpe_campaign_precarryoverfix_backup.csv` / `..._weather_precarryoverfix_backup.csv`.
+
+- **v1.44 — 61734's zone-1 defect root-caused (not a G3 bug); ensemble secondary metric switched from arithmetic mean to median (`orem.F` `compute_rpe`).** Investigated the case flagged unresolved by v1.41–v1.43 (`scratch_rpe/diag_61734_zone1.F`/`diag_61734_zone1_data.F`): zone 1 sits at ~35,000 km apogee (e=0.72, near-original GTO), a genuinely clean 19-day linear fit (R²=0.994) only 138 days before the object's true re-entry. **Disproved the G3-miscalibration hypothesis directly**: a test build with G3's BSTAR-floor bypassed still lands zone 1 at a non-boundary BN=26.3 with RPE unchanged at 763.9% — the search range was never the problem. Root cause: a single constant-BN KS propagation from this early, high-apogee window cannot linearly extrapolate the ~1000+ days such a fit implies, because the real object's decay accelerates far faster than that over its remaining ~138 days. This is a long-horizon-extrapolation limitation intrinsic to zone 1's own position in the decay history, not a fixable search/calibration bug.
+  - **Fix targets the ensemble's vulnerability to this failure mode, not the zone-1 fit itself**: `compute_rpe`'s secondary "ensemble" indicator now reports the **median**, not the arithmetic mean, of valid per-zone predictions (`t_mean` parameter name kept for call-site compatibility; `report.F` labels updated to "median re-entry JD"). One catastrophically-wrong early zone can drag a mean far off; a median is far more robust to exactly one such outlier. Re-verified the underlying premise first (`scratch_rpe/ensemble_eval_50obj.py`, re-running the v1.20 `ensemble_eval.py` comparison against the *current* 50-object campaign rather than assuming the old figures still hold): median beats uniform mean on every aggregate stat today, though both remain behind the already-shipped latest-zone **primary** estimate (v1.20) — this change only affects the secondary spread/agreement indicator.
+  - **Result: one of the cleanest wins this investigation has produced.** Curated-7 static mean\|ensemble RPE\| 12.01%→**4.05%**, median 7.27%→**2.78%**, max 38.81%→**12.23%**. Curated-7 weather+bulge mean 14.27%→**4.50%**, median 11.22%→**3.40%**, max 41.82%→**10.00%** (6/7 objects improve; only 37819 regresses, 4.48%→9.40%, still small). All-50 (45 comparable objects) mean 30.02%→**24.26%**, median 7.27%→**3.70%**; max unchanged at 565.16% (44187 has only one valid zone — median of one value is that value, so this single-zone marginal-fit case is untouched by construction, exactly as expected). 12 objects improve by >0.5pp, 4 regress by >0.5pp (all small), 29 unchanged. **61734 itself: 181.68%→-6.77%**, matching this investigation's own hand-derived prediction exactly. Predict rate unaffected (36/45, as expected — a pure reporting-statistic change touches no fitting/propagation code). 382/382 tests pass (2 new: D6 encodes 61734's exact scenario as a synthetic regression test).
+  - **Does not touch the fragile BN-carryover chain at all** — no RSM/GA/zone_select changes, so none of the three regression patterns that have hit every other change this session apply here.
+  - Pre-fix baselines preserved at `scratch_rpe/rpe_campaign_premedian_backup.csv` / `..._weather_premedian_backup.csv`.
 
 ---
 

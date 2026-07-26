@@ -2,12 +2,10 @@ c     ============================================================
 c     report.F — Structured output reporting for OREM (issue #13)
 c
 c     Writes a human-readable prediction report from orem_run's
-c     outputs: per-zone fit/prediction table, ensemble statistics
-c     (mean/std/relative spread across zones with a re-entry), and
-c     the zone_status diagnostic legend. The ensemble row is the
-c     headline: as of v1.18 the ensemble mean beats every individual
-c     zone on the validation set (42928: ensemble +11% vs best
-c     single zone +3.2%, worst +52%).
+c     outputs: per-zone fit/prediction table, PRIMARY estimate (latest
+c     zone, v1.20), ensemble statistics (median/std/relative spread
+c     across zones with a re-entry, issue #29 v1.44 -- median, not
+c     mean, since v1.44), and the zone_status diagnostic legend.
 c
 c     Author: Harishkumar Sellamuthu
 c     ============================================================
@@ -132,8 +130,11 @@ c        7-object validation campaign it lands within 15% for every
 c        object (median |RPE| 8.2%, mean 7.6%) vs the uniform mean's
 c        45% mean -- the latest zone has the shortest extrapolation
 c        and the freshest attitude/altitude regime (v1.20 evaluation,
-c        scratch_rpe/ensemble_eval.py). The uniform mean +- std stays
-c        as the spread/agreement indicator.
+c        scratch_rpe/ensemble_eval.py). The ensemble median +- std
+c        stays as the spread/agreement indicator (median, not mean,
+c        since v1.44 -- issue #29: a single early zone with a long,
+c        wrongly-extrapolated horizon can dominate an arithmetic mean;
+c        the median is far more robust to exactly that failure mode).
          call jd2cal(reentry_jd(izl), cal)
          write(44,'(A,I2,A,F13.4,A,I5,I3,I3,A)')
      &      'PRIMARY estimate (latest zone, Z', izl,
@@ -150,7 +151,7 @@ c        as the spread/agreement indicator.
      &      'Ensemble (', nre, ' of ', nzones_used,
      &      ' zones with a predicted re-entry):'
          write(44,'(A,F13.4,A,I5,I3,I3,A,F8.2,A)')
-     &      '  mean re-entry JD ', t_mean, '  (',
+     &      '  median re-entry JD ', t_mean, '  (',
      &      int(cal(1)), int(cal(2)), int(cal(3)),
      &      ' )  +- ', t_std, ' days'
          rel_spread = 0.d0
@@ -158,7 +159,7 @@ c        as the spread/agreement indicator.
             rel_spread = t_std/(t_mean - zone_epoch(1))*100.d0
             write(44,'(A,F7.2,A)')
      &         '  relative spread: ', rel_spread,
-     &         ' % of the zone-1 -> mean horizon'
+     &         ' % of the zone-1 -> median horizon'
          end if
          if (t_obs_jd .gt. 0.d0) then
             horiz = t_obs_jd - zone_epoch(1)
