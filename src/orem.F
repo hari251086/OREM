@@ -164,7 +164,7 @@ c     Force model
 
 c     Working
       double precision bn_lo, bn_hi, e_mid, de
-      double precision bn_val, t_obs_jd, bn_range
+      double precision bn_val, t_obs_jd, bn_range, bn_center
       double precision a_kep(7), x0(3), xd0(3), cal0(6)
       integer iz, i, nzone, nvalid, nzone1
       double precision smin, smax
@@ -658,16 +658,35 @@ c        weak-signal noise, chaining from it previously imprisoned
 c        later zones (37151's 8-zone chain marched [12.5,160] to
 c        [17.2,24.9] through seven untrusted zones). Untrusted zones
 c        leave the range unchanged for the next zone.
+c        Carryover chain sensitivity investigation (2026-07-26): a
+c        boundary-pinned zone's own bn_opt is definitionally
+c        unreliable -- it sits at whatever edge the CURRENT window
+c        happened to have, not necessarily the true value. The
+c        original widen-on-boundary logic above still RECENTERED on
+c        that unreliable value before widening, which lets a run of
+c        boundary hits walk/escalate the window in one direction
+c        each time, rather than actually escaping a too-narrow trap.
+c        Confirmed directly this session (61734, max_zone_days=20
+c        campaign): BN 16.3(bound)->58.6->89.4(bound)->136.0(bound),
+c        RPE 25.4%->181.5%, each boundary zone's own value becoming
+c        the next zone's new center. Fix: widen around the EXISTING
+c        center instead of the boundary-pinned zone's own value --
+c        preserves the original "give the next zone more room to
+c        escape a too-narrow window" intent without letting the
+c        window's center itself drift on an untrustworthy point.
          if ((idrag_flag .eq. 1 .and. reentry_jd(iz) .gt. 0.d0)
      &       .or.
      &       (idrag_flag .eq. 0 .and. zone_status(iz) .eq. 0)) then
             if (bn_at_bound) then
+               bn_center = (bn_hi + bn_lo) / 2.d0
                bn_range = (bn_hi - bn_lo) * 1.5d0
+               bn_lo = bn_center - bn_range / 2.d0
+               bn_hi = bn_center + bn_range / 2.d0
             else
                bn_range = (bn_hi - bn_lo) * 0.5d0
+               bn_lo = bn_opt_out(iz) - bn_range / 2.d0
+               bn_hi = bn_opt_out(iz) + bn_range / 2.d0
             end if
-            bn_lo = bn_opt_out(iz) - bn_range / 2.d0
-            bn_hi = bn_opt_out(iz) + bn_range / 2.d0
             if (bn_lo .lt. 10.d0) bn_lo = 10.d0
          end if
 
