@@ -1,0 +1,389 @@
+diff --git a/src/orem.F b/src/orem.F
+index 0d8d4cc..8af7db9 100644
+--- a/src/orem.F
++++ b/src/orem.F
+@@ -164,7 +164,7 @@ c     Force model
+ 
+ c     Working
+       double precision bn_lo, bn_hi, e_mid, de
+-      double precision bn_val, t_obs_jd, bn_range, bn_center
++      double precision bn_val, t_obs_jd
+       double precision a_kep(7), x0(3), xd0(3), cal0(6)
+       integer iz, i, nzone, nvalid, nzone1
+       double precision smin, smax
+@@ -172,6 +172,19 @@ c     Working
+       double precision bn_floor_est
+       logical bn_floor_ok
+ 
++c     Issue #35 (Phase 2): non-recursive, pooled BN prior replacing the
++c     recursive trust-gated narrow/widen-on-boundary carryover, bounded
++c     to the last K_POOL prior trusted zones (not all history -- an
++c     unbounded pool regressed objects whose true BN drifts over their
++c     lifetime; see the pool-loop comment below for the full story)
++      integer K_POOL
++      parameter(K_POOL = 4)
++      logical bn_at_bound_hist(nzones_max)
++      double precision bn_pool(nzones_max)
++      integer npool, jz
++      logical trusted_j
++      double precision bn_lo_pool, bn_hi_pool
++
+ c     Issue #31: osculating IC seed for rsm_generate/estimate_bn_floor
+ c     (only index-1 of smaz/ez/incz/raanz/aopz/maz is ever used as a
+ c     propagation initial condition -- see tle_find_osc below)
+@@ -197,6 +210,7 @@ c     for the earlier flat result measured before those existed).
+       t_std = 0.d0
+       do i = 1, nzones_max
+          zone_status(i) = 0
++         bn_at_bound_hist(i) = .false.
+       end do
+ 
+ c     ============================================================
+@@ -472,15 +486,53 @@ c        investigation.)
+          end do
+          if (de .lt. 1.d-5) de = 5.d-4
+ 
++c        Issue #35 (Phase 2): non-recursive, pooled BN prior from the
++c        last K_POOL prior TRUSTED zones (drag on: predicted a
++c        re-entry; drag off: zone_status==0) that are ALSO not
++c        boundary-pinned -- a boundary-pinned zone's own bn_opt sits
++c        at whatever edge the window happened to have, not the true
++c        value, so it's excluded from the pool rather than being
++c        allowed to become the next zone's new center (the exact
++c        failure mode that produced 61734's 16.3->58.6->89.4->136.0
++c        escalation under the old recursive logic). Replaces the
++c        recursive trust-gated narrow/widen-on-boundary carryover:
++c        bn_lo/bn_hi themselves are never reassigned after the G2
++c        floor block, so this recomputes the window FROM SCRATCH each
++c        zone from that fixed range plus the pooled evidence --
++c        results depend on WHICH zones are in the pool, not on the
++c        ORDER they were processed in.
++c        Bounded to the last K_POOL zones (not all prior history): an
++c        unbounded pool measurably regressed the ensemble metric on
++c        objects whose true BN genuinely drifts over their lifetime
++c        (35497 worst, mean|ensemble RPE| 2.78%->6.03%/3.40%->8.22% on
++c        the two curated-7 campaigns), while helping others a lot
++c        (37151 latest-zone RPE -42.32%->-6.59%) -- exactly the
++c        recency-vs-all-history tradeoff this session's design plan
++c        anticipated. K_POOL=4 tested first per that plan.
++         npool = 0
++         do jz = max(1, iz - K_POOL), iz - 1
++            trusted_j =
++     &         (idrag_flag .eq. 1 .and. reentry_jd(jz) .gt. 0.d0)
++     &         .or.
++     &         (idrag_flag .eq. 0 .and. zone_status(jz) .eq. 0)
++            if (trusted_j .and. .not. bn_at_bound_hist(jz)) then
++               npool = npool + 1
++               bn_pool(npool) = bn_opt_out(jz)
++            end if
++         end do
++
++         call estimate_bn_pool_prior(bn_pool, npool, nzones_max,
++     &      bn_lo, bn_hi, bn_lo_pool, bn_hi_pool)
++
+ c        Issue #32 (G3): narrow this zone's BN search range using its
+ c        own TLE-published BSTAR as an informative prior (intersection
+-c        only -- never widens beyond bn_lo/bn_hi). Falls back to the
+-c        unmodified bn_lo/bn_hi if this zone's BSTAR is unavailable or
+-c        the prior window doesn't overlap the caller's range at all.
++c        only -- never widens beyond bn_lo_pool/bn_hi_pool). Falls back
++c        to the unmodified bn_lo_pool/bn_hi_pool if this zone's BSTAR
++c        is unavailable or the prior window doesn't overlap at all.
+          call estimate_bn_bstar_prior(norad_id, epz, nzone,
+      &      norad_raw, epoch_yr_raw, epoch_day_raw, bstar_raw,
+      &      ntle_raw, maxtle,
+-     &      bn_lo, bn_hi, bn_lo_zone, bn_hi_zone, bn_prior_ok)
++     &      bn_lo_pool, bn_hi_pool, bn_lo_zone, bn_hi_zone, bn_prior_ok)
+          if (bn_prior_ok) then
+             write(*,'(A,I2,A,F7.2,A,F7.2,A)')
+      &         '  [INFO] Z', iz, ': G3 BSTAR prior narrows BN to [',
+@@ -587,6 +639,7 @@ c        below.
+      &         '  [WARN] Z', iz, ': GA optimum at search boundary '//
+      &         '-- true value may lie outside the search range'
+          end if
++         bn_at_bound_hist(iz) = bn_at_bound
+ 
+ c        Re-entry propagation with optimal (e, BN)
+          a_kep(1) = smaz(1)
+@@ -643,52 +696,16 @@ c        Re-entry propagation with optimal (e, BN)
+             end if
+          end if
+ 
+-c        Issue #33 revisit: restore the v1.21 trust-gated BN-range
+-c        narrow/widen-on-boundary logic (removed in #33 as an
+-c        isolated experiment; removing it measurably regressed RPE
+-c        22.9%->26.2%/22.0%->23.2% on its own, but that was tested
+-c        BEFORE G3 (issue #32) existed). This adjusts the GLOBAL
+-c        bn_lo/bn_hi carried into the next zone -- composes with G3
+-c        naturally, since G3 intersects its own per-zone BSTAR prior
+-c        against whatever bn_lo/bn_hi currently is at call time. Same
+-c        v1.21 trust gate as before: only chain from a zone whose fit
+-c        carries real drag signal (drag on: it predicted a re-entry;
+-c        drag off: zone_status(iz)==0) -- an untrusted zone's BN is
+-c        weak-signal noise, chaining from it previously imprisoned
+-c        later zones (37151's 8-zone chain marched [12.5,160] to
+-c        [17.2,24.9] through seven untrusted zones). Untrusted zones
+-c        leave the range unchanged for the next zone.
+-c        Carryover chain sensitivity investigation (2026-07-26): a
+-c        boundary-pinned zone's own bn_opt is definitionally
+-c        unreliable -- it sits at whatever edge the CURRENT window
+-c        happened to have, not necessarily the true value. The
+-c        original widen-on-boundary logic above still RECENTERED on
+-c        that unreliable value before widening, which lets a run of
+-c        boundary hits walk/escalate the window in one direction
+-c        each time, rather than actually escaping a too-narrow trap.
+-c        Confirmed directly this session (61734, max_zone_days=20
+-c        campaign): BN 16.3(bound)->58.6->89.4(bound)->136.0(bound),
+-c        RPE 25.4%->181.5%, each boundary zone's own value becoming
+-c        the next zone's new center. Fix: widen around the EXISTING
+-c        center instead of the boundary-pinned zone's own value --
+-c        preserves the original "give the next zone more room to
+-c        escape a too-narrow window" intent without letting the
+-c        window's center itself drift on an untrustworthy point.
+-         if ((idrag_flag .eq. 1 .and. reentry_jd(iz) .gt. 0.d0)
+-     &       .or.
+-     &       (idrag_flag .eq. 0 .and. zone_status(iz) .eq. 0)) then
+-            if (bn_at_bound) then
+-               bn_center = (bn_hi + bn_lo) / 2.d0
+-               bn_range = (bn_hi - bn_lo) * 1.5d0
+-               bn_lo = bn_center - bn_range / 2.d0
+-               bn_hi = bn_center + bn_range / 2.d0
+-            else
+-               bn_range = (bn_hi - bn_lo) * 0.5d0
+-               bn_lo = bn_opt_out(iz) - bn_range / 2.d0
+-               bn_hi = bn_opt_out(iz) + bn_range / 2.d0
+-            end if
+-            if (bn_lo .lt. 10.d0) bn_lo = 10.d0
+-         end if
++c        Issue #35 (Phase 2): bn_lo/bn_hi are deliberately NOT updated
++c        here -- unlike the recursive trust-gated narrow/widen-on-
++c        boundary carryover this replaced (removed after a direct A/B
++c        test found plain removal alone regressed the primary metric
++c        on both curated validation sets; see issue #35), the fixed
++c        [bn_lo,bn_hi] range plus the per-zone pooled prior computed
++c        above (before the G3 call) is the whole mechanism now. Kept
++c        for the next iteration's estimate_bn_pool_prior call, which
++c        recomputes fresh from bn_opt_out/zone_status/bn_at_bound_hist
++c        each time rather than mutating a running window.
+ 
+  50      continue
+       end do
+@@ -1054,6 +1071,118 @@ c     behavior, but not something the caller should log as "applied").
+       return
+       end
+ 
++c     ============================================================
++      subroutine estimate_bn_pool_prior(bn_pool, npool, maxpool,
++     &   bn_lo_in, bn_hi_in, bn_lo_out, bn_hi_out)
++c
++c     Issue #35 (Phase 2): non-recursive, robust BN search-range prior
++c     pooled from ALL prior trusted-and-not-boundary-pinned zones, not
++c     just the immediately preceding one -- replaces the recursive
++c     trust-gated narrow/widen-on-boundary carryover (removed after a
++c     direct A/B test found plain removal alone regressed the primary
++c     metric on both curated validation sets). Unlike that mechanism,
++c     results depend on WHICH zones are in the pool, not on the ORDER
++c     they were processed in, so one early zone's idiosyncrasy can no
++c     longer compound zone over zone into an increasingly overconfident
++c     window -- each call recomputes fresh from the caller's own fixed
++c     range plus whatever pool it's given.
++c
++c     0 pool points: search the full caller-supplied range unchanged.
++c     1 point: a bounded multiplicative window [0.5x, 2.0x] around it.
++c     >=2 points: median +/- 3*MAD (median absolute deviation, x1.4826
++c     for normal-consistent scaling), floored at 15% of the median so
++c     near-identical trusted zones don't collapse the window to
++c     near-zero width.
++c     Always intersected against the caller's own [bn_lo_in,bn_hi_in]
++c     (never widens beyond it), same floor-only spirit as G2/G3; falls
++c     back to the caller's unmodified range if the computed window is
++c     degenerate (non-positive width after intersection).
++c
++c     Input
++c       bn_pool(npool) : fitted BN of each prior trusted, non-boundary
++c                        zone (caller builds this -- see orem_run's own
++c                        trust-gate + bn_at_bound_hist loop)
++c       npool          : count (0 if none)
++c       maxpool        : declared dimension of bn_pool
++c       bn_lo_in, bn_hi_in : fixed range to intersect against
++c
++c     Output
++c       bn_lo_out, bn_hi_out : narrowed range
++c     ============================================================
++      implicit double precision (a-h, o-z)
++      integer npool, maxpool
++      double precision bn_pool(maxpool)
++      double precision bn_lo_in, bn_hi_in, bn_lo_out, bn_hi_out
++
++      double precision vals(500), vtmp, bn_med, bn_mad, bn_spread
++      integer i, j
++
++      if (npool .le. 0) then
++         bn_lo_out = bn_lo_in
++         bn_hi_out = bn_hi_in
++         return
++      end if
++
++      if (npool .eq. 1) then
++         bn_lo_out = max(bn_lo_in, 0.5d0*bn_pool(1))
++         bn_hi_out = min(bn_hi_in, 2.0d0*bn_pool(1))
++      else
++         do i = 1, npool
++            vals(i) = bn_pool(i)
++         end do
++         do i = 2, npool
++            vtmp = vals(i)
++            j = i - 1
++            do while (j .ge. 1 .and. vals(j) .gt. vtmp)
++               vals(j+1) = vals(j)
++               j = j - 1
++            end do
++            vals(j+1) = vtmp
++         end do
++         if (mod(npool,2) .eq. 1) then
++            bn_med = vals((npool+1)/2)
++         else
++            bn_med = 0.5d0*(vals(npool/2) + vals(npool/2+1))
++         end if
++
++         do i = 1, npool
++            vals(i) = dabs(vals(i) - bn_med)
++         end do
++         do i = 2, npool
++            vtmp = vals(i)
++            j = i - 1
++            do while (j .ge. 1 .and. vals(j) .gt. vtmp)
++               vals(j+1) = vals(j)
++               j = j - 1
++            end do
++            vals(j+1) = vtmp
++         end do
++         if (mod(npool,2) .eq. 1) then
++            bn_mad = vals((npool+1)/2)
++         else
++            bn_mad = 0.5d0*(vals(npool/2) + vals(npool/2+1))
++         end if
++         bn_mad = bn_mad * 1.4826d0
++         bn_spread = max(bn_mad, 0.15d0*bn_med)
++
++         bn_lo_out = max(bn_lo_in, bn_med - 3.d0*bn_spread)
++         bn_hi_out = min(bn_hi_in, bn_med + 3.d0*bn_spread)
++      end if
++
++c     Floor clamp BEFORE the degeneracy check -- a tight npool==1
++c     multiplicative window entirely below 10 (e.g. bn_pool(1)=1 ->
++c     [0.5,2.0]) would otherwise pass the check below with lo<hi, then
++c     get clamped to lo=10 > hi=2.0, a degenerate range the check
++c     never saw. Checking after flooring catches this case too.
++      if (bn_lo_out .lt. 10.d0) bn_lo_out = 10.d0
++      if (bn_lo_out .ge. bn_hi_out) then
++         bn_lo_out = bn_lo_in
++         bn_hi_out = bn_hi_in
++      end if
++
++      return
++      end
++
+ c     ============================================================
+       subroutine estimate_bn_floor(epz, smaz, ez, incz, raanz, aopz,
+      &   maz, nzone, n_force, ngeo_deg, nsun_deg, nmoon_deg,
+diff --git a/test/test_orem.F b/test/test_orem.F
+index f946d56..c93d508 100644
+--- a/test/test_orem.F
++++ b/test/test_orem.F
+@@ -63,6 +63,14 @@ c     ==============================================================
+ 
+       call test_bn_floor(npass, nfail)
+ 
++c     ==============================================================
++c     Issue #35 (Phase 2): non-recursive pooled BN prior
++c     ==============================================================
++      write(*,*) ''
++      write(*,*) '  --- Phase 2: pooled BN prior (#35) ---'
++
++      call test_bn_pool_prior(npass, nfail)
++
+ c     ==============================================================
+ c     Issue #13: structured output report
+ c     ==============================================================
+@@ -562,6 +570,80 @@ c     ============================================================
+       return
+       end
+ 
++c     ============================================================
++c     Issue #35 (Phase 2): estimate_bn_pool_prior unit tests --
++c     exact median/MAD/window arithmetic against hand-computed cases.
++c     ============================================================
++      subroutine test_bn_pool_prior(npass, nfail)
++      implicit double precision (a-h, o-z)
++      integer npass, nfail
++
++      parameter(mp = 4)
++      double precision bn_pool(mp)
++      double precision bn_lo_out, bn_hi_out
++
++c     P1: npool=0 -- range passes through unchanged
++      call estimate_bn_pool_prior(bn_pool, 0, mp,
++     &   80.d0, 160.d0, bn_lo_out, bn_hi_out)
++      call assert_d('P1 npool=0: lo unchanged',
++     &   bn_lo_out, 80.d0, 1.d-9, npass, nfail)
++      call assert_d('P1 npool=0: hi unchanged',
++     &   bn_hi_out, 160.d0, 1.d-9, npass, nfail)
++
++c     P2: npool=1, bn_pool(1)=100 -> [0.5x,2.0x]=[50,200],
++c     intersected with [10,300] -> [50,200]
++      bn_pool(1) = 100.d0
++      call estimate_bn_pool_prior(bn_pool, 1, mp,
++     &   10.d0, 300.d0, bn_lo_out, bn_hi_out)
++      call assert_d('P2 npool=1: lo=0.5x',
++     &   bn_lo_out, 50.d0, 1.d-6, npass, nfail)
++      call assert_d('P2 npool=1: hi=2.0x',
++     &   bn_hi_out, 200.d0, 1.d-6, npass, nfail)
++
++c     P3: npool=2, {80,120} -> median=100, MAD=20*1.4826=29.652,
++c     spread=max(29.652,15)=29.652 -> [100-88.956,100+88.956]
++      bn_pool(1) = 80.d0
++      bn_pool(2) = 120.d0
++      call estimate_bn_pool_prior(bn_pool, 2, mp,
++     &   10.d0, 300.d0, bn_lo_out, bn_hi_out)
++      call assert_d('P3 npool=2: median-3*MAD',
++     &   bn_lo_out, 11.044d0, 1.d-2, npass, nfail)
++      call assert_d('P3 npool=2: median+3*MAD',
++     &   bn_hi_out, 188.956d0, 1.d-2, npass, nfail)
++
++c     P4: npool=3, {90,100,110} -> median=100, MAD=10*1.4826=14.826,
++c     spread=max(14.826, 0.15*100=15)=15 (the 15% floor binds here,
++c     not the MAD itself) -> [100-45,100+45]=[55,145]
++      bn_pool(1) = 90.d0
++      bn_pool(2) = 100.d0
++      bn_pool(3) = 110.d0
++      call estimate_bn_pool_prior(bn_pool, 3, mp,
++     &   10.d0, 300.d0, bn_lo_out, bn_hi_out)
++      call assert_d('P4 npool=3: 15% spread floor binds (lo)',
++     &   bn_lo_out, 55.d0, 1.d-6, npass, nfail)
++      call assert_d('P4 npool=3: 15% spread floor binds (hi)',
++     &   bn_hi_out, 145.d0, 1.d-6, npass, nfail)
++
++c     P5: regression test for the floor-clamp/degeneracy ordering bug.
++c     npool=1, bn_pool(1)=4 -> window=[2,8]; intersected with
++c     [bn_lo_in=2, bn_hi_in=300] -> [2,8] (not degenerate yet). The
++c     absolute bn_lo<10 floor clamp must be applied BEFORE the
++c     degeneracy check, not after -- otherwise clamping lo to 10 here
++c     leaves [10,8], a silently-degenerate range no caller should ever
++c     receive. Correct behavior: the clamp creates the degeneracy,
++c     which the (correctly-ordered) check then catches and falls all
++c     the way back to the caller's own [bn_lo_in,bn_hi_in]=[2,300].
++      bn_pool(1) = 4.d0
++      call estimate_bn_pool_prior(bn_pool, 1, mp,
++     &   2.d0, 300.d0, bn_lo_out, bn_hi_out)
++      call assert_d('P5 floor-clamp degeneracy: falls back to lo_in',
++     &   bn_lo_out, 2.d0, 1.d-9, npass, nfail)
++      call assert_d('P5 floor-clamp degeneracy: falls back to hi_in',
++     &   bn_hi_out, 300.d0, 1.d-9, npass, nfail)
++
++      return
++      end
++
+ c     ============================================================
+ c     Issue #13 test: orem_report writes a well-formed report from
+ c     a real (fast, IDRAG=0) orem_run on the 42928 zone-0 file.
