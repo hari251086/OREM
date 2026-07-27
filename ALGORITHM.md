@@ -72,17 +72,26 @@ BN and e) against the TLE's own apogee-altitude history.
    physically-implied BN.
 5. **Per-zone loop** (`iz = 1..nzones`), for each zone:
    a. Extract that zone's TLE points, using the smooth mean-element apogee
-      trend as the base fitness signal, plus a **smooth (linear-in-time)
-      bias correction** toward osculating values (issue #31, revisited
-      2026-07-25). An earlier version instead overwrote the apogee series
-      per-point with an independent SGP4-osculating conversion of each TLE
-      — correct in isolation, but each TLE's own true/mean-anomaly phase is
-      effectively uncorrelated between points, so the resulting series
-      carried phase noise that didn't match `propagate_ks`'s own smoothly-
-      evolving trajectory and measured flat-to-worse. The current fix fits
+      trend directly as the fitness signal (`haz`), with no osculating
+      bias correction applied to it. **A smooth (linear-in-time) bias
+      correction toward osculating values was tried here (issue #31,
+      revisited 2026-07-25) and REVERTED (issue #34, v1.46)**: an even
+      earlier version had overwritten the apogee series per-point with an
+      independent SGP4-osculating conversion of each TLE — correct in
+      isolation, but each TLE's own true/mean-anomaly phase is effectively
+      uncorrelated between points, so the resulting series carried phase
+      noise that didn't match `propagate_ks`'s own smoothly-evolving
+      trajectory and measured flat-to-worse. The 2026-07-25 fix instead fit
       only the *smooth* part of the mean/osculating bias via `linfit` and
-      adds it back onto the mean-element trend, keeping the signal smooth
-      while still correcting for the systematic mean-vs-osculating offset.
+      added it back onto the mean-element trend — a small net positive on
+      the primary (latest-zone) metric at the time, kept despite a mild
+      ensemble-metric regression. Re-tested under today's full stack
+      (`max_zone_days=20`, the BN-carryover anchor fix, the median ensemble
+      metric — none of which existed when it was first kept), it now
+      regresses BOTH metrics instead: removing it improved curated-7
+      mean\|latest-zone RPE\| 32.1%→25.9% and mean\|ensemble RPE\| 4.1%→
+      1.9%. The original justification no longer held, so it was reverted
+      outright rather than re-tuned.
    b. Seed the zone's propagation initial condition (index 1 of the zone
       arrays) from a fresh SGP4-osculating state at the zone's own first
       TLE point (`tle_find_osc`). **A zone-to-zone trajectory-continuity
@@ -141,7 +150,7 @@ BN and e) against the TLE's own apogee-altitude history.
    estimate (v1.20 — later zones use more recent, more representative TLE
    data) — though on the current curated-7 static campaign the ensemble
    median is *empirically more accurate* than the latest-zone estimate for
-   most objects, a real reversal from the relationship that originally
+   all 7 objects, a real reversal from the relationship that originally
    motivated making latest-zone primary (see `ARCHITECTURE.md` §5.5/§6).
 
 ```mermaid
@@ -207,13 +216,13 @@ independent) but aren't in the current implementation.
 `test_propagate_ks`/`test_tle_evolution`/`test_tle_filter`/`test_zone_select`/
 `test_rsm`/`test_ga`/`test_ga_sensitivity`/`test_gmat`). Real-object
 campaigns (all figures current, static atmosphere unless noted):
-curated-7 mean\|latest-zone RPE\| **32.1%**, mean\|ensemble RPE\| **4.1%**
-(median 2.8%) — the ensemble/median metric is currently *more* accurate
-than the officially-primary latest-zone metric for most of these 7 objects
+curated-7 mean\|latest-zone RPE\| **25.9%**, mean\|ensemble RPE\| **1.9%**
+(median 1.2%) — the ensemble/median metric is currently *more* accurate
+than the officially-primary latest-zone metric for all 7 of these objects
 (see §4 step 6 above, and `ARCHITECTURE.md` §5.5/§6). With epoch-resolved weather + the
-diurnal density bulge: mean\|latest\|=26.1%, mean\|ensemble\|=4.5%. Across
-the 50-object generalization set: mean\|ensemble RPE\|=16.1%, predict rate
-35/50 (70%). These numbers reflect real, ongoing generalization work
+diurnal density bulge: mean\|latest\|=27.4%, mean\|ensemble\|=1.9%. Across
+the 50-object generalization set: mean\|ensemble RPE\|=16.8%, predict rate
+36/50 (72%). These numbers reflect real, ongoing generalization work
 (issue #32's tracking umbrella) — not a single settled accuracy figure;
 see README's Version History for the full sequence of individually-tested
 changes that produced them. Cross-validated against GMAT at the propagator
@@ -232,13 +241,16 @@ cross-validation of its own, only real-decay-date comparison.
   confirmed, recurring source of fragility, not a resolved design.** Four
   independent, individually-correct pipeline changes have each triggered a
   real accuracy regression through this one recursive mechanism (issue
-  #35 has the full history and root-cause trace). A non-recursive
-  replacement was designed, implemented, and campaign-tested but gave
+  #35 has the full history and root-cause trace); one of the four (the
+  noise-matched-apobs fix, §4 step 5a) was resolved by reverting it
+  outright (v1.46). A non-recursive replacement for the carryover
+  mechanism itself was designed, implemented, and campaign-tested but gave
   genuinely mixed results (fixes one chronic per-object regression,
-  regresses another) and was not shipped — the implementation survives as
-  a ready-to-reapply patch. Any future pipeline change that could shift a
-  zone's fitted BN even slightly should be re-validated against the full
-  campaign, not assumed safe from this interaction.
+  regresses another) and was explicitly discarded, not shipped — the
+  patch was deleted rather than kept for reapplication. Any future
+  pipeline change that could shift a zone's fitted BN even slightly should
+  be re-validated against the full campaign, not assumed safe from this
+  interaction.
 - **Issue #29**: the shipped `nzones_max=8` default's generalization gap to
   the broader 50-object population has been substantially, but not fully,
   closed (`max_zone_days` 10→20 raised the predict rate 58%→72%;
