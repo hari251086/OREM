@@ -3,9 +3,10 @@
 ## 1. Overview
 OREM (Optimal Regularized re-Entry Method) predicts atmospheric re-entry
 dates for GTO/HEO rocket bodies and debris from their real TLE (Two-Line
-Element) tracking history. It embeds `KSROP`'s own KS-regularized propagator
-source directly (`ksrop\propagate_ks.F`, `Subrouts.F`, `TLEread.F`,
-`Legendre.F`) and builds a full pipeline on top: TLE ingestion → data-quality
+Element) tracking history. It's an `fpm` package that consumes `KSROP` as a
+real git+tag dependency (§10) — `src/propagate_ks.F` carries KSROP's own
+KS-regularized propagator physics, refactored into a callable subroutine —
+and builds a full pipeline on top: TLE ingestion → data-quality
 filtering → zone (decay-trend-window) selection → per-zone response-surface
 + genetic-algorithm fitting of ballistic number and eccentricity → re-entry
 propagation → an ensemble prediction across zones with an RPE (Relative
@@ -33,8 +34,9 @@ BN and e) against the TLE's own apogee-altitude history.
 - The target NORAD catalog ID and (optionally, for retrospective validation)
   the actual observed decay date `t_obs_cal`.
 - Zone-selection parameters: `nzones_max`, `min_zone_pts` (default 8),
-  `max_zone_days` (default 10), `r2_thresh`/`slope_thresh` (decay-trend
-  linearity thresholds).
+  `max_zone_days` (default 20, raised from 10 in v1.43 — issue #29, rescued
+  7 of 12 previously-zero-valid-zone objects in the 50-object generalization
+  set), `r2_thresh`/`slope_thresh` (decay-trend linearity thresholds).
 - BN search bounds `bn_min_init`/`bn_max_init` (default [80,160] kg/m²) and
   `idrag_flag` (drag on/off — off is used for diagnostic/test runs only).
 - GA parameters (`ipopsize`, `maxgen`, `nbits_e`, `nbits_a`, `pcross`,
@@ -69,18 +71,28 @@ BN and e) against the TLE's own apogee-altitude history.
    `bn_hi`) if the caller's `bn_min_init` would otherwise exclude the
    physically-implied BN.
 5. **Per-zone loop** (`iz = 1..nzones`), for each zone:
-   a. Extract that zone's TLE points; overwrite the apogee series
-      (`haz`) with true SGP4-osculating values via `tle_find_osc`
-      (issue #31 fix — `propagate_ks`'s surfaces are osculating, so the
-      fitness comparison must be too, not raw TLE mean elements).
+   a. Extract that zone's TLE points, using the smooth mean-element apogee
+      trend as the base fitness signal, plus a **smooth (linear-in-time)
+      bias correction** toward osculating values (issue #31, revisited
+      2026-07-25). An earlier version instead overwrote the apogee series
+      per-point with an independent SGP4-osculating conversion of each TLE
+      — correct in isolation, but each TLE's own true/mean-anomaly phase is
+      effectively uncorrelated between points, so the resulting series
+      carried phase noise that didn't match `propagate_ks`'s own smoothly-
+      evolving trajectory and measured flat-to-worse. The current fix fits
+      only the *smooth* part of the mean/osculating bias via `linfit` and
+      adds it back onto the mean-element trend, keeping the signal smooth
+      while still correcting for the systematic mean-vs-osculating offset.
    b. Seed the zone's propagation initial condition (index 1 of the zone
       arrays) from a fresh SGP4-osculating state at the zone's own first
-      TLE point (`tle_find_osc` again). **A zone-to-zone trajectory-
-      continuity alternative to this — propagating the previous zone's own
-      fitted state forward instead of re-anchoring to fresh TLE data — was
-      tried and reverted** (measurably regressed RPE on both the 7- and
-      30-object campaigns; see issue #33 and README v1.28). Every zone
-      independently re-anchors to real data.
+      TLE point (`tle_find_osc`). **A zone-to-zone trajectory-continuity
+      alternative to this — propagating the previous zone's own fitted
+      state forward instead of re-anchoring to fresh TLE data — was tried
+      and reverted** (measurably regressed RPE on both the 7- and 30-object
+      campaigns; see issue #33 and README v1.28). Every zone independently
+      re-anchors its own *initial condition* to real data — this is
+      distinct from the BN *search range* carryover in (g) below, which
+      does chain across zones.
    c. **RSM** (`rsm_generate`, `rsm.F`): build a 3×3 grid over
       (eccentricity, BN), propagate each of the 9 combinations via
       `propagate_ks` from the zone's IC, and interpolate each resulting
@@ -97,19 +109,40 @@ BN and e) against the TLE's own apogee-altitude history.
    f. **Re-entry propagation**: propagate from the zone's IC using the
       fitted (e, BN) for up to 5 years (or until altitude < 80 km),
       recording the re-entry date if reached within that horizon.
-   g. **BN search range**: stays fixed at `[bn_min_init, bn_max_init]` (plus
-      the one-time G2 floor adjustment) for every zone — a v1.21
-      trust-gated per-zone narrow/widen scheme existed here previously and
-      was removed 2026-07-23 (also part of issue #33; kept, unlike the IC
-      chaining, despite also measuring as a small regression, per explicit
-      user direction to isolate which piece was responsible for what).
-6. **Ensemble + RPE** (`compute_rpe`): mean and standard deviation of all
-   zones' predicted re-entry dates form the ensemble estimate; RPE is
-   computed either against a known observed decay date (validation mode) or
-   against the ensemble mean itself (operational mode, no ground truth
-   available). The **latest zone's own prediction**, not the ensemble mean,
-   is reported as the primary estimate (later zones use more recent, more
-   representative TLE data).
+   g. **BN search range**: two mechanisms narrow it, one stateless and one
+      recursive. **G3** (issue #32, stateless): each zone's own
+      TLE-published BSTAR value narrows the range via a pooled
+      log10(BN)~log10(BSTAR) regression (intersection-only, falls back
+      cleanly if BSTAR is unavailable). **Trust-gated carryover** (v1.21;
+      a v1.21 narrow/widen scheme was removed as an isolated experiment in
+      2026-07-23, then *restored* shortly after when removal alone
+      measurably regressed accuracy — it is active today, not removed):
+      if the previous zone actually predicted a re-entry (or is otherwise
+      unflagged), re-center the *next* zone's range on that zone's own
+      fitted BN (half-width if interior, widen ×1.5 around the window's
+      existing center if the fit sat at a search boundary — v1.44 fixed a
+      boundary-recentering bug that let repeated boundary hits escalate
+      the window in one direction). **This recursive mechanism is a
+      confirmed, recurring source of fragility**: four independent,
+      individually-correct pipeline changes have each triggered a real
+      accuracy regression through it (issue #35 has the full history). A
+      non-recursive, pooled-median replacement was designed and tested but
+      gave mixed results and was not shipped — the mechanism above is what
+      runs today.
+6. **Ensemble + RPE** (`compute_rpe`): the **median** (changed from a mean
+   in v1.44, issue #29 — a mean lets one catastrophically-wrong zone, e.g.
+   an early zone whose window is too far from the true re-entry to
+   extrapolate linearly, drag the whole estimate off) and standard
+   deviation of all zones' predicted re-entry dates form the ensemble
+   estimate; RPE is computed either against a known observed decay date
+   (validation mode) or against the ensemble median itself (operational
+   mode, no ground truth available). The **latest zone's own prediction**,
+   not the ensemble median, is still reported as the officially "PRIMARY"
+   estimate (v1.20 — later zones use more recent, more representative TLE
+   data) — though on the current curated-7 static campaign the ensemble
+   median is *empirically more accurate* than the latest-zone estimate for
+   most objects, a real reversal from the relationship that originally
+   motivated making latest-zone primary (see `ARCHITECTURE.md` §5.5/§6).
 
 ```mermaid
 flowchart TD
@@ -118,11 +151,13 @@ flowchart TD
     C --> D[zone_select: decaying-trend windows]
     D --> E{Per-zone loop}
     E --> F[tle_find_osc: SGP4-osculating IC seed]
-    F --> G[rsm_generate: 3x3 e/BN grid via propagate_ks]
+    F --> G0[G3: BSTAR prior narrows BN range]
+    G0 --> G[rsm_generate: 3x3 e/BN grid via propagate_ks]
     G --> H[ga_optimize: fit e,BN to minimize RMS vs TLE apogee]
     H --> I[Propagate to re-entry with fitted e,BN]
-    I --> E
-    E -- all zones done --> J[compute_rpe: ensemble mean/std, per-zone RPE]
+    I --> G1{Trust-gated BN carryover: recenter next zone's range}
+    G1 --> E
+    E -- all zones done --> J[compute_rpe: ensemble median/std, per-zone RPE]
     J --> K[report.F: latest-zone primary + ensemble]
 ```
 
@@ -147,7 +182,8 @@ around it:
   (predicted re-entry Julian date, 0 if none within horizon), `rpe_out`,
   `zone_status` (0=ok, 1=propagator failure, 2=boundary-saturated,
   3=envelope-doesn't-bound-observations, 4=too-few-points).
-- Ensemble: `t_mean`, `t_std` across zones with a valid prediction.
+- Ensemble: `t_mean` (median since v1.44, name kept for call-site
+  compatibility), `t_std` across zones with a valid prediction.
 - Formatted prediction report (`report.F`, issue #13):
   `output/OREM_<norad>_<date>.txt` — zone table, primary (latest-zone)
   estimate, ensemble summary.
@@ -166,57 +202,74 @@ sequentially; the 9 RSM grid points *could* be parallelized (they're
 independent) but aren't in the current implementation.
 
 ## 8. Validation & Accuracy
-345 tests pass across 6 test executables (`test_orem`, `test_reentry`,
-`test_e2e`, plus the KSROP-inherited `test_propagate_ks`/
-`test_tle_evolution`/`test_zone_select`/`test_rsm`/`test_ga`/`test_gmat`) as
-of this session. Real-object campaigns: the curated 7-object validation set
-currently runs at **14.2% mean latest-zone \|RPE\|** (post-issue-#31 fix,
-which corrected a mean-vs-osculating fitness basis mismatch present since
-the pipeline's inception but made per-zone fits noisier in the process — a
-deliberate, documented trade-off, see README v1.27); a broader 30-object
-campaign (mixing well-tracked and sparsely-tracked objects) runs
-substantially worse (~23-33% depending on which of two recently-tried,
-both-regressed BN-search variants is active — see issue #33), reflecting
-that the curated set is not representative of the full population OREM is
-meant to handle. Cross-validated against GMAT at the propagator level (see
-`KSROP\ALGORITHM.md` §8) — OREM's own fitting/selection layer has no
-independent-tool cross-validation of its own, only real-decay-date
-comparison.
+382 tests pass across 12 test executables, built via `fpm test` (`test_orem`,
+`test_reentry`, `test_e2e`, `test_sw`, plus the KSROP-lineage-inherited
+`test_propagate_ks`/`test_tle_evolution`/`test_tle_filter`/`test_zone_select`/
+`test_rsm`/`test_ga`/`test_ga_sensitivity`/`test_gmat`). Real-object
+campaigns (all figures current, static atmosphere unless noted):
+curated-7 mean\|latest-zone RPE\| **32.1%**, mean\|ensemble RPE\| **4.1%**
+(median 2.8%) — the ensemble/median metric is currently *more* accurate
+than the officially-primary latest-zone metric for most of these 7 objects
+(see §4 step 6 above, and `ARCHITECTURE.md` §5.5/§6). With epoch-resolved weather + the
+diurnal density bulge: mean\|latest\|=26.1%, mean\|ensemble\|=4.5%. Across
+the 50-object generalization set: mean\|ensemble RPE\|=16.1%, predict rate
+35/50 (70%). These numbers reflect real, ongoing generalization work
+(issue #32's tracking umbrella) — not a single settled accuracy figure;
+see README's Version History for the full sequence of individually-tested
+changes that produced them. Cross-validated against GMAT at the propagator
+level — OREM's own fitting/selection layer has no independent-tool
+cross-validation of its own, only real-decay-date comparison.
 
 ## 9. Known Limitations
 - **RPE plateaus well above what the propagator's own GMAT-validated
   accuracy would suggest is achievable** — the subject of an active,
   ongoing global investigation (issue #32) into whether the remaining error
   is TLE noise, density-model error, ballistic-coefficient/attitude
-  variability, algorithmic identifiability, or (per literature findings
-  from that investigation) a genuine physical limit for objects in or near
-  solar apsidal resonance, where the field's own literature states
-  deterministic prediction may be provably infeasible.
-- **No diurnal atmospheric density bulge** — inherited directly from
-  `KSROP` (see that repo's ALGORITHM.md §9); a specified fix from the
-  literature exists but isn't implemented.
-- **Issue #27** (33587): a critical-inclination lunisolar perigee-collapse
-  case not yet resolved by any generic hypothesis tested so far — narrowed
-  during the literature investigation to a solar-apsidal-resonance
-  mechanism, not yet implemented as a diagnostic.
-- **Issue #29**: the shipped `nzones_max=8` default doesn't generalize to
-  the broader object population (`OREM-Watchlist` operationally overrides
-  it to 50).
-- Zone-to-zone BN estimates are fit completely independently (per §4.5.b);
-  literature (see project memory) suggests ballistic coefficient/attitude
-  do vary systematically zone-to-zone, but the one concrete attempt to
-  exploit that (trajectory-continuity IC chaining) measurably hurt
-  accuracy rather than helping — the right way to use that literature
-  finding, if any, is still unresolved.
-- Only degree-2190 EGM2008 zonals, drag, luni-solar third-body, and SRP are
-  modeled — same force-model scope as KSROP, no additions specific to
-  OREM's own re-entry-prediction use case.
+  variability, algorithmic identifiability, or a genuine physical limit for
+  objects in or near solar apsidal resonance (35497, i=5.7°, is the
+  project's persistent example — see `ARCHITECTURE.md` §6).
+- **The trust-gated BN-range carryover across zones (§4 step 5g) is a
+  confirmed, recurring source of fragility, not a resolved design.** Four
+  independent, individually-correct pipeline changes have each triggered a
+  real accuracy regression through this one recursive mechanism (issue
+  #35 has the full history and root-cause trace). A non-recursive
+  replacement was designed, implemented, and campaign-tested but gave
+  genuinely mixed results (fixes one chronic per-object regression,
+  regresses another) and was not shipped — the implementation survives as
+  a ready-to-reapply patch. Any future pipeline change that could shift a
+  zone's fitted BN even slightly should be re-validated against the full
+  campaign, not assumed safe from this interaction.
+- **Issue #29**: the shipped `nzones_max=8` default's generalization gap to
+  the broader 50-object population has been substantially, but not fully,
+  closed (`max_zone_days` 10→20 raised the predict rate 58%→72%;
+  `OREM-Watchlist` still operationally overrides `nzones_max` to 50 for
+  its more variably-tracked real candidates). Of the objects that still
+  don't predict, 5 have no clean decay signal anywhere in their tracked
+  history at any window size tested — a genuine data-availability gap, not
+  a tuning problem.
+- Three Falcon 9 R/B objects were removed from the 50-object generalization
+  set (v1.45) since `propagate_ks` has no thrust/maneuver modeling at all
+  and SpaceX is documented to perform active post-separation deorbit burns
+  on Falcon 9 second stages — this whole fitting methodology's validity
+  depends on drag+gravity+SRP being the complete force model, which does
+  not hold for actively-maneuvered objects.
+- Only degree-2190 EGM2008 zonals, drag (including the diurnal density
+  bulge, v1.42), luni-solar third-body, and SRP are modeled — same
+  force-model scope as KSROP, no thrust/maneuver modeling, no additions
+  specific to OREM's own re-entry-prediction use case beyond the drag
+  refinements already shipped.
 
 ## 10. Dependencies
-- **`KSROP`** (embeds directly): `ksrop\propagate_ks.F`, `Subrouts.F`,
-  `TLEread.F`, `Legendre.F` are copied source, not a package dependency —
-  changes to KSROP's own repo are not automatically picked up here and
-  would need to be manually re-synced.
+- **`KSROP`**: OREM is an `fpm` (Fortran Package Manager) package that
+  consumes KSROP as a real git+tag dependency declared in `fpm.toml` — not
+  hand-copied files. `fpm build`/`fpm test` fetches the pinned KSROP tag
+  into `build/dependencies/ksrop/` automatically; bumping the dependency
+  means bumping the tag in `fpm.toml`, not re-syncing files by hand.
+  `src/propagate_ks.F` itself is OREM's own file (refactored from KSROP's
+  `driver_KS.F` into a callable subroutine, no file I/O) and carries fixes
+  in both directions by hand where the physics is shared (e.g. the v1.18
+  drag-phase fix and the v1.42 diurnal bulge were both ported into
+  `driver_KS.F` after validating in OREM first).
 - **Depended on by `OREM-Watchlist`**: which orchestrates `orem.exe` as a
   subprocess for operational Space-Track-driven monitoring, with its own
   operational config overrides (`nzones_max=50`, `max_zone_days=30`).
