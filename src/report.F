@@ -15,7 +15,7 @@ c     ============================================================
      &   reentry_jd, e_opt, bn_opt, rms_o,
      &   zone_epoch, nzones_used,
      &   zone_status, nzones_valid,
-     &   rpe, t_mean, t_std, nzmax, ierr_rep)
+     &   rpe, t_mean, t_std, nzmax, last_perigee_alt, ierr_rep)
 c
 c     Input
 c       rep_file        : output file path
@@ -27,6 +27,10 @@ c       reentry_jd(nzmax), e_opt(nzmax), bn_opt(nzmax),
 c       rms_o(nzmax), zone_epoch(nzmax), nzones_used,
 c       zone_status(nzmax), nzones_valid,
 c       rpe(nzmax), t_mean, t_std : orem_run outputs
+c       last_perigee_alt : last-tracked-TLE perigee altitude (km),
+c                         from tle_last_perigee (issue #29 follow-up,
+c                         decay-phase-proximity indicator, NOT a
+c                         calibrated confidence score)
 c     Output
 c       ierr_rep        : 0=ok, 1=cannot open rep_file
 c     ============================================================
@@ -44,6 +48,7 @@ c     ============================================================
       integer nzones_used
       integer zone_status(nzmax), nzones_valid
       double precision rpe(nzmax), t_mean, t_std
+      double precision last_perigee_alt
       integer ierr_rep
 
       character*10 zslab(0:4)
@@ -75,6 +80,15 @@ c     ============================================================
       write(44,'(A,I2)')      'IDRAG:          ', idrag_flag
       write(44,'(A,I2,A,I2,A)') 'Zones:          ', nzones_used,
      &   ' processed, ', nzones_valid, ' clean (zone_status=0)'
+      write(44,'(A,F8.1,A)')
+     &   'Last-TLE perigee alt: ', last_perigee_alt,
+     &   ' km (decay-phase proximity, issue #29 -- NOT a'
+      write(44,'(A)')
+     &   '                       calibrated confidence score; ref: '//
+     &   'predicting objects in the'
+      write(44,'(A)')
+     &   '                       50-object validation set median '//
+     &   '125km, non-predicting 333km)'
 
       t_obs_jd = 0.d0
       if (t_obs_cal(1) .gt. 1900.d0) then

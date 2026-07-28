@@ -76,11 +76,11 @@ OREM/
 │   ├── test_rsm.F                   RSM integration tests (39)
 │   ├── test_sw.F                    Space weather / ATM2D tests (18)
 │   ├── test_tle_filter.F            TLE filter tests (14)
-│   ├── test_orem.F                  Driver + diagnostics + G2 + report tests (31)
+│   ├── test_orem.F                  Driver + diagnostics + G2 + report tests (34)
 │   ├── test_reentry.F               7-object re-entry validation (35)
 │   ├── test_e2e.F                   End-to-end integration, IDRAG=1 + full force (20)
 │   └── test_gmat.F                  GMAT cross-validation + exact-model drag reference (14)
-└── README.md                        (382 tests total)
+└── README.md                        (385 tests total)
 ```
 
 ---
@@ -305,13 +305,14 @@ Two-body energy conservation, orbit closure, multi-revolution propagation, re-en
 - Surface quality: higher e → higher ha, all finite (NaN check), physical range [5k-20k km], center nearest, repeatability
 - RSM→GA integration: feed real RSM surfaces into ga_optimize, e_opt/a_opt in bounds, rms valid, e_opt near TLE ecc, fitness>0.5
 
-### test_orem (29 tests) — includes issues #12/#13
+### test_orem (34 tests) — includes issues #12/#13/#29
 - compute_rpe: perfect RPE=0, 10-day late RPE~1.9%, mean/std (Mode 2), zero predictions
 - Error handling: bad TLE file, wrong NORAD ID
 - 42928 integration: full pipeline (TLE→zone→RSM→GA→propagation), e_opt physical, bn_opt physical (positive/finite — G2 floor + the corrected J71 table put fit-consistent BN below the caller's 80), rms valid, zone epochs valid
 - Failure recovery/diagnostics (#12): D15 propagator-divergence skip (BN=0 forces a division-by-zero in the drag term → NaN altitude → `zone_status=1`), D16 GA boundary detection with a [20,30] window pinned *below* the real BN (`zone_status=2`; a window pinned above gets un-pinned by the G2 floor), D17 all-zones-fail doesn't crash the driver loop (`nzones_valid=0`)
 - G2 physics-based BN floor (#12): 37151's zone 1 with the default `bn_min_init=80` — floor estimate extends `bn_lo` well below 80, letting `bn_opt(1)` land there (structurally impossible before this change)
 - Prediction report (#13): R1–R4 real-run report (header/zone table/ensemble/legend), R5–R7 synthetic-array report exercising the with-re-entry path (PRIMARY = latest zone, latest-zone RPE line)
+- Last-TLE perigee decay-phase indicator (#29, v1.47): R0 `tle_last_perigee` succeeds, R0b returns a physically plausible altitude, R4b report contains the new line
 
 ### test_e2e (20 tests) — Issue #16 (closed v1.20)
 Full pipeline with IDRAG=1, **full force model** (geo=20, sun=2, moon=3, SRP on: Cr=1.2, A/m=0.01 m²/kg, conical shadow); GA minimizes trajectory RMS:
@@ -799,6 +800,10 @@ of KSROP's `driver_KS.F` core with re-entry-specific logic added, and evolves in
 Tested the Phase-0 literature hypothesis this investigation had flagged but never directly checked (Gupta & Anilkumar 2014: best-in-class accuracy is only achieved in the terminal/drag-dominated decay phase) against last-tracked-TLE perigee altitude, computed read-only from each object's own TLE file (`scratch_rpe/diag_issue29_decay_phase.py`, no `orem_run` call, no production code touched). **Confirms the hypothesis directly**: objects that predict have last-TLE perigee altitude mean 168 km/median 125 km (all 7 curated objects sit in this band, 74-134 km); the 13 no-predict objects mean 398 km/median 333 km; the 5 ERR objects mean 304 km/median 321 km — a clean separation, not overlapping distributions. Even among the 32 objects that do predict, last-TLE perigee correlates with ensemble RPE (r=0.677, moderate-strong) and more weakly with latest-zone RPE (r=0.276).
 
 **Reframes #29's core question**: the broader-set accuracy gap is largely explained by decay-phase-proximity composition (whether an object's last tracked TLE is already near end-of-life), not a uniform algorithm identifiability floor that degrades with population size — the curated-7 happen to all be objects captured in their terminal decay phase; most of the other 43 are not. Not implemented as a shipped feature (diagnostic only) — the natural follow-on, if pursued, is reporting last-TLE perigee altitude as a per-object confidence indicator alongside a prediction, rather than continuing to chase uniform accuracy across a population that includes objects genuinely years from decay. Full writeup: issue #29 comment.
+
+**v1.47 — 2026-07-28, last-TLE perigee altitude shipped as a decay-phase-proximity indicator in the operational report (issue #29 follow-through).** Turns the diagnostic above into a small, reporting-only feature rather than leaving it as an unactioned finding. New `tle_last_perigee` subroutine (`src/orem.F`) reuses `tle_evolve`'s own `hp_out` (mean perigee altitude, already computed identically to how `orem_run` computes it for zone selection — same `sma*(1-e)-R_Earth` formula, same constants) and returns its last chronological point; zero new physics, a second cheap TLE read (independent of `orem_run`, so it still works even if the main pipeline errors out). `orem_report` (`src/report.F`) gained one new input parameter, `last_perigee_alt`, and prints it in the report header with the diagnostic's own reference medians (125 km predicting / 333 km non-predicting) inline, explicitly labeled **not** a calibrated confidence score — the underlying distributions overlap substantially in the 150-340 km band, and this project has already learned that lesson once (the Sharma ±10% BC-bounds diagnostic, issue #32, found reporting an falsely-precise band would understate real uncertainty by ~14x).
+
+Deliberately did **not** touch `orem_run`'s own signature (11 call sites across `app/`, `test/`, `scratch_rpe/`, `scratch_legacy_validation/` would all need updating) — `orem_report` only has 2 call sites (`main_orem.F`, `test_orem.F`), both updated. `main_orem.F` calls the new subroutine once, right before writing the report. 3 new tests in `test_report` (`test/test_orem.F`): R0 (`tle_last_perigee` succeeds), R0b (returns a physically plausible altitude for 42928), R4b (report file contains the new line). **385/385 tests pass** (382 + 3 new), verified via `fpm test --compiler ifx`; visually spot-checked `output/test_report.txt`'s rendered formatting.
 
 ---
 

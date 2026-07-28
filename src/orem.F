@@ -1140,3 +1140,58 @@ c     Short trial propagation at BN_trial from the zone's first TLE.
 
       return
       end
+
+c     ============================================================
+c     tle_last_perigee — issue #29 follow-up: last-tracked-TLE
+c     perigee altitude as a decay-phase-proximity indicator.
+c
+c     The curated-7 vs. broader-set RPE gap (issue #29) was shown to
+c     be largely explained by whether an object's last tracked TLE
+c     already sits near end-of-life (low perigee) rather than a
+c     uniform accuracy floor (scratch_rpe/diag_issue29_decay_phase.py,
+c     issue #29 comment 2026-07-28): predicting objects in the
+c     50-object validation set have a median last-TLE perigee of
+c     125 km vs. 333 km for objects that never predict a re-entry
+c     within the 5-year cap. Reports the raw altitude only — this is
+c     NOT a calibrated confidence score (the underlying distributions
+c     overlap substantially in the 150-340 km band), just a cheap,
+c     already-available proximity indicator for a human reader.
+c
+c     Reuses tle_evolve's own hp_out (already computed for zone
+c     selection whenever orem_run processes this object) — zero new
+c     physics, just its last chronological point. Read-only, no
+c     fitting or propagation; independent of orem_run so it can be
+c     called standalone for reporting even if orem_run itself fails.
+c     ============================================================
+      subroutine tle_last_perigee(tle_file, norad_id,
+     &   perigee_alt, ierr_lp)
+      implicit double precision (a-h, o-z)
+      character*(*) tle_file
+      integer norad_id, ierr_lp
+      double precision perigee_alt
+
+      parameter(maxpts_lp = 15000)
+      double precision epochs_lp(maxpts_lp), a_lp(maxpts_lp)
+      double precision e_lp(maxpts_lp), inc_lp(maxpts_lp)
+      double precision raan_lp(maxpts_lp), aop_lp(maxpts_lp)
+      double precision ha_lp(maxpts_lp), hp_lp(maxpts_lp)
+      double precision ls_lp(maxpts_lp)
+      integer npts_lp, ierr_tle_lp
+
+      call tle_evolve(tle_file, norad_id, maxpts_lp,
+     &   epochs_lp, a_lp, e_lp, inc_lp,
+     &   raan_lp, aop_lp,
+     &   ha_lp, hp_lp, ls_lp,
+     &   npts_lp, ierr_tle_lp)
+
+      if (ierr_tle_lp .ne. 0 .or. npts_lp .lt. 1) then
+         ierr_lp = 1
+         perigee_alt = 0.d0
+         return
+      end if
+
+      perigee_alt = hp_lp(npts_lp)
+      ierr_lp = 0
+
+      return
+      end

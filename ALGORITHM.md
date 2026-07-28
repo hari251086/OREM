@@ -195,7 +195,10 @@ around it:
   compatibility), `t_std` across zones with a valid prediction.
 - Formatted prediction report (`report.F`, issue #13):
   `output/OREM_<norad>_<date>.txt` — zone table, primary (latest-zone)
-  estimate, ensemble summary.
+  estimate, ensemble summary, and (v1.47, issue #29) last-tracked-TLE
+  perigee altitude as a decay-phase-proximity indicator — a raw number
+  with reference medians inline, explicitly not a calibrated confidence
+  score (`tle_last_perigee`, `orem.F`).
 - `ierr`: 0=ok, 1=TLE error, 2=no zones found, 3=all zones failed.
 
 ## 7. Complexity & Performance
@@ -211,7 +214,7 @@ sequentially; the 9 RSM grid points *could* be parallelized (they're
 independent) but aren't in the current implementation.
 
 ## 8. Validation & Accuracy
-382 tests pass across 12 test executables, built via `fpm test` (`test_orem`,
+385 tests pass across 12 test executables, built via `fpm test` (`test_orem`,
 `test_reentry`, `test_e2e`, `test_sw`, plus the KSROP-lineage-inherited
 `test_propagate_ks`/`test_tle_evolution`/`test_tle_filter`/`test_zone_select`/
 `test_rsm`/`test_ga`/`test_ga_sensitivity`/`test_gmat`). Real-object
@@ -258,7 +261,19 @@ cross-validation of its own, only real-decay-date comparison.
   its more variably-tracked real candidates). Of the objects that still
   don't predict, 5 have no clean decay signal anywhere in their tracked
   history at any window size tested — a genuine data-availability gap, not
-  a tuning problem.
+  a tuning problem. **The remaining accuracy gap on the objects that DO
+  predict is now understood, not just observed**: curated-7 mean\|ensemble
+  RPE\|=1.9% vs. the other 43's 20.4% is largely explained by
+  decay-phase-proximity composition — objects whose last tracked TLE
+  already sits at a low perigee (predicting-object median 125 km) predict
+  well; objects still at 300+ km (non-predicting median 333 km) correctly
+  don't predict imminent re-entry, because they aren't near it (2026-07-28,
+  `scratch_rpe/diag_issue29_decay_phase.py`). Not a uniform identifiability
+  floor that gets worse with population size. Shipped as a reporting-only
+  feature, v1.47: last-TLE perigee altitude now appears in every operational
+  report as a proximity indicator (§6 above) — explicitly not a calibrated
+  confidence score, since the two populations' distributions overlap
+  substantially in the 150-340 km band.
 - Three Falcon 9 R/B objects were removed from the 50-object generalization
   set (v1.45) since `propagate_ks` has no thrust/maneuver modeling at all
   and SpaceX is documented to perform active post-separation deorbit burns

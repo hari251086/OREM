@@ -578,9 +578,11 @@ c     ============================================================
       double precision alt(ndim_a), den(ndim_a), sch(ndim_a)
       integer natm, ierr, nzu, ierr_rep
       integer zstat(mxz), nzv
+      double precision last_perigee
+      integer ierr_lp
 
       character*200 line
-      integer ihdr, izone, iens, ilgd
+      integer ihdr, izone, iens, ilgd, iperi, iperi_ok
 
       call read_atm_orem(alt, den, sch, ndim_a, natm)
 
@@ -606,13 +608,26 @@ c     ============================================================
      &   zstat, nzv,
      &   rpe, t_mean, t_std, ierr)
 
+      call tle_last_perigee('input/example_42928_zone0.tle.txt',
+     &   42928, last_perigee, ierr_lp)
+
+c     R0: tle_last_perigee succeeds and returns a physically
+c     plausible GTO-debris perigee altitude for this object
+      call assert_i('R0 tle_last_perigee ierr_lp=0', ierr_lp, 0,
+     &              npass, nfail)
+      iperi_ok = 0
+      if (last_perigee .gt. 0.d0 .and. last_perigee .lt. 2000.d0)
+     &   iperi_ok = 1
+      call assert_i('R0b last_perigee in (0,2000)km', iperi_ok, 1,
+     &              npass, nfail)
+
       call orem_report(
      &   'output/test_report.txt', 42928, t_obs,
      &   80.d0, 160.d0, 0,
      &   reentry, e_opt, bn_opt, rms_o,
      &   zepoch, nzu,
      &   zstat, nzv,
-     &   rpe, t_mean, t_std, mxz, ierr_rep)
+     &   rpe, t_mean, t_std, mxz, last_perigee, ierr_rep)
 
 c     R1: report written without error
       call assert_i('R1 report ierr_rep=0', ierr_rep, 0,
@@ -623,6 +638,7 @@ c     R2-R4: report contains header, zone table, status legend
       izone = 0
       iens  = 0
       ilgd  = 0
+      iperi = 0
       open(unit=45, file='output/test_report.txt', status='old',
      &     err=800)
  10   read(45,'(A)',end=20) line
@@ -631,6 +647,7 @@ c     R2-R4: report contains header, zone table, status legend
       if (index(line, 'Zone  Epoch (JD)') .gt. 0) izone = 1
       if (index(line, 'Ensemble') .gt. 0) iens = 1
       if (index(line, 'zone_status legend') .gt. 0) ilgd = 1
+      if (index(line, 'Last-TLE perigee alt') .gt. 0) iperi = 1
       goto 10
  20   close(45)
 
@@ -639,6 +656,8 @@ c     R2-R4: report contains header, zone table, status legend
       call assert_i('R3 zone table present', izone, 1,
      &              npass, nfail)
       call assert_i('R4 ensemble + legend present', iens*ilgd, 1,
+     &              npass, nfail)
+      call assert_i('R4b last-TLE perigee line present', iperi, 1,
      &              npass, nfail)
 
 c     R5-R7: with-re-entry path via synthetic zone data (fast; no
@@ -677,7 +696,7 @@ c     median |RPE| 8.2% vs the uniform mean's 45% mean error).
      &   reentry, e_opt, bn_opt, rms_o,
      &   zepoch, nzu,
      &   zstat, 3,
-     &   rpe, t_mean, t_std, mxz, ierr_rep)
+     &   rpe, t_mean, t_std, mxz, last_perigee, ierr_rep)
 
       call assert_i('R5 synthetic report ierr_rep=0', ierr_rep, 0,
      &              npass, nfail)
