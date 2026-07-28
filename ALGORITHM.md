@@ -15,6 +15,18 @@ under `GitHub\` and the direct consumer of `KSROP`'s propagator; the
 operational layer around it (Space-Track data ops, scheduling, a watchlist
 database) is a separate repo, `OREM-Watchlist`.
 
+The zones + response-surface + genetic-algorithm architecture itself isn't
+novel to this codebase — it's a direct methodological descendant of a line
+of R.K. Sharma (co-author, §9) papers on GTO upper-stage reentry prediction:
+Sharma, Bandyopadhyay & Adimurthy (2006) first states the response-surface +
+GA (ballistic coefficient, perigee) fitting cost function; Mutyalarao &
+Sharma (2010, 2011) extend it to explicit apogee-decay "zones" and a ±10%
+BC-bounds uncertainty technique (the direct ancestor of the ±10% diagnostic
+tested, and found too narrow, against OREM's own uncertainty reporting —
+issue #32). KS regularization with oblateness as the propagation framework
+traces to Sharma & James Raj (1988), predating KSROP itself by decades. See
+§9 for full citations.
+
 ## 2. Problem Statement
 Given an object's real TLE tracking history (which encodes its orbit's
 gradual decay under atmospheric drag, but not its physical ballistic
