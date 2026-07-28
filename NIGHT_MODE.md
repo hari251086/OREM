@@ -32,17 +32,43 @@ issue #32 is the parent tracking issue for this investigation.
   reporting it as-is is this investigation's whole methodology — keep doing
   that rather than taking aggregate results or a single paper at face value.
 
-**Current state (2026-07-22)**: Phase 0 literature reading is the active
-task — user explicitly said to finish "reading and compiling and
-remembering everything before we do trade off and implementation," so no
-Phase 1+ code changes until that's done and reported. See
-[[project_orem_rpe_investigation_plan]] and
-[[reference_orem_reentry_literature]] for exactly what's read vs.
-remaining. Once reading is complete: synthesize findings into the plan file
-and memory, report back to the user, and only then move to trade-off
-discussion / Phase 0's synthetic harness build — do not skip ahead on the
-assumption that "more reading" and "start implementing" are the same
-decision.
+**Current state (2026-07-29, reactivated)**: the RPE-accuracy investigation
+(fitting-basis-seed/carryover-chain/decay-phase threads) is genuinely
+exhausted for now — see [[project_orem_rpe_investigation_plan]]'s "all 4
+investigated paths closed" note. User explicitly redirected to a
+from-scratch, first-principles math/code review of `src/ga.F`/`src/rsm.F`
+themselves ("act as a mathematics and code reviewer"), excluding the
+propagator. Active task, full detail: **[[project_orem_ga_rsm_review]]**
+and GitHub issue #36.
+
+Two major findings already CONFIRMED and quantified this session (real,
+growing osculating-vs-mean apogee gap in the RSM fit target; GA fitness
+RMS silently divided by 100, meaning every historical "rms_fit" citation
+in this whole project has been 100x too small). One hypothesis (Finding 3
+— GA may be fitting a bilinear-interpolation artifact rather than real
+propagated physics) flagged but not yet isolated from Finding 1 — the next
+diagnostic for it is fully specified in [[project_orem_ga_rsm_review]],
+not yet built. Nothing has been fixed/shipped — deliberate
+investigate-and-checkpoint phase, matching this project's discipline
+throughout its history.
+
+A background agent was spawned to deep-read the specific RSM+GA re-entry
+papers already located (`E:\Research\References\0` — Mutyalarao & Sharma
+2010/2011, Sharma/Bandyopadhyay/Adimurthy 2006) for how THEY handle
+mean-vs-osculating apogee, to determine whether Finding 1 is OREM-specific
+or a shared field approximation. Check for its result before starting new
+work — don't re-read those papers from scratch if it already reported
+back.
+
+**If resuming this after a session break**: read
+[[project_orem_ga_rsm_review]] in full first, then issue #36's comment
+thread (authoritative, has the exact numbers). Priority order: (1) check
+the literature-survey agent's result if not already folded in, (2) build
+and run the Finding 3 isolation diagnostic (design is fully specified in
+memory), (3) only after both of those, consider whether/how to actually
+fix Finding 1/2 in production code — do not jump to a fix before the
+investigation converges, matching this project's own "measure before
+deciding" discipline.
 
 **Never suggest or cite Gondelach et al. 2017** — see
 [[feedback_avoid_gondelach_paper]]. This exclusion survives any autonomous
