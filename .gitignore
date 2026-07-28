@@ -12,6 +12,10 @@
 # Debug files
 debug_*.F
 
+# Python diagnostic script byproducts
+__pycache__/
+*.pyc
+
 # Large multi-satellite catalog (94k entries, not needed for tests)
 input/example_multi.tle.txt
 

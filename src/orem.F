@@ -164,7 +164,7 @@ c     Force model
 
 c     Working
       double precision bn_lo, bn_hi, e_mid, de
-      double precision bn_val, t_obs_jd, bn_range
+      double precision bn_val, t_obs_jd, bn_range, bn_center
       double precision a_kep(7), x0(3), xd0(3), cal0(6)
       integer iz, i, nzone, nvalid, nzone1
       double precision smin, smax
@@ -181,14 +181,6 @@ c     propagation initial condition -- see tle_find_osc below)
 c     Issue #32 (G3): BSTAR-informed BN search-range prior, per zone
       double precision bn_lo_zone, bn_hi_zone
       logical bn_prior_ok
-
-c     Issue #31 follow-up: smooth (linfit-trend) mean/osculating bias
-c     correction for haz -- see the noise-matched apobs comment below.
-c     Revisited 2026-07-25 alongside G3+trust-gate (see project memory
-c     for the earlier flat result measured before those existed).
-      double precision bias_t(500), bias_y(500)
-      double precision bias_slope, bias_intcpt, bias_r2
-      integer nbias
 
       ierr = 0
       nzones_used = 0
@@ -389,45 +381,22 @@ c        (#10) can shrink a zone after selection.
             smaz(i)  = a_tle(zone_start(iz) + i - 1)
          end do
 
-c        Issue #31 follow-up (noise-matched apobs, revisited 2026-07-25
-c        alongside G3+trust-gate): haz feeds rsm_generate's apobs,
-c        which ga_fitness RMS-compares directly against propagate_ks's
-c        genuinely-osculating surfaces. An earlier version overwrote
-c        haz(i) per-point with an INDEPENDENT SGP4-osculating
-c        conversion of that TLE alone -- correct in isolation, but
-c        each TLE is its own independently least-squares-fit snapshot,
-c        so consecutive points' true/mean anomaly phases are
-c        effectively uncorrelated, and the resulting series carried
-c        phase-dependent noise that doesn't match propagate_ks's own
-c        smoothly-evolving trajectory (measured flat/no-help against
-c        the pre-G3 baseline; see project memory). Fix: keep the
-c        smooth mean-element ha_tle trend (already in haz(i) from the
-c        copy loop above) as the base signal, and add back only the
-c        SMOOTH (linear-in-time) part of the mean/osculating bias, fit
-c        via the same linfit() zone_select.F already uses. Falls back
-c        to the unmodified mean-element haz(i) if fewer than 2 points
-c        in the zone get a successful SGP4 conversion to fit against.
-         nbias = 0
-         do i = 1, nzone
-            call tle_find_osc(norad_id, epz(i),
-     &         norad_raw, epoch_yr_raw, epoch_day_raw,
-     &         ainc_raw, raan_raw, ecc_raw, aop_raw, ama_raw,
-     &         amm_raw, bstar_raw, ntle_raw, maxtle,
-     &         a_kep_osc1, osc_ok)
-            if (osc_ok) then
-               nbias = nbias + 1
-               bias_t(nbias) = epz(i)
-               bias_y(nbias) = a_kep_osc1(1)*(1.d0+a_kep_osc1(2))
-     &                         - R_Earth - haz(i)
-            end if
-         end do
-         if (nbias .ge. 2) then
-            call linfit(bias_t, bias_y, nbias,
-     &         bias_slope, bias_intcpt, bias_r2)
-            do i = 1, nzone
-               haz(i) = haz(i) + bias_slope*epz(i) + bias_intcpt
-            end do
-         end if
+c        Issue #31's noise-matched-apobs bias correction (smooth
+c        linfit-trend mean/osculating adjustment to haz) was tried
+c        here and REVERTED (issue #34, re-tested 2026-07-27 under the
+c        current stack): it now regresses BOTH the latest-zone and
+c        ensemble RPE metrics on the curated-7 campaign (mean
+c        |latest-zone| 32.1%->25.9%, mean|ensemble| 4.1%->1.9% when
+c        removed), the opposite of the small net-positive result that
+c        justified keeping it back when it was first revisited
+c        (2026-07-25, before max_zone_days=20/the BN-carryover anchor
+c        fix/the median ensemble metric existed). Root cause is the
+c        same BN-carryover-chain amplification documented elsewhere in
+c        this file (see the trust-gated carryover comment below): the
+c        correction shifts early-zone BN slightly, which cascades
+c        through the carryover chain to different final-zone BN
+c        values. haz(i) is left as the smooth mean-element ha_tle
+c        trend from the copy loop above, unmodified.
 
          do j = 1, nzone
             maz(j) = 0.d0
@@ -658,16 +627,35 @@ c        weak-signal noise, chaining from it previously imprisoned
 c        later zones (37151's 8-zone chain marched [12.5,160] to
 c        [17.2,24.9] through seven untrusted zones). Untrusted zones
 c        leave the range unchanged for the next zone.
+c        Carryover chain sensitivity investigation (2026-07-26): a
+c        boundary-pinned zone's own bn_opt is definitionally
+c        unreliable -- it sits at whatever edge the CURRENT window
+c        happened to have, not necessarily the true value. The
+c        original widen-on-boundary logic above still RECENTERED on
+c        that unreliable value before widening, which lets a run of
+c        boundary hits walk/escalate the window in one direction
+c        each time, rather than actually escaping a too-narrow trap.
+c        Confirmed directly this session (61734, max_zone_days=20
+c        campaign): BN 16.3(bound)->58.6->89.4(bound)->136.0(bound),
+c        RPE 25.4%->181.5%, each boundary zone's own value becoming
+c        the next zone's new center. Fix: widen around the EXISTING
+c        center instead of the boundary-pinned zone's own value --
+c        preserves the original "give the next zone more room to
+c        escape a too-narrow window" intent without letting the
+c        window's center itself drift on an untrustworthy point.
          if ((idrag_flag .eq. 1 .and. reentry_jd(iz) .gt. 0.d0)
      &       .or.
      &       (idrag_flag .eq. 0 .and. zone_status(iz) .eq. 0)) then
             if (bn_at_bound) then
+               bn_center = (bn_hi + bn_lo) / 2.d0
                bn_range = (bn_hi - bn_lo) * 1.5d0
+               bn_lo = bn_center - bn_range / 2.d0
+               bn_hi = bn_center + bn_range / 2.d0
             else
                bn_range = (bn_hi - bn_lo) * 0.5d0
+               bn_lo = bn_opt_out(iz) - bn_range / 2.d0
+               bn_hi = bn_opt_out(iz) + bn_range / 2.d0
             end if
-            bn_lo = bn_opt_out(iz) - bn_range / 2.d0
-            bn_hi = bn_opt_out(iz) + bn_range / 2.d0
             if (bn_lo .lt. 10.d0) bn_lo = 10.d0
          end if
 
@@ -702,7 +690,30 @@ c     ============================================================
 c
 c     RPE metric — two modes:
 c     Mode 1 (t_obs > 0): RPE vs observed re-entry
-c     Mode 2 (t_obs = 0): RPE vs ensemble mean
+c     Mode 2 (t_obs = 0): RPE vs ensemble median
+c
+c     Issue #29 (61734 zone-1 investigation, 2026-07-26): t_mean is the
+c     MEDIAN of valid per-zone predictions, not the arithmetic mean --
+c     parameter name kept as t_mean since every caller (report.F,
+c     campaign scripts, tests) references it positionally, not by name.
+c     Root cause for 61734's own 759.7%/181.7% ensemble RPE: zone 1 is a
+c     genuinely well-fitted (R2=0.994) 19-day window at ~35,000 km
+c     apogee, only 138 days before the object's true re-entry -- a
+c     confirmed non-G3 effect (a no-G3 test still lands the fit at a
+c     non-boundary BN=26.3 with RPE unchanged at 763.9%): the local
+c     decay rate this window measures cannot be linearly extrapolated
+c     the ~1000+ days a constant-BN propagation implies, because the
+c     real object's decay accelerates far faster than that. The
+c     arithmetic mean lets this one early, long-horizon outlier
+c     dominate the ensemble; the median does not. Re-verified against
+c     the current 50-object campaign (scratch_rpe/
+c     ensemble_eval_50obj.py, current codebase state, not the v1.20
+c     figures): median beats uniform mean on every aggregate stat
+c     (median|RPE| 26.9%->20.1%, mean 49.5%->40.4%) though both remain
+c     behind the already-shipped latest-zone PRIMARY estimate
+c     (12.4%/36.2%) -- this changes the SECONDARY ensemble indicator
+c     only, per report.F's v1.20 "PRIMARY (latest zone) + ensemble
+c     spread" structure, not the primary metric itself.
 c     ============================================================
       implicit double precision (a-h, o-z)
       integer nzones, maxz
@@ -710,15 +721,15 @@ c     ============================================================
       double precision t_obs_jd
       double precision rpe(maxz), t_mean, t_std
 
-      integer i, nvalid
+      double precision vals(maxz), vtmp
+      integer i, j, nvalid
 
-c     Compute mean of valid predictions
-      t_mean = 0.d0
+c     Gather valid predictions
       nvalid = 0
       do i = 1, nzones
          if (reentry_jd(i) .gt. 0.d0) then
-            t_mean = t_mean + reentry_jd(i)
             nvalid = nvalid + 1
+            vals(nvalid) = reentry_jd(i)
          end if
       end do
 
@@ -731,14 +742,28 @@ c     Compute mean of valid predictions
          return
       end if
 
-      t_mean = t_mean / dble(nvalid)
+c     Insertion sort (nvalid <= nzones_max, always small) then median
+      do i = 2, nvalid
+         vtmp = vals(i)
+         j = i - 1
+         do while (j .ge. 1 .and. vals(j) .gt. vtmp)
+            vals(j+1) = vals(j)
+            j = j - 1
+         end do
+         vals(j+1) = vtmp
+      end do
 
-c     Compute std deviation
+      if (mod(nvalid,2) .eq. 1) then
+         t_mean = vals((nvalid+1)/2)
+      else
+         t_mean = 0.5d0*(vals(nvalid/2) + vals(nvalid/2+1))
+      end if
+
+c     Std deviation around the median (same spread semantics as
+c     before, just centered on the new estimator)
       t_std = 0.d0
-      do i = 1, nzones
-         if (reentry_jd(i) .gt. 0.d0) then
-            t_std = t_std + (reentry_jd(i) - t_mean)**2
-         end if
+      do i = 1, nvalid
+         t_std = t_std + (vals(i) - t_mean)**2
       end do
       if (nvalid .gt. 1) then
          t_std = dsqrt(t_std / dble(nvalid - 1))
@@ -760,7 +785,7 @@ c           Mode 1: vs observed
                rpe(i) = 0.d0
             end if
          else
-c           Mode 2: vs ensemble mean
+c           Mode 2: vs ensemble median
             denom = t_mean - zone_epoch(i)
             if (dabs(denom) .gt. 0.1d0) then
                rpe(i) = (reentry_jd(i) - t_mean)

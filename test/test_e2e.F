@@ -204,7 +204,7 @@ c     ============================================================
      &      '  [INFO]  best |RPE|=', dabs(rpe_best),
      &      '% (not enforced — pending BN tuning via #11)'
          write(*,'(A,F12.2,A,F6.2,A)')
-     &      '  Ensemble: mean JD=', t_mean,
+     &      '  Ensemble: median JD=', t_mean,
      &      ' std=', t_std, ' days'
       else
          write(*,*) '  [INFO]  RPE: no re-entry to evaluate'
@@ -317,7 +317,7 @@ c     RPE diagnostic for zone-0 run
          write(*,'(A,F7.2,A)')
      &      '  [INFO]  z0 best |RPE|=', dabs(rpe_best), '%'
          write(*,'(A,F12.2,A,F6.2,A)')
-     &      '  Ensemble: mean JD=', t_mean,
+     &      '  Ensemble: median JD=', t_mean,
      &      ' std=', t_std, ' days'
       end if
 

@@ -124,7 +124,9 @@ c     RPE = (555-545)/(545-018)*100 = 10/527*100 = 1.9%
      &                 0, 1, npass, nfail)
       end if
 
-c     D3: Mode 2 — no observed re-entry, compute mean/std
+c     D3: Mode 2 — no observed re-entry, compute median/std. These
+c     three values are symmetric (540, 545, 550), so median==mean here
+c     -- D6 below is the real test of median-vs-mean behavior.
       reentry(1) = 2458540.d0
       reentry(2) = 2458550.d0
       reentry(3) = 2458545.d0
@@ -133,7 +135,7 @@ c     D3: Mode 2 — no observed re-entry, compute mean/std
       zepoch(3) = 2458200.d0
       call compute_rpe(reentry, zepoch, 3,
      &   0.d0, rpe, t_mean, t_std, mxz)
-      call assert_d('D3 mean=(540+550+545)/3',
+      call assert_d('D3 median=545 (symmetric, ==mean here)',
      &   t_mean, 2458545.d0, 0.1d0, npass, nfail)
 
 c     D4: Std deviation > 0
@@ -152,6 +154,32 @@ c     D5: Zero predictions → mean=0
      &   0.d0, rpe, t_mean, t_std, mxz)
       call assert_d('D5 no valid: mean=0',
      &   t_mean, 0.d0, 1.d-10, npass, nfail)
+
+c     D6: issue #29 (61734 zone-1) regression -- one early zone with a
+c     catastrophically wrong, long-horizon-extrapolated prediction
+c     among several sane ones. Mirrors 61734's real zones: three
+c     predictions clustered near 2460730-2460760, one at 2461804 (a
+c     ~1074-day outlier). Median must stay near the sane cluster;
+c     arithmetic mean would be dragged toward ~2461006 by the outlier.
+      reentry(1) = 2461804.24d0
+      reentry(2) = 2460760.25d0
+      reentry(3) = 2460734.08d0
+      reentry(4) = 2460729.63d0
+      zepoch(1) = 2460618.59d0
+      zepoch(2) = 2460639.84d0
+      zepoch(3) = 2460661.99d0
+      zepoch(4) = 2460686.73d0
+      call compute_rpe(reentry, zepoch, 4,
+     &   0.d0, rpe, t_mean, t_std, mxz)
+      call assert_d('D6 median stays near sane cluster, not outlier',
+     &   t_mean, 2460747.17d0, 1.d0, npass, nfail)
+      if (t_mean .lt. 2460900.d0) then
+         call assert_i('D6 median unaffected by outlier (<2460900)',
+     &                 1, 1, npass, nfail)
+      else
+         call assert_i('D6 median unaffected by outlier (<2460900)',
+     &                 0, 1, npass, nfail)
+      end if
 
       return
       end
@@ -342,7 +370,7 @@ c     D14: t_mean finite (0 is valid with IDRAG=0)
          end if
       end do
       write(*,'(A,F12.2,A,F6.2,A)')
-     &   '    mean JD=', t_mean, ' std=', t_std, ' days'
+     &   '    median JD=', t_mean, ' std=', t_std, ' days'
 
       return
       end
