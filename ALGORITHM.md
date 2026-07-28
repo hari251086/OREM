@@ -262,10 +262,20 @@ cross-validation of its own, only real-decay-date comparison.
   mechanism itself was designed, implemented, and campaign-tested but gave
   genuinely mixed results (fixes one chronic per-object regression,
   regresses another) and was explicitly discarded, not shipped — the
-  patch was deleted rather than kept for reapplication. Any future
-  pipeline change that could shift a zone's fitted BN even slightly should
-  be re-validated against the full campaign, not assumed safe from this
-  interaction.
+  patch was deleted rather than kept for reapplication. A follow-on
+  hypothesis — that the RSM/GA fit's own mean-vs-osculating basis
+  inconsistency (§4 step 5c seeds an osculating IC into a fit whose
+  targets stay mean-element) was itself feeding noise into the carryover
+  chain — was also tested (reverting the osculating seed to pure mean
+  elements) and also rejected: it regresses both curated-7 campaigns
+  cleanly, so the osculating seed is doing real positive work despite the
+  inconsistency (2026-07-28, issue #31 comment). **A sequential
+  Bayesian/EnKF rewrite of the estimation architecture was identified as
+  the only remaining structural alternative but has been explicitly
+  deprioritized by project decision, not just left unstarted** — not
+  currently a candidate to revisit. Any future pipeline change that could
+  shift a zone's fitted BN even slightly should still be re-validated
+  against the full campaign, not assumed safe from this interaction.
 - **Issue #29**: the shipped `nzones_max=8` default's generalization gap to
   the broader 50-object population has been substantially, but not fully,
   closed (`max_zone_days` 10→20 raised the predict rate 58%→72%;
