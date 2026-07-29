@@ -248,7 +248,23 @@ c     ============================================================
 
 c     ============================================================
 c     G3: BSTAR-informed narrowing, EXACTLY orem.F's own sequence
+c     DEBUG: manually extract BSTAR per zone-1 epoch first, to see
+c     WHY estimate_bn_bstar_prior returns ok or not-ok.
 c     ============================================================
+      nb_dbg = 0
+      do i = 1, nzone1
+         call tle_find_bstar(norad_id, epz(i),
+     &      norad_raw, epoch_yr_raw, epoch_day_raw, bstar_raw,
+     &      ntle_raw, maxtle, bstar_dbg)
+         if (bstar_dbg .gt. 0.d0) then
+            nb_dbg = nb_dbg + 1
+            if (nb_dbg .eq. 1) write(*,'(A,F14.8)')
+     &         'DEBUG first valid bstar=', bstar_dbg
+         end if
+      end do
+      write(*,'(A,I4,A,I4)') 'DEBUG nb_valid_bstar=', nb_dbg,
+     &   ' of nzone1=', nzone1
+
       call estimate_bn_bstar_prior(norad_id, epz, nzone1,
      &   norad_raw, epoch_yr_raw, epoch_day_raw, bstar_raw,
      &   ntle_raw, maxtle,
