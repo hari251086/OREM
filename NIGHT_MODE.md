@@ -60,15 +60,20 @@ or a shared field approximation. Check for its result before starting new
 work — don't re-read those papers from scratch if it already reported
 back.
 
-**If resuming this after a session break**: read
-[[project_orem_ga_rsm_review]] in full first, then issue #36's comment
-thread (authoritative, has the exact numbers). Priority order: (1) check
-the literature-survey agent's result if not already folded in, (2) build
-and run the Finding 3 isolation diagnostic (design is fully specified in
-memory), (3) only after both of those, consider whether/how to actually
-fix Finding 1/2 in production code — do not jump to a fix before the
-investigation converges, matching this project's own "measure before
-deciding" discipline.
+**Update, later same session: issue #36 is now CLOSED with a definitive,
+ground-truth-verified conclusion** — see [[project_orem_ga_rsm_review]]'s
+final section. Finding 2 (RMS/100) was real and is fixed (`e21a790`).
+Finding 1 (osculating-vs-mean apogee) was RETRACTED after a temporary
+`orem.F` instrumentation (reverted, never shipped) proved the original
+dramatic gap was entirely a diagnostic reconstruction artifact, not a
+real production issue. Finding 3 (RSM interpolation is ~2x more
+optimistic than direct propagation at the converged optimum) is real and
+now cleanly quantified, consistent with the literature's own undocumented
+tradeoff. **If resuming after a session break: don't re-open Finding 1
+without a genuinely new angle — it was thoroughly chased, not just
+deprioritized.** If OREM accuracy work continues, the one live lead from
+this thread is checking whether Finding 3's ~2x optimism factor holds
+across more than the single zone tested here.
 
 **Never suggest or cite Gondelach et al. 2017** — see
 [[feedback_avoid_gondelach_paper]]. This exclusion survives any autonomous
