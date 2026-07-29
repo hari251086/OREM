@@ -362,7 +362,10 @@ c     G15: GA finds optimal A near 120
       end if
 
 c     G16: RMS at optimum is near zero
-      if (rms_opt .lt. 0.1d0) then
+c     Issue #36 (Finding 2): rms_opt is now true km (ga.F fix restores
+c     the *100 that ga_fitness's internal /100 conditioning removed) --
+c     threshold scaled 0.1->10 to preserve this test's original intent.
+      if (rms_opt .lt. 10.d0) then
          call assert_i('G16 rms_opt near 0',
      &                 1, 1, npass, nfail)
       else
@@ -371,7 +374,10 @@ c     G16: RMS at optimum is near zero
       end if
 
 c     G17: Fitness > 0.9 (high quality match)
-      fit = 1.d0 / (1.d0 + rms_opt)
+c     Issue #36: fit recomputed here mirrors ga_fitness's own internal
+c     formula (1/(1+rms/100)) -- rms_opt is now true km, so the /100
+c     must be reapplied here to match what ga_fitness actually computed.
+      fit = 1.d0 / (1.d0 + rms_opt/100.d0)
       if (fit .gt. 0.9d0) then
          call assert_i('G17 fitness > 0.9',
      &                 1, 1, npass, nfail)
@@ -387,7 +393,7 @@ c     G18: Different seed still converges
      &   4, 500, 40, 16, 0.8d0, 0.01d0, 0.987d0,
      &   e_opt, a_opt, rms_opt)
       if (dabs(e_opt - 0.32d0) .lt. 0.01d0 .and.
-     &    rms_opt .lt. 0.5d0) then
+     &    rms_opt .lt. 50.d0) then
          call assert_i('G18 diff seed same optimum',
      &                 1, 1, npass, nfail)
       else
@@ -417,7 +423,7 @@ c     G20: pop=4 with more generations (1000)
      &   4, 1000, 40, 16, 0.8d0, 0.01d0, 0.555d0,
      &   e_opt, a_opt, rms_opt)
       if (dabs(e_opt - 0.32d0) .lt. 0.01d0 .and.
-     &    rms_opt .lt. 0.5d0) then
+     &    rms_opt .lt. 50.d0) then
          call assert_i('G20 1000gen converges',
      &                 1, 1, npass, nfail)
       else
@@ -878,7 +884,7 @@ c     G47: Optimum at grid corner (e=0.34, A=160)
      &   0.30d0, 0.34d0, 80.d0, 160.d0,
      &   4, 500, 40, 16, 0.8d0, 0.01d0, 0.123d0,
      &   e_opt, a_opt, rms_opt)
-      if (rms_opt .lt. 1.d0 .and.
+      if (rms_opt .lt. 100.d0 .and.
      &    e_opt .ge. 0.30d0 .and. e_opt .le. 0.34d0) then
          call assert_i('G47 upper corner converges',
      &                 1, 1, npass, nfail)
@@ -1005,7 +1011,7 @@ c     G51: High-e (0.68) finds optimum
       end if
 
 c     G52: RMS near zero at high-e optimum
-      if (rms_opt .lt. 0.5d0) then
+      if (rms_opt .lt. 50.d0) then
          call assert_i('G52 e~0.68 rms < 0.5',
      &                 1, 1, npass, nfail)
       else
@@ -1154,7 +1160,7 @@ c     G56: GEO-scale apogee
      &   4, 500, 40, 16, 0.8d0, 0.01d0, 0.123d0,
      &   e_opt, a_opt, rms_opt)
       if (dabs(e_opt - 0.72d0) .lt. 0.01d0 .and.
-     &    rms_opt .lt. 2.d0) then
+     &    rms_opt .lt. 200.d0) then
          call assert_i('G56 GEO-scale converges',
      &                 1, 1, npass, nfail)
       else
