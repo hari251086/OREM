@@ -15,6 +15,18 @@ under `GitHub\` and the direct consumer of `KSROP`'s propagator; the
 operational layer around it (Space-Track data ops, scheduling, a watchlist
 database) is a separate repo, `OREM-Watchlist`.
 
+The zones + response-surface + genetic-algorithm architecture itself isn't
+novel to this codebase — it's a direct methodological descendant of a line
+of R.K. Sharma (co-author, §9) papers on GTO upper-stage reentry prediction:
+Sharma, Bandyopadhyay & Adimurthy (2006) first states the response-surface +
+GA (ballistic coefficient, perigee) fitting cost function; Mutyalarao &
+Sharma (2010, 2011) extend it to explicit apogee-decay "zones" and a ±10%
+BC-bounds uncertainty technique (the direct ancestor of the ±10% diagnostic
+tested, and found too narrow, against OREM's own uncertainty reporting —
+issue #32). KS regularization with oblateness as the propagation framework
+traces to Sharma & James Raj (1988), predating KSROP itself by decades. See
+§9 for full citations.
+
 ## 2. Problem Statement
 Given an object's real TLE tracking history (which encodes its orbit's
 gradual decay under atmospheric drag, but not its physical ballistic
@@ -195,7 +207,10 @@ around it:
   compatibility), `t_std` across zones with a valid prediction.
 - Formatted prediction report (`report.F`, issue #13):
   `output/OREM_<norad>_<date>.txt` — zone table, primary (latest-zone)
-  estimate, ensemble summary.
+  estimate, ensemble summary, and (v1.47, issue #29) last-tracked-TLE
+  perigee altitude as a decay-phase-proximity indicator — a raw number
+  with reference medians inline, explicitly not a calibrated confidence
+  score (`tle_last_perigee`, `orem.F`).
 - `ierr`: 0=ok, 1=TLE error, 2=no zones found, 3=all zones failed.
 
 ## 7. Complexity & Performance
@@ -211,7 +226,7 @@ sequentially; the 9 RSM grid points *could* be parallelized (they're
 independent) but aren't in the current implementation.
 
 ## 8. Validation & Accuracy
-382 tests pass across 12 test executables, built via `fpm test` (`test_orem`,
+385 tests pass across 12 test executables, built via `fpm test` (`test_orem`,
 `test_reentry`, `test_e2e`, `test_sw`, plus the KSROP-lineage-inherited
 `test_propagate_ks`/`test_tle_evolution`/`test_tle_filter`/`test_zone_select`/
 `test_rsm`/`test_ga`/`test_ga_sensitivity`/`test_gmat`). Real-object
@@ -247,10 +262,20 @@ cross-validation of its own, only real-decay-date comparison.
   mechanism itself was designed, implemented, and campaign-tested but gave
   genuinely mixed results (fixes one chronic per-object regression,
   regresses another) and was explicitly discarded, not shipped — the
-  patch was deleted rather than kept for reapplication. Any future
-  pipeline change that could shift a zone's fitted BN even slightly should
-  be re-validated against the full campaign, not assumed safe from this
-  interaction.
+  patch was deleted rather than kept for reapplication. A follow-on
+  hypothesis — that the RSM/GA fit's own mean-vs-osculating basis
+  inconsistency (§4 step 5c seeds an osculating IC into a fit whose
+  targets stay mean-element) was itself feeding noise into the carryover
+  chain — was also tested (reverting the osculating seed to pure mean
+  elements) and also rejected: it regresses both curated-7 campaigns
+  cleanly, so the osculating seed is doing real positive work despite the
+  inconsistency (2026-07-28, issue #31 comment). **A sequential
+  Bayesian/EnKF rewrite of the estimation architecture was identified as
+  the only remaining structural alternative but has been explicitly
+  deprioritized by project decision, not just left unstarted** — not
+  currently a candidate to revisit. Any future pipeline change that could
+  shift a zone's fitted BN even slightly should still be re-validated
+  against the full campaign, not assumed safe from this interaction.
 - **Issue #29**: the shipped `nzones_max=8` default's generalization gap to
   the broader 50-object population has been substantially, but not fully,
   closed (`max_zone_days` 10→20 raised the predict rate 58%→72%;
@@ -258,7 +283,19 @@ cross-validation of its own, only real-decay-date comparison.
   its more variably-tracked real candidates). Of the objects that still
   don't predict, 5 have no clean decay signal anywhere in their tracked
   history at any window size tested — a genuine data-availability gap, not
-  a tuning problem.
+  a tuning problem. **The remaining accuracy gap on the objects that DO
+  predict is now understood, not just observed**: curated-7 mean\|ensemble
+  RPE\|=1.9% vs. the other 43's 20.4% is largely explained by
+  decay-phase-proximity composition — objects whose last tracked TLE
+  already sits at a low perigee (predicting-object median 125 km) predict
+  well; objects still at 300+ km (non-predicting median 333 km) correctly
+  don't predict imminent re-entry, because they aren't near it (2026-07-28,
+  `scratch_rpe/diag_issue29_decay_phase.py`). Not a uniform identifiability
+  floor that gets worse with population size. Shipped as a reporting-only
+  feature, v1.47: last-TLE perigee altitude now appears in every operational
+  report as a proximity indicator (§6 above) — explicitly not a calibrated
+  confidence score, since the two populations' distributions overlap
+  substantially in the 150-340 km band.
 - Three Falcon 9 R/B objects were removed from the 50-object generalization
   set (v1.45) since `propagate_ks` has no thrust/maneuver modeling at all
   and SpaceX is documented to perform active post-separation deorbit burns

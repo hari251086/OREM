@@ -48,6 +48,8 @@ c     Output
       integer iarg, ierr_rep, ivals(8)
       character*60 rep_file
       integer ierr_sw, ierr_a2
+      double precision last_perigee
+      integer ierr_lp
 
 c     ============================================================
 c     Parse command line argument
@@ -258,6 +260,10 @@ c     ============================================================
 c     ============================================================
 c     Write prediction report (issue #13)
 c     ============================================================
+      call tle_last_perigee(tle_file, norad_id, last_perigee,
+     &   ierr_lp)
+      if (ierr_lp .ne. 0) last_perigee = 0.d0
+
       call date_and_time(values=ivals)
       write(rep_file,'(A,I5.5,A,I4.4,I2.2,I2.2,A)')
      &   'output/OREM_', norad_id, '_',
@@ -268,7 +274,7 @@ c     ============================================================
      &   reentry, e_opt, bn_opt, rms_o,
      &   zepoch, nzu,
      &   zstat, nzv,
-     &   rpe, t_mean, t_std, mxz, ierr_rep)
+     &   rpe, t_mean, t_std, mxz, last_perigee, ierr_rep)
       if (ierr_rep .eq. 0) then
          write(*,'(A,A)') '  Report:  ', trim(rep_file)
       else

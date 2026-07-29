@@ -165,7 +165,9 @@ call orem_report(
      &   bn_min_init, bn_max_init, idrag_flag,
      &   reentry_jd, e_opt, bn_opt, rms_o,
      &   zone_epoch, nzones_used, zone_status, nzones_valid,
-     &   rpe, t_mean, t_std, nzmax, ierr_rep)
+     &   rpe, t_mean, t_std, nzmax,
+     &   last_perigee_alt,                     ! v1.47 — issue #29
+     &   ierr_rep)
 
 call propagate_ks(x0, xd0, cal0, nrev, istep, tole,
      &   n_force, ngeo_deg, nsun_deg, nmoon_deg,
@@ -321,7 +323,7 @@ The ensemble (median) column beats the "primary" latest-zone column for all 7 ob
 
 Core algorithm **complete** (all closed): #1–#8 pipeline, #12 diagnostics/identifiability, #13 report, #16 E2E + accuracy target, #25 drag audit, #26 epoch-resolved space weather (§4.1), #27 critical-inclination decay (root-caused as a BN-identifiability issue, not a gravity-model gap — see git/issue history for the GMAT cross-check that resolved it), KSROP #24.
 
-**Open, priority order**: **#32** (P1, critical — the umbrella tracking issue for the whole ongoing RPE-accuracy investigation; most items below are its follow-ons); **#29** (P2 — the shipped `nzones_max=8`/50-object generalization gap; substantially improved via `max_zone_days` 10→20, a `zone_select` recency fix, the median ensemble metric, and the Falcon-9 roster swap, but the underlying BN-carryover fragility it kept surfacing is still open as #35); **#35** (P2 — BN-carryover chain: a non-recursive replacement was designed, implemented, and tested but gave mixed results and was explicitly discarded, not shipped, §5.3 — the recursive mechanism itself is still structurally unresolved); #14 (P3 — atmospheric density model validation); #34 (P3 — CLOSED in effect: the already-shipped apobs fix (issue #31) was found to regress under the current stack and has now been reverted, v1.46); #9 (P4 — inclination as a third design variable); #28 (P4 — `propagate_ks.F` doesn't compile under gfortran); and the P4 operational backlog (#15, #17, #24). **382 tests across 12 suites** (unchanged by v1.46's revert — no test asserted the removed bias-correction block directly); the discarded issue #35 Phase 2 work's 10 extra tests were never part of the shipped suite and the patch that held them has been deleted.
+**Open, priority order**: **#32** (P1, critical — the umbrella tracking issue for the whole ongoing RPE-accuracy investigation; most items below are its follow-ons); **#29** (P2 — the shipped `nzones_max=8`/50-object generalization gap; substantially improved via `max_zone_days` 10→20, a `zone_select` recency fix, the median ensemble metric, and the Falcon-9 roster swap, but the underlying BN-carryover fragility it kept surfacing is still open as #35); **#35** (P2 — BN-carryover chain: a non-recursive replacement was designed, implemented, and tested but gave mixed results and was explicitly discarded, not shipped, §5.3 — the recursive mechanism itself is still structurally unresolved); #14 (P3 — atmospheric density model validation); #34 (P3 — CLOSED in effect: the already-shipped apobs fix (issue #31) was found to regress under the current stack and has now been reverted, v1.46); #9 (P4 — inclination as a third design variable); #28 (P4 — `propagate_ks.F` doesn't compile under gfortran); and the P4 operational backlog (#15, #17, #24). **385 tests across 12 suites** (382 after v1.46's revert, unchanged by that change since no test asserted the removed bias-correction block directly; +3 in v1.47 for `tle_last_perigee` and its new report line, issue #29); the discarded issue #35 Phase 2 work's 10 extra tests were never part of the shipped suite and the patch that held them has been deleted.
 
 ---
 

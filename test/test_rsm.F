@@ -737,7 +737,9 @@ c     eccentricity should be closest to matching observations
       end if
 
 c     R33: Fitness > 0.5 (reasonable match)
-      fit = 1.d0 / (1.d0 + rms_opt)
+c     Issue #36: fit mirrors ga_fitness's own internal formula
+c     (1/(1+rms/100)) -- rms_opt is now true km (Finding 2 fix).
+      fit = 1.d0 / (1.d0 + rms_opt/100.d0)
       if (fit .gt. 0.5d0) then
          call assert_i('R33 fitness > 0.5',
      &                 1, 1, npass, nfail)

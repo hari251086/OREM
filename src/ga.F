@@ -218,7 +218,15 @@ c        Copy new → old
 c     Output best solution
       e_opt = bestsol(1)
       a_opt = bestsol(2)
-      rms_opt = (1.d0 - bestfit) / bestfit
+c     Issue #36 (Finding 2): ga_fitness divides the per-point residual
+c     by 100 before squaring (numerical conditioning only), so
+c     (1-bestfit)/bestfit algebraically equals (true RMS in km)/100,
+c     not true RMS. Restore km units here so rms_opt -- and everything
+c     downstream that reports it as "rms_fit" -- is the real value.
+c     This is a pure reporting fix: the /100 is a monotonic transform
+c     of the fitness, so it never changed which (e,BN) the GA
+c     converges to (verified algebraically before this fix shipped).
+      rms_opt = (1.d0 - bestfit) / bestfit * 100.d0
 
       return
       end
@@ -361,7 +369,10 @@ c     ============================================================
       end do
 
       bn_opt = bestsol
-      rms_opt = (1.d0 - bestfit) / bestfit
+c     Issue #36 (Finding 2): same /100 fix as ga_optimize -- see that
+c     subroutine's comment. ga_camp_fitness applies the identical
+c     /100 scaling to its per-zone RMS before averaging.
+      rms_opt = (1.d0 - bestfit) / bestfit * 100.d0
 
       return
       end
