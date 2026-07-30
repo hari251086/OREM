@@ -276,6 +276,12 @@ cross-validation of its own, only real-decay-date comparison.
   currently a candidate to revisit. Any future pipeline change that could
   shift a zone's fitted BN even slightly should still be re-validated
   against the full campaign, not assumed safe from this interaction.
+  **Issue #35 closed 2026-07-30**: all four investigated fix paths (remove
+  entirely, pooled prior, osculating-seed hypothesis, EnKF) exhausted with
+  no clean win; the recursive carryover's fragility is accepted as a
+  characterized, understood cost of the current architecture, not an open
+  bug being actively chased. Revisiting it needs a genuinely new idea, not
+  a variation on any of the four already tried.
 - **Issue #29**: the shipped `nzones_max=8` default's generalization gap to
   the broader 50-object population has been substantially, but not fully,
   closed (`max_zone_days` 10→20 raised the predict rate 58%→72%;

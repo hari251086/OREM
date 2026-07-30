@@ -806,6 +806,8 @@ Tested the Phase-0 literature hypothesis this investigation had flagged but neve
 
 Deliberately did **not** touch `orem_run`'s own signature (11 call sites across `app/`, `test/`, `scratch_rpe/`, `scratch_legacy_validation/` would all need updating) — `orem_report` only has 2 call sites (`main_orem.F`, `test_orem.F`), both updated. `main_orem.F` calls the new subroutine once, right before writing the report. 3 new tests in `test_report` (`test/test_orem.F`): R0 (`tle_last_perigee` succeeds), R0b (returns a physically plausible altitude for 42928), R4b (report file contains the new line). **385/385 tests pass** (382 + 3 new), verified via `fpm test --compiler ifx`; visually spot-checked `output/test_report.txt`'s rendered formatting.
 
+**2026-07-30 — Issue #35 closed, no code change.** All four investigated fix paths for the trust-gated BN-carryover chain's fragility (remove entirely, pooled median±MAD prior, osculating-seed-mismatch hypothesis, EnKF/particle-filter rewrite) are now exhausted with no clean win — see §8/§9 of `ALGORITHM.md` for the full history. Explicit user decision: accept the recursive carryover's fragility as a characterized, understood cost of the current architecture rather than continue chasing a fix. The mechanism itself is unchanged; this closes the investigation, not the underlying limitation.
+
 ---
 
 ## 9. References
