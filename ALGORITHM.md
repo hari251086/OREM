@@ -301,7 +301,16 @@ cross-validation of its own, only real-decay-date comparison.
   feature, v1.47: last-TLE perigee altitude now appears in every operational
   report as a proximity indicator (§6 above) — explicitly not a calibrated
   confidence score, since the two populations' distributions overlap
-  substantially in the 150-340 km band.
+  substantially in the 150-340 km band. **Issue #29 closed 2026-07-30**:
+  tested raising `nzones_max` itself (=20, =50, matching `OREM-Watchlist`'s
+  operational override) against the post-recency-fix stack — the one
+  direction from the issue's original write-up never tried. Latest-zone
+  predict status is identical for all 50 objects at every value tested (the
+  `zone_select` recency guarantee already decouples that outcome from
+  `nzones_max`), while the ensemble metric consistently regresses as
+  `nzones_max` rises (curated-7 mean 1.9%→4.4%→2.1%, other-43
+  20.4%→22.6%→24.6%). Not shipped; `nzones_max` stays at 8
+  (`scratch_rpe/rpe_campaign_nzmax{20,50}_result.csv`).
 - Three Falcon 9 R/B objects were removed from the 50-object generalization
   set (v1.45) since `propagate_ks` has no thrust/maneuver modeling at all
   and SpaceX is documented to perform active post-separation deorbit burns
