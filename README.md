@@ -19,6 +19,10 @@ OREM predicts re-entry times of HEO debris (GTO, Molniya, SSTO upper stages) by:
 
 Accuracy (v1.21, 7-object validation campaign, full force model): latest-zone RPE **median 2.4%, mean 4.1%, worst object 10.4%** — see `scratch_rpe/`.
 
+Running OREM on a new object beyond the curated validation set (TLE
+acquisition, mass/area/BN estimation, config, and how to read a
+result)? See `OPERATIONS.md`.
+
 ---
 
 ## 2. Project Structure
@@ -815,6 +819,8 @@ Deliberately did **not** touch `orem_run`'s own signature (11 call sites across 
 **2026-07-30 — Issue #9 closed without implementation, no code change.** The proposed 3-variable (e, A, i) RSM-GA optimization — extending the grid to 3×3×3 and interpolation to trilinear (TRIINT) to capture 35497-class low-inclination solar-apsidal-resonance sensitivity — was never built. Closed per explicit user decision as a deprioritized future enhancement, not because it was tested and found wanting; unlike #29/#35 above, this is a "not pursued" close, not a "tried and rejected" one. `ARCHITECTURE.md` §7's priority list updated to remove it from the open backlog.
 
 **2026-07-30 — Issue #14 closed, no code change.** All 4 original scope items are now done or explicitly dispositioned: standard-model comparison (via GMAT JacchiaRoberts, v1.17 — literal NRLMSISE-00 comparison formally waived as infeasible with available tooling), perigee-altitude density sensitivity (`scratch_rpe/density_sensitivity_42928.F`), solar-activity correction over the prediction window (#26 epoch-resolved weather), and validation against observed decay (superseded by the 50-object RPE campaign). Two developments since the last recommend-to-close comment (2026-07-19) were cross-posted before closing: the diurnal density bulge Sharma 1997a identified as missing has since shipped (v1.42, `2b44b98`), and the ISO/CD 27852 "critique of `propagate_ks`'s exponential density form" claim made in this issue's own thread was later corrected (issue #32, `5295900`) — the standard's own words on this lineage are "not ideal, [but] can work well for long-duration orbit lifetime studies," an acceptable tier, not the avoid category. Remaining points (Swinerd & Boulton's eccentricity-transfer caveat, degree-20-zonal gravity ceiling) are documented limitations, not open action items.
+
+**2026-07-30 — `OPERATIONS.md` added (issue #15).** New-object operational workflow doc, grounded in what's actually shipped and running rather than written speculatively: TLE acquisition and object characterization (mass/area/Cd via `OREM-Watchlist`'s `heowatch.object_info` — DISCOS, then Space-Track SATCAT RCS, then a configured default, cached), BN search-range derivation (`heowatch.orem_wrapper.bn_range_from_params` — a ±50% band around `mass/(Cd·area)`, superseding this issue's original TLE-decay-rate-based proposal), configuration guidance (`nzones_max`/`max_zone_days` — OREM's own curated-set defaults vs. `OREM-Watchlist`'s wider operational values and why they differ), interpretation (the `IMMINENT`/`HIGH_CONFIDENCE`/`TRACKING`/`NO_PREDICTION` status thresholds from issue #20, plus the v1.47 decay-phase-proximity indicator as the one empirically-validated confidence signal — fit RMS explicitly does **not** predict extrapolation accuracy, per the global RPE investigation), edge cases (low-eccentricity screening, maneuvering-object exclusion by policy rather than automated detection, critical-inclination/resonance cases), and a decision flowchart. No code change.
 
 ---
 
