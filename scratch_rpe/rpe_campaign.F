@@ -413,8 +413,12 @@ c        Ensemble RPE: t_mean vs observed, horizon from zone 1 epoch
      &            '  Z', iz, ': e=', e_opt(iz), ' BN=', bn_opt(iz),
      &            ' (no re-entry)  zstat=', zstat(iz)
             end if
+c           Issue #36 (Finding 2): rms_o is now true km (was /100-
+c           scaled before the ga.F fix) -- F9.4 could overflow to
+c           asterisks for a badly-fit zone's now-100x-larger value
+c           (seen for 59347 zone 6). Widened to F14.4.
             write(33,'(I5,A,I1,A,F9.6,A,F8.3,A,F13.4,A,F9.3,A,I2,
-     &         A,F13.4,A,F8.2,A,F9.3,A,F13.4,A,F9.4)')
+     &         A,F13.4,A,F8.2,A,F9.3,A,F13.4,A,F14.4)')
      &         norad(io), ',', iz, ',', e_opt(iz), ',', bn_opt(iz),
      &         ',', reentry(iz), ',', rpe(iz), ',', zstat(iz),
      &         ',', t_mean, ',', t_std, ',', rpe_ens,

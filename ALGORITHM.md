@@ -276,6 +276,12 @@ cross-validation of its own, only real-decay-date comparison.
   currently a candidate to revisit. Any future pipeline change that could
   shift a zone's fitted BN even slightly should still be re-validated
   against the full campaign, not assumed safe from this interaction.
+  **Issue #35 closed 2026-07-30**: all four investigated fix paths (remove
+  entirely, pooled prior, osculating-seed hypothesis, EnKF) exhausted with
+  no clean win; the recursive carryover's fragility is accepted as a
+  characterized, understood cost of the current architecture, not an open
+  bug being actively chased. Revisiting it needs a genuinely new idea, not
+  a variation on any of the four already tried.
 - **Issue #29**: the shipped `nzones_max=8` default's generalization gap to
   the broader 50-object population has been substantially, but not fully,
   closed (`max_zone_days` 10→20 raised the predict rate 58%→72%;
@@ -295,7 +301,16 @@ cross-validation of its own, only real-decay-date comparison.
   feature, v1.47: last-TLE perigee altitude now appears in every operational
   report as a proximity indicator (§6 above) — explicitly not a calibrated
   confidence score, since the two populations' distributions overlap
-  substantially in the 150-340 km band.
+  substantially in the 150-340 km band. **Issue #29 closed 2026-07-30**:
+  tested raising `nzones_max` itself (=20, =50, matching `OREM-Watchlist`'s
+  operational override) against the post-recency-fix stack — the one
+  direction from the issue's original write-up never tried. Latest-zone
+  predict status is identical for all 50 objects at every value tested (the
+  `zone_select` recency guarantee already decouples that outcome from
+  `nzones_max`), while the ensemble metric consistently regresses as
+  `nzones_max` rises (curated-7 mean 1.9%→4.4%→2.1%, other-43
+  20.4%→22.6%→24.6%). Not shipped; `nzones_max` stays at 8
+  (`scratch_rpe/rpe_campaign_nzmax{20,50}_result.csv`).
 - Three Falcon 9 R/B objects were removed from the 50-object generalization
   set (v1.45) since `propagate_ks` has no thrust/maneuver modeling at all
   and SpaceX is documented to perform active post-separation deorbit burns
