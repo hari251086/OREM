@@ -87,6 +87,7 @@ c     RNG state
 c     Working
       integer i, j, k, igen, ncross, nmute
       double precision sumfitness, avg, amax, amin
+      integer ga_iflip
 
       lchrom = nbits_e + nbits_a
       alow(1) = e_lo
@@ -278,6 +279,7 @@ c     ============================================================
 
       integer i, j, k, igen, ncross, nmute
       double precision sumfitness, avg, amax, amin
+      integer ga_iflip
 
       lchrom = nbits_bn
       alow(1) = bn_lo
@@ -482,6 +484,7 @@ c     ============================================================
 
       integer i, j, k, igen, ncross, nmute
       double precision sumfitness, avg, amax, amin
+      integer ga_iflip
 
       lchrom = nbits_e + nbits_bn
       alow(1) = e_lo
@@ -836,6 +839,7 @@ c     Stochastic remainder roulette wheel preselection.
       integer jrand
 
       integer j, k, jassign, winner
+      integer ga_iflip
 
 c     Issue #30: expected=oldfit(j)/avg is assumed to be a small
 c     well-ordered finite number (typically 0-3ish, since avg is a
@@ -915,6 +919,7 @@ c     Pick from mating pool without replacement.
       integer jrand
 
       integer jpick
+      integer ga_irnd
 
       jpick = ga_irnd(1, ipopsize, oldrand, jrand)
       iselected = choices(jpick)
@@ -939,6 +944,7 @@ c     Single-point crossover with integrated mutation.
       integer jrand
 
       integer j, jcross, iflipchk
+      integer ga_iflip, ga_irnd, ga_mutate
 
       iflipchk = ga_iflip(pcross, oldrand, jrand)
       if (iflipchk .eq. 1) then
@@ -981,6 +987,7 @@ c     Bit-flip mutation with probability pmute.
       double precision pmute
       double precision oldrand(55)
       integer jrand
+      integer ga_iflip
 
       ga_mutate = ival
       if (ga_iflip(pmute, oldrand, jrand) .eq. 1) then
