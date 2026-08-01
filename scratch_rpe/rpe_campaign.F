@@ -56,15 +56,14 @@ c     deliberately rather than cherry-picked away, since sparse
 c     terminal tracking is exactly the real-world failure mode issue
 c     #29 is about, not a reason to curate a rosier set.
 c
-c     Compile:
-c       ifx /heap-arrays /F:16777216 scratch_rpe\rpe_campaign.F
-c           orem.F rsm.F ga.F tle_evolution.F tle_filter.F
-c           zone_select.F ksrop\propagate_ks.F ksrop\Subrouts.F
-c           ksrop\TLEread.F ksrop\Legendre.F
-c           /exe:scratch_rpe\rpe_campaign.exe
-c     Run from the OREM repo root, full 30-object run (unchanged
+c     Compile (fpm, current since the fpm migration -- add a temporary
+c     [[executable]] entry pointing source-dir at scratch_rpe, main at
+c     rpe_campaign.F, matching this whole repo's scratch_rpe/bench/
+c     ad-hoc diagnostic pattern; see e.g. benchmark_stages.F's header):
+c       fpm build --compiler ifx --flag "-heap-arrays"
+c     Run from the OREM repo root, full 97-object run (unchanged
 c     default, backward compatible with every prior invocation):
-c       scratch_rpe\rpe_campaign.exe
+c       fpm run rpe_campaign --compiler ifx --flag "-heap-arrays"
 c     Output: scratch_rpe\rpe_campaign.csv
 c
 c     Optional 4-core-capped parallel run (repo-wide max-4-cores rule,
@@ -75,11 +74,11 @@ c     partitioned across up to 4 independent OS PROCESSES, each a
 c     separate address space. Pass <io_start> <io_end> (1-based,
 c     inclusive) to process only that object slice, writing to
 c     scratch_rpe\rpe_campaign_part_<start>_<end>.csv instead of the
-c     shared default file:
-c       scratch_rpe\rpe_campaign.exe 1 8
-c       scratch_rpe\rpe_campaign.exe 9 15
-c       scratch_rpe\rpe_campaign.exe 16 23
-c       scratch_rpe\rpe_campaign.exe 24 30
+c     shared default file (97 objects / 4 ~ 25 each):
+c       rpe_campaign.exe 1 25
+c       rpe_campaign.exe 26 49
+c       rpe_campaign.exe 50 73
+c       rpe_campaign.exe 74 97
 c     Run at most 4 of these concurrently, then concatenate the 4
 c     rpe_campaign_part_*.csv files (drop the repeated header lines)
 c     into rpe_campaign.csv.
@@ -99,7 +98,49 @@ c     candidates, so a higher cap admits LATER zones -- and v1.20
 c     showed the latest zone is the primary estimator. This run
 c     measures how much later the latest zone gets and what it does
 c     to the latest-zone RPE.
-      parameter(ndim_a = 291, mxz = 8, nobj = 50)
+c
+c     Extended 50 -> 97 objects (2026-08-01). The established 2012+
+c     decay / ROCKET BODY+DEBRIS filter against the current satcat.csv
+c     returned essentially zero new candidates (only more of the
+c     already-heavily-used 2025-05-07/08 SL-12 debris cluster) -- the
+c     easily-findable pool under those exact criteria is exhausted, a
+c     bigger version of the same "zero new candidates" result the
+c     20->30 round hit. Per explicit user decision, relaxed in two
+c     steps rather than accepting cluster duplication as the only
+c     lever: (1) dropped the decay-date floor entirely (accept any
+c     decay 1961-2025, not just post-2012) -- opened 60 diverse
+c     non-Falcon9/non-SL12 candidates (Delta/Atlas Centaur/Ariane/CZ/
+c     H-1/Fregat/SL-6/Cosmos families); real zone_select screening
+c     (not raw TLE-count guessing) passed 21 of 34 plausible
+c     candidates -- excluded 5988/14301 for 13-14yr last-TLE-to-decay
+c     gaps (matches the already-established "12-16yr genuinely
+c     unreachable" bound from the 30-object round) and 9892 for an
+c     internally-inconsistent decay date (last tracked TLE ~15.7yr
+c     AFTER its catalogued decay). (2) Still short of 50 new, so per a
+c     second explicit user decision: relaxed the apogee ceiling to
+c     the same 280,000km bound already established for excluding
+c     TLI/lunar-regime CZ-5 R/Bs (excludes LUNA 3/APOLLO 8/GENESIS SRC
+c     and 2 FREGAT R/Bs whose apogees are 340,000-1,373,247km -- lunar
+c     or interplanetary trajectories, not HEO) and included PAYLOAD
+c     (not just ROCKET BODY/DEBRIS) for the first time -- old,
+c     individually-named, non-maneuverable dead satellites (Explorer/
+c     IMP/ERS/OGO/Prognoz/ISEE magnetospheric-research missions,
+c     Cosmos/Elektron payloads). Newly-surfaced multi-member families
+c     (WESTFORD NEEDLES -- 1960s needle-dipole debris, physically
+c     unrepresentative of normal fragmentation debris, excluded
+c     entirely; MOLNIYA, PAGEOS 1 DEB, PROGNOZ, EXPLORER/IMP, OGO)
+c     capped at 2 members each, same cluster-independence reasoning as
+c     the SL-12 precedent. Real zone_select screening passed 19 of 19
+c     plausible candidates from this round, all with sub-2.5yr last-
+c     TLE-to-decay gaps. Topped up with 7 of the 9 remaining SL-12
+c     cluster candidates (2 failed screening: 42979, 45497) -- their
+c     own last-TLE-to-decay gaps (2.5-6.2yr) are within the same
+c     precedent range already accepted for other SL-12 members in the
+c     original 50 (e.g. 27976's 8.7yr). Final: 21+19+7 = 47 new
+c     objects (21 diverse historical, 19 diverse+PAYLOAD, 7 SL-12),
+c     97 total -- 3 short of round-number 100 given how thin the
+c     genuinely independent candidate pool is; not padded further.
+      parameter(ndim_a = 291, mxz = 8, nobj = 97)
 
       double precision ALT_a(ndim_a), DEN_a(ndim_a), SCH_a(ndim_a)
       integer natm
@@ -202,7 +243,17 @@ c     unreachable, not on any new criterion.
      &             41693, 21935, 48264, 28589, 29202,
      &             32977, 41561, 43670, 27790, 27976,
      &             44590, 45493, 48090, 27035, 27902,
-     &             27901, 41679, 44892, 45036, 44563 /
+     &             27901, 41679, 44892, 45036, 44563,
+     &             3553, 18983, 832, 8844, 13112,
+     &             28141, 2924, 8529, 19881, 32971,
+     &             5980, 21962, 4049, 24821, 5960,
+     &             5974, 5735, 23572, 5961, 19558,
+     &             21670, 4570, 4431, 8080, 2805,
+     &             10724, 830, 7352, 28943, 28140,
+     &             3138, 37798, 32491, 879, 44911,
+     &             44482, 62189, 23126, 26463, 42908,
+     &             41686, 42977, 43685, 44555, 45494,
+     &             45495, 45499 /
       data oyr / 2019.d0, 2016.d0, 2015.d0, 2017.d0, 2012.d0,
      &           2010.d0, 2013.d0, 2025.d0, 2026.d0, 2020.d0,
      &           2026.d0, 2025.d0, 2025.d0, 2025.d0, 2018.d0,
@@ -212,7 +263,17 @@ c     unreachable, not on any new criterion.
      &           2023.d0, 2024.d0, 2025.d0, 2025.d0, 2025.d0,
      &           2025.d0, 2025.d0, 2025.d0, 2025.d0, 2025.d0,
      &           2025.d0, 2025.d0, 2025.d0, 2025.d0, 2025.d0,
-     &           2025.d0, 2025.d0, 2025.d0, 2025.d0, 2025.d0 /
+     &           2025.d0, 2025.d0, 2025.d0, 2025.d0, 2025.d0,
+     &           2004.d0, 2002.d0, 1983.d0, 1990.d0, 1992.d0,
+     &           2007.d0, 1978.d0, 1986.d0, 1993.d0, 2010.d0,
+     &           1976.d0, 1992.d0, 1971.d0, 1997.d0, 1973.d0,
+     &           1975.d0, 1973.d0, 1995.d0, 1973.d0, 1989.d0,
+     &           1992.d0, 1972.d0, 1976.d0, 1977.d0, 1977.d0,
+     &           1982.d0, 1983.d0, 1990.d0, 2006.d0, 2007.d0,
+     &           2011.d0, 2012.d0, 2016.d0, 2020.d0, 2022.d0,
+     &           2022.d0, 2025.d0, 2025.d0, 2025.d0, 2026.d0,
+     &           2025.d0, 2025.d0, 2025.d0, 2025.d0, 2025.d0,
+     &           2025.d0, 2025.d0 /
       data omo / 3.d0, 10.d0, 12.d0, 9.d0, 5.d0, 6.d0, 9.d0,
      &           4.d0, 6.d0, 2.d0,
      &           2.d0, 4.d0, 3.d0, 1.d0, 11.d0,
@@ -222,7 +283,17 @@ c     unreachable, not on any new criterion.
      &           5.d0, 6.d0, 4.d0, 5.d0, 5.d0,
      &           5.d0, 5.d0, 5.d0, 5.d0, 5.d0,
      &           5.d0, 5.d0, 5.d0, 5.d0, 6.d0,
-     &           7.d0, 5.d0, 5.d0, 5.d0, 5.d0 /
+     &           7.d0, 5.d0, 5.d0, 5.d0, 5.d0,
+     &           7.d0, 1.d0, 8.d0, 5.d0, 11.d0,
+     &           10.d0, 4.d0, 10.d0, 3.d0, 3.d0,
+     &           4.d0, 6.d0, 6.d0, 6.d0, 6.d0,
+     &           8.d0, 3.d0, 11.d0, 6.d0, 6.d0,
+     &           5.d0, 5.d0, 3.d0, 1.d0, 12.d0,
+     &           8.d0, 10.d0, 7.d0, 3.d0, 10.d0,
+     &           7.d0, 3.d0, 2.d0, 8.d0, 5.d0,
+     &           12.d0, 2.d0, 5.d0, 10.d0, 4.d0,
+     &           5.d0, 5.d0, 5.d0, 5.d0, 5.d0,
+     &           5.d0, 5.d0 /
       data ody / 3.d0, 31.d0, 3.d0, 15.d0, 9.d0, 6.d0, 12.d0,
      &           10.d0, 8.d0, 20.d0,
      &           10.d0, 14.d0, 22.d0, 3.d0, 8.d0,
@@ -232,7 +303,17 @@ c     unreachable, not on any new criterion.
      &           9.d0, 6.d0, 25.d0, 7.d0, 7.d0,
      &           7.d0, 7.d0, 7.d0, 8.d0, 8.d0,
      &           8.d0, 8.d0, 8.d0, 9.d0, 26.d0,
-     &           18.d0, 7.d0, 8.d0, 8.d0, 8.d0 /
+     &           18.d0, 7.d0, 8.d0, 8.d0, 8.d0,
+     &           23.d0, 23.d0, 24.d0, 5.d0, 14.d0,
+     &           14.d0, 14.d0, 13.d0, 1.d0, 16.d0,
+     &           12.d0, 19.d0, 10.d0, 4.d0, 26.d0,
+     &           10.d0, 9.d0, 13.d0, 26.d0, 16.d0,
+     &           1.d0, 31.d0, 2.d0, 21.d0, 6.d0,
+     &           31.d0, 12.d0, 6.d0, 24.d0, 14.d0,
+     &           2.d0, 25.d0, 27.d0, 29.d0, 4.d0,
+     &           30.d0, 22.d0, 7.d0, 22.d0, 23.d0,
+     &           7.d0, 7.d0, 7.d0, 7.d0, 8.d0,
+     &           8.d0, 8.d0 /
 
       tle_file(1) = 'input/example_42928.tle.txt'
       tle_file(2) = 'input/example_35497.tle.txt'
@@ -284,6 +365,53 @@ c     unreachable, not on any new criterion.
       tle_file(48) = 'input/example_44892.tle.txt'
       tle_file(49) = 'input/example_45036.tle.txt'
       tle_file(50) = 'input/example_44563.tle.txt'
+      tle_file(51) = 'input/example_3553.tle.txt'
+      tle_file(52) = 'input/example_18983.tle.txt'
+      tle_file(53) = 'input/example_832.tle.txt'
+      tle_file(54) = 'input/example_8844.tle.txt'
+      tle_file(55) = 'input/example_13112.tle.txt'
+      tle_file(56) = 'input/example_28141.tle.txt'
+      tle_file(57) = 'input/example_2924.tle.txt'
+      tle_file(58) = 'input/example_8529.tle.txt'
+      tle_file(59) = 'input/example_19881.tle.txt'
+      tle_file(60) = 'input/example_32971.tle.txt'
+      tle_file(61) = 'input/example_5980.tle.txt'
+      tle_file(62) = 'input/example_21962.tle.txt'
+      tle_file(63) = 'input/example_4049.tle.txt'
+      tle_file(64) = 'input/example_24821.tle.txt'
+      tle_file(65) = 'input/example_5960.tle.txt'
+      tle_file(66) = 'input/example_5974.tle.txt'
+      tle_file(67) = 'input/example_5735.tle.txt'
+      tle_file(68) = 'input/example_23572.tle.txt'
+      tle_file(69) = 'input/example_5961.tle.txt'
+      tle_file(70) = 'input/example_19558.tle.txt'
+      tle_file(71) = 'input/example_21670.tle.txt'
+      tle_file(72) = 'input/example_4570.tle.txt'
+      tle_file(73) = 'input/example_4431.tle.txt'
+      tle_file(74) = 'input/example_8080.tle.txt'
+      tle_file(75) = 'input/example_2805.tle.txt'
+      tle_file(76) = 'input/example_10724.tle.txt'
+      tle_file(77) = 'input/example_830.tle.txt'
+      tle_file(78) = 'input/example_7352.tle.txt'
+      tle_file(79) = 'input/example_28943.tle.txt'
+      tle_file(80) = 'input/example_28140.tle.txt'
+      tle_file(81) = 'input/example_3138.tle.txt'
+      tle_file(82) = 'input/example_37798.tle.txt'
+      tle_file(83) = 'input/example_32491.tle.txt'
+      tle_file(84) = 'input/example_879.tle.txt'
+      tle_file(85) = 'input/example_44911.tle.txt'
+      tle_file(86) = 'input/example_44482.tle.txt'
+      tle_file(87) = 'input/example_62189.tle.txt'
+      tle_file(88) = 'input/example_23126.tle.txt'
+      tle_file(89) = 'input/example_26463.tle.txt'
+      tle_file(90) = 'input/example_42908.tle.txt'
+      tle_file(91) = 'input/example_41686.tle.txt'
+      tle_file(92) = 'input/example_42977.tle.txt'
+      tle_file(93) = 'input/example_43685.tle.txt'
+      tle_file(94) = 'input/example_44555.tle.txt'
+      tle_file(95) = 'input/example_45494.tle.txt'
+      tle_file(96) = 'input/example_45495.tle.txt'
+      tle_file(97) = 'input/example_45499.tle.txt'
       obj_name(1) = '42928 PSLV-C39'
       obj_name(2) = '35497 Ariane 5 ESC-A'
       obj_name(3) = '37151 Long March 3B'
@@ -334,6 +462,53 @@ c     unreachable, not on any new criterion.
       obj_name(48) = '44892 SL-12 deb'
       obj_name(49) = '45036 SL-12 deb'
       obj_name(50) = '44563 SL-12 deb'
+      obj_name(51) = '3553 Cosmos252 deb'
+      obj_name(52) = '18983 SL-6 R/B(2)'
+      obj_name(53) = '832 SL-3 R/B'
+      obj_name(54) = '8844 SL-6 R/B(2)'
+      obj_name(55) = '13112 SL-6 R/B(2)'
+      obj_name(56) = '28141 CZ-2C R/B'
+      obj_name(57) = '2924 SL-6 R/B(2)'
+      obj_name(58) = '8529 SL-6 R/B(2)'
+      obj_name(59) = '19881 Cosmos931 deb'
+      obj_name(60) = '32971 Cosmos1409 deb'
+      obj_name(61) = '5980 Titan3C TS deb'
+      obj_name(62) = '21962 SL-6 deb'
+      obj_name(63) = '4049 SL-6 R/B(2)'
+      obj_name(64) = '24821 Ariane44L R/B'
+      obj_name(65) = '5960 Delta1 deb'
+      obj_name(66) = '5974 Delta1 deb'
+      obj_name(67) = '5735 Delta1 deb'
+      obj_name(68) = '23572 Ariane44LP+3 R/B'
+      obj_name(69) = '5961 Delta1 deb'
+      obj_name(70) = '19558 H-1 R/B(2)'
+      obj_name(71) = '21670 H-1 R/B(2)'
+      obj_name(72) = '4570 SL-6 R/B(2)'
+      obj_name(73) = '4431 SL-6 R/B(2)'
+      obj_name(74) = '8080 Pageos1 deb'
+      obj_name(75) = '2805 Cosmos159'
+      obj_name(76) = '10724 AtlasCentaur deb'
+      obj_name(77) = '830 Elektron4'
+      obj_name(78) = '7352 Cosmos665'
+      obj_name(79) = '28943 Arabsat4'
+      obj_name(80) = '28140 Doublestar TC-1'
+      obj_name(81) = '3138 OGO5'
+      obj_name(82) = '37798 ExpressAM-4'
+      obj_name(83) = '32491 BreezeM deb'
+      obj_name(84) = '879 OGO1'
+      obj_name(85) = '44911 CZ-5 R/B'
+      obj_name(86) = '44482 TDO spacecraft'
+      obj_name(87) = '62189 CZ-3B R/B'
+      obj_name(88) = '23126 STRV1B'
+      obj_name(89) = '26463 ClusterII-FM5'
+      obj_name(90) = '42908 BreezeM deb tank'
+      obj_name(91) = '41686 SL-12 deb'
+      obj_name(92) = '42977 SL-12 deb'
+      obj_name(93) = '43685 SL-12 deb'
+      obj_name(94) = '44555 SL-12 deb'
+      obj_name(95) = '45494 SL-12 deb'
+      obj_name(96) = '45495 SL-12 deb'
+      obj_name(97) = '45499 SL-12 deb'
 
 c     Issue: 4-core-capped parallel partitioning (see header comment).
 c     No args (the default, every prior invocation) -> full 1..nobj
