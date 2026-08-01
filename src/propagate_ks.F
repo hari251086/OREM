@@ -37,6 +37,7 @@ c     -------------------------------------------------------------c
      &   exit_code)
 
       implicit double precision (a-h, o-z)
+      integer cn0
       parameter(n = 10, cn0 = 2190)
 c     Value of pi, degree to radians and radians to degree
       common /xy/ pi,d2r,r2d,amue,AU,R_Earth
