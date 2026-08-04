@@ -1,0 +1,325 @@
+Project is up to date
+
+ ===== 42928 PSLV-C39          
+  --- irefine=0
+  [INFO] G2 BN floor estimate=   77.29 -> bn_lo=   38.64
+  Z 1: exit= 1 pts=  7051 BN=   81.20
+  [WARN] Z 2: GA optimum at search boundary -- true value may lie outside the search range
+  Z 2: exit= 1 pts=  4829 BN=  110.98
+  Z 3: exit= 1 pts=  4737 BN=   74.88
+  Z 4: exit= 1 pts=  6200 BN=   82.70
+  [WARN] Z 5: GA optimum at search boundary -- true value may lie outside the search range
+  Z 5: exit= 1 pts=  4920 BN=   92.58
+  [WARN] Z 6: GA optimum at search boundary -- true value may lie outside the search range
+  Z 6: exit= 1 pts=  3833 BN=   99.33
+  [WARN] Z 7: GA optimum at search boundary -- true value may lie outside the search range
+  Z 7: exit= 1 pts=  1305 BN=   62.75
+  [WARN] Z 8: GA optimum at search boundary -- true value may lie outside the search range
+  Z 8: exit= 1 pts=   196 BN=  120.64
+  latest zone= 8 RPE=  -22.00%
+  ensemble RPE=    1.32%
+  --- irefine=1
+  [INFO] G2 BN floor estimate=   77.29 -> bn_lo=   38.64
+  [REFINE] Z 1: e= 0.321707 bn=  81.20  =>  e= 0.321368 bn=  78.16  nevals= 25
+  Z 1: exit= 1 pts=  6808 BN=   78.16
+  [REFINE] Z 2: e= 0.295865 bn= 108.32  =>  e= 0.295729 bn= 108.50  nevals= 25
+  [WARN] Z 2: GA optimum at search boundary -- true value may lie outside the search range
+  Z 2: exit= 1 pts=  4717 BN=  108.50
+  [REFINE] Z 3: e= 0.287715 bn=  74.82  =>  e= 0.287715 bn=  71.41  nevals= 25
+  Z 3: exit= 1 pts=  4540 BN=   71.41
+  [REFINE] Z 4: e= 0.280633 bn=  81.12  =>  e= 0.280633 bn=  80.84  nevals= 25
+  Z 4: exit= 1 pts=  6051 BN=   80.84
+  [REFINE] Z 5: e= 0.274907 bn=  92.16  =>  e= 0.274987 bn=  92.21  nevals= 25
+  [WARN] Z 5: GA optimum at search boundary -- true value may lie outside the search range
+  Z 5: exit= 1 pts=  4904 BN=   92.21
+  [REFINE] Z 6: e= 0.226836 bn=  97.75  =>  e= 0.226812 bn=  97.90  nevals= 25
+  [WARN] Z 6: GA optimum at search boundary -- true value may lie outside the search range
+  Z 6: exit= 1 pts=  3777 BN=   97.90
+  [REFINE] Z 7: e= 0.140381 bn=  62.87  =>  e= 0.140381 bn=  60.95  nevals= 25
+  [WARN] Z 7: GA optimum at search boundary -- true value may lie outside the search range
+  Z 7: exit= 1 pts=  1268 BN=   60.95
+  [REFINE] Z 8: e= 0.081571 bn= 119.00  =>  e= 0.085886 bn= 119.23  nevals= 25
+  [WARN] Z 8: GA optimum at search boundary -- true value may lie outside the search range
+  Z 8: exit= 1 pts=   211 BN=  119.23
+  latest zone= 8 RPE=  -15.53%
+  ensemble RPE=    1.29%
+ [PROGRESS]  14% ( 1 of  7 objects done)
+
+ ===== 35497 Ariane 5 ESC-A    
+  --- irefine=0
+  [INFO] G2 BN floor estimate=   58.63 -> bn_lo=   29.32
+  Z 1: exit= 0 pts=  7374 BN=   67.47
+  [WARN] Z 2: RSM envelope does not bound  13 of  36 observations -- proceeding anyway
+  [WARN] Z 2: GA optimum at search boundary -- true value may lie outside the search range
+  Z 2: exit= 0 pts=  7475 BN=   94.92
+  Z 3: exit= 0 pts=  7503 BN=   79.30
+  Z 4: exit= 0 pts=  7644 BN=   80.27
+  Z 5: exit= 1 pts=  6367 BN=   84.18
+  [WARN] Z 6: GA optimum at search boundary -- true value may lie outside the search range
+  Z 6: exit= 1 pts=  1366 BN=  116.61
+  [WARN] Z 7: GA optimum at search boundary -- true value may lie outside the search range
+  Z 7: exit= 1 pts=   411 BN=  132.90
+  [INFO] Z 8: G3 BSTAR prior narrows BN to [  21.88, 157.69]
+  [WARN] Z 8: RSM envelope does not bound  42 of  47 observations -- proceeding anyway
+  [WARN] Z 8: GA optimum at search boundary -- true value may lie outside the search range
+  Z 8: exit= 1 pts=    39 BN=  155.86
+  latest zone= 8 RPE=  -76.36%
+  ensemble RPE=    2.77%
+  --- irefine=1
+  [INFO] G2 BN floor estimate=   58.63 -> bn_lo=   29.32
+  [REFINE] Z 1: e= 0.605222 bn=  67.47  =>  e= 0.605203 bn=  54.40  nevals= 25
+  Z 1: exit= 0 pts=  7375 BN=   54.40
+  [WARN] Z 2: RSM envelope does not bound  13 of  36 observations -- proceeding anyway
+  [REFINE] Z 2: e= 0.602965 bn=  94.92  =>  e= 0.602966 bn=  87.57  nevals= 25
+  [WARN] Z 2: GA optimum at search boundary -- true value may lie outside the search range
+  Z 2: exit= 0 pts=  7475 BN=   87.57
+  [REFINE] Z 3: e= 0.602449 bn=  79.30  =>  e= 0.602390 bn=  66.23  nevals= 25
+  Z 3: exit= 0 pts=  7504 BN=   66.23
+  [REFINE] Z 4: e= 0.598157 bn=  80.27  =>  e= 0.597994 bn=  72.10  nevals= 25
+  Z 4: exit= 0 pts=  7649 BN=   72.10
+  [REFINE] Z 5: e= 0.582345 bn=  84.18  =>  e= 0.582018 bn=  74.38  nevals= 25
+  Z 5: exit= 1 pts=  5817 BN=   74.38
+  [WARN] Z 6: RSM envelope does not bound   3 of  35 observations -- proceeding anyway
+  [REFINE] Z 6: e= 0.560446 bn= 106.63  =>  e= 0.560028 bn= 107.05  nevals= 25
+  [WARN] Z 6: GA optimum at search boundary -- true value may lie outside the search range
+  Z 6: exit= 1 pts=  1162 BN=  107.05
+  [REFINE] Z 7: e= 0.476275 bn= 123.07  =>  e= 0.478562 bn= 123.38  nevals= 25
+  [WARN] Z 7: GA optimum at search boundary -- true value may lie outside the search range
+  Z 7: exit= 1 pts=   389 BN=  123.38
+  [INFO] Z 8: G3 BSTAR prior narrows BN to [  21.88, 147.89]
+  [WARN] Z 8: RSM envelope does not bound  43 of  47 observations -- proceeding anyway
+  [REFINE] Z 8: e= 0.356940 bn= 147.18  =>  e= 0.356940 bn= 146.79  nevals= 25
+  [WARN] Z 8: GA optimum at search boundary -- true value may lie outside the search range
+  Z 8: exit= 1 pts=    37 BN=  146.79
+  latest zone= 8 RPE=  -77.66%
+  ensemble RPE=    0.27%
+ [PROGRESS]  28% ( 2 of  7 objects done)
+
+ ===== 37151 Long March 3B     
+  --- irefine=0
+  [INFO] G2 BN floor estimate=   34.51 -> bn_lo=   17.26
+  Z 1: exit= 0 pts=  8779 BN=   57.64
+  Z 2: exit= 0 pts=  9664 BN=   53.01
+  [INFO] Z 3: G3 BSTAR prior narrows BN to [  17.78, 160.00]
+  Z 3: exit= 1 pts=  4550 BN=   70.41
+  Z 4: exit= 1 pts=  3298 BN=   64.14
+  [WARN] Z 5: GA optimum at search boundary -- true value may lie outside the search range
+  Z 5: exit= 1 pts=  3334 BN=   46.55
+  Z 6: exit= 1 pts= 10216 BN=   58.77
+  [WARN] Z 7: GA optimum at search boundary -- true value may lie outside the search range
+  Z 7: exit= 1 pts=  2057 BN=   69.93
+  [WARN] Z 8: RSM envelope does not bound   7 of   9 observations -- proceeding anyway
+  [WARN] Z 8: GA optimum at search boundary -- true value may lie outside the search range
+  Z 8: exit= 1 pts=    20 BN=   76.68
+  latest zone= 8 RPE=  -24.21%
+  ensemble RPE=   -1.19%
+  --- irefine=1
+  [INFO] G2 BN floor estimate=   34.51 -> bn_lo=   17.26
+  [REFINE] Z 1: e= 0.558188 bn=  57.64  =>  e= 0.558035 bn=  36.23  nevals= 25
+  [WARN] Z 1: GA optimum at search boundary -- true value may lie outside the search range
+  Z 1: exit= 0 pts=  8784 BN=   36.23
+  [REFINE] Z 2: e= 0.530443 bn=  53.01  =>  e= 0.529826 bn=  31.60  nevals= 25
+  [WARN] Z 2: GA optimum at search boundary -- true value may lie outside the search range
+  Z 2: exit= 0 pts=  9683 BN=   31.60
+  [INFO] Z 3: G3 BSTAR prior narrows BN to [  17.78, 160.00]
+  [REFINE] Z 3: e= 0.516500 bn=  70.41  =>  e= 0.515971 bn=  49.08  nevals= 25
+  Z 3: exit= 1 pts=  3986 BN=   49.08
+  [INFO] Z 4: G3 BSTAR prior narrows BN to [  21.57,  84.76]
+  [REFINE] Z 4: e= 0.510230 bn=  62.94  =>  e= 0.510230 bn=  59.97  nevals= 25
+  Z 4: exit= 1 pts=  3248 BN=   59.97
+  [REFINE] Z 5: e= 0.481581 bn=  42.30  =>  e= 0.481581 bn=  42.41  nevals= 25
+  [WARN] Z 5: GA optimum at search boundary -- true value may lie outside the search range
+  Z 5: exit= 1 pts=  3205 BN=   42.41
+  [REFINE] Z 6: e= 0.416880 bn=  54.62  =>  e= 0.416880 bn=  52.28  nevals= 25
+  Z 6: exit= 1 pts=  7899 BN=   52.28
+  [REFINE] Z 7: e= 0.369448 bn=  65.52  =>  e= 0.369395 bn=  65.66  nevals= 25
+  [WARN] Z 7: GA optimum at search boundary -- true value may lie outside the search range
+  Z 7: exit= 1 pts=  1916 BN=   65.66
+  [WARN] Z 8: RSM envelope does not bound   7 of   9 observations -- proceeding anyway
+  [REFINE] Z 8: e= 0.064274 bn=  71.82  =>  e= 0.064427 bn=  72.36  nevals= 25
+  [WARN] Z 8: GA optimum at search boundary -- true value may lie outside the search range
+  Z 8: exit= 1 pts=    15 BN=   72.36
+  latest zone= 8 RPE=  -44.45%
+  ensemble RPE=   -5.71%
+ [PROGRESS]  42% ( 3 of  7 objects done)
+
+ ===== 39615 Proton-M Briz-M   
+  --- irefine=0
+  [INFO] G2 BN floor estimate=   58.03 -> bn_lo=   29.02
+  [INFO] Z 1: G3 BSTAR prior narrows BN to [  32.69, 160.00]
+  Z 1: exit= 1 pts=  1632 BN=   82.62
+  [WARN] Z 2: GA optimum at search boundary -- true value may lie outside the search range
+  Z 2: exit= 1 pts=  8080 BN=   50.30
+  [INFO] Z 3: G3 BSTAR prior narrows BN to [  33.84, 131.74]
+  Z 3: exit= 0 pts= 10850 BN=   60.95
+  Z 4: exit= 0 pts= 11178 BN=   74.18
+  Z 5: exit= 1 pts=  2987 BN=   69.56
+  [WARN] Z 6: GA optimum at search boundary -- true value may lie outside the search range
+  Z 6: exit= 1 pts=  3571 BN=   47.69
+  Z 7: exit= 1 pts=  1818 BN=   60.37
+  Z 8: exit= 1 pts=   237 BN=   52.15
+  latest zone= 8 RPE=   19.81%
+  ensemble RPE=   -0.08%
+  --- irefine=1
+  [INFO] G2 BN floor estimate=   58.03 -> bn_lo=   29.02
+  [INFO] Z 1: G3 BSTAR prior narrows BN to [  32.69, 160.00]
+  [REFINE] Z 1: e= 0.553510 bn=  82.62  =>  e= 0.552909 bn=  73.07  nevals= 25
+  Z 1: exit= 1 pts=  1578 BN=   73.07
+  [REFINE] Z 2: e= 0.526388 bn=  48.78  =>  e= 0.526388 bn=  45.51  nevals= 25
+  [WARN] Z 2: GA optimum at search boundary -- true value may lie outside the search range
+  Z 2: exit= 1 pts=  6681 BN=   45.51
+  [INFO] Z 3: G3 BSTAR prior narrows BN to [  33.84, 122.19]
+  [REFINE] Z 3: e= 0.493963 bn=  61.10  =>  e= 0.493963 bn=  52.26  nevals= 25
+  Z 3: exit= 0 pts= 10857 BN=   52.26
+  [INFO] Z 4: G3 BSTAR prior narrows BN to [  30.81, 122.19]
+  [REFINE] Z 4: e= 0.483678 bn=  71.92  =>  e= 0.483678 bn=  67.92  nevals= 25
+  Z 4: exit= 0 pts= 11181 BN=   67.92
+  [INFO] Z 5: G3 BSTAR prior narrows BN to [  27.23, 122.19]
+  [REFINE] Z 5: e= 0.443847 bn=  66.95  =>  e= 0.442942 bn=  66.36  nevals= 25
+  Z 5: exit= 1 pts=  2916 BN=   66.36
+  [REFINE] Z 6: e= 0.336612 bn=  48.45  =>  e= 0.336612 bn=  46.60  nevals= 25
+  [WARN] Z 6: GA optimum at search boundary -- true value may lie outside the search range
+  Z 6: exit= 1 pts=  3451 BN=   46.60
+  [REFINE] Z 7: e= 0.301048 bn=  59.54  =>  e= 0.301048 bn=  54.02  nevals= 25
+  Z 7: exit= 1 pts=  1627 BN=   54.02
+  [REFINE] Z 8: e= 0.112353 bn=  51.29  =>  e= 0.113449 bn=  48.99  nevals= 25
+  Z 8: exit= 1 pts=   223 BN=   48.99
+  latest zone= 8 RPE=   12.70%
+  ensemble RPE=   -1.47%
+ [PROGRESS]  57% ( 4 of  7 objects done)
+
+ ===== 27526 Ariane 5 R/B      
+  --- irefine=0
+  [INFO] G2 BN floor estimate=   48.19 -> bn_lo=   24.09
+  Z 1: exit= 0 pts=  8427 BN=   72.51
+  Z 2: exit= 1 pts=  9919 BN=   72.09
+  Z 3: exit= 1 pts=  2252 BN=   68.69
+  Z 4: exit= 1 pts=  2792 BN=   79.11
+  [WARN] Z 5: GA optimum at search boundary -- true value may lie outside the search range
+  Z 5: exit= 1 pts=  1772 BN=   71.98
+  [WARN] Z 6: GA optimum at search boundary -- true value may lie outside the search range
+  Z 6: exit= 1 pts=  1696 BN=   66.48
+  [WARN] Z 7: GA optimum at search boundary -- true value may lie outside the search range
+  Z 7: exit= 1 pts=   799 BN=   98.22
+  Z 8: exit= 1 pts=   236 BN=   93.73
+  latest zone= 8 RPE=    4.71%
+  ensemble RPE=    0.27%
+  --- irefine=1
+  [INFO] G2 BN floor estimate=   48.19 -> bn_lo=   24.09
+  [REFINE] Z 1: e= 0.571213 bn=  72.51  =>  e= 0.571057 bn=  55.52  nevals= 25
+  Z 1: exit= 0 pts=  8432 BN=   55.52
+  [REFINE] Z 2: e= 0.498203 bn=  72.09  =>  e= 0.498203 bn=  51.71  nevals= 25
+  Z 2: exit= 1 pts=  7499 BN=   51.71
+  [INFO] Z 3: G3 BSTAR prior narrows BN to [  19.86,  85.68]
+  [REFINE] Z 3: e= 0.446272 bn=  70.16  =>  e= 0.446272 bn=  66.45  nevals= 25
+  Z 3: exit= 1 pts=  2180 BN=   66.45
+  [REFINE] Z 4: e= 0.428749 bn=  79.10  =>  e= 0.428749 bn=  78.46  nevals= 25
+  [WARN] Z 4: GA optimum at search boundary -- true value may lie outside the search range
+  Z 4: exit= 1 pts=  2760 BN=   78.46
+  [REFINE] Z 5: e= 0.409663 bn=  76.02  =>  e= 0.409663 bn=  73.79  nevals= 25
+  Z 5: exit= 1 pts=  1822 BN=   73.79
+  [REFINE] Z 6: e= 0.388972 bn=  62.97  =>  e= 0.389501 bn=  61.05  nevals= 25
+  [WARN] Z 6: GA optimum at search boundary -- true value may lie outside the search range
+  Z 6: exit= 1 pts=  1562 BN=   61.05
+  [REFINE] Z 7: e= 0.379256 bn=  92.56  =>  e= 0.379614 bn=  92.90  nevals= 25
+  [WARN] Z 7: GA optimum at search boundary -- true value may lie outside the search range
+  Z 7: exit= 1 pts=   765 BN=   92.90
+  [REFINE] Z 8: e= 0.133938 bn=  91.78  =>  e= 0.133938 bn=  87.48  nevals= 25
+  Z 8: exit= 1 pts=   231 BN=   87.48
+  latest zone= 8 RPE=    2.72%
+  ensemble RPE=    0.07%
+ [PROGRESS]  71% ( 5 of  7 objects done)
+
+ ===== 32007 GSLV R/B          
+  --- irefine=0
+  [INFO] G2 BN floor estimate=   48.86 -> bn_lo=   24.43
+  Z 1: exit= 1 pts= 13502 BN=   71.91
+  [WARN] Z 2: GA optimum at search boundary -- true value may lie outside the search range
+  Z 2: exit= 1 pts= 13430 BN=   41.09
+  Z 3: exit= 1 pts= 12656 BN=   52.34
+  Z 4: exit= 1 pts=  7491 BN=   42.34
+  [WARN] Z 5: GA optimum at search boundary -- true value may lie outside the search range
+  Z 5: exit= 1 pts=  5157 BN=   55.03
+  Z 6: exit= 1 pts=  5440 BN=   38.26
+  [WARN] Z 7: GA optimum at search boundary -- true value may lie outside the search range
+  Z 7: exit= 1 pts=  3381 BN=   47.70
+  [WARN] Z 8: GA optimum at search boundary -- true value may lie outside the search range
+  Z 8: exit= 1 pts=   306 BN=   52.53
+  latest zone= 8 RPE=    2.00%
+  ensemble RPE=   -0.25%
+  --- irefine=1
+  [INFO] G2 BN floor estimate=   48.86 -> bn_lo=   24.43
+  [REFINE] Z 1: e= 0.285251 bn=  71.91  =>  e= 0.285073 bn=  54.96  nevals= 25
+  Z 1: exit= 1 pts= 10474 BN=   54.96
+  [INFO] Z 2: G3 BSTAR prior narrows BN to [  22.63,  88.85]
+  [REFINE] Z 2: e= 0.278624 bn=  45.78  =>  e= 0.278442 bn=  40.82  nevals= 25
+  Z 2: exit= 1 pts= 13332 BN=   40.82
+  [REFINE] Z 3: e= 0.265798 bn=  38.31  =>  e= 0.265798 bn=  36.83  nevals= 25
+  Z 3: exit= 1 pts=  8846 BN=   36.83
+  [REFINE] Z 4: e= 0.226290 bn=  36.83  =>  e= 0.226330 bn=  36.93  nevals= 25
+  Z 4: exit= 1 pts=  6592 BN=   36.93
+  [REFINE] Z 5: e= 0.201912 bn=  40.66  =>  e= 0.201883 bn=  41.17  nevals= 25
+  [WARN] Z 5: GA optimum at search boundary -- true value may lie outside the search range
+  Z 5: exit= 1 pts=  3818 BN=   41.17
+  [REFINE] Z 6: e= 0.195270 bn=  40.23  =>  e= 0.195270 bn=  39.43  nevals= 25
+  Z 6: exit= 1 pts=  5599 BN=   39.43
+  [REFINE] Z 7: e= 0.162638 bn=  42.54  =>  e= 0.162620 bn=  42.61  nevals= 25
+  [WARN] Z 7: GA optimum at search boundary -- true value may lie outside the search range
+  Z 7: exit= 1 pts=  3037 BN=   42.61
+  [REFINE] Z 8: e= 0.057906 bn=  43.61  =>  e= 0.058939 bn=  43.85  nevals= 25
+  [WARN] Z 8: GA optimum at search boundary -- true value may lie outside the search range
+  Z 8: exit= 1 pts=   282 BN=   43.85
+  latest zone= 8 RPE=   -5.51%
+  ensemble RPE=   -6.28%
+ [PROGRESS]  85% ( 6 of  7 objects done)
+
+ ===== 37819 Proton-M R/B      
+  --- irefine=0
+  [INFO] G2 BN floor estimate=   43.93 -> bn_lo=   21.96
+  [INFO] Z 1: G3 BSTAR prior narrows BN to [  28.59, 160.00]
+  Z 1: exit= 1 pts=  5136 BN=   61.75
+  [INFO] Z 2: G3 BSTAR prior narrows BN to [  28.26,  96.26]
+  Z 2: exit= 1 pts=  3430 BN=   44.46
+  [INFO] Z 3: G3 BSTAR prior narrows BN to [  31.05,  61.72]
+  Z 3: exit= 1 pts=  2856 BN=   40.13
+  [INFO] Z 4: G3 BSTAR prior narrows BN to [  31.71,  48.76]
+  Z 4: exit= 1 pts=  2524 BN=   45.15
+  Z 5: exit= 1 pts=  2034 BN=   43.41
+  [WARN] Z 6: GA optimum at search boundary -- true value may lie outside the search range
+  Z 6: exit= 1 pts=  1611 BN=   45.53
+  Z 7: exit= 1 pts=  1507 BN=   44.03
+  Z 8: exit= 1 pts=    81 BN=   44.57
+  latest zone= 8 RPE=   31.89%
+  ensemble RPE=   -7.74%
+  --- irefine=1
+  [INFO] G2 BN floor estimate=   43.93 -> bn_lo=   21.96
+  [INFO] Z 1: G3 BSTAR prior narrows BN to [  28.59, 160.00]
+  [REFINE] Z 1: e= 0.410341 bn=  61.75  =>  e= 0.409794 bn=  48.61  nevals= 25
+  Z 1: exit= 1 pts=  4374 BN=   48.61
+  [INFO] Z 2: G3 BSTAR prior narrows BN to [  28.26,  83.12]
+  [REFINE] Z 2: e= 0.376806 bn=  42.90  =>  e= 0.376806 bn=  38.79  nevals= 25
+  Z 2: exit= 1 pts=  3107 BN=   38.79
+  [INFO] Z 3: G3 BSTAR prior narrows BN to [  31.05,  56.04]
+  [REFINE] Z 3: e= 0.354320 bn=  38.62  =>  e= 0.354320 bn=  37.69  nevals= 25
+  Z 3: exit= 1 pts=  2734 BN=   37.69
+  [INFO] Z 4: G3 BSTAR prior narrows BN to [  31.71,  46.31]
+  [REFINE] Z 4: e= 0.344717 bn=  45.51  =>  e= 0.344717 bn=  45.42  nevals= 25
+  [WARN] Z 4: GA optimum at search boundary -- true value may lie outside the search range
+  Z 4: exit= 1 pts=  2534 BN=   45.42
+  [INFO] Z 5: G3 BSTAR prior narrows BN to [  31.79,  50.63]
+  [REFINE] Z 5: e= 0.321474 bn=  41.72  =>  e= 0.321140 bn=  41.48  nevals= 25
+  Z 5: exit= 1 pts=  1974 BN=   41.48
+  [REFINE] Z 6: e= 0.292646 bn=  46.47  =>  e= 0.292646 bn=  46.18  nevals= 25
+  [WARN] Z 6: GA optimum at search boundary -- true value may lie outside the search range
+  Z 6: exit= 1 pts=  1630 BN=   46.18
+  [INFO] Z 7: G3 BSTAR prior narrows BN to [  31.98,  51.19]
+  [REFINE] Z 7: e= 0.274645 bn=  44.00  =>  e= 0.274645 bn=  43.76  nevals= 25
+  Z 7: exit= 1 pts=  1499 BN=   43.76
+  [REFINE] Z 8: e= 0.048204 bn=  48.52  =>  e= 0.047300 bn=  47.30  nevals= 25
+  [WARN] Z 8: GA optimum at search boundary -- true value may lie outside the search range
+  Z 8: exit= 1 pts=    79 BN=   47.30
+  latest zone= 8 RPE=   27.56%
+  ensemble RPE=   -9.04%
+ [PROGRESS] 100% ( 7 of  7 objects done)
+
+ campaign complete -> scratch_rpe/rpe_campaign_7obj_issue40.csv

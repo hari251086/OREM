@@ -22,6 +22,11 @@ name = "campaign41"
 source-dir = "scratch_rpe/issue41"
 main = "rpe_campaign_7obj_issue41.F"
 
+[[executable]]
+name = "campaign40"
+source-dir = "scratch_rpe/issue40"
+main = "rpe_campaign_7obj_issue40.F"
+
 [[test]]
 name = "test_propagate_ks"
 source-dir = "test"

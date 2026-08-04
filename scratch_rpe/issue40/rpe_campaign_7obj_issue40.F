@@ -1,16 +1,18 @@
-c     rpe_campaign_7obj_issue41.F -- issue #41 ceiling study: runs the
-c     curated 7-object set twice per object, iadapt_zone=0 (baseline,
-c     unchanged pipeline) vs iadapt_zone=1 (RPE-driven sequential zone
-c     selection). Mode-1 RPE only, so this is meaningful ONLY because
-c     these 7 objects have a real known re-entry date -- not a
-c     deployable production path. Same objects/config as
-c     rpe_campaign_7obj_issue31.F (nzones_max=8, min_zone_pts=8,
-c     max_zone_days=20, r2=0.90).
+c     rpe_campaign_7obj_issue40.F -- issue #40 comparison: runs the
+c     curated 7-object set twice per object, irefine=0 (baseline,
+c     unchanged GA-interpolated fitness) vs irefine=1 (bounded local
+c     refinement using direct-propagation fitness, rsm_refine). Unlike
+c     issue #41, this uses only in-zone TLE data -- no oracle/future
+c     information -- so it is meaningful for a real, as-yet-undecayed
+c     prediction too, not just this offline comparison. Same
+c     objects/config as rpe_campaign_7obj_issue31.F (nzones_max=8,
+c     min_zone_pts=8, max_zone_days=20, r2=0.90). iadapt_zone fixed at
+c     0 throughout (issue #41, already tested and rejected separately).
 c
-c     Build: registered as the "campaign41" executable in fpm.toml.
-c       fpm run campaign41 --compiler ifx
+c     Build: registered as the "campaign40" executable in fpm.toml.
+c       fpm run campaign40 --compiler ifx
 c     -------------------------------------------------------
-      program rpe_campaign_7obj_issue41
+      program rpe_campaign_7obj_issue40
 
       implicit double precision (a-h, o-z)
       common /xy/ pi, d2r, r2d, amue, AU, R_Earth
@@ -32,7 +34,7 @@ c     -------------------------------------------------------
       double precision oyr(nobj), omo(nobj), ody(nobj)
       double precision t_obs_jd, horiz
       double precision rpe_ens0
-      integer io, iadapt, nre, iz_last
+      integer io, irefine, nre, iz_last
 
       data norad / 42928, 35497, 37151, 39615, 27526, 32007, 37819 /
       data oyr / 2019.d0, 2016.d0, 2015.d0, 2017.d0, 2012.d0,
@@ -58,9 +60,9 @@ c     -------------------------------------------------------
       call init_constants()
       call read_atm_c(ALT_a, DEN_a, SCH_a, ndim_a, natm)
 
-      open(unit=34, file='scratch_rpe/rpe_campaign_7obj_issue41.csv',
+      open(unit=35, file='scratch_rpe/rpe_campaign_7obj_issue40.csv',
      &     status='unknown')
-      write(34,'(A)') 'norad,iadapt_zone,nzu,latest_zone_rpe_pct,'//
+      write(35,'(A)') 'norad,irefine,nzu,latest_zone_rpe_pct,'//
      &   'ensemble_rpe_pct'
 
       do io = 1, nobj
@@ -74,13 +76,13 @@ c     -------------------------------------------------------
          t_obs(6) = 0.d0
          call cal2jd(t_obs, t_obs_jd)
 
-         do iadapt = 0, 1
-            write(*,'(A,I1)') '  --- iadapt_zone=', iadapt
+         do irefine = 0, 1
+            write(*,'(A,I1)') '  --- irefine=', irefine
 
             call orem_run(
      &         tle_file(io), norad(io),
      &         t_obs, mxz, 8, 20.d0, 0.90d0, -1.d0,
-     &         80.d0, 160.d0, 1, iadapt, 0,
+     &         80.d0, 160.d0, 1, 0, irefine,
      &         20, 500, 40, 16, 0.8d0, 0.01d0, 0.123d0,
      &         20, 2, 3,
      &         7.2921150d-5, 3.35281066d-3, 1.d0,
@@ -94,7 +96,7 @@ c     -------------------------------------------------------
 
             if (ierr .ne. 0 .and. ierr .ne. 3) then
                write(*,'(A,I3)') '  pipeline error ierr=', ierr
-               write(34,'(I5,A,I1,A,I3)') norad(io), ',', iadapt,
+               write(35,'(I5,A,I1,A,I3)') norad(io), ',', irefine,
      &            ',ERR,,', ierr
                goto 80
             end if
@@ -123,12 +125,12 @@ c     -------------------------------------------------------
             write(*,'(A,F8.2,A)') '  ensemble RPE=', rpe_ens0, '%'
 
             if (iz_last .gt. 0) then
-               write(34,'(I5,A,I1,A,I2,A,F9.3,A,F9.3)')
-     &            norad(io), ',', iadapt, ',', nzu, ',',
+               write(35,'(I5,A,I1,A,I2,A,F9.3,A,F9.3)')
+     &            norad(io), ',', irefine, ',', nzu, ',',
      &            rpe(iz_last), ',', rpe_ens0
             else
-               write(34,'(I5,A,I1,A,I2,A,A)')
-     &            norad(io), ',', iadapt, ',', nzu,
+               write(35,'(I5,A,I1,A,I2,A,A)')
+     &            norad(io), ',', irefine, ',', nzu,
      &            ',,'
             end if
 
@@ -139,9 +141,9 @@ c     -------------------------------------------------------
      &      (io*100)/nobj, '% (', io, ' of ', nobj, ' objects done)'
       end do
 
-      close(34)
+      close(35)
       write(*,'(/,A)') ' campaign complete -> scratch_rpe/'//
-     &   'rpe_campaign_7obj_issue41.csv'
+     &   'rpe_campaign_7obj_issue40.csv'
 
       stop
       end

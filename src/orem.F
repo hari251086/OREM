@@ -13,7 +13,7 @@ c     ============================================================
      &   nzones_max, min_zone_pts, max_zone_days,
      &   r2_thresh, slope_thresh,
      &   bn_min_init, bn_max_init,
-     &   idrag_flag, iadapt_zone,
+     &   idrag_flag, iadapt_zone, irefine,
      &   ipopsize, maxgen, nbits_e, nbits_a,
      &   pcross, pmute, ga_seed,
      &   ngeo_deg, nsun_deg, nmoon_deg,
@@ -42,6 +42,18 @@ c                          meaningful when t_obs_cal is a real known
 c                          re-entry -- a ceiling/diagnostic study, not
 c                          usable for an operational (t_obs_cal=0)
 c                          prediction. See issue #41.
+c       irefine          : issue #40 -- 0=off (default), 1=on: after
+c                          the GA converges on a zone's (e, BN) using
+c                          the cheap RSM-interpolated fitness, run a
+c                          bounded (~25 evaluation) local pattern
+c                          search using direct-propagation fitness
+c                          (rsm_direct_eval/rsm_refine) instead, since
+c                          issue #36 found the interpolated fitness is
+c                          systematically ~1.8x more optimistic than
+c                          the true, directly-propagated RMS at the
+c                          same point. Uses only in-zone TLE data (no
+c                          future/oracle information, unlike #41), so
+c                          usable in a real operational prediction.
 c       zone selection params, area bounds, mass, Cd, GA params,
 c       force model params, atmosphere tables
 c
@@ -79,7 +91,7 @@ c     --- Input arguments ---
       double precision max_zone_days, r2_thresh, slope_thresh
       double precision t_obs_cal(6)
       double precision bn_min_init, bn_max_init
-      integer idrag_flag, iadapt_zone
+      integer idrag_flag, iadapt_zone, irefine
       integer ipopsize, maxgen, nbits_e, nbits_a
       double precision pcross, pmute, ga_seed
       integer ngeo_deg, nsun_deg, nmoon_deg
@@ -200,6 +212,19 @@ c     Issue #41: RPE-driven sequential zone selection (adapt mode)
       double precision rpe_this, rpe_best, horiz_z
       double precision e_opt_best, bn_opt_best
       double precision rms_best, reentry_best
+
+c     Issue #40: direct-propagation local refinement (refine mode)
+c     refine_max_eval starts with 'r' -- would default to DOUBLE
+c     PRECISION under this file's implicit typing (a-h,o-z), but
+c     max_eval is declared INTEGER in rsm_refine, so this must be
+c     explicit (see feedback_fortran_implicit_typing_trap in project
+c     memory -- passing a mistyped double where an integer dummy
+c     argument is expected corrupts the callee's value, not a compile
+c     error).
+      integer refine_max_eval
+      parameter(refine_max_eval = 25)
+      double precision zone_dur_r, e_refined, bn_refined, rms_refined
+      integer neval_r
 
       ierr = 0
       nzones_used = 0
@@ -593,6 +618,37 @@ c        GA optimization: match predicted apogee trajectory to TLE observations
      &      ipopsize, maxgen, nbits_e, nbits_a,
      &      pcross, pmute, ga_seed,
      &      e_opt_out(iz), bn_opt_out(iz), rms_out(iz))
+
+         if (irefine .eq. 1) then
+c           Issue #40: bounded local refinement using direct-
+c           propagation fitness instead of the GA's interpolated
+c           fitness. e_grid/bn_grid are the same bounds ga_optimize
+c           just searched (set by rsm_generate above).
+            zone_dur_r = epz(nzone) - epz(1)
+            call rsm_refine(
+     &         smaz(1), ez(1), incz(1), raanz(1), aopz(1), maz(1),
+     &         epz(1), zone_dur_r,
+     &         e_opt_out(iz), bn_opt_out(iz),
+     &         e_grid(1), e_grid(3), bn_grid(1), bn_grid(3),
+     &         tobs, apobs, nobs,
+     &         360, 1.d-10,
+     &         n_force, ngeo_deg, nsun_deg, nmoon_deg,
+     &         WE_rot, EPS_f, FR_rot,
+     &         CR_srp, AM_srp, IPSR, ISHAD,
+     &         PSR_srp, amuS, amuM,
+     &         ALT_atm, DEN_atm, SCH_atm, ndim_atm,
+     &         refine_max_eval,
+     &         e_refined, bn_refined, rms_refined, neval_r)
+            if (neval_r .gt. 0) then
+               write(*,'(A,I2,A,F9.6,A,F7.2,A,F9.6,A,F7.2,A,I3)')
+     &            '  [REFINE] Z', iz, ': e=', e_opt_out(iz),
+     &            ' bn=', bn_opt_out(iz), '  =>  e=', e_refined,
+     &            ' bn=', bn_refined, '  nevals=', neval_r
+               e_opt_out(iz)  = e_refined
+               bn_opt_out(iz) = bn_refined
+               rms_out(iz)    = rms_refined
+            end if
+         end if
 
 c        Issue #12: GA boundary solution (optimum within 15% of a
 c        search bound suggests the true value may lie outside the
