@@ -914,6 +914,15 @@ Isolating the chain does **not** remove the volatility — it reveals a cleaner,
 
 The curated-7 ensemble-RPE regression (1.94%→3.51%) does not reproduce at n=24 — it reads as small-sample noise (the curated-7 baseline ensemble RPE was already tiny, so any perturbation looked like a large relative swing). At n=24, `irefine=2` is a clear, fairly consistent win on the PRIMARY metric and neutral on the secondary one — meaningfully stronger evidence than n=7 alone. Not yet done: full 97-object validation, or a decision on promoting `irefine=2` toward the default pipeline — both flagged as open rather than decided unilaterally. Commit f301e3c on HS-dev, pushed.
 
+**2026-08-04 — Issue #40 extended to the full 50-object campaign: primary-metric win holds but weakens as harder, less-curated objects are added.** Objects 31-50 added to the already-recorded 1-30 (commit 2d2ac89), same methodology:
+
+| n (valid objects) | mean\|latest-zone RPE\| baseline → irefine=2 | better/worse | mean\|ensemble RPE\| baseline → irefine=2 | better/worse |
+|---|---|---|---|---|
+| 24 (objects 1-30) | 45.50% → 42.30% | 17/24 (71%) better | 12.97% → 12.60% | 12/24 (wash) |
+| 36 (objects 1-50) | 44.34% → 42.47% | 20/36 (56%) better | 16.80% → 16.66% | 15/36 better, 21/36 worse |
+
+Still net positive on the primary metric through n=36, and the ensemble mean stays essentially flat — but the effect is noticeably weaker than the n=24 subsample suggested, and the ensemble per-object count now leans slightly negative even though the average holds (a few large improvements likely offsetting many small regressions). No new failures introduced (same 36 valid objects in both modes — nothing flipped to/from `ERR` or no-prediction). Objects 31-50 include the campaign's less-curated, harder-to-fit cases per its own sourcing history, which plausibly explains the dilution. Remaining 47 objects (51-97) not yet run.
+
 ---
 
 ## 9. References
