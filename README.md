@@ -893,6 +893,18 @@ Code kept in place (opt-in, default off) as a documented, tested negative result
 
 Fixed one real bug during development: `refine_max_eval` was implicitly typed DOUBLE PRECISION (starts with 'r' under `orem.F`'s a-h,o-z implicit typing) but passed to `rsm_refine`'s INTEGER `max_eval` dummy argument — corrupted the evaluation budget so the search silently exited after 1 evaluation every time until fixed with an explicit `integer` declaration. Same class of bug as `feedback_fortran_implicit_typing_trap` in project memory. Not closed — parked pending a decision on next steps (larger campaign for a clearer statistical read, or isolate the carryover-chain interaction by using the refined BN only for that zone's own re-entry propagation without feeding it forward).
 
+**2026-08-04 — Issue #40 follow-up: `irefine=2` isolates the carryover-chain question — answer is no, and the isolated result is a real, interpretable improvement on the PRIMARY metric.** Added `irefine=2`: refines each zone's own reported outputs identically to `irefine=1`, but the boundary check and next-zone `bn_lo`/`bn_hi` carryover use the GA's pre-refinement optimum instead of the refined one — directly testing whether `irefine=1`'s mixed result was carryover-chain amplification (per #41/#35/#37) or something else.
+
+Isolating the chain does **not** remove the volatility — it reveals a cleaner, different pattern (`scratch_rpe/rpe_campaign_7obj_issue40_isolate.csv`, log `scratch_rpe/issue40/campaign40_isolate_run.log`):
+
+| mode | mean\|latest-zone RPE\| (PRIMARY) | mean\|ensemble RPE\| (secondary) |
+|---|---|---|
+| `irefine=0` (baseline) | 25.85% | 1.94% |
+| `irefine=1` (refine, feeds chain) | 26.59% | 3.45% |
+| `irefine=2` (refine, isolated) | **22.99%** | 3.51% |
+
+`irefine=2` improves the report's own PRIMARY metric (6/7 objects improve or flat) — cleaner directionality than `irefine=1`'s mixed 4/7 — while the secondary ensemble-spread metric worsens by about the same amount either way. Reading: freeing the refinement from the carryover chain lets each zone genuinely improve on its own physical fit merits (the primary-metric win), at the cost of cross-zone BN consistency (the ensemble-spread cost) — a real tradeoff, not the #41-style failure mode. Not yet validated beyond n=7 — next step, not yet taken, is the existing 30/50/97-object campaign before considering `irefine=2` for the default pipeline. Both `irefine=1` and `irefine=2` remain opt-in/default-off. Commit cd0f2be on HS-dev, pushed. 385/385 tests pass.
+
 ---
 
 ## 9. References
