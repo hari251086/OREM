@@ -17,6 +17,11 @@ name = "orem"
 source-dir = "app"
 main = "main_orem.F"
 
+[[executable]]
+name = "campaign41"
+source-dir = "scratch_rpe/issue41"
+main = "rpe_campaign_7obj_issue41.F"
+
 [[test]]
 name = "test_propagate_ks"
 source-dir = "test"

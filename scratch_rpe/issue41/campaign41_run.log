@@ -1,0 +1,854 @@
+Project is up to date
+
+ ===== 42928 PSLV-C39          
+  --- iadapt_zone=0
+  [INFO] G2 BN floor estimate=   77.29 -> bn_lo=   38.64
+  Z 1: exit= 1 pts=  7051 BN=   81.20
+  [WARN] Z 2: GA optimum at search boundary -- true value may lie outside the search range
+  Z 2: exit= 1 pts=  4829 BN=  110.98
+  Z 3: exit= 1 pts=  4737 BN=   74.88
+  Z 4: exit= 1 pts=  6200 BN=   82.70
+  [WARN] Z 5: GA optimum at search boundary -- true value may lie outside the search range
+  Z 5: exit= 1 pts=  4920 BN=   92.58
+  [WARN] Z 6: GA optimum at search boundary -- true value may lie outside the search range
+  Z 6: exit= 1 pts=  3833 BN=   99.33
+  [WARN] Z 7: GA optimum at search boundary -- true value may lie outside the search range
+  Z 7: exit= 1 pts=  1305 BN=   62.75
+  [WARN] Z 8: GA optimum at search boundary -- true value may lie outside the search range
+  Z 8: exit= 1 pts=   196 BN=  120.64
+  latest zone= 8 RPE=  -22.00%
+  ensemble RPE=    1.32%
+  --- iadapt_zone=1
+  [INFO] G2 BN floor estimate=   63.62 -> bn_lo=   31.81
+  Z 1: exit= 1 pts=  7928 BN=   65.43
+  [ADAPT] Z 1: RPE=    23.9% (>20%), retry #  1 band=[    1,   11]
+  Z 1: exit= 1 pts= 10429 BN=   78.61
+  [ADAPT] Z 1: RPE=    62.1% (>20%), retry #  2 band=[    1,   12]
+  Z 1: exit= 1 pts= 10160 BN=   77.29
+  [ADAPT] Z 1: RPE=    58.0% (>20%), retry #  3 band=[    1,   13]
+  Z 1: exit= 1 pts= 11123 BN=   81.86
+  [ADAPT] Z 1: RPE=    72.6% (>20%), retry #  4 band=[    1,   14]
+  Z 1: exit= 1 pts= 11762 BN=   84.73
+  [ADAPT] Z 1: RPE=    82.2% (>20%), retry #  5 band=[    1,   15]
+  Z 1: exit= 1 pts=  8501 BN=   68.61
+  [ADAPT] Z 1: RPE=    32.6% (>20%), retry #  6 band=[    1,    9]
+  Z 1: exit= 1 pts=  7925 BN=   65.41
+  [ADAPT] Z 1: RPE=    23.8% (>20%), retry #  7 band=[    1,    8]
+  Z 1: exit= 1 pts=  7287 BN=   61.71
+  [ADAPT] Z 1: final RPE=    14.1% after   7 adjustment(s)
+  Z 2: exit= 1 pts=  7941 BN=   76.40
+  [ADAPT] Z 2: RPE=    24.4% (>20%), retry #  1 band=[    9,   66]
+  Z 2: exit= 1 pts=  7676 BN=   74.56
+  [ADAPT] Z 2: RPE=    20.3% (>20%), retry #  2 band=[    9,   67]
+  Z 2: exit= 1 pts=  7849 BN=   75.77
+  [ADAPT] Z 2: RPE=    23.0% (>20%), retry #  3 band=[    9,   68]
+  Z 2: exit= 1 pts=  8177 BN=   78.01
+  [ADAPT] Z 2: RPE=    28.0% (>20%), retry #  4 band=[    9,   69]
+  Z 2: exit= 1 pts=  7961 BN=   76.49
+  [ADAPT] Z 2: RPE=    24.7% (>20%), retry #  5 band=[    9,   70]
+  Z 2: exit= 1 pts=  7740 BN=   74.98
+  [ADAPT] Z 2: RPE=    21.3% (>20%), retry #  6 band=[    9,   64]
+  Z 2: exit= 1 pts=  8452 BN=   79.90
+  [ADAPT] Z 2: RPE=    32.2% (>20%), retry #  7 band=[    9,   63]
+  Z 2: exit= 1 pts=  7801 BN=   75.43
+  [ADAPT] Z 2: RPE=    22.2% (>20%), retry #  8 band=[    9,   62]
+  Z 2: exit= 1 pts=  7517 BN=   73.48
+  [ADAPT] Z 2: final RPE=    17.9% after   8 adjustment(s)
+  [WARN] Z 3: GA optimum at search boundary -- true value may lie outside the search range
+  Z 3: exit= 1 pts=  6472 BN=   85.49
+  [ADAPT] Z 3: final RPE=     7.3% after   0 adjustment(s)
+  Z 4: exit= 1 pts=  5527 BN=   66.47
+  [ADAPT] Z 4: final RPE=    -6.1% after   0 adjustment(s)
+  [WARN] Z 5: GA optimum at search boundary -- true value may lie outside the search range
+  Z 5: exit= 1 pts=  3312 BN=   77.33
+  [ADAPT] Z 5: RPE=   -41.7% (>20%), retry #  1 band=[  152,  204]
+  [WARN] Z 5: GA optimum at search boundary -- true value may lie outside the search range
+  Z 5: exit= 1 pts=  3343 BN=   78.09
+  [ADAPT] Z 5: RPE=   -41.2% (>20%), retry #  2 band=[  152,  205]
+  [WARN] Z 5: GA optimum at search boundary -- true value may lie outside the search range
+  Z 5: exit= 1 pts=  3331 BN=   77.81
+  [ADAPT] Z 5: RPE=   -41.4% (>20%), retry #  3 band=[  152,  206]
+  [WARN] Z 5: GA optimum at search boundary -- true value may lie outside the search range
+  Z 5: exit= 1 pts=  3335 BN=   77.89
+  [ADAPT] Z 5: RPE=   -41.3% (>20%), retry #  4 band=[  152,  207]
+  [WARN] Z 5: GA optimum at search boundary -- true value may lie outside the search range
+  Z 5: exit= 1 pts=  3334 BN=   77.78
+  [ADAPT] Z 5: RPE=   -41.3% (>20%), retry #  5 band=[  152,  208]
+  [WARN] Z 5: GA optimum at search boundary -- true value may lie outside the search range
+  Z 5: exit= 1 pts=  3262 BN=   76.02
+  [ADAPT] Z 5: RPE=   -42.6% (>20%), retry #  6 band=[  152,  202]
+  [WARN] Z 5: GA optimum at search boundary -- true value may lie outside the search range
+  Z 5: exit= 1 pts=  3312 BN=   77.33
+  [ADAPT] Z 5: RPE=   -41.7% (>20%), retry #  7 band=[  152,  201]
+  [WARN] Z 5: GA optimum at search boundary -- true value may lie outside the search range
+  Z 5: exit= 1 pts=  3332 BN=   77.83
+  [ADAPT] Z 5: RPE=   -41.3% (>20%), retry #  8 band=[  152,  200]
+  [WARN] Z 5: GA optimum at search boundary -- true value may lie outside the search range
+  Z 5: exit= 1 pts=  3322 BN=   77.60
+  [ADAPT] Z 5: RPE=   -41.5% (>20%), retry #  9 band=[  152,  199]
+  [WARN] Z 5: GA optimum at search boundary -- true value may lie outside the search range
+  Z 5: exit= 1 pts=  3353 BN=   78.34
+  [ADAPT] Z 5: RPE=   -41.0% (>20%), retry # 10 band=[  152,  198]
+  [WARN] Z 5: GA optimum at search boundary -- true value may lie outside the search range
+  Z 5: exit= 1 pts=  3317 BN=   77.49
+  [ADAPT] Z 5: final RPE=   -41.0% after  10 adjustment(s)
+  [WARN] Z 6: GA optimum at search boundary -- true value may lie outside the search range
+  Z 6: exit= 1 pts=  4801 BN=   84.32
+  [ADAPT] Z 6: final RPE=   -13.1% after   0 adjustment(s)
+  [WARN] Z 7: GA optimum at search boundary -- true value may lie outside the search range
+  Z 7: exit= 1 pts=  5142 BN=   93.21
+  [ADAPT] Z 7: final RPE=    -4.5% after   0 adjustment(s)
+  Z 8: exit= 1 pts=  4271 BN=   87.27
+  [ADAPT] Z 8: final RPE=   -16.0% after   0 adjustment(s)
+  latest zone= 8 RPE=  -15.97%
+  ensemble RPE=   -4.66%
+ [PROGRESS]  14% ( 1 of  7 objects done)
+
+ ===== 35497 Ariane 5 ESC-A    
+  --- iadapt_zone=0
+  [INFO] G2 BN floor estimate=   58.63 -> bn_lo=   29.32
+  Z 1: exit= 0 pts=  7374 BN=   67.47
+  [WARN] Z 2: RSM envelope does not bound  13 of  36 observations -- proceeding anyway
+  [WARN] Z 2: GA optimum at search boundary -- true value may lie outside the search range
+  Z 2: exit= 0 pts=  7475 BN=   94.92
+  Z 3: exit= 0 pts=  7503 BN=   79.30
+  Z 4: exit= 0 pts=  7644 BN=   80.27
+  Z 5: exit= 1 pts=  6367 BN=   84.18
+  [WARN] Z 6: GA optimum at search boundary -- true value may lie outside the search range
+  Z 6: exit= 1 pts=  1366 BN=  116.61
+  [WARN] Z 7: GA optimum at search boundary -- true value may lie outside the search range
+  Z 7: exit= 1 pts=   411 BN=  132.90
+  [INFO] Z 8: G3 BSTAR prior narrows BN to [  21.88, 157.69]
+  [WARN] Z 8: RSM envelope does not bound  42 of  47 observations -- proceeding anyway
+  [WARN] Z 8: GA optimum at search boundary -- true value may lie outside the search range
+  Z 8: exit= 1 pts=    39 BN=  155.86
+  latest zone= 8 RPE=  -76.36%
+  ensemble RPE=    2.77%
+  --- iadapt_zone=1
+  [INFO] G2 BN floor estimate=   44.93 -> bn_lo=   22.47
+  Z 1: exit= 1 pts=  4193 BN=   58.00
+  [ADAPT] Z 1: RPE=   -35.5% (>20%), retry #  1 band=[    1,   24]
+  Z 1: exit= 1 pts=  4186 BN=   57.38
+  [ADAPT] Z 1: RPE=   -35.6% (>20%), retry #  2 band=[    1,   25]
+  Z 1: exit= 1 pts=  4182 BN=   56.97
+  [ADAPT] Z 1: RPE=   -35.7% (>20%), retry #  3 band=[    1,   26]
+  Z 1: exit= 1 pts=  4184 BN=   57.18
+  [ADAPT] Z 1: RPE=   -35.7% (>20%), retry #  4 band=[    1,   27]
+  Z 1: exit= 1 pts=  4181 BN=   56.92
+  [ADAPT] Z 1: RPE=   -35.7% (>20%), retry #  5 band=[    1,   28]
+  Z 1: exit= 1 pts=  4173 BN=   56.25
+  [ADAPT] Z 1: RPE=   -35.9% (>20%), retry #  6 band=[    1,   22]
+  Z 1: exit= 1 pts=  4138 BN=   53.69
+  [ADAPT] Z 1: RPE=   -36.7% (>20%), retry #  7 band=[    1,   21]
+  Z 1: exit= 1 pts=  4193 BN=   58.05
+  [ADAPT] Z 1: RPE=   -35.5% (>20%), retry #  8 band=[    1,   20]
+  Z 1: exit= 1 pts=  4204 BN=   59.02
+  [ADAPT] Z 1: RPE=   -35.2% (>20%), retry #  9 band=[    1,   19]
+  Z 1: exit= 1 pts=  4136 BN=   53.46
+  [ADAPT] Z 1: RPE=   -36.7% (>20%), retry # 10 band=[    1,   18]
+  Z 1: exit= 1 pts=  4211 BN=   59.73
+  [ADAPT] Z 1: final RPE=   -35.0% after  10 adjustment(s)
+  Z 2: exit= 1 pts=  3728 BN=   43.34
+  [ADAPT] Z 2: RPE=   -42.5% (>20%), retry #  1 band=[   19,   48]
+  Z 2: exit= 1 pts=  3711 BN=   42.33
+  [ADAPT] Z 2: RPE=   -42.8% (>20%), retry #  2 band=[   19,   49]
+  Z 2: exit= 1 pts=  3685 BN=   40.90
+  [ADAPT] Z 2: RPE=   -43.3% (>20%), retry #  3 band=[   19,   50]
+  Z 2: exit= 1 pts=  3669 BN=   39.87
+  [ADAPT] Z 2: RPE=   -43.7% (>20%), retry #  4 band=[   19,   51]
+  Z 2: exit= 1 pts=  3705 BN=   42.01
+  [ADAPT] Z 2: RPE=   -42.9% (>20%), retry #  5 band=[   19,   52]
+  Z 2: exit= 1 pts=  3697 BN=   41.55
+  [ADAPT] Z 2: RPE=   -43.1% (>20%), retry #  6 band=[   19,   46]
+  Z 2: exit= 1 pts=  3712 BN=   42.36
+  [ADAPT] Z 2: RPE=   -42.8% (>20%), retry #  7 band=[   19,   45]
+  Z 2: exit= 1 pts=  3696 BN=   41.52
+  [ADAPT] Z 2: RPE=   -43.1% (>20%), retry #  8 band=[   19,   44]
+  Z 2: exit= 1 pts=  3698 BN=   41.63
+  [ADAPT] Z 2: RPE=   -43.1% (>20%), retry #  9 band=[   19,   43]
+  Z 2: exit= 1 pts=  3725 BN=   43.27
+  [ADAPT] Z 2: RPE=   -42.5% (>20%), retry # 10 band=[   19,   42]
+  Z 2: exit= 1 pts=  3707 BN=   42.14
+  [ADAPT] Z 2: final RPE=   -42.5% after  10 adjustment(s)
+  Z 3: exit= 1 pts=  4767 BN=   44.25
+  [ADAPT] Z 3: RPE=   -28.6% (>20%), retry #  1 band=[   48,   80]
+  Z 3: exit= 1 pts=  4759 BN=   43.95
+  [ADAPT] Z 3: RPE=   -28.8% (>20%), retry #  2 band=[   48,   81]
+  Z 3: exit= 1 pts=  4765 BN=   44.16
+  [ADAPT] Z 3: RPE=   -28.7% (>20%), retry #  3 band=[   48,   82]
+  Z 3: exit= 1 pts=  4758 BN=   43.92
+  [ADAPT] Z 3: RPE=   -28.8% (>20%), retry #  4 band=[   48,   83]
+  Z 3: exit= 1 pts=  4815 BN=   45.93
+  [ADAPT] Z 3: RPE=   -27.7% (>20%), retry #  5 band=[   48,   84]
+  Z 3: exit= 1 pts=  4734 BN=   43.09
+  [ADAPT] Z 3: RPE=   -29.3% (>20%), retry #  6 band=[   48,   78]
+  Z 3: exit= 1 pts=  4734 BN=   43.12
+  [ADAPT] Z 3: RPE=   -29.3% (>20%), retry #  7 band=[   48,   77]
+  Z 3: exit= 1 pts=  4768 BN=   44.28
+  [ADAPT] Z 3: RPE=   -28.6% (>20%), retry #  8 band=[   48,   76]
+  Z 3: exit= 1 pts=  4819 BN=   46.08
+  [ADAPT] Z 3: RPE=   -27.6% (>20%), retry #  9 band=[   48,   75]
+  Z 3: exit= 1 pts=  4791 BN=   45.10
+  [ADAPT] Z 3: RPE=   -28.2% (>20%), retry # 10 band=[   48,   74]
+  Z 3: exit= 1 pts=  4803 BN=   45.53
+  [ADAPT] Z 3: final RPE=   -27.6% after  10 adjustment(s)
+  [WARN] Z 4: GA optimum at search boundary -- true value may lie outside the search range
+  Z 4: exit= 0 pts=  6966 BN=   39.47
+  Z 5: exit= 0 pts=  7024 BN=   42.57
+  Z 6: exit= 0 pts=  7072 BN=   48.70
+  [WARN] Z 7: RSM envelope does not bound  28 of  32 observations -- proceeding anyway
+  [WARN] Z 7: GA optimum at search boundary -- true value may lie outside the search range
+  Z 7: exit= 0 pts=  7116 BN=   53.75
+  [WARN] Z 8: GA optimum at search boundary -- true value may lie outside the search range
+  Z 8: exit= 0 pts=  7140 BN=   38.13
+  latest zone= 3 RPE=  -27.64%
+  ensemble RPE=  -35.04%
+ [PROGRESS]  28% ( 2 of  7 objects done)
+
+ ===== 37151 Long March 3B     
+  --- iadapt_zone=0
+  [INFO] G2 BN floor estimate=   34.51 -> bn_lo=   17.26
+  Z 1: exit= 0 pts=  8779 BN=   57.64
+  Z 2: exit= 0 pts=  9664 BN=   53.01
+  [INFO] Z 3: G3 BSTAR prior narrows BN to [  17.78, 160.00]
+  Z 3: exit= 1 pts=  4550 BN=   70.41
+  Z 4: exit= 1 pts=  3298 BN=   64.14
+  [WARN] Z 5: GA optimum at search boundary -- true value may lie outside the search range
+  Z 5: exit= 1 pts=  3334 BN=   46.55
+  Z 6: exit= 1 pts= 10216 BN=   58.77
+  [WARN] Z 7: GA optimum at search boundary -- true value may lie outside the search range
+  Z 7: exit= 1 pts=  2057 BN=   69.93
+  [WARN] Z 8: RSM envelope does not bound   7 of   9 observations -- proceeding anyway
+  [WARN] Z 8: GA optimum at search boundary -- true value may lie outside the search range
+  Z 8: exit= 1 pts=    20 BN=   76.68
+  latest zone= 8 RPE=  -24.21%
+  ensemble RPE=   -1.19%
+  --- iadapt_zone=1
+  [INFO] G2 BN floor estimate=   91.16 -> bn_lo=   45.58
+  Z 1: exit= 0 pts=  5154 BN=   88.56
+  [WARN] Z 2: GA optimum at search boundary -- true value may lie outside the search range
+  Z 2: exit= 0 pts=  5199 BN=   45.83
+  [WARN] Z 3: GA optimum at search boundary -- true value may lie outside the search range
+  Z 3: exit= 0 pts=  5252 BN=   50.03
+  [INFO] Z 4: G3 BSTAR prior narrows BN to [  45.58, 159.49]
+  [WARN] Z 4: GA optimum at search boundary -- true value may lie outside the search range
+  Z 4: exit= 0 pts=  5342 BN=   45.65
+  [INFO] Z 5: G3 BSTAR prior narrows BN to [  45.58, 155.37]
+  [WARN] Z 5: GA optimum at search boundary -- true value may lie outside the search range
+  Z 5: exit= 1 pts=  2024 BN=   45.60
+  [ADAPT] Z 5: RPE=   -75.2% (>20%), retry #  1 band=[   86,   99]
+  [INFO] Z 5: G3 BSTAR prior narrows BN to [  45.58, 153.25]
+  [WARN] Z 5: GA optimum at search boundary -- true value may lie outside the search range
+  Z 5: exit= 1 pts=  2025 BN=   45.82
+  [ADAPT] Z 5: RPE=   -75.1% (>20%), retry #  2 band=[   86,  100]
+  [INFO] Z 5: G3 BSTAR prior narrows BN to [  45.58, 155.37]
+  [WARN] Z 5: GA optimum at search boundary -- true value may lie outside the search range
+  Z 5: exit= 1 pts=  2026 BN=   45.65
+  [ADAPT] Z 5: RPE=   -75.1% (>20%), retry #  3 band=[   86,  101]
+  [INFO] Z 5: G3 BSTAR prior narrows BN to [  45.58, 156.36]
+  [WARN] Z 5: GA optimum at search boundary -- true value may lie outside the search range
+  Z 5: exit= 1 pts=  2009 BN=   52.65
+  [ADAPT] Z 5: RPE=   -74.6% (>20%), retry #  4 band=[   86,  102]
+  [INFO] Z 5: G3 BSTAR prior narrows BN to [  45.58, 157.38]
+  [WARN] Z 5: GA optimum at search boundary -- true value may lie outside the search range
+  Z 5: exit= 1 pts=  2028 BN=   45.59
+  [ADAPT] Z 5: RPE=   -75.1% (>20%), retry #  5 band=[   86,  103]
+  [INFO] Z 5: G3 BSTAR prior narrows BN to [  45.58, 158.88]
+  [WARN] Z 5: GA optimum at search boundary -- true value may lie outside the search range
+  Z 5: exit= 1 pts=  2027 BN=   46.80
+  [ADAPT] Z 5: RPE=   -75.0% (>20%), retry #  6 band=[   86,   97]
+  [INFO] Z 5: G3 BSTAR prior narrows BN to [  45.58, 156.36]
+  [WARN] Z 5: GA optimum at search boundary -- true value may lie outside the search range
+  Z 5: exit= 1 pts=  2023 BN=   45.70
+  [ADAPT] Z 5: RPE=   -75.2% (>20%), retry #  7 band=[   86,   96]
+  [INFO] Z 5: G3 BSTAR prior narrows BN to [  45.58, 157.38]
+  [WARN] Z 5: GA optimum at search boundary -- true value may lie outside the search range
+  Z 5: exit= 1 pts=  2024 BN=   45.72
+  [ADAPT] Z 5: RPE=   -75.2% (>20%), retry #  8 band=[   86,   95]
+  [INFO] Z 5: G3 BSTAR prior narrows BN to [  45.58, 158.88]
+  [WARN] Z 5: GA optimum at search boundary -- true value may lie outside the search range
+  Z 5: exit= 1 pts=  2023 BN=   45.69
+  [ADAPT] Z 5: RPE=   -75.2% (>20%), retry #  9 band=[   86,   94]
+  [WARN] Z 5: GA optimum at search boundary -- true value may lie outside the search range
+  Z 5: exit= 1 pts=  2022 BN=   46.21
+  [ADAPT] Z 5: RPE=   -75.1% (>20%), retry # 10 band=[   86,   93]
+  [WARN] Z 5: GA optimum at search boundary -- true value may lie outside the search range
+  Z 5: exit= 1 pts=  2020 BN=   47.27
+  [ADAPT] Z 5: final RPE=   -74.6% after  10 adjustment(s)
+  [INFO] Z 6: G3 BSTAR prior narrows BN to [  16.97, 162.62]
+  Z 6: exit= 1 pts=  1300 BN=   56.65
+  [ADAPT] Z 6: RPE=   -83.0% (>20%), retry #  1 band=[  102,  115]
+  [INFO] Z 6: G3 BSTAR prior narrows BN to [  16.97, 164.60]
+  Z 6: exit= 1 pts=  1281 BN=   53.80
+  [ADAPT] Z 6: RPE=   -83.2% (>20%), retry #  2 band=[  102,  116]
+  [INFO] Z 6: G3 BSTAR prior narrows BN to [  16.97, 162.62]
+  Z 6: exit= 1 pts=  1301 BN=   56.73
+  [ADAPT] Z 6: RPE=   -83.0% (>20%), retry #  3 band=[  102,  117]
+  [INFO] Z 6: G3 BSTAR prior narrows BN to [  16.97, 162.24]
+  Z 6: exit= 1 pts=  1295 BN=   55.94
+  [ADAPT] Z 6: RPE=   -83.0% (>20%), retry #  4 band=[  102,  118]
+  [INFO] Z 6: G3 BSTAR prior narrows BN to [  16.97, 161.86]
+  Z 6: exit= 1 pts=  1278 BN=   53.12
+  [ADAPT] Z 6: RPE=   -83.2% (>20%), retry #  5 band=[  102,  119]
+  [INFO] Z 6: G3 BSTAR prior narrows BN to [  16.97, 161.70]
+  Z 6: exit= 1 pts=  1339 BN=   61.15
+  [ADAPT] Z 6: RPE=   -82.6% (>20%), retry #  6 band=[  102,  113]
+  [INFO] Z 6: G3 BSTAR prior narrows BN to [  16.97, 162.24]
+  Z 6: exit= 1 pts=  1299 BN=   56.55
+  [ADAPT] Z 6: RPE=   -83.0% (>20%), retry #  7 band=[  102,  112]
+  [INFO] Z 6: G3 BSTAR prior narrows BN to [  16.97, 161.86]
+  Z 6: exit= 1 pts=  1300 BN=   56.58
+  [ADAPT] Z 6: RPE=   -83.0% (>20%), retry #  8 band=[  102,  111]
+  [INFO] Z 6: G3 BSTAR prior narrows BN to [  16.97, 161.70]
+  Z 6: exit= 1 pts=  1298 BN=   56.45
+  [ADAPT] Z 6: RPE=   -83.0% (>20%), retry #  9 band=[  102,  110]
+  [INFO] Z 6: G3 BSTAR prior narrows BN to [  16.97, 161.86]
+  Z 6: exit= 1 pts=  1311 BN=   58.54
+  [ADAPT] Z 6: RPE=   -82.9% (>20%), retry # 10 band=[  102,  109]
+  [INFO] Z 6: G3 BSTAR prior narrows BN to [  16.97, 164.20]
+  Z 6: exit= 1 pts=  1306 BN=   58.00
+  [ADAPT] Z 6: final RPE=   -82.6% after  10 adjustment(s)
+  [WARN] Z 7: GA optimum at search boundary -- true value may lie outside the search range
+  Z 7: exit= 1 pts=  2047 BN=   30.95
+  [ADAPT] Z 7: RPE=   -76.6% (>20%), retry #  1 band=[  120,  128]
+  [WARN] Z 7: GA optimum at search boundary -- true value may lie outside the search range
+  Z 7: exit= 1 pts=  2045 BN=   30.74
+  [ADAPT] Z 7: RPE=   -76.7% (>20%), retry #  2 band=[  120,  129]
+  [WARN] Z 7: GA optimum at search boundary -- true value may lie outside the search range
+  Z 7: exit= 1 pts=  2045 BN=   30.66
+  [ADAPT] Z 7: RPE=   -76.7% (>20%), retry #  3 band=[  120,  130]
+  Z 7: exit= 1 pts=  2079 BN=   34.12
+  [ADAPT] Z 7: RPE=   -76.0% (>20%), retry #  4 band=[  120,  131]
+  [WARN] Z 7: GA optimum at search boundary -- true value may lie outside the search range
+  Z 7: exit= 1 pts=  2041 BN=   30.42
+  [ADAPT] Z 7: RPE=   -76.7% (>20%), retry #  5 band=[  120,  132]
+  Z 7: exit= 1 pts=  2084 BN=   34.94
+  [ADAPT] Z 7: final RPE=   -75.8% after   6 adjustment(s)
+  [INFO] Z 8: G3 BSTAR prior narrows BN to [  14.26,  56.39]
+  Z 8: exit= 1 pts=  2935 BN=   33.30
+  [ADAPT] Z 8: RPE=   -68.7% (>20%), retry #  1 band=[  127,  149]
+  [INFO] Z 8: G3 BSTAR prior narrows BN to [  14.60,  56.39]
+  Z 8: exit= 1 pts=  2956 BN=   33.71
+  [ADAPT] Z 8: RPE=   -68.5% (>20%), retry #  2 band=[  127,  150]
+  [INFO] Z 8: G3 BSTAR prior narrows BN to [  14.26,  56.39]
+  Z 8: exit= 1 pts=  2937 BN=   33.35
+  [ADAPT] Z 8: RPE=   -68.7% (>20%), retry #  3 band=[  127,  151]
+  [INFO] Z 8: G3 BSTAR prior narrows BN to [  14.11,  56.39]
+  Z 8: exit= 1 pts=  2928 BN=   33.17
+  [ADAPT] Z 8: RPE=   -68.8% (>20%), retry #  4 band=[  127,  152]
+  [INFO] Z 8: G3 BSTAR prior narrows BN to [  14.35,  56.39]
+  Z 8: exit= 1 pts=  2929 BN=   33.20
+  [ADAPT] Z 8: RPE=   -68.8% (>20%), retry #  5 band=[  127,  153]
+  [INFO] Z 8: G3 BSTAR prior narrows BN to [  14.60,  56.39]
+  Z 8: exit= 1 pts=  2933 BN=   33.26
+  [ADAPT] Z 8: RPE=   -68.8% (>20%), retry #  6 band=[  127,  147]
+  [INFO] Z 8: G3 BSTAR prior narrows BN to [  13.95,  56.39]
+  Z 8: exit= 1 pts=  2937 BN=   33.34
+  [ADAPT] Z 8: RPE=   -68.7% (>20%), retry #  7 band=[  127,  146]
+  [INFO] Z 8: G3 BSTAR prior narrows BN to [  13.89,  56.39]
+  Z 8: exit= 1 pts=  2945 BN=   33.49
+  [ADAPT] Z 8: RPE=   -68.6% (>20%), retry #  8 band=[  127,  145]
+  [INFO] Z 8: G3 BSTAR prior narrows BN to [  13.84,  56.39]
+  Z 8: exit= 1 pts=  2913 BN=   32.88
+  [ADAPT] Z 8: RPE=   -69.0% (>20%), retry #  9 band=[  127,  144]
+  [INFO] Z 8: G3 BSTAR prior narrows BN to [  13.89,  56.39]
+  Z 8: exit= 1 pts=  2955 BN=   33.66
+  [ADAPT] Z 8: RPE=   -68.6% (>20%), retry # 10 band=[  127,  143]
+  [INFO] Z 8: G3 BSTAR prior narrows BN to [  13.84,  56.39]
+  Z 8: exit= 1 pts=  2974 BN=   34.08
+  [ADAPT] Z 8: final RPE=   -68.3% after  10 adjustment(s)
+  latest zone= 8 RPE=  -68.34%
+  ensemble RPE=  -70.35%
+ [PROGRESS]  42% ( 3 of  7 objects done)
+
+ ===== 39615 Proton-M Briz-M   
+  --- iadapt_zone=0
+  [INFO] G2 BN floor estimate=   58.03 -> bn_lo=   29.02
+  [INFO] Z 1: G3 BSTAR prior narrows BN to [  32.69, 160.00]
+  Z 1: exit= 1 pts=  1632 BN=   82.62
+  [WARN] Z 2: GA optimum at search boundary -- true value may lie outside the search range
+  Z 2: exit= 1 pts=  8080 BN=   50.30
+  [INFO] Z 3: G3 BSTAR prior narrows BN to [  33.84, 131.74]
+  Z 3: exit= 0 pts= 10850 BN=   60.95
+  Z 4: exit= 0 pts= 11178 BN=   74.18
+  Z 5: exit= 1 pts=  2987 BN=   69.56
+  [WARN] Z 6: GA optimum at search boundary -- true value may lie outside the search range
+  Z 6: exit= 1 pts=  3571 BN=   47.69
+  Z 7: exit= 1 pts=  1818 BN=   60.37
+  Z 8: exit= 1 pts=   237 BN=   52.15
+  latest zone= 8 RPE=   19.81%
+  ensemble RPE=   -0.08%
+  --- iadapt_zone=1
+  [INFO] G2 BN floor estimate=   47.52 -> bn_lo=   23.76
+  Z 1: exit= 0 pts=  5447 BN=   70.70
+  Z 2: exit= 0 pts=  5911 BN=   49.34
+  [WARN] Z 3: GA optimum at search boundary -- true value may lie outside the search range
+  Z 3: exit= 0 pts=  6482 BN=   40.50
+  Z 4: exit= 0 pts=  7078 BN=   57.65
+  Z 5: exit= 1 pts=  5605 BN=   68.85
+  [ADAPT] Z 5: final RPE=     4.1% after   0 adjustment(s)
+  Z 6: exit= 1 pts=  1503 BN=   66.63
+  [ADAPT] Z 6: RPE=   -68.7% (>20%), retry #  1 band=[  165,  203]
+  Z 6: exit= 1 pts=  1503 BN=   66.64
+  [ADAPT] Z 6: RPE=   -68.7% (>20%), retry #  2 band=[  165,  204]
+  Z 6: exit= 1 pts=  1500 BN=   66.49
+  [ADAPT] Z 6: RPE=   -68.8% (>20%), retry #  3 band=[  165,  205]
+  Z 6: exit= 1 pts=  1495 BN=   66.15
+  [ADAPT] Z 6: RPE=   -68.9% (>20%), retry #  4 band=[  165,  206]
+  Z 6: exit= 1 pts=  1503 BN=   66.64
+  [ADAPT] Z 6: RPE=   -68.7% (>20%), retry #  5 band=[  165,  207]
+  Z 6: exit= 1 pts=  1501 BN=   66.56
+  [ADAPT] Z 6: RPE=   -68.8% (>20%), retry #  6 band=[  165,  201]
+  Z 6: exit= 1 pts=  1504 BN=   66.77
+  [ADAPT] Z 6: RPE=   -68.7% (>20%), retry #  7 band=[  165,  200]
+  Z 6: exit= 1 pts=  1500 BN=   66.49
+  [ADAPT] Z 6: RPE=   -68.8% (>20%), retry #  8 band=[  165,  199]
+  Z 6: exit= 1 pts=  1501 BN=   66.50
+  [ADAPT] Z 6: RPE=   -68.8% (>20%), retry #  9 band=[  165,  198]
+  Z 6: exit= 1 pts=  1506 BN=   66.88
+  [ADAPT] Z 6: RPE=   -68.7% (>20%), retry # 10 band=[  165,  197]
+  Z 6: exit= 1 pts=  1504 BN=   66.70
+  [ADAPT] Z 6: final RPE=   -68.7% after  10 adjustment(s)
+  [WARN] Z 7: GA optimum at search boundary -- true value may lie outside the search range
+  Z 7: exit= 1 pts=   856 BN=   83.09
+  [ADAPT] Z 7: RPE=   -80.4% (>20%), retry #  1 band=[  199,  220]
+  [WARN] Z 7: GA optimum at search boundary -- true value may lie outside the search range
+  Z 7: exit= 1 pts=   856 BN=   83.57
+  [ADAPT] Z 7: RPE=   -80.4% (>20%), retry #  2 band=[  199,  221]
+  [WARN] Z 7: GA optimum at search boundary -- true value may lie outside the search range
+  Z 7: exit= 1 pts=   856 BN=   83.75
+  [ADAPT] Z 7: RPE=   -80.4% (>20%), retry #  3 band=[  199,  222]
+  [WARN] Z 7: GA optimum at search boundary -- true value may lie outside the search range
+  Z 7: exit= 1 pts=   856 BN=   83.87
+  [ADAPT] Z 7: RPE=   -80.4% (>20%), retry #  4 band=[  199,  223]
+  [WARN] Z 7: GA optimum at search boundary -- true value may lie outside the search range
+  Z 7: exit= 1 pts=   854 BN=   83.37
+  [ADAPT] Z 7: RPE=   -80.4% (>20%), retry #  5 band=[  199,  224]
+  [WARN] Z 7: GA optimum at search boundary -- true value may lie outside the search range
+  Z 7: exit= 1 pts=   855 BN=   83.91
+  [ADAPT] Z 7: RPE=   -80.4% (>20%), retry #  6 band=[  199,  218]
+  [WARN] Z 7: GA optimum at search boundary -- true value may lie outside the search range
+  Z 7: exit= 1 pts=   857 BN=   83.83
+  [ADAPT] Z 7: RPE=   -80.4% (>20%), retry #  7 band=[  199,  217]
+  [WARN] Z 7: GA optimum at search boundary -- true value may lie outside the search range
+  Z 7: exit= 1 pts=   856 BN=   83.47
+  [ADAPT] Z 7: RPE=   -80.4% (>20%), retry #  8 band=[  199,  216]
+  [WARN] Z 7: GA optimum at search boundary -- true value may lie outside the search range
+  Z 7: exit= 1 pts=   853 BN=   82.14
+  [ADAPT] Z 7: RPE=   -80.5% (>20%), retry #  9 band=[  199,  215]
+  [WARN] Z 7: GA optimum at search boundary -- true value may lie outside the search range
+  Z 7: exit= 1 pts=   855 BN=   82.36
+  [ADAPT] Z 7: RPE=   -80.5% (>20%), retry # 10 band=[  199,  214]
+  [WARN] Z 7: GA optimum at search boundary -- true value may lie outside the search range
+  Z 7: exit= 1 pts=   861 BN=   83.88
+  [ADAPT] Z 7: final RPE=   -80.3% after  10 adjustment(s)
+  [WARN] Z 8: GA optimum at search boundary -- true value may lie outside the search range
+  Z 8: exit= 1 pts=   716 BN=   92.34
+  [ADAPT] Z 8: RPE=   -83.4% (>20%), retry #  1 band=[  215,  241]
+  [WARN] Z 8: GA optimum at search boundary -- true value may lie outside the search range
+  Z 8: exit= 1 pts=   717 BN=   92.39
+  [ADAPT] Z 8: RPE=   -83.4% (>20%), retry #  2 band=[  215,  242]
+  [WARN] Z 8: GA optimum at search boundary -- true value may lie outside the search range
+  Z 8: exit= 1 pts=   716 BN=   92.42
+  [ADAPT] Z 8: RPE=   -83.4% (>20%), retry #  3 band=[  215,  243]
+  [WARN] Z 8: GA optimum at search boundary -- true value may lie outside the search range
+  Z 8: exit= 1 pts=   715 BN=   92.40
+  [ADAPT] Z 8: RPE=   -83.4% (>20%), retry #  4 band=[  215,  244]
+  [WARN] Z 8: GA optimum at search boundary -- true value may lie outside the search range
+  Z 8: exit= 1 pts=   715 BN=   92.39
+  [ADAPT] Z 8: RPE=   -83.4% (>20%), retry #  5 band=[  215,  245]
+  [WARN] Z 8: GA optimum at search boundary -- true value may lie outside the search range
+  Z 8: exit= 1 pts=   714 BN=   92.42
+  [ADAPT] Z 8: RPE=   -83.4% (>20%), retry #  6 band=[  215,  239]
+  [WARN] Z 8: GA optimum at search boundary -- true value may lie outside the search range
+  Z 8: exit= 1 pts=   716 BN=   92.39
+  [ADAPT] Z 8: RPE=   -83.4% (>20%), retry #  7 band=[  215,  238]
+  [WARN] Z 8: GA optimum at search boundary -- true value may lie outside the search range
+  Z 8: exit= 1 pts=   716 BN=   92.13
+  [ADAPT] Z 8: RPE=   -83.4% (>20%), retry #  8 band=[  215,  237]
+  [WARN] Z 8: GA optimum at search boundary -- true value may lie outside the search range
+  Z 8: exit= 1 pts=   716 BN=   92.15
+  [ADAPT] Z 8: RPE=   -83.4% (>20%), retry #  9 band=[  215,  236]
+  [WARN] Z 8: GA optimum at search boundary -- true value may lie outside the search range
+  Z 8: exit= 1 pts=   717 BN=   92.38
+  [ADAPT] Z 8: RPE=   -83.4% (>20%), retry # 10 band=[  215,  235]
+  [WARN] Z 8: GA optimum at search boundary -- true value may lie outside the search range
+  Z 8: exit= 1 pts=   717 BN=   92.43
+  [ADAPT] Z 8: final RPE=   -83.4% after  10 adjustment(s)
+  latest zone= 8 RPE=  -83.38%
+  ensemble RPE=  -64.11%
+ [PROGRESS]  57% ( 4 of  7 objects done)
+
+ ===== 27526 Ariane 5 R/B      
+  --- iadapt_zone=0
+  [INFO] G2 BN floor estimate=   48.19 -> bn_lo=   24.09
+  Z 1: exit= 0 pts=  8427 BN=   72.51
+  Z 2: exit= 1 pts=  9919 BN=   72.09
+  Z 3: exit= 1 pts=  2252 BN=   68.69
+  Z 4: exit= 1 pts=  2792 BN=   79.11
+  [WARN] Z 5: GA optimum at search boundary -- true value may lie outside the search range
+  Z 5: exit= 1 pts=  1772 BN=   71.98
+  [WARN] Z 6: GA optimum at search boundary -- true value may lie outside the search range
+  Z 6: exit= 1 pts=  1696 BN=   66.48
+  [WARN] Z 7: GA optimum at search boundary -- true value may lie outside the search range
+  Z 7: exit= 1 pts=   799 BN=   98.22
+  Z 8: exit= 1 pts=   236 BN=   93.73
+  latest zone= 8 RPE=    4.71%
+  ensemble RPE=    0.27%
+  --- iadapt_zone=1
+  [INFO] G2 BN floor estimate=   60.42 -> bn_lo=   30.21
+  Z 1: exit= 0 pts=  7686 BN=   54.56
+  Z 2: exit= 0 pts=  7701 BN=   82.49
+  [WARN] Z 3: RSM envelope does not bound  12 of  21 observations -- proceeding anyway
+  [WARN] Z 3: GA optimum at search boundary -- true value may lie outside the search range
+  Z 3: exit= 1 pts=  5717 BN=  153.01
+  [ADAPT] Z 3: RPE=    26.7% (>20%), retry #  1 band=[   46,   67]
+  [WARN] Z 3: RSM envelope does not bound  12 of  22 observations -- proceeding anyway
+  [WARN] Z 3: GA optimum at search boundary -- true value may lie outside the search range
+  Z 3: exit= 1 pts=  5717 BN=  153.01
+  [ADAPT] Z 3: RPE=    26.7% (>20%), retry #  2 band=[   46,   68]
+  [WARN] Z 3: RSM envelope does not bound  12 of  23 observations -- proceeding anyway
+  [WARN] Z 3: GA optimum at search boundary -- true value may lie outside the search range
+  Z 3: exit= 1 pts=  5802 BN=  104.29
+  [ADAPT] Z 3: RPE=    24.7% (>20%), retry #  3 band=[   46,   69]
+  [WARN] Z 3: RSM envelope does not bound  12 of  24 observations -- proceeding anyway
+  [WARN] Z 3: GA optimum at search boundary -- true value may lie outside the search range
+  Z 3: exit= 1 pts=  5817 BN=   95.35
+  [ADAPT] Z 3: RPE=    24.1% (>20%), retry #  4 band=[   46,   70]
+  [WARN] Z 3: RSM envelope does not bound  12 of  25 observations -- proceeding anyway
+  [WARN] Z 3: GA optimum at search boundary -- true value may lie outside the search range
+  Z 3: exit= 1 pts=  5795 BN=  108.04
+  [ADAPT] Z 3: RPE=    24.9% (>20%), retry #  5 band=[   46,   71]
+  [WARN] Z 3: RSM envelope does not bound   3 of  26 observations -- proceeding anyway
+  Z 3: exit= 1 pts=  5827 BN=   84.41
+  [ADAPT] Z 3: RPE=    23.1% (>20%), retry #  6 band=[   46,   65]
+  [WARN] Z 3: RSM envelope does not bound  12 of  20 observations -- proceeding anyway
+  [WARN] Z 3: GA optimum at search boundary -- true value may lie outside the search range
+  Z 3: exit= 1 pts=  5767 BN=  123.99
+  [ADAPT] Z 3: RPE=    25.7% (>20%), retry #  7 band=[   46,   64]
+  [WARN] Z 3: RSM envelope does not bound  12 of  19 observations -- proceeding anyway
+  [WARN] Z 3: GA optimum at search boundary -- true value may lie outside the search range
+  Z 3: exit= 1 pts=  5717 BN=  153.01
+  [ADAPT] Z 3: RPE=    26.7% (>20%), retry #  8 band=[   46,   63]
+  [WARN] Z 3: RSM envelope does not bound  12 of  18 observations -- proceeding anyway
+  [WARN] Z 3: GA optimum at search boundary -- true value may lie outside the search range
+  Z 3: exit= 1 pts=  5717 BN=  153.01
+  [ADAPT] Z 3: RPE=    26.7% (>20%), retry #  9 band=[   46,   62]
+  [WARN] Z 3: RSM envelope does not bound  12 of  17 observations -- proceeding anyway
+  [WARN] Z 3: GA optimum at search boundary -- true value may lie outside the search range
+  Z 3: exit= 1 pts=  5717 BN=  153.01
+  [ADAPT] Z 3: RPE=    26.7% (>20%), retry # 10 band=[   46,   61]
+  [WARN] Z 3: RSM envelope does not bound  12 of  16 observations -- proceeding anyway
+  [WARN] Z 3: GA optimum at search boundary -- true value may lie outside the search range
+  Z 3: exit= 1 pts=  5717 BN=  153.01
+  [ADAPT] Z 3: final RPE=    23.1% after  10 adjustment(s)
+  [INFO] Z 4: G3 BSTAR prior narrows BN to [  18.86, 192.45]
+  [WARN] Z 4: RSM envelope does not bound   2 of  23 observations -- proceeding anyway
+  Z 4: exit= 1 pts=  3592 BN=   86.42
+  [ADAPT] Z 4: final RPE=   -19.9% after   0 adjustment(s)
+  [WARN] Z 5: RSM envelope does not bound   3 of  26 observations -- proceeding anyway
+  [WARN] Z 5: GA optimum at search boundary -- true value may lie outside the search range
+  Z 5: exit= 1 pts=  6630 BN=   41.40
+  [ADAPT] Z 5: RPE=    30.2% (>20%), retry #  1 band=[   95,  121]
+  [WARN] Z 5: RSM envelope does not bound   3 of  27 observations -- proceeding anyway
+  [WARN] Z 5: GA optimum at search boundary -- true value may lie outside the search range
+  Z 5: exit= 1 pts=  6620 BN=   41.09
+  [ADAPT] Z 5: RPE=    29.9% (>20%), retry #  2 band=[   95,  122]
+  [WARN] Z 5: RSM envelope does not bound   3 of  28 observations -- proceeding anyway
+  [WARN] Z 5: GA optimum at search boundary -- true value may lie outside the search range
+  Z 5: exit= 1 pts=  6619 BN=   41.11
+  [ADAPT] Z 5: RPE=    29.9% (>20%), retry #  3 band=[   95,  123]
+  [WARN] Z 5: RSM envelope does not bound   3 of  29 observations -- proceeding anyway
+  [WARN] Z 5: GA optimum at search boundary -- true value may lie outside the search range
+  Z 5: exit= 1 pts=  6744 BN=   44.58
+  [ADAPT] Z 5: RPE=    32.9% (>20%), retry #  4 band=[   95,  124]
+  [WARN] Z 5: RSM envelope does not bound   3 of  30 observations -- proceeding anyway
+  [WARN] Z 5: GA optimum at search boundary -- true value may lie outside the search range
+  Z 5: exit= 1 pts=  6760 BN=   45.06
+  [ADAPT] Z 5: RPE=    33.3% (>20%), retry #  5 band=[   95,  125]
+  [WARN] Z 5: RSM envelope does not bound   3 of  31 observations -- proceeding anyway
+  [WARN] Z 5: GA optimum at search boundary -- true value may lie outside the search range
+  Z 5: exit= 1 pts=  6646 BN=   41.86
+  [ADAPT] Z 5: RPE=    30.6% (>20%), retry #  6 band=[   95,  119]
+  [WARN] Z 5: RSM envelope does not bound   3 of  25 observations -- proceeding anyway
+  [WARN] Z 5: GA optimum at search boundary -- true value may lie outside the search range
+  Z 5: exit= 1 pts=  6617 BN=   41.00
+  [ADAPT] Z 5: RPE=    29.8% (>20%), retry #  7 band=[   95,  118]
+  [WARN] Z 5: RSM envelope does not bound   3 of  24 observations -- proceeding anyway
+  [WARN] Z 5: GA optimum at search boundary -- true value may lie outside the search range
+  Z 5: exit= 1 pts=  6811 BN=   46.84
+  [ADAPT] Z 5: RPE=    34.6% (>20%), retry #  8 band=[   95,  117]
+  [WARN] Z 5: RSM envelope does not bound   3 of  23 observations -- proceeding anyway
+  [WARN] Z 5: GA optimum at search boundary -- true value may lie outside the search range
+  Z 5: exit= 1 pts=  6708 BN=   43.75
+  [ADAPT] Z 5: RPE=    32.1% (>20%), retry #  9 band=[   95,  116]
+  [WARN] Z 5: RSM envelope does not bound   3 of  22 observations -- proceeding anyway
+  [WARN] Z 5: GA optimum at search boundary -- true value may lie outside the search range
+  Z 5: exit= 1 pts=  6611 BN=   40.94
+  [ADAPT] Z 5: RPE=    29.7% (>20%), retry # 10 band=[   95,  115]
+  [WARN] Z 5: RSM envelope does not bound   3 of  21 observations -- proceeding anyway
+  [WARN] Z 5: GA optimum at search boundary -- true value may lie outside the search range
+  Z 5: exit= 1 pts=  6680 BN=   42.94
+  [ADAPT] Z 5: final RPE=    29.7% after  10 adjustment(s)
+  [WARN] Z 6: RSM envelope does not bound   3 of  31 observations -- proceeding anyway
+  [WARN] Z 6: GA optimum at search boundary -- true value may lie outside the search range
+  Z 6: exit= 0 pts=  7810 BN=   55.95
+  [WARN] Z 7: RSM envelope does not bound   4 of  25 observations -- proceeding anyway
+  [WARN] Z 7: GA optimum at search boundary -- true value may lie outside the search range
+  Z 7: exit= 0 pts=  7864 BN=   59.54
+  [WARN] Z 8: GA optimum at search boundary -- true value may lie outside the search range
+  Z 8: exit= 0 pts=  7921 BN=   57.32
+  latest zone= 5 RPE=   29.74%
+  ensemble RPE=   22.03%
+ [PROGRESS]  71% ( 5 of  7 objects done)
+
+ ===== 32007 GSLV R/B          
+  --- iadapt_zone=0
+  [INFO] G2 BN floor estimate=   48.86 -> bn_lo=   24.43
+  Z 1: exit= 1 pts= 13502 BN=   71.91
+  [WARN] Z 2: GA optimum at search boundary -- true value may lie outside the search range
+  Z 2: exit= 1 pts= 13430 BN=   41.09
+  Z 3: exit= 1 pts= 12656 BN=   52.34
+  Z 4: exit= 1 pts=  7491 BN=   42.34
+  [WARN] Z 5: GA optimum at search boundary -- true value may lie outside the search range
+  Z 5: exit= 1 pts=  5157 BN=   55.03
+  Z 6: exit= 1 pts=  5440 BN=   38.26
+  [WARN] Z 7: GA optimum at search boundary -- true value may lie outside the search range
+  Z 7: exit= 1 pts=  3381 BN=   47.70
+  [WARN] Z 8: GA optimum at search boundary -- true value may lie outside the search range
+  Z 8: exit= 1 pts=   306 BN=   52.53
+  latest zone= 8 RPE=    2.00%
+  ensemble RPE=   -0.25%
+  --- iadapt_zone=1
+  [INFO] G2 BN floor estimate=   44.78 -> bn_lo=   22.39
+  Z 1: exit= 0 pts= 17941 BN=   74.57
+  Z 2: exit= 1 pts= 13545 BN=   72.13
+  [ADAPT] Z 2: final RPE=    18.8% after   0 adjustment(s)
+  Z 3: exit= 1 pts= 11819 BN=   71.33
+  [ADAPT] Z 3: final RPE=     5.0% after   0 adjustment(s)
+  [WARN] Z 4: GA optimum at search boundary -- true value may lie outside the search range
+  Z 4: exit= 0 pts= 18313 BN=   54.49
+  [WARN] Z 5: GA optimum at search boundary -- true value may lie outside the search range
+  Z 5: exit= 1 pts=  8319 BN=   54.30
+  [ADAPT] Z 5: RPE=   -21.7% (>20%), retry #  1 band=[  227,  280]
+  [WARN] Z 5: GA optimum at search boundary -- true value may lie outside the search range
+  Z 5: exit= 1 pts=  8467 BN=   55.82
+  [ADAPT] Z 5: RPE=   -20.3% (>20%), retry #  2 band=[  227,  281]
+  [WARN] Z 5: GA optimum at search boundary -- true value may lie outside the search range
+  Z 5: exit= 1 pts=  8735 BN=   58.67
+  [ADAPT] Z 5: final RPE=   -17.7% after   2 adjustment(s)
+  Z 6: exit= 0 pts= 18553 BN=   60.69
+  [WARN] Z 7: GA optimum at search boundary -- true value may lie outside the search range
+  Z 7: exit= 1 pts= 10006 BN=   50.09
+  [ADAPT] Z 7: final RPE=    -3.0% after   0 adjustment(s)
+  [WARN] Z 8: GA optimum at search boundary -- true value may lie outside the search range
+  Z 8: exit= 1 pts=  9984 BN=   42.21
+  [ADAPT] Z 8: final RPE=    -2.4% after   0 adjustment(s)
+  latest zone= 8 RPE=   -2.36%
+  ensemble RPE=   -2.01%
+ [PROGRESS]  85% ( 6 of  7 objects done)
+
+ ===== 37819 Proton-M R/B      
+  --- iadapt_zone=0
+  [INFO] G2 BN floor estimate=   43.93 -> bn_lo=   21.96
+  [INFO] Z 1: G3 BSTAR prior narrows BN to [  28.59, 160.00]
+  Z 1: exit= 1 pts=  5136 BN=   61.75
+  [INFO] Z 2: G3 BSTAR prior narrows BN to [  28.26,  96.26]
+  Z 2: exit= 1 pts=  3430 BN=   44.46
+  [INFO] Z 3: G3 BSTAR prior narrows BN to [  31.05,  61.72]
+  Z 3: exit= 1 pts=  2856 BN=   40.13
+  [INFO] Z 4: G3 BSTAR prior narrows BN to [  31.71,  48.76]
+  Z 4: exit= 1 pts=  2524 BN=   45.15
+  Z 5: exit= 1 pts=  2034 BN=   43.41
+  [WARN] Z 6: GA optimum at search boundary -- true value may lie outside the search range
+  Z 6: exit= 1 pts=  1611 BN=   45.53
+  Z 7: exit= 1 pts=  1507 BN=   44.03
+  Z 8: exit= 1 pts=    81 BN=   44.57
+  latest zone= 8 RPE=   31.89%
+  ensemble RPE=   -7.74%
+  --- iadapt_zone=1
+  [INFO] G2 BN floor estimate=   19.29 -> bn_lo=    9.65
+  [INFO] Z 1: G3 BSTAR prior narrows BN to [  19.83, 160.00]
+  [WARN] Z 1: GA optimum at search boundary -- true value may lie outside the search range
+  Z 1: exit= 1 pts=  5702 BN=   24.83
+  [ADAPT] Z 1: final RPE=    -3.1% after   0 adjustment(s)
+  [INFO] Z 2: G3 BSTAR prior narrows BN to [  20.18, 197.59]
+  [WARN] Z 2: GA optimum at search boundary -- true value may lie outside the search range
+  Z 2: exit= 1 pts=  5048 BN=   36.46
+  [ADAPT] Z 2: final RPE=   -10.8% after   0 adjustment(s)
+  [INFO] Z 3: G3 BSTAR prior narrows BN to [  20.42, 242.99]
+  [WARN] Z 3: GA optimum at search boundary -- true value may lie outside the search range
+  Z 3: exit= 1 pts=  4349 BN=   41.21
+  [ADAPT] Z 3: RPE=   -21.1% (>20%), retry #  1 band=[   62,  104]
+  [INFO] Z 3: G3 BSTAR prior narrows BN to [  20.42, 243.00]
+  [WARN] Z 3: GA optimum at search boundary -- true value may lie outside the search range
+  Z 3: exit= 1 pts=  4396 BN=   44.21
+  [ADAPT] Z 3: final RPE=   -19.9% after   1 adjustment(s)
+  [INFO] Z 4: G3 BSTAR prior narrows BN to [  20.78, 247.35]
+  Z 4: exit= 1 pts=  4177 BN=   55.52
+  [ADAPT] Z 4: RPE=   -20.5% (>20%), retry #  1 band=[  105,  161]
+  [INFO] Z 4: G3 BSTAR prior narrows BN to [  20.79, 247.44]
+  [WARN] Z 4: GA optimum at search boundary -- true value may lie outside the search range
+  Z 4: exit= 1 pts=  4118 BN=   49.22
+  [ADAPT] Z 4: RPE=   -22.2% (>20%), retry #  2 band=[  105,  162]
+  [INFO] Z 4: G3 BSTAR prior narrows BN to [  20.80, 247.55]
+  [WARN] Z 4: GA optimum at search boundary -- true value may lie outside the search range
+  Z 4: exit= 1 pts=  4153 BN=   52.81
+  [ADAPT] Z 4: RPE=   -21.2% (>20%), retry #  3 band=[  105,  163]
+  [INFO] Z 4: G3 BSTAR prior narrows BN to [  20.81, 247.66]
+  [WARN] Z 4: GA optimum at search boundary -- true value may lie outside the search range
+  Z 4: exit= 1 pts=  4149 BN=   52.43
+  [ADAPT] Z 4: RPE=   -21.3% (>20%), retry #  4 band=[  105,  164]
+  [INFO] Z 4: G3 BSTAR prior narrows BN to [  20.81, 247.70]
+  [WARN] Z 4: GA optimum at search boundary -- true value may lie outside the search range
+  Z 4: exit= 1 pts=  4101 BN=   47.63
+  [ADAPT] Z 4: RPE=   -22.6% (>20%), retry #  5 band=[  105,  165]
+  [INFO] Z 4: G3 BSTAR prior narrows BN to [  20.82, 247.73]
+  [WARN] Z 4: GA optimum at search boundary -- true value may lie outside the search range
+  Z 4: exit= 1 pts=  4135 BN=   50.95
+  [ADAPT] Z 4: RPE=   -21.7% (>20%), retry #  6 band=[  105,  159]
+  [INFO] Z 4: G3 BSTAR prior narrows BN to [  20.78, 247.27]
+  Z 4: exit= 1 pts=  4183 BN=   56.29
+  [ADAPT] Z 4: RPE=   -20.4% (>20%), retry #  7 band=[  105,  158]
+  [INFO] Z 4: G3 BSTAR prior narrows BN to [  20.77, 247.16]
+  [WARN] Z 4: GA optimum at search boundary -- true value may lie outside the search range
+  Z 4: exit= 1 pts=  4133 BN=   50.73
+  [ADAPT] Z 4: RPE=   -21.8% (>20%), retry #  8 band=[  105,  157]
+  [INFO] Z 4: G3 BSTAR prior narrows BN to [  20.76, 247.05]
+  [WARN] Z 4: GA optimum at search boundary -- true value may lie outside the search range
+  Z 4: exit= 1 pts=  4104 BN=   47.91
+  [ADAPT] Z 4: RPE=   -22.6% (>20%), retry #  9 band=[  105,  156]
+  [INFO] Z 4: G3 BSTAR prior narrows BN to [  20.74, 246.87]
+  [WARN] Z 4: GA optimum at search boundary -- true value may lie outside the search range
+  Z 4: exit= 1 pts=  4083 BN=   46.11
+  [ADAPT] Z 4: RPE=   -23.1% (>20%), retry # 10 band=[  105,  155]
+  [INFO] Z 4: G3 BSTAR prior narrows BN to [  20.73, 246.68]
+  [WARN] Z 4: GA optimum at search boundary -- true value may lie outside the search range
+  Z 4: exit= 1 pts=  4006 BN=   40.26
+  [ADAPT] Z 4: final RPE=   -20.4% after  10 adjustment(s)
+  [INFO] Z 5: G3 BSTAR prior narrows BN to [  21.96, 261.31]
+  Z 5: exit= 1 pts=  3717 BN=   67.17
+  [ADAPT] Z 5: RPE=   -26.7% (>20%), retry #  1 band=[  160,  215]
+  [INFO] Z 5: G3 BSTAR prior narrows BN to [  21.95, 261.29]
+  Z 5: exit= 1 pts=  3750 BN=   75.19
+  [ADAPT] Z 5: RPE=   -25.6% (>20%), retry #  2 band=[  160,  216]
+  [INFO] Z 5: G3 BSTAR prior narrows BN to [  21.95, 261.28]
+  Z 5: exit= 1 pts=  3738 BN=   71.91
+  [ADAPT] Z 5: RPE=   -26.0% (>20%), retry #  3 band=[  160,  217]
+  [INFO] Z 5: G3 BSTAR prior narrows BN to [  21.95, 261.28]
+  Z 5: exit= 1 pts=  3699 BN=   63.26
+  [ADAPT] Z 5: RPE=   -27.3% (>20%), retry #  4 band=[  160,  218]
+  [INFO] Z 5: G3 BSTAR prior narrows BN to [  21.95, 261.28]
+  Z 5: exit= 1 pts=  3712 BN=   66.03
+  [ADAPT] Z 5: RPE=   -26.9% (>20%), retry #  5 band=[  160,  219]
+  [INFO] Z 5: G3 BSTAR prior narrows BN to [  21.95, 261.24]
+  Z 5: exit= 1 pts=  3729 BN=   69.51
+  [ADAPT] Z 5: RPE=   -26.3% (>20%), retry #  6 band=[  160,  213]
+  [INFO] Z 5: G3 BSTAR prior narrows BN to [  21.96, 261.31]
+  Z 5: exit= 1 pts=  3748 BN=   74.22
+  [ADAPT] Z 5: RPE=   -25.7% (>20%), retry #  7 band=[  160,  212]
+  [INFO] Z 5: G3 BSTAR prior narrows BN to [  21.96, 261.32]
+  Z 5: exit= 1 pts=  3730 BN=   70.33
+  [ADAPT] Z 5: RPE=   -26.2% (>20%), retry #  8 band=[  160,  211]
+  [INFO] Z 5: G3 BSTAR prior narrows BN to [  21.96, 261.38]
+  Z 5: exit= 1 pts=  3733 BN=   70.43
+  [ADAPT] Z 5: RPE=   -26.2% (>20%), retry #  9 band=[  160,  210]
+  [INFO] Z 5: G3 BSTAR prior narrows BN to [  21.97, 261.44]
+  Z 5: exit= 1 pts=  3725 BN=   68.84
+  [ADAPT] Z 5: RPE=   -26.5% (>20%), retry # 10 band=[  160,  209]
+  [INFO] Z 5: G3 BSTAR prior narrows BN to [  21.97, 261.45]
+  Z 5: exit= 1 pts=  3730 BN=   70.71
+  [ADAPT] Z 5: final RPE=   -25.6% after  10 adjustment(s)
+  [INFO] Z 6: G3 BSTAR prior narrows BN to [  21.73, 166.78]
+  Z 6: exit= 1 pts=  3272 BN=   50.76
+  [ADAPT] Z 6: RPE=   -34.8% (>20%), retry #  1 band=[  216,  266]
+  [INFO] Z 6: G3 BSTAR prior narrows BN to [  21.73, 166.78]
+  Z 6: exit= 1 pts=  3272 BN=   50.76
+  [ADAPT] Z 6: RPE=   -34.8% (>20%), retry #  2 band=[  216,  267]
+  [INFO] Z 6: G3 BSTAR prior narrows BN to [  21.73, 166.78]
+  Z 6: exit= 1 pts=  3272 BN=   50.76
+  [ADAPT] Z 6: RPE=   -34.8% (>20%), retry #  3 band=[  216,  268]
+  [INFO] Z 6: G3 BSTAR prior narrows BN to [  21.73, 166.78]
+  Z 6: exit= 1 pts=  3222 BN=   44.97
+  [ADAPT] Z 6: RPE=   -36.2% (>20%), retry #  4 band=[  216,  269]
+  [INFO] Z 6: G3 BSTAR prior narrows BN to [  21.72, 166.78]
+  Z 6: exit= 1 pts=  3252 BN=   48.26
+  [ADAPT] Z 6: RPE=   -35.4% (>20%), retry #  5 band=[  216,  270]
+  [INFO] Z 6: G3 BSTAR prior narrows BN to [  21.73, 166.78]
+  Z 6: exit= 1 pts=  3269 BN=   50.23
+  [ADAPT] Z 6: RPE=   -34.9% (>20%), retry #  6 band=[  216,  264]
+  [INFO] Z 6: G3 BSTAR prior narrows BN to [  21.73, 166.78]
+  Z 6: exit= 1 pts=  3308 BN=   55.91
+  [ADAPT] Z 6: RPE=   -33.7% (>20%), retry #  7 band=[  216,  263]
+  [INFO] Z 6: G3 BSTAR prior narrows BN to [  21.74, 166.78]
+  Z 6: exit= 1 pts=  3272 BN=   50.79
+  [ADAPT] Z 6: RPE=   -34.8% (>20%), retry #  8 band=[  216,  262]
+  [INFO] Z 6: G3 BSTAR prior narrows BN to [  21.74, 166.78]
+  Z 6: exit= 1 pts=  3280 BN=   51.69
+  [ADAPT] Z 6: RPE=   -34.5% (>20%), retry #  9 band=[  216,  261]
+  [INFO] Z 6: G3 BSTAR prior narrows BN to [  21.77, 166.78]
+  Z 6: exit= 1 pts=  3295 BN=   53.95
+  [ADAPT] Z 6: RPE=   -34.1% (>20%), retry # 10 band=[  216,  260]
+  [INFO] Z 6: G3 BSTAR prior narrows BN to [  21.79, 166.78]
+  Z 6: exit= 1 pts=  3272 BN=   50.81
+  [ADAPT] Z 6: final RPE=   -33.7% after  10 adjustment(s)
+  [INFO] Z 7: G3 BSTAR prior narrows BN to [  22.46,  95.11]
+  Z 7: exit= 1 pts=  2898 BN=   41.36
+  [ADAPT] Z 7: RPE=   -41.5% (>20%), retry #  1 band=[  265,  319]
+  [INFO] Z 7: G3 BSTAR prior narrows BN to [  22.45,  95.11]
+  Z 7: exit= 1 pts=  2919 BN=   43.29
+  [ADAPT] Z 7: RPE=   -41.0% (>20%), retry #  2 band=[  265,  320]
+  [INFO] Z 7: G3 BSTAR prior narrows BN to [  22.45,  95.11]
+  Z 7: exit= 1 pts=  2860 BN=   38.25
+  [ADAPT] Z 7: RPE=   -42.6% (>20%), retry #  3 band=[  265,  321]
+  [INFO] Z 7: G3 BSTAR prior narrows BN to [  22.44,  95.11]
+  Z 7: exit= 1 pts=  2905 BN=   41.94
+  [ADAPT] Z 7: RPE=   -41.3% (>20%), retry #  4 band=[  265,  322]
+  [INFO] Z 7: G3 BSTAR prior narrows BN to [  22.44,  95.11]
+  Z 7: exit= 1 pts=  2935 BN=   44.90
+  [ADAPT] Z 7: RPE=   -40.5% (>20%), retry #  5 band=[  265,  323]
+  [INFO] Z 7: G3 BSTAR prior narrows BN to [  22.43,  95.11]
+  Z 7: exit= 1 pts=  2925 BN=   43.86
+  [ADAPT] Z 7: RPE=   -40.8% (>20%), retry #  6 band=[  265,  317]
+  [INFO] Z 7: G3 BSTAR prior narrows BN to [  22.46,  95.11]
+  Z 7: exit= 1 pts=  2912 BN=   42.62
+  [ADAPT] Z 7: RPE=   -41.1% (>20%), retry #  7 band=[  265,  316]
+  [INFO] Z 7: G3 BSTAR prior narrows BN to [  22.47,  95.11]
+  Z 7: exit= 1 pts=  2859 BN=   38.15
+  [ADAPT] Z 7: RPE=   -42.6% (>20%), retry #  8 band=[  265,  315]
+  [INFO] Z 7: G3 BSTAR prior narrows BN to [  22.46,  95.11]
+  Z 7: exit= 1 pts=  2885 BN=   40.19
+  [ADAPT] Z 7: RPE=   -41.9% (>20%), retry #  9 band=[  265,  314]
+  [INFO] Z 7: G3 BSTAR prior narrows BN to [  22.46,  95.11]
+  Z 7: exit= 1 pts=  2939 BN=   45.45
+  [ADAPT] Z 7: RPE=   -40.4% (>20%), retry # 10 band=[  265,  313]
+  [INFO] Z 7: G3 BSTAR prior narrows BN to [  22.45,  95.11]
+  Z 7: exit= 1 pts=  2910 BN=   42.41
+  [ADAPT] Z 7: final RPE=   -40.4% after  10 adjustment(s)
+  Z 8: exit= 1 pts=  2600 BN=   34.61
+  [ADAPT] Z 8: RPE=   -47.0% (>20%), retry #  1 band=[  315,  368]
+  Z 8: exit= 1 pts=  2606 BN=   35.05
+  [ADAPT] Z 8: RPE=   -46.9% (>20%), retry #  2 band=[  315,  369]
+  Z 8: exit= 1 pts=  2596 BN=   34.38
+  [ADAPT] Z 8: RPE=   -47.1% (>20%), retry #  3 band=[  315,  370]
+  Z 8: exit= 1 pts=  2576 BN=   33.17
+  [ADAPT] Z 8: RPE=   -47.6% (>20%), retry #  4 band=[  315,  371]
+  Z 8: exit= 1 pts=  2568 BN=   32.70
+  [ADAPT] Z 8: RPE=   -47.8% (>20%), retry #  5 band=[  315,  372]
+  Z 8: exit= 1 pts=  2588 BN=   33.85
+  [ADAPT] Z 8: RPE=   -47.3% (>20%), retry #  6 band=[  315,  366]
+  Z 8: exit= 1 pts=  2572 BN=   32.94
+  [ADAPT] Z 8: RPE=   -47.7% (>20%), retry #  7 band=[  315,  365]
+  Z 8: exit= 1 pts=  2595 BN=   34.32
+  [ADAPT] Z 8: RPE=   -47.2% (>20%), retry #  8 band=[  315,  364]
+  Z 8: exit= 1 pts=  2593 BN=   34.16
+  [ADAPT] Z 8: RPE=   -47.2% (>20%), retry #  9 band=[  315,  363]
+  Z 8: exit= 1 pts=  2569 BN=   32.76
+  [ADAPT] Z 8: RPE=   -47.8% (>20%), retry # 10 band=[  315,  362]
+  Z 8: exit= 1 pts=  2619 BN=   35.91
+  [ADAPT] Z 8: final RPE=   -46.5% after  10 adjustment(s)
+  latest zone= 8 RPE=  -46.52%
+  ensemble RPE=  -20.69%
+ [PROGRESS] 100% ( 7 of  7 objects done)
+
+ campaign complete -> scratch_rpe/rpe_campaign_7obj_issue41.csv

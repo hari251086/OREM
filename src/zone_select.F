@@ -82,6 +82,110 @@ c     R² = 1 - SS_res / SS_tot
       end
 
 c     ============================================================
+      subroutine zone_select_next(epochs, ha, npts, istart_scan,
+     &                       min_zone_pts, max_zone_days,
+     &                       r2_threshold, slope_threshold,
+     &                       zs, ze, found)
+c
+c     Issue #41: incremental single-zone version of zone_select's
+c     Pass 1. Finds the first quasi-linear decay window starting the
+c     scan at istart_scan and returns immediately -- no comparison
+c     against candidates found later in the history (that's
+c     zone_select's Pass 2, which this intentionally skips). Used by
+c     orem.F's RPE-driven sequential zone selection (iadapt_zone=1)
+c     in place of a single upfront zone_select call, so each zone's
+c     window is only chosen after the previous one has been finalized
+c     (including any RPE-driven band adjustment) -- avoiding overlap
+c     by construction instead of zone_select's overlap-removal pass.
+c
+c     Input
+c       epochs(npts), ha(npts) : as zone_select
+c       npts                   : number of points
+c       istart_scan            : first index to try as a zone start
+c                                 (1 for the first zone; the previous
+c                                 zone's finalized zone_end+1 after
+c                                 that)
+c       min_zone_pts, max_zone_days, r2_threshold, slope_threshold :
+c                                 as zone_select
+c     Output
+c       zs, ze : start/end indices of the found zone (into
+c                epochs/ha) -- only valid if found is .true.
+c       found  : .true. if a qualifying zone exists starting at or
+c                after istart_scan
+c     ============================================================
+      implicit double precision (a-h, o-z)
+      integer npts, istart_scan, min_zone_pts
+      double precision epochs(npts), ha(npts)
+      double precision max_zone_days, r2_threshold, slope_threshold
+      integer zs, ze
+      logical found
+
+      double precision slope, intercept, r2
+      integer i, istart, iend
+
+      found = .false.
+      zs = 0
+      ze = 0
+
+      if (npts .lt. min_zone_pts) return
+
+      i = istart_scan
+      if (i .lt. 1) i = 1
+
+ 10   continue
+      if (i .gt. npts - min_zone_pts + 1) return
+
+      istart = i
+      iend = i + min_zone_pts - 1
+
+      if (epochs(iend) - epochs(istart) .gt.
+     &    max_zone_days) then
+         i = i + 1
+         goto 10
+      end if
+
+      call linfit(epochs(istart), ha(istart),
+     &            iend - istart + 1, slope, intercept, r2)
+
+      if (slope .ge. slope_threshold) then
+         i = i + 1
+         goto 10
+      end if
+
+ 20   continue
+      if (iend .ge. npts) goto 30
+      if (epochs(iend+1) - epochs(istart) .gt.
+     &    max_zone_days) goto 30
+
+      call linfit(epochs(istart), ha(istart),
+     &            iend - istart + 2, slope, intercept, r2)
+
+      if (r2 .ge. r2_threshold .and.
+     &    slope .lt. slope_threshold) then
+         iend = iend + 1
+         goto 20
+      end if
+
+ 30   continue
+
+      call linfit(epochs(istart), ha(istart),
+     &            iend - istart + 1, slope, intercept, r2)
+
+      if (r2 .ge. r2_threshold .and.
+     &    slope .lt. slope_threshold .and.
+     &    iend - istart + 1 .ge. min_zone_pts) then
+         zs = istart
+         ze = iend
+         found = .true.
+         return
+      else
+         i = i + 1
+         goto 10
+      end if
+
+      end
+
+c     ============================================================
       subroutine zone_select(epochs, ha, npts,
      &                       min_zone_pts, max_zone_days,
      &                       r2_threshold, slope_threshold,
