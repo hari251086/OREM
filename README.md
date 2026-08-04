@@ -905,6 +905,15 @@ Isolating the chain does **not** remove the volatility — it reveals a cleaner,
 
 `irefine=2` improves the report's own PRIMARY metric (6/7 objects improve or flat) — cleaner directionality than `irefine=1`'s mixed 4/7 — while the secondary ensemble-spread metric worsens by about the same amount either way. Reading: freeing the refinement from the carryover chain lets each zone genuinely improve on its own physical fit merits (the primary-metric win), at the cost of cross-zone BN consistency (the ensemble-spread cost) — a real tradeoff, not the #41-style failure mode. Not yet validated beyond n=7 — next step, not yet taken, is the existing 30/50/97-object campaign before considering `irefine=2` for the default pipeline. Both `irefine=1` and `irefine=2` remain opt-in/default-off. Commit cd0f2be on HS-dev, pushed. 385/385 tests pass.
 
+**2026-08-04 — Issue #40 validated on the 30-object campaign: `irefine=2`'s primary-metric win holds, and the ensemble-spread cost seen at n=7 turns out to be small-sample noise.** Fixed `rpe_campaign.F`'s `orem_run` call (stale since #41's signature change — not fpm-tracked, so this didn't break the build, but the script itself was broken for anyone trying to run it) and added an optional 3rd CLI arg for `irefine` (default 0, backward compatible). Ran objects 1-30 as 4 parallel processes (repo's 4-core-cap convention), compared against the already-recorded 97-object baseline for the same 30. Of the 24 objects with a valid re-entry prediction in both modes (6 never predict in either mode, 23647 has a pre-existing `ierr=2` failure in both — neither is a regression):
+
+| metric | baseline | `irefine=2` | direction |
+|---|---|---|---|
+| mean\|latest-zone RPE\| (PRIMARY) | 45.50% | **42.30%** | 17/24 better, 7/24 worse |
+| mean\|ensemble RPE\| (secondary) | 12.97% | 12.60% | 12/24 better, 12/24 worse (wash) |
+
+The curated-7 ensemble-RPE regression (1.94%→3.51%) does not reproduce at n=24 — it reads as small-sample noise (the curated-7 baseline ensemble RPE was already tiny, so any perturbation looked like a large relative swing). At n=24, `irefine=2` is a clear, fairly consistent win on the PRIMARY metric and neutral on the secondary one — meaningfully stronger evidence than n=7 alone. Not yet done: full 97-object validation, or a decision on promoting `irefine=2` toward the default pipeline — both flagged as open rather than decided unilaterally. Commit f301e3c on HS-dev, pushed.
+
 ---
 
 ## 9. References
