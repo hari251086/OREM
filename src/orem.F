@@ -54,6 +54,12 @@ c                          the true, directly-propagated RMS at the
 c                          same point. Uses only in-zone TLE data (no
 c                          future/oracle information, unlike #41), so
 c                          usable in a real operational prediction.
+c                          2=same refinement, but the boundary check
+c                          and next-zone bn_lo/bn_hi carryover use the
+c                          GA's pre-refinement optimum instead of the
+c                          refined one -- isolates whether irefine=1's
+c                          mixed curated-7 result traces to the same
+c                          carryover-chain amplification as issue #41.
 c       zone selection params, area bounds, mass, Cd, GA params,
 c       force model params, atmosphere tables
 c
@@ -225,6 +231,13 @@ c     error).
       parameter(refine_max_eval = 25)
       double precision zone_dur_r, e_refined, bn_refined, rms_refined
       integer neval_r
+c     irefine=2: isolate-carryover variant -- refine this zone's own
+c     reported outputs same as irefine=1, but the boundary check and
+c     next-zone bn_lo/bn_hi carryover use the GA's pre-refinement
+c     optimum, not the refined one. Tests whether irefine=1's mixed
+c     curated-7 result traces to the same carryover-chain amplification
+c     as issue #41, or is independent of it.
+      double precision e_ga_only, bn_ga_only, e_bound_val, bn_bound_val
 
       ierr = 0
       nzones_used = 0
@@ -619,7 +632,10 @@ c        GA optimization: match predicted apogee trajectory to TLE observations
      &      pcross, pmute, ga_seed,
      &      e_opt_out(iz), bn_opt_out(iz), rms_out(iz))
 
-         if (irefine .eq. 1) then
+         e_ga_only = e_opt_out(iz)
+         bn_ga_only = bn_opt_out(iz)
+
+         if (irefine .eq. 1 .or. irefine .eq. 2) then
 c           Issue #40: bounded local refinement using direct-
 c           propagation fitness instead of the GA's interpolated
 c           fitness. e_grid/bn_grid are the same bounds ga_optimize
@@ -662,15 +678,22 @@ c        width from the edge, not exactly on it. Doesn't change this
 c        zone's outputs -- only flags it and, for BN specifically,
 c        widens (instead of narrows) the next zone's search range
 c        below.
+         if (irefine .eq. 2) then
+            e_bound_val = e_ga_only
+            bn_bound_val = bn_ga_only
+         else
+            e_bound_val = e_opt_out(iz)
+            bn_bound_val = bn_opt_out(iz)
+         end if
          e_at_bound =
-     &      dabs(e_opt_out(iz)-e_grid(1)) .le.
+     &      dabs(e_bound_val-e_grid(1)) .le.
      &         0.15d0*(e_grid(3)-e_grid(1)) .or.
-     &      dabs(e_opt_out(iz)-e_grid(3)) .le.
+     &      dabs(e_bound_val-e_grid(3)) .le.
      &         0.15d0*(e_grid(3)-e_grid(1))
          bn_at_bound =
-     &      dabs(bn_opt_out(iz)-bn_grid(1)) .le.
+     &      dabs(bn_bound_val-bn_grid(1)) .le.
      &         0.15d0*(bn_grid(3)-bn_grid(1)) .or.
-     &      dabs(bn_opt_out(iz)-bn_grid(3)) .le.
+     &      dabs(bn_bound_val-bn_grid(3)) .le.
      &         0.15d0*(bn_grid(3)-bn_grid(1))
          if (e_at_bound .or. bn_at_bound) then
             zone_status(iz) = 2
@@ -839,8 +862,8 @@ c        window's center itself drift on an untrustworthy point.
                bn_hi = bn_center + bn_range / 2.d0
             else
                bn_range = (bn_hi - bn_lo) * 0.5d0
-               bn_lo = bn_opt_out(iz) - bn_range / 2.d0
-               bn_hi = bn_opt_out(iz) + bn_range / 2.d0
+               bn_lo = bn_bound_val - bn_range / 2.d0
+               bn_hi = bn_bound_val + bn_range / 2.d0
             end if
             if (bn_lo .lt. 10.d0) bn_lo = 10.d0
          end if

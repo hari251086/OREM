@@ -60,7 +60,8 @@ c     -------------------------------------------------------
       call init_constants()
       call read_atm_c(ALT_a, DEN_a, SCH_a, ndim_a, natm)
 
-      open(unit=35, file='scratch_rpe/rpe_campaign_7obj_issue40.csv',
+      open(unit=35,
+     &     file='scratch_rpe/rpe_campaign_7obj_issue40_isolate.csv',
      &     status='unknown')
       write(35,'(A)') 'norad,irefine,nzu,latest_zone_rpe_pct,'//
      &   'ensemble_rpe_pct'
@@ -76,7 +77,11 @@ c     -------------------------------------------------------
          t_obs(6) = 0.d0
          call cal2jd(t_obs, t_obs_jd)
 
-         do irefine = 0, 1
+c        Issue #40 isolate-carryover check: 0 (baseline) and 2
+c        (refine, but boundary check + next-zone bn_lo/bn_hi carryover
+c        use the GA's pre-refinement optimum) -- 1 (refine, feeds the
+c        chain) already recorded from the prior run, not re-run here.
+         do irefine = 0, 2, 2
             write(*,'(A,I1)') '  --- irefine=', irefine
 
             call orem_run(
@@ -143,7 +148,7 @@ c     -------------------------------------------------------
 
       close(35)
       write(*,'(/,A)') ' campaign complete -> scratch_rpe/'//
-     &   'rpe_campaign_7obj_issue40.csv'
+     &   'rpe_campaign_7obj_issue40_isolate.csv'
 
       stop
       end
