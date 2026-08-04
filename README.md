@@ -923,6 +923,16 @@ The curated-7 ensemble-RPE regression (1.94%→3.51%) does not reproduce at n=24
 
 Still net positive on the primary metric through n=36, and the ensemble mean stays essentially flat — but the effect is noticeably weaker than the n=24 subsample suggested, and the ensemble per-object count now leans slightly negative even though the average holds (a few large improvements likely offsetting many small regressions). No new failures introduced (same 36 valid objects in both modes — nothing flipped to/from `ERR` or no-prediction). Objects 31-50 include the campaign's less-curated, harder-to-fit cases per its own sourcing history, which plausibly explains the dilution. Remaining 47 objects (51-97) not yet run.
 
+**2026-08-04 — Issue #40, full 97-object validation complete: the effect washes out at scale. Verdict: do NOT promote `irefine=2` to the default pipeline.** Objects 51-97 added to complete the set (commit 1831ed1). The trend across all three sample sizes, matched pairs:
+
+| n (valid, matched pairs) | mean\|latest-zone RPE\| baseline → `irefine=2` | better/worse | mean\|ensemble RPE\| baseline → `irefine=2` | better/worse |
+|---|---|---|---|---|
+| 24 (objects 1-30) | 45.50% → 42.30% | 17/24 (71%) better | 12.97% → 12.60% | 12/24 wash |
+| 36 (objects 1-50) | 44.34% → 42.47% | 20/36 (56%) better | 16.80% → 16.66% | 15/36 better, 21/36 worse |
+| 53 (objects 1-97) | 43.34% → 42.43% | **26/53 (49%) better** | **20.99% → 21.36% (worse)** | 21/53 better, 32/53 worse |
+
+Monotonic and decisive across all three: primary-metric win rate falls 71%→56%→49% (a coin flip at full scale), the mean improvement shrinks -3.20pp→-1.87pp→-0.91pp, and the ensemble metric goes from clearly-better to flat to clearly-worse. **The earlier promising reads were concentrated on this campaign's curated, easier-to-fit objects** — as the harder, less-curated objects added in later campaign-extension rounds are included, the primary-metric win evaporates and the secondary metric reverses to a mild regression. Stopping at n=24 or n=36 would have supported shipping this; both would have been wrong. One isolated positive: object 32491 (zero re-entry prediction under baseline) gets a valid prediction under `irefine=2` — a genuine capability improvement, but a single case, not enough to move the overall verdict. Both `irefine=1` and `irefine=2` stay opt-in/default-off. Not closing #40 — kept documented and buildable as a real negative-at-scale result, same as #41, in case a future angle on the underlying carryover-chain problem is worth trying against this validated baseline.
+
 ---
 
 ## 9. References
