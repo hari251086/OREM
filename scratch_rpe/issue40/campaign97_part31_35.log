@@ -1,0 +1,180 @@
+
+ ===== 41693 SL-12 deb         
+  pipeline error ierr=  2
+ [PROGRESS]  20% (31 of 35 objects done, this chunk)
+
+ ===== 21935 SL-12 deb         
+  [WARN] tle_filter: epoch gap at point   339 (********** -> **********,     81.8 days)
+  [WARN] tle_filter: epoch gap at point   372 (********** -> **********,     60.7 days)
+  [INFO] G2 BN floor estimate=    5.00 -> bn_lo=    2.50
+  [REFINE] Z 1: e= 0.463559 bn=  29.34  =>  e= 0.463570 bn=  29.34  nevals= 25
+  Z 1: exit= 0 pts= 10464 BN=   29.34
+  [REFINE] Z 2: e= 0.465938 bn=  54.44  =>  e= 0.465917 bn=  54.44  nevals= 25
+  Z 2: exit= 0 pts= 10554 BN=   54.44
+  [REFINE] Z 3: e= 0.463172 bn= 135.63  =>  e= 0.463172 bn= 135.63  nevals= 25
+  Z 3: exit= 0 pts= 10558 BN=  135.63
+  [REFINE] Z 4: e= 0.470249 bn=  13.50  =>  e= 0.470237 bn=  13.50  nevals= 25
+  [WARN] Z 4: GA optimum at search boundary -- true value may lie outside the search range
+  Z 4: exit= 0 pts= 10603 BN=   13.50
+  [REFINE] Z 5: e= 0.470306 bn=  40.18  =>  e= 0.470306 bn=  40.18  nevals= 25
+  Z 5: exit= 0 pts= 10623 BN=   40.18
+  [REFINE] Z 6: e= 0.473338 bn=  13.15  =>  e= 0.473338 bn=   2.50  nevals= 25
+  [WARN] Z 6: GA optimum at search boundary -- true value may lie outside the search range
+  Z 6: exit= 0 pts= 10723 BN=    2.50
+  [REFINE] Z 7: e= 0.458781 bn= 113.56  =>  e= 0.458781 bn= 113.56  nevals= 25
+  Z 7: exit= 0 pts= 10943 BN=  113.56
+  [INFO] Z 8: G3 BSTAR prior narrows BN to [   2.50,  23.98]
+  [WARN] Z 8: RSM envelope does not bound   4 of  20 observations -- proceeding anyway
+  [REFINE] Z 8: e= 0.407294 bn=   3.18  =>  e= 0.407350 bn=   2.50  nevals= 25
+  [WARN] Z 8: GA optimum at search boundary -- true value may lie outside the search range
+  Z 8: exit= 0 pts= 12907 BN=    2.50
+  Z1: e=  0.4636 BN=  29.34 (no re-entry)  zstat= 0
+  Z2: e=  0.4659 BN=  54.44 (no re-entry)  zstat= 0
+  Z3: e=  0.4632 BN= 135.63 (no re-entry)  zstat= 0
+  Z4: e=  0.4702 BN=  13.50 (no re-entry)  zstat= 2
+  Z5: e=  0.4703 BN=  40.18 (no re-entry)  zstat= 0
+  Z6: e=  0.4733 BN=   2.50 (no re-entry)  zstat= 2
+  Z7: e=  0.4588 BN= 113.56 (no re-entry)  zstat= 0
+  Z8: e=  0.4074 BN=   2.50 (no re-entry)  zstat= 2
+  no re-entry in any zone (weak-signal fits; lifetime beyond 5-yr cap)
+ [PROGRESS]  40% (32 of 35 objects done, this chunk)
+
+ ===== 48264 Cosmos1261 deb    
+  [INFO] Z 1: G3 BSTAR prior narrows BN to [  80.00, 151.23]
+  [REFINE] Z 1: e= 0.748513 bn=  90.47  =>  e= 0.748513 bn=  80.00  nevals= 25
+  [WARN] Z 1: GA optimum at search boundary -- true value may lie outside the search range
+  Z 1: exit= 1 pts=   572 BN=   80.00
+  [INFO] Z 2: G3 BSTAR prior narrows BN to [  60.00, 162.64]
+  [REFINE] Z 2: e= 0.749393 bn=  60.37  =>  e= 0.749397 bn=  60.00  nevals= 25
+  [WARN] Z 2: GA optimum at search boundary -- true value may lie outside the search range
+  Z 2: exit= 1 pts=   462 BN=   60.00
+  [INFO] Z 3: G3 BSTAR prior narrows BN to [  30.00, 162.80]
+  [REFINE] Z 3: e= 0.749873 bn=  32.02  =>  e= 0.749873 bn=  30.00  nevals= 25
+  [WARN] Z 3: GA optimum at search boundary -- true value may lie outside the search range
+  Z 3: exit= 1 pts=   519 BN=   30.00
+  [INFO] Z 4: G3 BSTAR prior narrows BN to [  10.00, 115.99]
+  [REFINE] Z 4: e= 0.749578 bn=  14.02  =>  e= 0.749679 bn=  10.00  nevals= 25
+  [WARN] Z 4: GA optimum at search boundary -- true value may lie outside the search range
+  Z 4: exit= 1 pts=   492 BN=   10.00
+  [INFO] Z 5: G3 BSTAR prior narrows BN to [  10.00, 117.64]
+  [REFINE] Z 5: e= 0.747437 bn=  14.12  =>  e= 0.747629 bn=  10.00  nevals= 25
+  [WARN] Z 5: GA optimum at search boundary -- true value may lie outside the search range
+  Z 5: exit= 1 pts=   427 BN=   10.00
+  [INFO] Z 6: G3 BSTAR prior narrows BN to [  14.32, 170.47]
+  [REFINE] Z 6: e= 0.743400 bn=  14.66  =>  e= 0.743330 bn=  14.32  nevals= 25
+  [WARN] Z 6: GA optimum at search boundary -- true value may lie outside the search range
+  Z 6: exit= 1 pts=   348 BN=   14.32
+  [INFO] Z 7: G3 BSTAR prior narrows BN to [  20.60, 245.13]
+  [REFINE] Z 7: e= 0.738559 bn=  87.07  =>  e= 0.737008 bn=  59.00  nevals= 25
+  Z 7: exit= 1 pts=   238 BN=   59.00
+  [INFO] Z 8: G3 BSTAR prior narrows BN to [  23.24, 206.70]
+  [REFINE] Z 8: e= 0.731109 bn= 102.62  =>  e= 0.730192 bn=  88.86  nevals= 25
+  Z 8: exit= 1 pts=   174 BN=   88.86
+  Z1: e=  0.7485 BN=  80.00 RPE=   -1.09%  zstat= 2
+  Z2: e=  0.7494 BN=  60.00 RPE=  -14.87%  zstat= 2
+  Z3: e=  0.7499 BN=  30.00 RPE=   -4.00%  zstat= 2
+  Z4: e=  0.7497 BN=  10.00 RPE=   33.75%  zstat= 2
+  Z5: e=  0.7476 BN=  10.00 RPE=   41.96%  zstat= 2
+  Z6: e=  0.7433 BN=  14.32 RPE=   46.16%  zstat= 2
+  Z7: e=  0.7370 BN=  59.00 RPE=   32.36%  zstat= 0
+  Z8: e=  0.7302 BN=  88.86 RPE=   36.39%  zstat= 0
+  ensemble (8 of 8 zones): mean JD=  2460805.529 std=   24.4 d
+  ENSEMBLE RPE =     7.21%
+ [PROGRESS]  60% (33 of 35 objects done, this chunk)
+
+ ===== 28589 SL-12 deb         
+  [WARN] tle_filter: epoch gap at point  4359 (********** -> **********,     35.9 days)
+  [WARN] tle_filter: epoch gap at point  4363 (********** -> **********,     55.6 days)
+  [WARN] tle_filter: epoch gap at point  4380 (********** -> **********,    134.4 days)
+  [WARN] tle_filter: epoch gap at point  4391 (********** -> **********,     39.7 days)
+  [WARN] tle_filter: epoch gap at point  4574 (********** -> **********,     34.8 days)
+  [WARN] tle_filter: epoch gap at point  4599 (********** -> **********,    111.7 days)
+  [INFO] G2 BN floor estimate=    5.00 -> bn_lo=    2.50
+  [INFO] Z 1: G3 BSTAR prior narrows BN to [   2.63,  31.26]
+  [WARN] Z 1: RSM envelope does not bound   6 of  16 observations -- proceeding anyway
+  [REFINE] Z 1: e= 0.563293 bn=   8.11  =>  e= 0.563293 bn=   2.63  nevals= 25
+  [WARN] Z 1: GA optimum at search boundary -- true value may lie outside the search range
+  Z 1: exit= 0 pts=  8082 BN=    2.63
+  [INFO] Z 2: G3 BSTAR prior narrows BN to [   6.45,  76.80]
+  [REFINE] Z 2: e= 0.517446 bn=  17.85  =>  e= 0.517436 bn=  17.85  nevals= 25
+  Z 2: exit= 0 pts=  9078 BN=   17.85
+  [REFINE] Z 3: e= 0.515355 bn=  28.10  =>  e= 0.515345 bn=  28.10  nevals= 25
+  Z 3: exit= 0 pts=  9075 BN=   28.10
+  [REFINE] Z 4: e= 0.512643 bn=  33.52  =>  e= 0.512643 bn=  33.52  nevals= 25
+  Z 4: exit= 0 pts=  9071 BN=   33.52
+  [INFO] Z 5: G3 BSTAR prior narrows BN to [   4.59,  54.57]
+  [REFINE] Z 5: e= 0.518826 bn=  13.42  =>  e= 0.518771 bn=   4.59  nevals= 25
+  Z 5: exit= 1 pts=  9289 BN=    4.59
+  [REFINE] Z 6: e= 0.497571 bn=  11.82  =>  e= 0.497584 bn=  10.00  nevals= 25
+  [WARN] Z 6: GA optimum at search boundary -- true value may lie outside the search range
+  Z 6: exit= 0 pts= 10142 BN=   10.00
+  [REFINE] Z 7: e= 0.477268 bn=  52.67  =>  e= 0.477268 bn=  52.67  nevals= 25
+  [WARN] Z 7: GA optimum at search boundary -- true value may lie outside the search range
+  Z 7: exit= 0 pts= 10448 BN=   52.67
+  [INFO] Z 8: G3 BSTAR prior narrows BN to [  10.00,  28.20]
+  [WARN] Z 8: RSM envelope does not bound   5 of  31 observations -- proceeding anyway
+  [REFINE] Z 8: e= 0.473436 bn=  16.17  =>  e= 0.473436 bn=  10.71  nevals= 25
+  Z 8: exit= 0 pts= 10693 BN=   10.71
+  Z1: e=  0.5633 BN=   2.63 (no re-entry)  zstat= 2
+  Z2: e=  0.5174 BN=  17.85 (no re-entry)  zstat= 0
+  Z3: e=  0.5153 BN=  28.10 (no re-entry)  zstat= 0
+  Z4: e=  0.5126 BN=  33.52 (no re-entry)  zstat= 0
+  Z5: e=  0.5188 BN=   4.59 RPE=  -30.09%  zstat= 0
+  Z6: e=  0.4976 BN=  10.00 (no re-entry)  zstat= 2
+  Z7: e=  0.4773 BN=  52.67 (no re-entry)  zstat= 2
+  Z8: e=  0.4734 BN=  10.71 (no re-entry)  zstat= 3
+  ensemble (1 of 8 zones): mean JD=  2460132.772 std=    0.0 d
+  ENSEMBLE RPE =   -13.03%
+ [PROGRESS]  80% (34 of 35 objects done, this chunk)
+
+ ===== 29202 Cosmos1261 deb    
+  [WARN] tle_filter: epoch gap at point     2 (********** -> **********,   6809.3 days)
+  [INFO] G2 BN floor estimate=   14.79 -> bn_lo=    7.39
+  [INFO] Z 1: G3 BSTAR prior narrows BN to [   7.39,  66.63]
+  [REFINE] Z 1: e= 0.742645 bn=  15.15  =>  e= 0.742645 bn=   7.39  nevals= 25
+  [WARN] Z 1: GA optimum at search boundary -- true value may lie outside the search range
+  Z 1: exit= 1 pts=  1661 BN=    7.39
+  [INFO] Z 2: G3 BSTAR prior narrows BN to [  10.00,  67.66]
+  [WARN] Z 2: RSM envelope does not bound   1 of  15 observations -- proceeding anyway
+  [REFINE] Z 2: e= 0.742889 bn=  10.78  =>  e= 0.742890 bn=  10.00  nevals= 25
+  [WARN] Z 2: GA optimum at search boundary -- true value may lie outside the search range
+  Z 2: exit= 1 pts=  1385 BN=   10.00
+  [INFO] Z 3: G3 BSTAR prior narrows BN to [  10.00,  72.46]
+  [WARN] Z 3: RSM envelope does not bound   3 of  18 observations -- proceeding anyway
+  [REFINE] Z 3: e= 0.745722 bn=  19.67  =>  e= 0.745722 bn=  10.00  nevals= 25
+  [WARN] Z 3: GA optimum at search boundary -- true value may lie outside the search range
+  Z 3: exit= 1 pts=   962 BN=   10.00
+  [INFO] Z 4: G3 BSTAR prior narrows BN to [  10.00,  71.48]
+  [WARN] Z 4: RSM envelope does not bound   3 of  20 observations -- proceeding anyway
+  [REFINE] Z 4: e= 0.745790 bn=  10.88  =>  e= 0.745800 bn=  10.00  nevals= 25
+  [WARN] Z 4: GA optimum at search boundary -- true value may lie outside the search range
+  Z 4: exit= 1 pts=   917 BN=   10.00
+  [WARN] Z 5: RSM envelope does not bound   5 of  18 observations -- proceeding anyway
+  [REFINE] Z 5: e= 0.745964 bn=  10.50  =>  e= 0.745929 bn=  10.00  nevals= 25
+  [WARN] Z 5: GA optimum at search boundary -- true value may lie outside the search range
+  Z 5: exit= 1 pts=   821 BN=   10.00
+  [INFO] Z 6: G3 BSTAR prior narrows BN to [  10.00,  90.84]
+  [REFINE] Z 6: e= 0.745830 bn=  13.90  =>  e= 0.745870 bn=  10.00  nevals= 25
+  [WARN] Z 6: GA optimum at search boundary -- true value may lie outside the search range
+  Z 6: exit= 1 pts=   709 BN=   10.00
+  [INFO] Z 7: G3 BSTAR prior narrows BN to [  10.00,  89.97]
+  [REFINE] Z 7: e= 0.715593 bn=  13.51  =>  e= 0.715970 bn=  10.00  nevals= 25
+  [WARN] Z 7: GA optimum at search boundary -- true value may lie outside the search range
+  Z 7: exit= 1 pts=   697 BN=   10.00
+  [INFO] Z 8: G3 BSTAR prior narrows BN to [  10.00,  87.70]
+  [REFINE] Z 8: e= 0.708632 bn=  13.19  =>  e= 0.708941 bn=  10.00  nevals= 25
+  [WARN] Z 8: GA optimum at search boundary -- true value may lie outside the search range
+  Z 8: exit= 1 pts=   639 BN=   10.00
+  Z1: e=  0.7426 BN=   7.39 RPE=  -24.50%  zstat= 2
+  Z2: e=  0.7429 BN=  10.00 RPE=  -25.33%  zstat= 2
+  Z3: e=  0.7457 BN=  10.00 RPE=  -33.34%  zstat= 2
+  Z4: e=  0.7458 BN=  10.00 RPE=  -34.57%  zstat= 2
+  Z5: e=  0.7459 BN=  10.00 RPE=  -46.65%  zstat= 2
+  Z6: e=  0.7459 BN=  10.00 RPE=  -47.90%  zstat= 2
+  Z7: e=  0.7160 BN=  10.00 RPE=  -54.08%  zstat= 2
+  Z8: e=  0.7089 BN=  10.00 RPE=  -59.08%  zstat= 2
+  ensemble (8 of 8 zones): mean JD=  2460603.260 std=   16.9 d
+  ENSEMBLE RPE =   -25.14%
+ [PROGRESS] 100% (35 of 35 objects done, this chunk)
+
+ campaign complete -> scratch_rpe/rpe_campaign_part_31_35_irefine2.csv

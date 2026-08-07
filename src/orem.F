@@ -13,7 +13,7 @@ c     ============================================================
      &   nzones_max, min_zone_pts, max_zone_days,
      &   r2_thresh, slope_thresh,
      &   bn_min_init, bn_max_init,
-     &   idrag_flag,
+     &   idrag_flag, iadapt_zone, irefine,
      &   ipopsize, maxgen, nbits_e, nbits_a,
      &   pcross, pmute, ga_seed,
      &   ngeo_deg, nsun_deg, nmoon_deg,
@@ -32,6 +32,34 @@ c       tle_file         : TLE file path
 c       norad_id         : target NORAD catalog number
 c       t_obs_cal(6)     : observed re-entry [yr,mo,dy,hr,mn,sc]
 c                          (all zeros = operational mode)
+c       iadapt_zone      : issue #41 -- 0=off (default: single
+c                          upfront zone_select call, unchanged
+c                          behavior), 1=on (RPE-driven sequential zone
+c                          selection: zones found one at a time,
+c                          band adjusted +/-10 TLE points if |RPE| >
+c                          20%). Uses Mode-1 RPE internally, so only
+c                          meaningful when t_obs_cal is a real known
+c                          re-entry -- a ceiling/diagnostic study, not
+c                          usable for an operational (t_obs_cal=0)
+c                          prediction. See issue #41.
+c       irefine          : issue #40 -- 0=off (default), 1=on: after
+c                          the GA converges on a zone's (e, BN) using
+c                          the cheap RSM-interpolated fitness, run a
+c                          bounded (~25 evaluation) local pattern
+c                          search using direct-propagation fitness
+c                          (rsm_direct_eval/rsm_refine) instead, since
+c                          issue #36 found the interpolated fitness is
+c                          systematically ~1.8x more optimistic than
+c                          the true, directly-propagated RMS at the
+c                          same point. Uses only in-zone TLE data (no
+c                          future/oracle information, unlike #41), so
+c                          usable in a real operational prediction.
+c                          2=same refinement, but the boundary check
+c                          and next-zone bn_lo/bn_hi carryover use the
+c                          GA's pre-refinement optimum instead of the
+c                          refined one -- isolates whether irefine=1's
+c                          mixed curated-7 result traces to the same
+c                          carryover-chain amplification as issue #41.
 c       zone selection params, area bounds, mass, Cd, GA params,
 c       force model params, atmosphere tables
 c
@@ -69,7 +97,7 @@ c     --- Input arguments ---
       double precision max_zone_days, r2_thresh, slope_thresh
       double precision t_obs_cal(6)
       double precision bn_min_init, bn_max_init
-      integer idrag_flag
+      integer idrag_flag, iadapt_zone, irefine
       integer ipopsize, maxgen, nbits_e, nbits_a
       double precision pcross, pmute, ga_seed
       integer ngeo_deg, nsun_deg, nmoon_deg
@@ -182,6 +210,35 @@ c     Issue #32 (G3): BSTAR-informed BN search-range prior, per zone
       double precision bn_lo_zone, bn_hi_zone
       logical bn_prior_ok
 
+c     Issue #41: RPE-driven sequential zone selection (adapt mode)
+      parameter(n_adapt_max = 10, rpe_adapt_thresh = 20.d0)
+      integer nzones_loop, istart_scan
+      logical found_zone
+      integer zone_end_orig, iadapt_try, zend_best, zstat_best
+      double precision rpe_this, rpe_best, horiz_z
+      double precision e_opt_best, bn_opt_best
+      double precision rms_best, reentry_best
+
+c     Issue #40: direct-propagation local refinement (refine mode)
+c     refine_max_eval starts with 'r' -- would default to DOUBLE
+c     PRECISION under this file's implicit typing (a-h,o-z), but
+c     max_eval is declared INTEGER in rsm_refine, so this must be
+c     explicit (see feedback_fortran_implicit_typing_trap in project
+c     memory -- passing a mistyped double where an integer dummy
+c     argument is expected corrupts the callee's value, not a compile
+c     error).
+      integer refine_max_eval
+      parameter(refine_max_eval = 25)
+      double precision zone_dur_r, e_refined, bn_refined, rms_refined
+      integer neval_r
+c     irefine=2: isolate-carryover variant -- refine this zone's own
+c     reported outputs same as irefine=1, but the boundary check and
+c     next-zone bn_lo/bn_hi carryover use the GA's pre-refinement
+c     optimum, not the refined one. Tests whether irefine=1's mixed
+c     curated-7 result traces to the same carryover-chain amplification
+c     as issue #41, or is independent of it.
+      double precision e_ga_only, bn_ga_only, e_bound_val, bn_bound_val
+
       ierr = 0
       nzones_used = 0
       nzones_valid = 0
@@ -251,15 +308,35 @@ c     ============================================================
 c     ============================================================
 c     Step 3: Zone selection
 c     ============================================================
-      call zone_select(epochs, ha_tle, npts,
-     &   min_zone_pts, max_zone_days,
-     &   r2_thresh, slope_thresh,
-     &   nzones_max,
-     &   zone_start, zone_end, nzones)
+      if (iadapt_zone .eq. 0) then
+         call zone_select(epochs, ha_tle, npts,
+     &      min_zone_pts, max_zone_days,
+     &      r2_thresh, slope_thresh,
+     &      nzones_max,
+     &      zone_start, zone_end, nzones)
 
-      if (nzones .eq. 0) then
-         ierr = 2
-         return
+         if (nzones .eq. 0) then
+            ierr = 2
+            return
+         end if
+         nzones_loop = nzones
+      else
+c        Issue #41: incremental, RPE-driven zone selection -- the
+c        remaining zones are discovered one at a time inside the main
+c        loop below via zone_select_next, instead of all at once
+c        here. Zone 1 is found now (unchanged from zone_select's own
+c        "first zone" role) since the BN-floor estimate just below
+c        needs zone_start(1)/zone_end(1) before the main loop starts.
+         istart_scan = 1
+         call zone_select_next(epochs, ha_tle, npts, istart_scan,
+     &      min_zone_pts, max_zone_days, r2_thresh, slope_thresh,
+     &      zone_start(1), zone_end(1), found_zone)
+         if (.not. found_zone) then
+            ierr = 2
+            return
+         end if
+         nzones = 1
+         nzones_loop = nzones_max
       end if
 
 c     ============================================================
@@ -343,10 +420,37 @@ c        guarantee.
          end if
       end if
 
-      do iz = 1, nzones
+      do iz = 1, nzones_loop
          zone_status(iz) = 0
          bn_at_bound = .false.
 
+         if (iadapt_zone .eq. 1 .and. iz .gt. 1) then
+c           Issue #41: find this zone's initial band now that the
+c           previous zone (including any RPE-driven adjustment below)
+c           has been finalized -- avoids overlap by construction.
+c           Scan resumes from zone_end(iz-1)+1 (that slot's FINAL
+c           value, post-adjustment, since iz-1's full processing
+c           already completed in the prior loop iteration) rather
+c           than a separately-tracked scan pointer, which would
+c           otherwise need explicit advancing after every exit path
+c           (RPE-adjusted, too-few-TLEs skip, etc.) and is easy to
+c           forget on one of them.
+            istart_scan = zone_end(iz-1) + 1
+            call zone_select_next(epochs, ha_tle, npts, istart_scan,
+     &         min_zone_pts, max_zone_days, r2_thresh, slope_thresh,
+     &         zone_start(iz), zone_end(iz), found_zone)
+            if (.not. found_zone) then
+               nzones = iz - 1
+               goto 65
+            end if
+            nzones = iz
+         end if
+
+         zone_end_orig = zone_end(iz)
+         iadapt_try = 0
+         rpe_best = 1.d30
+
+ 70      continue
 c        Extract TLE data within zone
          nzone = zone_end(iz) - zone_start(iz) + 1
 
@@ -528,6 +632,40 @@ c        GA optimization: match predicted apogee trajectory to TLE observations
      &      pcross, pmute, ga_seed,
      &      e_opt_out(iz), bn_opt_out(iz), rms_out(iz))
 
+         e_ga_only = e_opt_out(iz)
+         bn_ga_only = bn_opt_out(iz)
+
+         if (irefine .eq. 1 .or. irefine .eq. 2) then
+c           Issue #40: bounded local refinement using direct-
+c           propagation fitness instead of the GA's interpolated
+c           fitness. e_grid/bn_grid are the same bounds ga_optimize
+c           just searched (set by rsm_generate above).
+            zone_dur_r = epz(nzone) - epz(1)
+            call rsm_refine(
+     &         smaz(1), ez(1), incz(1), raanz(1), aopz(1), maz(1),
+     &         epz(1), zone_dur_r,
+     &         e_opt_out(iz), bn_opt_out(iz),
+     &         e_grid(1), e_grid(3), bn_grid(1), bn_grid(3),
+     &         tobs, apobs, nobs,
+     &         360, 1.d-10,
+     &         n_force, ngeo_deg, nsun_deg, nmoon_deg,
+     &         WE_rot, EPS_f, FR_rot,
+     &         CR_srp, AM_srp, IPSR, ISHAD,
+     &         PSR_srp, amuS, amuM,
+     &         ALT_atm, DEN_atm, SCH_atm, ndim_atm,
+     &         refine_max_eval,
+     &         e_refined, bn_refined, rms_refined, neval_r)
+            if (neval_r .gt. 0) then
+               write(*,'(A,I2,A,F9.6,A,F7.2,A,F9.6,A,F7.2,A,I3)')
+     &            '  [REFINE] Z', iz, ': e=', e_opt_out(iz),
+     &            ' bn=', bn_opt_out(iz), '  =>  e=', e_refined,
+     &            ' bn=', bn_refined, '  nevals=', neval_r
+               e_opt_out(iz)  = e_refined
+               bn_opt_out(iz) = bn_refined
+               rms_out(iz)    = rms_refined
+            end if
+         end if
+
 c        Issue #12: GA boundary solution (optimum within 15% of a
 c        search bound suggests the true value may lie outside the
 c        search range). 15% (not a tighter %) because the
@@ -540,15 +678,22 @@ c        width from the edge, not exactly on it. Doesn't change this
 c        zone's outputs -- only flags it and, for BN specifically,
 c        widens (instead of narrows) the next zone's search range
 c        below.
+         if (irefine .eq. 2) then
+            e_bound_val = e_ga_only
+            bn_bound_val = bn_ga_only
+         else
+            e_bound_val = e_opt_out(iz)
+            bn_bound_val = bn_opt_out(iz)
+         end if
          e_at_bound =
-     &      dabs(e_opt_out(iz)-e_grid(1)) .le.
+     &      dabs(e_bound_val-e_grid(1)) .le.
      &         0.15d0*(e_grid(3)-e_grid(1)) .or.
-     &      dabs(e_opt_out(iz)-e_grid(3)) .le.
+     &      dabs(e_bound_val-e_grid(3)) .le.
      &         0.15d0*(e_grid(3)-e_grid(1))
          bn_at_bound =
-     &      dabs(bn_opt_out(iz)-bn_grid(1)) .le.
+     &      dabs(bn_bound_val-bn_grid(1)) .le.
      &         0.15d0*(bn_grid(3)-bn_grid(1)) .or.
-     &      dabs(bn_opt_out(iz)-bn_grid(3)) .le.
+     &      dabs(bn_bound_val-bn_grid(3)) .le.
      &         0.15d0*(bn_grid(3)-bn_grid(1))
          if (e_at_bound .or. bn_at_bound) then
             zone_status(iz) = 2
@@ -612,6 +757,70 @@ c        Re-entry propagation with optimal (e, BN)
             end if
          end if
 
+c        Issue #41: RPE-driven band adjustment (ceiling study, adapt
+c        mode only -- needs a known t_obs_jd, so this never runs in
+c        operational mode). Same Mode-1 RPE formula as compute_rpe.
+c        Greedy: grow zone_end outward first (the known failure mode
+c        here is windows too short to extrapolate reliably, see the
+c        61734 root-cause note below), then shrink; stop at the first
+c        band under threshold, else keep whichever band scored best
+c        across all attempts.
+         if (iadapt_zone .eq. 1 .and. t_obs_jd .gt. 0.d0 .and.
+     &       reentry_jd(iz) .gt. 0.d0) then
+            horiz_z = t_obs_jd - epz(1)
+            if (dabs(horiz_z) .gt. 0.1d0) then
+               rpe_this = (reentry_jd(iz) - t_obs_jd)
+     &                  / horiz_z * 100.d0
+            else
+               rpe_this = 0.d0
+            end if
+
+            if (iadapt_try .eq. 0 .or.
+     &          dabs(rpe_this) .lt. dabs(rpe_best)) then
+               rpe_best     = rpe_this
+               zend_best    = zone_end(iz)
+               e_opt_best   = e_opt_out(iz)
+               bn_opt_best  = bn_opt_out(iz)
+               rms_best     = rms_out(iz)
+               reentry_best = reentry_jd(iz)
+               zstat_best   = zone_status(iz)
+            end if
+
+            if (dabs(rpe_this) .gt. rpe_adapt_thresh .and.
+     &          iadapt_try .lt. n_adapt_max) then
+               iadapt_try = iadapt_try + 1
+               if (iadapt_try .le. n_adapt_max/2) then
+c                 Grow outward first
+                  zone_end(iz) = zone_end_orig + iadapt_try
+               else
+c                 Then shrink (never below min_zone_pts)
+                  zone_end(iz) = zone_end_orig
+     &               - (iadapt_try - n_adapt_max/2)
+                  if (zone_end(iz) - zone_start(iz) + 1 .lt.
+     &                min_zone_pts) goto 80
+               end if
+               if (zone_end(iz) .gt. npts) goto 80
+               write(*,'(A,I2,A,F8.1,A,I3,A,I5,A,I5,A)')
+     &            '  [ADAPT] Z', iz, ': RPE=', rpe_this,
+     &            '% (>20%), retry #', iadapt_try,
+     &            ' band=[', zone_start(iz), ',', zone_end(iz), ']'
+               goto 70
+            end if
+
+ 80         continue
+            if (dabs(rpe_best) .lt. dabs(rpe_this)) then
+               zone_end(iz)    = zend_best
+               e_opt_out(iz)   = e_opt_best
+               bn_opt_out(iz)  = bn_opt_best
+               rms_out(iz)     = rms_best
+               reentry_jd(iz)  = reentry_best
+               zone_status(iz) = zstat_best
+            end if
+            write(*,'(A,I2,A,F8.1,A,I3,A)')
+     &         '  [ADAPT] Z', iz, ': final RPE=', rpe_best,
+     &         '% after ', iadapt_try, ' adjustment(s)'
+         end if
+
 c        Issue #33 revisit: restore the v1.21 trust-gated BN-range
 c        narrow/widen-on-boundary logic (removed in #33 as an
 c        isolated experiment; removing it measurably regressed RPE
@@ -653,8 +862,8 @@ c        window's center itself drift on an untrustworthy point.
                bn_hi = bn_center + bn_range / 2.d0
             else
                bn_range = (bn_hi - bn_lo) * 0.5d0
-               bn_lo = bn_opt_out(iz) - bn_range / 2.d0
-               bn_hi = bn_opt_out(iz) + bn_range / 2.d0
+               bn_lo = bn_bound_val - bn_range / 2.d0
+               bn_hi = bn_bound_val + bn_range / 2.d0
             end if
             if (bn_lo .lt. 10.d0) bn_lo = 10.d0
          end if
@@ -662,6 +871,7 @@ c        window's center itself drift on an untrustworthy point.
  50      continue
       end do
 
+ 65   continue
       nzones_used = nzones
 
       nzones_valid = 0
