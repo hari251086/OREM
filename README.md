@@ -71,6 +71,12 @@ OREM/
 ├── scratch_rpe/                    7-object RPE campaigns (4-zone / 8-zone / 8-zone gated)
 │                                   + ensemble_eval.py estimator comparison
 │
+├── drama/                          ESA DRAMA/OSCAR re-entry cross-validation (see drama/README.md):
+│   ├── scripts/                    pydrama driver scripts (run_oscar_reentry.py working;
+│   │                               run_ares.py/run_sara.py/compare_orem_drama.py scaffolded)
+│   ├── input/                      DRAMA-format input/config files
+│   └── output/                     OSCAR run results (JSON)
+│
 ├── test/
 │   ├── test_propagate_ks.F          Propagator tests (10)
 │   ├── test_tle_evolution.F         TLE evolution tests (56)
@@ -932,6 +938,8 @@ Still net positive on the primary metric through n=36, and the ensemble mean sta
 | 53 (objects 1-97) | 43.34% → 42.43% | **26/53 (49%) better** | **20.99% → 21.36% (worse)** | 21/53 better, 32/53 worse |
 
 Monotonic and decisive across all three: primary-metric win rate falls 71%→56%→49% (a coin flip at full scale), the mean improvement shrinks -3.20pp→-1.87pp→-0.91pp, and the ensemble metric goes from clearly-better to flat to clearly-worse. **The earlier promising reads were concentrated on this campaign's curated, easier-to-fit objects** — as the harder, less-curated objects added in later campaign-extension rounds are included, the primary-metric win evaporates and the secondary metric reverses to a mild regression. Stopping at n=24 or n=36 would have supported shipping this; both would have been wrong. One isolated positive: object 32491 (zero re-entry prediction under baseline) gets a valid prediction under `irefine=2` — a genuine capability improvement, but a single case, not enough to move the overall verdict. Both `irefine=1` and `irefine=2` stay opt-in/default-off. Not closing #40 — kept documented and buildable as a real negative-at-scale result, same as #41, in case a future angle on the underlying carryover-chain problem is worth trying against this validated baseline.
+
+**2026-08-06 — DRAMA/OSCAR cross-validation scaffolding added (`drama/`, external to fpm build).** Installed ESA DRAMA 4.1.4 (`E:\DRAMA`, unattended) + Java 17 prerequisite (`E:\Java\jdk-17`, SARA-RISK only — OSCAR/ARES in 4.1.4 are native executables) + pyDRAMA (package `drama`) into a dedicated venv at `drama/.venv`. `drama/scripts/run_oscar_reentry.py` runs OSCAR's natural-decay lifetime tool against an OREM TLE input and is verified working end-to-end: for NORAD 21670 (H-1 R/B(2)), using OREM's own fitted ballistic number (`BN_opt=10.246 kg/m^2`, `scratch_rpe/rpe_campaign.csv`) to derive OSCAR's spacecraft mass, OSCAR independently predicts a 0.699-year lifetime from the Aug-1991 epoch — consistent with the object's real TLE history showing decay through early 1992. `run_ares.py`/`run_sara.py`/`compare_orem_drama.py` are scaffolded stubs, not yet exercised. See `drama/README.md`. A full multi-object OREM-vs-DRAMA validation campaign (comparable in scope to the KSROP↔GMAT campaign) is a deliberate follow-on, not done here.
 
 ---
 

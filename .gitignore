@@ -23,6 +23,11 @@ input/example_multi.tle.txt
 output/*.txt
 !output/.gitkeep
 
+# DRAMA validation venv + run outputs (drama/output/.gitkeep marks the dir as tracked)
+drama/.venv/
+drama/output/*
+!drama/output/.gitkeep
+
 # Credentials -- never commit these
 .env
 .env.*
