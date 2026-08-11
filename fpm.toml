@@ -88,4 +88,4 @@ source-dir = "test"
 main = "test_gmat.F"
 
 [dependencies]
-ksrop = { git = "https://github.com/hari251086/KSROP", tag = "v2.11.0" }
+ksrop = { git = "https://github.com/hari251086/KSROP", tag = "v2.11.1" }
