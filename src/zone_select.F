@@ -186,6 +186,112 @@ c     ============================================================
       end
 
 c     ============================================================
+      subroutine zone_outlier_filter(epz, haz, nzone, sigma_thresh,
+     &   mask, nremoved)
+c
+c     Issue #42: flags TLE points within an already-selected zone whose
+c     apogee altitude deviates too far from the ZONE'S OWN best-fit
+c     linear trend, for removal before RSM/GA see them. zone_select's
+c     r2_threshold only checks that the whole window fits a line well ON
+c     AVERAGE -- a handful of individual points can still sit well off
+c     the fitted line without failing that aggregate check; this is a
+c     second, tighter, zone-local pass distinct from tle_filter.F's
+c     issue #10 check (which runs once on the whole raw evolution
+c     stream, using a trailing window, before zone_select ever sees the
+c     data).
+c
+c     Leave-one-out (LOO), not a single fit-all-points-then-threshold
+c     pass: point i's own fit and residual-sigma are both computed from
+c     the OTHER nzone-1 points only, then point i is tested against
+c     that fit. A fit-all-points version was tried first and rejected --
+c     an outlier pulls its own residual-sigma estimate up just by being
+c     in the fit, self-masking (Monte Carlo: a single 10x-noise outlier
+c     landed only ~3.0 self-normalized sigmas from a fit that included
+c     it, regardless of how much larger the injected offset was, capped
+c     near sqrt(nzone) by construction). LOO removes that self-
+c     inflation; same "genuinely would this look anomalous" spirit as
+c     tle_filter.F's trailing-only window, just leave-one-out instead of
+c     leave-future-out since a zone's points are already a fixed,
+c     retrospective set with no ordering asymmetry to exploit.
+c
+c     sigma_thresh=5.0 (not 3.0) -- Monte Carlo over synthetic 8-30
+c     point zones with realistic (~30 km) linear-decay scatter: sigma=3
+c     false-positive rate (>=1 clean point flagged per zone) was 39%,
+c     sigma=4 was 6%, sigma=5 was ~1% while still flagging 100% of
+c     10x-noise-scale synthetic outliers -- matches tle_filter.F's own
+c     ~1.5% target false-positive rate.
+c
+c     Same mask/nremoved contract as tle_filter.F's Step 1b check --
+c     this only flags, the caller (orem.F) compacts the zone's parallel
+c     arrays and re-checks the RSM-viability floor, since dropping a
+c     zone below that floor is a decision that belongs with the
+c     caller's other zone-viability checks, not duplicated here.
+c
+c     Input
+c       epz(nzone), haz(nzone) : zone epoch/apogee-altitude arrays
+c       nzone                  : zone point count (LOO needs >= 4:
+c                                 the excluded point plus >= 3 to fit)
+c       sigma_thresh           : outlier threshold, in LOO residual-
+c                                 sigmas from the zone's own linear fit
+c     Output
+c       mask(nzone) : 1 = keep, 0 = reject
+c       nremoved    : number of points with mask=0
+c     ============================================================
+      implicit double precision (a-h, o-z)
+      integer nzone, nremoved
+      double precision epz(nzone), haz(nzone)
+      double precision sigma_thresh
+      integer mask(nzone)
+
+      double precision xo(500), yo(500)
+      double precision slope, intercept, r2, resid, ssres, sresid
+      double precision pred_i
+      integer i, j, k, no
+
+      nremoved = 0
+      do i = 1, nzone
+         mask(i) = 1
+      end do
+
+      if (nzone .lt. 4) return
+
+      do i = 1, nzone
+         no = 0
+         do j = 1, nzone
+            if (j .ne. i) then
+               no = no + 1
+               xo(no) = epz(j)
+               yo(no) = haz(j)
+            end if
+         end do
+
+         call linfit(xo, yo, no, slope, intercept, r2)
+
+         ssres = 0.d0
+         do k = 1, no
+            resid = yo(k) - (slope*xo(k) + intercept)
+            ssres = ssres + resid**2
+         end do
+         sresid = dsqrt(ssres / dble(no))
+c        Floor, not skip (same idiom as tle_filter.F's wstd/wsigma
+c        floors) -- if the OTHER points fit a line essentially exactly,
+c        that's the strongest possible evidence, not a reason to give
+c        up: any non-negligible deviation of the held-out point should
+c        still flag it.
+         if (sresid .lt. 1.d-6) sresid = 1.d-6
+
+         pred_i = slope*epz(i) + intercept
+         resid = haz(i) - pred_i
+         if (dabs(resid) .gt. sigma_thresh * sresid) then
+            mask(i) = 0
+            nremoved = nremoved + 1
+         end if
+      end do
+
+      return
+      end
+
+c     ============================================================
       subroutine zone_select(epochs, ha, npts,
      &                       min_zone_pts, max_zone_days,
      &                       r2_threshold, slope_threshold,
