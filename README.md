@@ -125,7 +125,7 @@ call propagate_ks(
 
 ## 4. Building
 
-Requires **Intel oneAPI Fortran** (`ifx`) or **gfortran**, on Windows or Linux — both toolchains are now validated (issue #28, 2026-08-01). `fpm.toml` sets `implicit-typing`/`implicit-external` (matching KSROP's own manifest) so gfortran doesn't force `-fimplicit-none -Werror=implicit-interface` on this F77-style codebase; `propagate_ks.F`'s `cn0` and `ga.F`'s function-return-type declarations were fixed to compile cleanly either way, and the KSROP dependency is pinned to `v2.2.0` (the tag that fixed the same class of bug in `jr71_profile.F`). CI (`.github/workflows/ci.yml`) runs both `ifx` and `gfortran` in a matrix.
+Requires **Intel oneAPI Fortran** (`ifx`) or **gfortran**, on Windows or Linux — both toolchains are now validated (issue #28, 2026-08-01). `fpm.toml` sets `implicit-typing`/`implicit-external` (matching KSROP's own manifest) so gfortran doesn't force `-fimplicit-none -Werror=implicit-interface` on this F77-style codebase; `propagate_ks.F`'s `cn0` and `ga.F`'s function-return-type declarations were fixed to compile cleanly either way, and the KSROP dependency was bumped to `v2.2.0` at the time (the tag that fixed the same class of bug in `jr71_profile.F`) — since bumped further to `v2.11.0` (2026-08-11, see §8 Version History; no test or campaign regressions). CI (`.github/workflows/ci.yml`) runs both `ifx` and `gfortran` in a matrix.
 
 ### fpm (Fortran Package Manager) — recommended
 
@@ -364,11 +364,16 @@ release tag in `fpm.toml`:
 
 ```toml
 [dependencies]
-ksrop = { git = "https://github.com/hari251086/KSROP", tag = "v2.1.0" }
+ksrop = { git = "https://github.com/hari251086/KSROP", tag = "v2.11.0" }
 ```
 
 To pick up a newer KSROP release, bump the `tag` here (and re-run the full test suite —
 `fpm test --compiler ifx --flag "-heap-arrays"` — to confirm nothing regressed before committing).
+`propagate_ks.F` only calls KSROP's longstanding `geo_coeff`/`car2ks`/`ks2car`/`aLegP`/`car2oe`/
+`ks2ksr` — none of the general (n,m) tesseral geopotential, `Rtilt` pole-rotation, or refactored
+drag subroutines KSROP grew between v2.2.0 and v2.11.0 are wired in here, so a version bump is
+expected to be numerically silent unless those specific subroutines' signatures or behavior
+changed (see §8 Version History, 2026-08-11 entry).
 
 `propagate_ks.F` (`src/propagate_ks.F`) is **not** part of this dependency — it's OREM's own fork
 of KSROP's `driver_KS.F` core with re-entry-specific logic added, and evolves independently.
@@ -960,6 +965,8 @@ Monotonic and decisive across all three: primary-metric win rate falls 71%→56%
 **Practical implication**: option 1 already ruled out naively swapping direct propagation into the GA (400-1000x runtime regression, 1.4-14 hours/object). A BO-based search at a 50-100-evaluation/zone budget, at the ~0.5s/propagation cost issue #40's own scoping established, would cost roughly 25-50s/zone (~3-7 min for an 8-zone object) — a real, affordable multiple of production's current ~2-2.5 min/object runtime, not a 400-1000x blowup. This makes option 3 the first evidence-backed candidate for actually affording a direct-propagation fitness function.
 
 **Caveats, explicit**: (1) the GP hyperparameters are fixed/untuned (no per-zone marginal-likelihood optimization) — a properly tuned GP would likely do better still, this is a floor not a ceiling on BO's potential; (2) this only tests search efficiency on the *cheap interpolated* landscape as a proxy — it does not yet touch the real question of whether searching against true direct-propagation RMS (rather than the interpolated surrogate) closes issue #36's Finding 3 optimism gap, which needs an actual expensive-fitness integration to test; (3) "true optimum of the interpolated surface" is a different target than "true optimum of the real physics" (Finding 3's whole point) — BO's demonstrated advantage here is search efficiency, not yet fitness accuracy. Not implemented — diagnostic + offline Python study only, `orem.F`/`ga.F` unchanged, `fpm.toml` reverted after the Fortran dump run.
+
+**2026-08-11 — KSROP dependency bumped v2.2.0 → v2.11.0, full test suite and 97-object RPE campaign re-run, zero regressions.** Picks up ~9 months of upstream KSROP work (general (n,m) tesseral geopotential, `Rtilt` body-pole-rotation, geopotential/drag numerical-stability fixes, drag model extracted into a shared subroutine, XJR-thesis zonal validation) that had accumulated on KSROP's `HS-dev`/`main` since this repo's pin was last touched. `fpm build`/`fpm test --compiler ifx` (11 executables, 385 tests) all pass unchanged. Re-ran the full 97-object RPE campaign (`scratch_rpe/rpe_campaign.F`, 4-way process-parallel per its own header convention, GitHub\CLAUDE.md 4-core cap) — **results are bit-identical to the pre-bump baseline**: median\|RPE\|=31.89% across the 61/97 objects with a primary-zone prediction, every individual object's `rpe_pct` unchanged to the digit. This is expected, not a null result: `propagate_ks.F` (§7) only calls KSROP's longstanding `geo_coeff`/`car2ks`/`ks2car`/`aLegP`/`car2oe`/`ks2ksr`/`third_body_aux`, none of which changed behavior between v2.2.0 and v2.11.0 — all of the new capability landed in new subroutines (`tess_legendre_force`, `geo_coeff_tess_general`, `DragOblateCorotating.F`) that `propagate_ks.F` doesn't call. The DRAMA/OSCAR comparison baseline (`drama/output/oscar_campaign_results.csv`, median OREM 31.9% vs DRAMA/OSCAR 41.3%, 2026-08-07) is therefore still current and was not re-run — its OREM-side inputs (bn_opt, zepoch per object) are unchanged, so its outputs would be too. **Adopting** KSROP's newer general (n,m) tesseral field or the `Rtilt`/drag-refactor machinery in `propagate_ks.F` itself — which would change these numbers — is a separate, not-yet-started integration, tracked as future work rather than implied by this version bump.
 
 ---
 
