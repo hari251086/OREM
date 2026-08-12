@@ -278,7 +278,7 @@ Two-body energy conservation, orbit closure, multi-revolution propagation, re-en
 - Repeatability, boundary conditions (maxpts=1)
 - Deduplication: no consecutive epochs within 86 sec, duplicate removal count
 
-### test_zone_select (77 tests)
+### test_zone_select (71 tests)
 - linfit unit: perfect linear, negative slope, constant, 2-point, noisy, 1-point
 - Synthetic: linear decay, flat, oscillating, rising, empty, single, nzones cap
 - Real HEO: 42928 PSLV-C39, 35497 Ariane 5, 37151 Long March 3B, 39615 Proton-M
@@ -294,9 +294,6 @@ Two-body energy conservation, orbit closure, multi-revolution propagation, re-en
 - Independent R² verification (manual SS_res/SS_tot)
 - Degenerate: identical epochs, 2 points, very steep decay
 - Repeatability, robustness (nzones_max=0, large nzones_max)
-- Issue #42: zone_outlier_filter (leave-one-out outlier check) -- clean zone
-  no-op, injected-outlier detection, realistic-scatter false-positive bound,
-  nzone<4 no-op
 
 ### test_ga (74 tests)
 - TWOINT bilinear interpolation: constant, linear, corners, center, edges, quadratic, boundary
@@ -981,7 +978,7 @@ Ran the new algorithm on the canonical object list at n=7/50/90 (4-way process-p
 | 50 | 29.62 → 32.15 | 1.69 → 2.06 | 11/40 comparable |
 | 90 | 27.35 → 32.40 | 1.19 → 0.68 | 15/53 comparable |
 
-The filter does fire on real data (4 zones across the curated-7 alone), so this isn't a no-op — but the PRIMARY metric (this report's own headline estimator, §8 passim) gets measurably *worse* at the largest, most reliable sample size (+5 points median at n=90), while the secondary ensemble metric is inconsistent (worse at n=50, better at n=90). Re-ran the DRAMA/OSCAR cross-validation (`drama/scripts/run_oscar_campaign.py` + `compare_orem_drama.py`) against the new n=90 results: OREM median \|RPE%\| moves from 31.89% to 32.40% (DRAMA/OSCAR's own 41.29% is unchanged, as expected — its inputs derive from OREM's fit). Per this project's established standard for empirically-tested refinements (cf. `irefine=2`'s "washes out at scale" verdict above, the reverted noise-matched-apobs correction, the reverted zone-to-zone trajectory seeding), a change that regresses the primary metric does not ship to `main` by default: the implementation stays on `HS-dev`, fully tested and documented, but is **not merged to `main`** and not part of the default pipeline. See issue #42 for the full campaign data and per-object breakdown.
+The filter does fire on real data (4 zones across the curated-7 alone), so this isn't a no-op — but the PRIMARY metric (this report's own headline estimator, §8 passim) gets measurably *worse* at the largest, most reliable sample size (+5 points median at n=90), while the secondary ensemble metric is inconsistent (worse at n=50, better at n=90). Re-ran the DRAMA/OSCAR cross-validation (`drama/scripts/run_oscar_campaign.py` + `compare_orem_drama.py`) against the new n=90 results: OREM median \|RPE%\| moves from 31.89% to 32.40% (DRAMA/OSCAR's own 41.29% is unchanged, as expected — its inputs derive from OREM's fit). Per this project's established standard for empirically-tested refinements (cf. `irefine=2`'s "washes out at scale" verdict above, the reverted noise-matched-apobs correction, the reverted zone-to-zone trajectory seeding), a change that regresses the primary metric does not ship: the code was reverted from `HS-dev` (test count back to 71). The campaign data, unit-test design (LOO vs. the rejected self-masking naive version), and this write-up remain as the documented record. See issue #42 for the full campaign data and per-object breakdown.
 
 ---
 
