@@ -87,7 +87,7 @@ c        chain) already recorded from the prior run, not re-run here.
             call orem_run(
      &         tle_file(io), norad(io),
      &         t_obs, mxz, 8, 20.d0, 0.90d0, -1.d0,
-     &         80.d0, 160.d0, 1, 0, irefine, 0,
+     &         80.d0, 160.d0, 1, 0, irefine,
      &         20, 500, 40, 16, 0.8d0, 0.01d0, 0.123d0,
      &         20, 2, 3,
      &         7.2921150d-5, 3.35281066d-3, 1.d0,
