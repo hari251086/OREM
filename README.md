@@ -354,6 +354,15 @@ Cross-validates propagate_ks against GMAT R2026a reference runs (`scratch_gmat/g
 - 32007 GSLV R/B (i=25.9°, e=0.29, re-entry 2010-06-06)
 - 37819 Proton-M R/B (i=63.4°, e=0.47, re-entry 2013-09-12)
 
+### test_bo (32 tests) — Issue #40 option 3 follow-up
+Bayesian-optimization core (`bo.F`), standalone unit tests -- does not exercise `orem.F`/`propagate_ks` at all:
+- erf/normal CDF/PDF against known reference values
+- RBF kernel: identity, decay with distance, symmetry
+- Cholesky decomposition: reconstruction on a known PD matrix, non-PD rejection, forward/back substitution solves
+- GP posterior: mean recovers training data near-exactly (small nugget), variance grows away from data
+- Expected Improvement: zero at sigma=0, large for promising candidates, small for poor ones
+- Two end-to-end synthetic-bowl optimizations (centered and off-center/anisotropic) verifying `bo_next_point`'s search strategy actually converges near the true minimum within budget
+
 ---
 
 ## 7. KSROP Dependency
@@ -979,6 +988,12 @@ Ran the new algorithm on the canonical object list at n=7/50/90 (4-way process-p
 | 90 | 27.35 → 32.40 | 1.19 → 0.68 | 15/53 comparable |
 
 The filter does fire on real data (4 zones across the curated-7 alone), so this isn't a no-op — but the PRIMARY metric (this report's own headline estimator, §8 passim) gets measurably *worse* at the largest, most reliable sample size (+5 points median at n=90), while the secondary ensemble metric is inconsistent (worse at n=50, better at n=90). Re-ran the DRAMA/OSCAR cross-validation (`drama/scripts/run_oscar_campaign.py` + `compare_orem_drama.py`) against the new n=90 results: OREM median \|RPE%\| moves from 31.89% to 32.40% (DRAMA/OSCAR's own 41.29% is unchanged, as expected — its inputs derive from OREM's fit). Per this project's established standard for empirically-tested refinements (cf. `irefine=2`'s "washes out at scale" verdict above, the reverted noise-matched-apobs correction, the reverted zone-to-zone trajectory seeding), a change that regresses the primary metric does not ship: the code was reverted from `HS-dev` (test count back to 71). The campaign data, unit-test design (LOO vs. the rejected self-masking naive version), and this write-up remain as the documented record. See issue #42 for the full campaign data and per-object breakdown.
+
+**2026-08-12 — Issue #40 option 3 follow-up: full Bayesian-optimization (GP+EI) search against REAL direct-propagation fitness, implemented and validated -- washes out at n=50, same verdict as `irefine=2`, but the code stays (unlike #42) because it's already opt-in/default-off.** Closes the one gap option 3's own offline Python study explicitly left open (issue #40): that study proved GP-EI is far more sample-efficient than the GA *against the cheap interpolated RSM surface*, but never tested it against the true, un-interpolated physics. New `bo.F`: fixed-lengthscale (0.25, matching the Python study for comparability) RBF-kernel GP, from-scratch Cholesky-based posterior, Expected Improvement acquisition (grid-search argmax), warm-started from the zone's own 9 *free* RSM grid-corner evaluations (exact real-physics points already paid for by `rsm_generate` -- a grid corner's bilinear weight is 1, so reading them costs nothing extra) plus 91 new `rsm_direct_eval` calls (100 total, option 3's own validated evaluation count). 32 new tests (`test_bo.F`), including two end-to-end synthetic-bowl convergence checks, all passing on the first run. Wired into `orem.F` as `isearch` (0=default, unchanged `ga_optimize`+`irefine` path; 1=`bo_optimize` replaces both entirely for the zone) -- required updating every active `orem_run` call site (`main_orem`, `test_e2e`/`test_orem`/`test_reentry`, `campaign40`/`campaign41`) to pass `isearch=0`; full suite (335+32 tests) green with zero behavior change at the default.
+
+Validated at n=1 (sanity: runs correctly, 100% propagation success, ~4.6x slower than baseline for an 8-zone object -- ~3m45s vs 49s), n=7 (curated-7: primary mean flat 25.85%→26.52%, median improves 22.00%→12.13% but driven by one large swing while another object worsens 31.89%→54.85%, 4/7 objects improve -- the same ambiguous small-n signature `irefine` showed before reversing at scale), and n=50 (4-way process-parallel, GitHub\CLAUDE.md 4-core cap): **primary mean roughly flat (44.34%→42.93%), primary median slightly worse (27.00%→29.42%), win rate 17/36 (47%, a coin flip)** -- no improvement, at ~4.6x the compute cost of the GA path. Re-ran DRAMA/OSCAR cross-validation on the n=50 results (31 comparable objects): OREM median 35.71%, no material change in character from baseline. **Verdict: does not close issue #36's interpolation-optimism gap in a way that improves the primary metric -- do not promote `isearch=1` to the default.**
+
+Unlike issue #42 (reverted entirely -- it had no opt-in gate, so leaving it would have meant shipping a live regression), `isearch=1` costs nothing when off (one integer comparison, `bo.F` never called) -- same "opt-in/default-off is the right place" treatment as `irefine=1`/`irefine=2` above, so the code stays on `HS-dev` as a documented negative result and a reusable, independently-tested GP-EI implementation, rather than being reverted. With this result, **all three of issue #40's originally-scoped options (hybrid refinement, reduced GA cost, full BO replacement) have now been tried and found non-beneficial** -- see issue #40 for the complete history and final disposition.
 
 ---
 
