@@ -87,5 +87,10 @@ name = "test_gmat"
 source-dir = "test"
 main = "test_gmat.F"
 
+[[test]]
+name = "test_bo"
+source-dir = "test"
+main = "test_bo.F"
+
 [dependencies]
 ksrop = { git = "https://github.com/hari251086/KSROP", tag = "v2.11.1" }
