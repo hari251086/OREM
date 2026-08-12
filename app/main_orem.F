@@ -175,7 +175,7 @@ c     ============================================================
      &   nzones_max, min_zone_pts, max_zone_days,
      &   r2_thresh, slope_thresh,
      &   bn_min, bn_max,
-     &   idrag_flag, 0, 0,
+     &   idrag_flag, 0, 0, 0,
      &   ipopsize, maxgen, nbits_e, nbits_a,
      &   pcross, pmute, ga_seed,
      &   ngeo_deg, nsun_deg, nmoon_deg,
