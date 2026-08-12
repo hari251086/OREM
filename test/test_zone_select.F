@@ -29,9 +29,6 @@ c     linfit test variables
 
       integer npass, nfail, iall_ok, i, j
 
-c     Issue #42: zone_outlier_filter test variables
-      integer mask_zout(20), nremoved_zout
-
       call init_constants()
 
       npass = 0
@@ -1182,64 +1179,6 @@ c     the MOST RECENT window (D) must win instead.
       end if
       call assert_i('Z68 recency: sole slot goes to most recent',
      &              iall_ok, 1, npass, nfail)
-
-c     ==============================================================
-c     Issue #42: zone_outlier_filter (leave-one-out outlier check)
-c     ==============================================================
-      write(*,*) ''
-      write(*,*) '  --- zone_outlier_filter (issue #42) ---'
-
-c     Z69: Clean linear zone (no outlier) -- nothing removed
-      do i = 1, 15
-         epochs(i) = 2460000.d0 + dble(i-1)
-         ha(i) = 30000.d0 - 100.d0*dble(i-1)
-      end do
-      call zone_outlier_filter(epochs, ha, 15, 5.d0,
-     &                         mask_zout, nremoved_zout)
-      call assert_i('Z69 clean zone: 0 removed',
-     &              nremoved_zout, 0, npass, nfail)
-
-c     Z70: One point pulled far off the line -- that point removed,
-c     the rest kept
-      ha(8) = ha(8) + 2000.d0
-      call zone_outlier_filter(epochs, ha, 15, 5.d0,
-     &                         mask_zout, nremoved_zout)
-      call assert_i('Z70 injected outlier: 1 removed',
-     &              nremoved_zout, 1, npass, nfail)
-      call assert_i('Z70 injected outlier: point 8 flagged',
-     &              mask_zout(8), 0, npass, nfail)
-      iall_ok = 1
-      do i = 1, 15
-         if (i .ne. 8 .and. mask_zout(i) .ne. 1) iall_ok = 0
-      end do
-      call assert_i('Z70 injected outlier: others kept',
-     &              iall_ok, 1, npass, nfail)
-
-c     Z71: Small realistic scatter (no injected outlier) -- LOO check
-c     should not remove more than 1 of 20 (matches the ~1% zone-level
-c     false-positive rate the sigma=5 threshold was calibrated to)
-      do i = 1, 20
-         epochs(i) = 2460000.d0 + dble(i-1)
-         ha(i) = 30000.d0 - 100.d0*dble(i-1)
-      end do
-      ha(3)  = ha(3)  + 25.d0
-      ha(9)  = ha(9)  - 30.d0
-      ha(14) = ha(14) + 20.d0
-      call zone_outlier_filter(epochs, ha, 20, 5.d0,
-     &                         mask_zout, nremoved_zout)
-      if (nremoved_zout .le. 1) then
-         call assert_i('Z71 realistic scatter: <=1 removed',
-     &                 1, 1, npass, nfail)
-      else
-         call assert_i('Z71 realistic scatter: <=1 removed',
-     &                 0, 1, npass, nfail)
-      end if
-
-c     Z72: Too few points (nzone < 4) -- filter is a no-op, all kept
-      call zone_outlier_filter(epochs, ha, 3, 5.d0,
-     &                         mask_zout, nremoved_zout)
-      call assert_i('Z72 nzone<4: 0 removed (no-op)',
-     &              nremoved_zout, 0, npass, nfail)
 
 c     ==============================================================
 c     Summary

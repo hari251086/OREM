@@ -210,15 +210,6 @@ c     Issue #32 (G3): BSTAR-informed BN search-range prior, per zone
       double precision bn_lo_zone, bn_hi_zone
       logical bn_prior_ok
 
-c     Issue #42: zone-local outlier filter, before RSM/GA. sigma_thresh
-c     hardcoded (not a new orem_run argument) -- same always-on,
-c     internally-calibrated-constant pattern as G2/G3 above.
-c     sigma_thresh=5.0 per zone_outlier_filter's own Monte Carlo
-c     calibration (zone_select.F) -- see that header for the leave-one-
-c     out design and why 3.0 (the naive choice) badly self-masks.
-      parameter(zout_sigma = 5.d0)
-      integer mask_zout(500), nremoved_zout, i_zout, j_zout
-
 c     Issue #41: RPE-driven sequential zone selection (adapt mode)
       parameter(n_adapt_max = 10, rpe_adapt_thresh = 20.d0)
       integer nzones_loop, istart_scan
@@ -493,34 +484,6 @@ c        (#10) can shrink a zone after selection.
             aopz(i)  = aop_tle(zone_start(iz) + i - 1)
             smaz(i)  = a_tle(zone_start(iz) + i - 1)
          end do
-
-c        Issue #42: filter TLE points that don't fit this zone's own
-c        linear apogee trend, before RSM/GA see them. Never drops the
-c        zone below the RSM-viability floor (3 pts, same as the
-c        too-few-TLEs check above) -- if filtering would, skip it and
-c        keep the zone as zone_select found it.
-         call zone_outlier_filter(epz, haz, nzone, zout_sigma,
-     &      mask_zout, nremoved_zout)
-         if (nremoved_zout .gt. 0 .and.
-     &       nzone - nremoved_zout .ge. 3) then
-            j_zout = 0
-            do i_zout = 1, nzone
-               if (mask_zout(i_zout) .eq. 1) then
-                  j_zout = j_zout + 1
-                  epz(j_zout)   = epz(i_zout)
-                  haz(j_zout)   = haz(i_zout)
-                  ez(j_zout)    = ez(i_zout)
-                  incz(j_zout)  = incz(i_zout)
-                  raanz(j_zout) = raanz(i_zout)
-                  aopz(j_zout)  = aopz(i_zout)
-                  smaz(j_zout)  = smaz(i_zout)
-               end if
-            end do
-            write(*,'(A,I2,A,I2,A,I3,A)')
-     &         '  [INFO] Z', iz, ': outlier filter removed ',
-     &         nremoved_zout, ' of ', nzone, ' TLE points'
-            nzone = j_zout
-         end if
 
 c        Issue #31's noise-matched-apobs bias correction (smooth
 c        linfit-trend mean/osculating adjustment to haz) was tried
