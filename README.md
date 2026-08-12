@@ -278,7 +278,7 @@ Two-body energy conservation, orbit closure, multi-revolution propagation, re-en
 - Repeatability, boundary conditions (maxpts=1)
 - Deduplication: no consecutive epochs within 86 sec, duplicate removal count
 
-### test_zone_select (68 tests)
+### test_zone_select (77 tests)
 - linfit unit: perfect linear, negative slope, constant, 2-point, noisy, 1-point
 - Synthetic: linear decay, flat, oscillating, rising, empty, single, nzones cap
 - Real HEO: 42928 PSLV-C39, 35497 Ariane 5, 37151 Long March 3B, 39615 Proton-M
@@ -294,6 +294,9 @@ Two-body energy conservation, orbit closure, multi-revolution propagation, re-en
 - Independent R² verification (manual SS_res/SS_tot)
 - Degenerate: identical epochs, 2 points, very steep decay
 - Repeatability, robustness (nzones_max=0, large nzones_max)
+- Issue #42: zone_outlier_filter (leave-one-out outlier check) -- clean zone
+  no-op, injected-outlier detection, realistic-scatter false-positive bound,
+  nzone<4 no-op
 
 ### test_ga (74 tests)
 - TWOINT bilinear interpolation: constant, linear, corners, center, edges, quadratic, boundary
@@ -967,6 +970,18 @@ Monotonic and decisive across all three: primary-metric win rate falls 71%→56%
 **Caveats, explicit**: (1) the GP hyperparameters are fixed/untuned (no per-zone marginal-likelihood optimization) — a properly tuned GP would likely do better still, this is a floor not a ceiling on BO's potential; (2) this only tests search efficiency on the *cheap interpolated* landscape as a proxy — it does not yet touch the real question of whether searching against true direct-propagation RMS (rather than the interpolated surrogate) closes issue #36's Finding 3 optimism gap, which needs an actual expensive-fitness integration to test; (3) "true optimum of the interpolated surface" is a different target than "true optimum of the real physics" (Finding 3's whole point) — BO's demonstrated advantage here is search efficiency, not yet fitness accuracy. Not implemented — diagnostic + offline Python study only, `orem.F`/`ga.F` unchanged, `fpm.toml` reverted after the Fortran dump run.
 
 **2026-08-11 — KSROP dependency bumped v2.2.0 → v2.11.0, full test suite and 97-object RPE campaign re-run, zero regressions.** Picks up ~9 months of upstream KSROP work (general (n,m) tesseral geopotential, `Rtilt` body-pole-rotation, geopotential/drag numerical-stability fixes, drag model extracted into a shared subroutine, XJR-thesis zonal validation) that had accumulated on KSROP's `HS-dev`/`main` since this repo's pin was last touched. `fpm build`/`fpm test --compiler ifx` (11 executables, 385 tests) all pass unchanged. Re-ran the full 97-object RPE campaign (`scratch_rpe/rpe_campaign.F`, 4-way process-parallel per its own header convention, GitHub\CLAUDE.md 4-core cap) — **results are bit-identical to the pre-bump baseline**: median\|RPE\|=31.89% across the 61/97 objects with a primary-zone prediction, every individual object's `rpe_pct` unchanged to the digit. This is expected, not a null result: `propagate_ks.F` (§7) only calls KSROP's longstanding `geo_coeff`/`car2ks`/`ks2car`/`aLegP`/`car2oe`/`ks2ksr`/`third_body_aux`, none of which changed behavior between v2.2.0 and v2.11.0 — all of the new capability landed in new subroutines (`tess_legendre_force`, `geo_coeff_tess_general`, `DragOblateCorotating.F`) that `propagate_ks.F` doesn't call. The DRAMA/OSCAR comparison baseline (`drama/output/oscar_campaign_results.csv`, median OREM 31.9% vs DRAMA/OSCAR 41.3%, 2026-08-07) is therefore still current and was not re-run — its OREM-side inputs (bn_opt, zepoch per object) are unchanged, so its outputs would be too. **Adopting** KSROP's newer general (n,m) tesseral field or the `Rtilt`/drag-refactor machinery in `propagate_ks.F` itself — which would change these numbers — is a separate, not-yet-started integration, tracked as future work rather than implied by this version bump.
+
+**2026-08-11/12 — Issue #42: zone-local outlier filter before RSM/GA, implemented and tested, but the PRIMARY metric regresses at scale — do NOT promote to the default pipeline.** Added `zone_outlier_filter` (`zone_select.F`): within an already-selected zone, re-fits a leave-one-out linear apogee trend per point (a fit-all-points-then-threshold design was tried first and rejected — Monte Carlo showed a single outlier self-masks its own residual-sigma estimate, capped near `sqrt(nzone)` regardless of how far off it actually is) and flags points beyond 5 residual-sigmas from that LOO fit (Monte Carlo-calibrated: 3σ gave a 39% false-positive rate on clean synthetic zones, 5σ gives ~1%, matching `tle_filter.F`'s own ~1.5% target while still catching 100% of 10×-noise-scale synthetic outliers). `orem.F` compacts the zone's arrays after filtering, never dropping below the existing 3-point RSM-viability floor. 6 new tests (`test_zone_select.F`, 71→77), full suite green, zero regressions.
+
+Ran the new algorithm on the canonical object list at n=7/50/90 (4-way process-parallel for the 90, GitHub\CLAUDE.md 4-core cap; 7/50 are subsets of the same 90-object run) and compared against the already-recorded pre-change baseline (`scratch_rpe/rpe_campaign.csv`):
+
+| n | primary \|RPE%\| median (before→after) | ensemble \|RPE%\| median (before→after) | objects w/ changed primary |
+|---|---|---|---|
+| 7 | 22.00 → 22.00 | 1.19 → 1.20 | 1/7 |
+| 50 | 29.62 → 32.15 | 1.69 → 2.06 | 11/40 comparable |
+| 90 | 27.35 → 32.40 | 1.19 → 0.68 | 15/53 comparable |
+
+The filter does fire on real data (4 zones across the curated-7 alone), so this isn't a no-op — but the PRIMARY metric (this report's own headline estimator, §8 passim) gets measurably *worse* at the largest, most reliable sample size (+5 points median at n=90), while the secondary ensemble metric is inconsistent (worse at n=50, better at n=90). Re-ran the DRAMA/OSCAR cross-validation (`drama/scripts/run_oscar_campaign.py` + `compare_orem_drama.py`) against the new n=90 results: OREM median \|RPE%\| moves from 31.89% to 32.40% (DRAMA/OSCAR's own 41.29% is unchanged, as expected — its inputs derive from OREM's fit). Per this project's established standard for empirically-tested refinements (cf. `irefine=2`'s "washes out at scale" verdict above, the reverted noise-matched-apobs correction, the reverted zone-to-zone trajectory seeding), a change that regresses the primary metric does not ship to `main` by default: the implementation stays on `HS-dev`, fully tested and documented, but is **not merged to `main`** and not part of the default pipeline. See issue #42 for the full campaign data and per-object breakdown.
 
 ---
 
