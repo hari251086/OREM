@@ -96,9 +96,6 @@ c     Issue #40: irefine validation on the full campaign. Optional 3rd
 c     CLI arg (default 0 = baseline, unchanged from every prior
 c     invocation). Not iadapt_zone -- #41 stays rejected/off here.
       integer irefine_cli
-c     Issue #40 option 3 follow-up: optional 4th CLI arg for isearch
-c     (default 0 = baseline, unchanged from every prior invocation).
-      integer isearch_cli
 
 c     mxz=8 (v1.21 experiment; was 4): zone_select returns the top-R2
 c     candidates, so a higher cap admits LATER zones -- and v1.20
@@ -523,7 +520,6 @@ c     range, unchanged output filename.
       io_start = 1
       io_end = nobj
       irefine_cli = 0
-      isearch_cli = 0
       csv_name = 'scratch_rpe/rpe_campaign.csv'
       iarg = iargc()
       if (iarg .ge. 2) then
@@ -542,15 +538,6 @@ c     range, unchanged output filename.
      &      'scratch_rpe/rpe_campaign_part_', io_start, '_',
      &      io_end, '_irefine', irefine_cli, '.csv'
       end if
-      if (iarg .ge. 4) then
-         call getarg(4, arg_str)
-         read(arg_str, *) isearch_cli
-         write(csv_name, '(A,I2.2,A,I2.2,A,I1,A,I1,A)')
-     &      'scratch_rpe/rpe_campaign_part_', io_start, '_',
-     &      io_end, '_irefine', irefine_cli, '_isearch',
-     &      isearch_cli, '.csv'
-      end if
-
       call init_constants()
       call read_atm_c(ALT_a, DEN_a, SCH_a, ndim_a, natm)
 
@@ -571,7 +558,7 @@ c     range, unchanged output filename.
          call orem_run(
      &      tle_file(io), norad(io),
      &      t_obs, mxz, 8, 20.d0, 0.90d0, -1.d0,
-     &      80.d0, 160.d0, 1, 0, irefine_cli, isearch_cli,
+     &      80.d0, 160.d0, 1, 0, irefine_cli,
      &      20, 500, 40, 16, 0.8d0, 0.01d0, 0.123d0,
      &      20, 2, 3,
      &      7.2921150d-5, 3.35281066d-3, 1.d0,

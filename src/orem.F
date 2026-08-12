@@ -13,7 +13,7 @@ c     ============================================================
      &   nzones_max, min_zone_pts, max_zone_days,
      &   r2_thresh, slope_thresh,
      &   bn_min_init, bn_max_init,
-     &   idrag_flag, iadapt_zone, irefine, isearch,
+     &   idrag_flag, iadapt_zone, irefine,
      &   ipopsize, maxgen, nbits_e, nbits_a,
      &   pcross, pmute, ga_seed,
      &   ngeo_deg, nsun_deg, nmoon_deg,
@@ -60,19 +60,6 @@ c                          GA's pre-refinement optimum instead of the
 c                          refined one -- isolates whether irefine=1's
 c                          mixed curated-7 result traces to the same
 c                          carryover-chain amplification as issue #41.
-c       isearch          : issue #40 option 3 follow-up -- 0=off
-c                          (default: ga_optimize on the cheap
-c                          interpolated RSM surface, unchanged
-c                          behavior, irefine as above applies on top of
-c                          it), 1=on: skip ga_optimize/irefine entirely
-c                          and instead search (e, BN) directly with
-c                          bo_optimize (GP + Expected Improvement)
-c                          against rsm_direct_eval's real propagated
-c                          fitness the whole time, warm-started from
-c                          the zone's own 9 free RSM grid-corner
-c                          evaluations. Uses only in-zone TLE data, so
-c                          (like irefine) usable in a real operational
-c                          prediction, not just an offline study.
 c       zone selection params, area bounds, mass, Cd, GA params,
 c       force model params, atmosphere tables
 c
@@ -110,7 +97,7 @@ c     --- Input arguments ---
       double precision max_zone_days, r2_thresh, slope_thresh
       double precision t_obs_cal(6)
       double precision bn_min_init, bn_max_init
-      integer idrag_flag, iadapt_zone, irefine, isearch
+      integer idrag_flag, iadapt_zone, irefine
       integer ipopsize, maxgen, nbits_e, nbits_a
       double precision pcross, pmute, ga_seed
       integer ngeo_deg, nsun_deg, nmoon_deg
@@ -250,15 +237,6 @@ c     next-zone bn_lo/bn_hi carryover use the GA's pre-refinement
 c     optimum, not the refined one. Tests whether irefine=1's mixed
 c     curated-7 result traces to the same carryover-chain amplification
 c     as issue #41, or is independent of it.
-
-c     Issue #40 option 3 follow-up: isearch=1 (BO search, replaces
-c     ga_optimize+irefine entirely for the zone). n_bo_new_eval=91
-c     (+9 free RSM-corner warm-start = 100 total) matches option 3's
-c     own validated evaluation count (bo.F's header/issue #40).
-      integer n_bo_new_eval
-      parameter(n_bo_new_eval = 91)
-      double precision zone_dur_bo
-      integer neval_bo_total, neval_bo_ok
       double precision e_ga_only, bn_ga_only, e_bound_val, bn_bound_val
 
       ierr = 0
@@ -643,34 +621,6 @@ c        GA on the existing surfaces.
      &         ' observations -- proceeding anyway'
          end if
 
-         if (isearch .eq. 1) then
-c           Issue #40 option 3 follow-up: BO search against real
-c           direct-propagation fitness the whole time -- replaces
-c           ga_optimize (interpolated surface) and irefine (post-hoc
-c           refinement of the GA's answer) entirely for this zone.
-            zone_dur_bo = epz(nzone) - epz(1)
-            call bo_optimize(
-     &         smaz(1), ez(1), incz(1), raanz(1), aopz(1), maz(1),
-     &         epz(1), zone_dur_bo,
-     &         surfaces, max_surf, e_grid, bn_grid,
-     &         tobs, apobs, nobs,
-     &         360, 1.d-10,
-     &         n_force, ngeo_deg, nsun_deg, nmoon_deg,
-     &         WE_rot, EPS_f, FR_rot,
-     &         CR_srp, AM_srp, IPSR, ISHAD,
-     &         PSR_srp, amuS, amuM,
-     &         ALT_atm, DEN_atm, SCH_atm, ndim_atm,
-     &         n_bo_new_eval,
-     &         e_opt_out(iz), bn_opt_out(iz), rms_out(iz),
-     &         neval_bo_total, neval_bo_ok)
-            write(*,'(A,I2,A,I3,A,I3,A)')
-     &         '  [BO] Z', iz, ': ', neval_bo_ok, ' of ',
-     &         neval_bo_total-9, ' new direct-propagation evals ok'
-            e_ga_only = e_opt_out(iz)
-            bn_ga_only = bn_opt_out(iz)
-            goto 75
-         end if
-
 c        GA optimization: match predicted apogee trajectory to TLE observations
          call ga_optimize(
      &      surfaces, max_surf, e_grid, bn_grid,
@@ -716,7 +666,6 @@ c           just searched (set by rsm_generate above).
             end if
          end if
 
- 75      continue
 c        Issue #12: GA boundary solution (optimum within 15% of a
 c        search bound suggests the true value may lie outside the
 c        search range). 15% (not a tighter %) because the
