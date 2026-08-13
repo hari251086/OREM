@@ -86,11 +86,11 @@ OREM/
 │   ├── test_rsm.F                   RSM integration tests (39)
 │   ├── test_sw.F                    Space weather / ATM2D tests (18)
 │   ├── test_tle_filter.F            TLE filter tests (14)
-│   ├── test_orem.F                  Driver + diagnostics + G2 + report tests (34)
+│   ├── test_orem.F                  Driver + diagnostics + G2 + report + BN-sweep tests (37)
 │   ├── test_reentry.F               7-object re-entry validation (35)
 │   ├── test_e2e.F                   End-to-end integration, IDRAG=1 + full force (20)
 │   └── test_gmat.F                  GMAT cross-validation + exact-model drag reference (14)
-└── README.md                        (385 tests total)
+└── README.md                        (388 tests total)
 ```
 
 ---
@@ -189,7 +189,7 @@ input/example_42928.tle.txt          <- TLE file path
 2019 3 3 0 0 0.0                    <- Observed re-entry (yr mo dy hr mn sc). Use 0 0 0 0 0 0.0 if unknown
 8                                    <- Max number of zones (8 recommended: later zones sharpen the primary estimate, v1.21)
 8 10.0 0.90 -1.0                    <- Zone: min_pts, max_days, R2_threshold, slope_threshold
-80.0 160.0                          <- Ballistic number bounds [BN_min, BN_max] (G2 floor may extend zone 1 downward)
+80.0 160.0 0                        <- Ballistic number bounds [BN_min, BN_max] (G2 floor may extend zone 1 downward), n_bn_sweep (issue #43: 0/1=off, >=2=BN-sweep dispersion band, operational mode only — see §5 Step 4)
 20 200 40 16 0.8 0.01 0.123         <- GA: pop, gen, bits_e, bits_BN, Pc, Pm, seed (pop=20 required — see v1.15)
 2 0 0                               <- Force model: geo_deg, sun_deg, moon_deg
 0 7.2921150d-5 3.35281066d-3 1.0    <- Drag: IDRAG(0=off,1=on), WE, EPS_f, FR
@@ -215,12 +215,20 @@ PRIMARY estimate (latest zone, Z 4): JD  2458526.0047  ( 2019  2 11 )
   latest-zone RPE:  -15.65 %
 Ensemble ( 4 of  4 zones with a predicted re-entry):
   mean re-entry JD  2458602.1499  ( 2019  4 28 )  +-    94.05 days
+
+Dispersion band (BN swept across the PRIMARY zone's fitted search window, real space weather):
+  BN (kg/m2)   Re-entry (JD)   Re-entry (UTC)
+      70.20   2458520.31        2019  2  5
+      85.10   2458526.00        2019  2 11
+     100.00   2458531.84        2019  2 17
+  band width:    11.53 days  ( 3 of  3 BN values re-entered within cap)
 ```
 
 - **e_opt / BN** — optimal eccentricity and ballistic number (kg/m²) fitted by the GA for this zone
 - **PRIMARY estimate** — the latest zone's prediction: the shortest extrapolation and the freshest attitude/altitude regime, and the most accurate single estimator on the validation set (median |RPE| 2.4% at 8 zones)
 - **Ensemble mean ± std** — agreement/spread indicator across all predicting zones
 - **RPE(%)** — relative prediction error vs observed (if provided); **status** — per-zone diagnostic (`ok`/`boundary`/`nobound`/...)
+- **Dispersion band** (issue #43, operational mode only — no observed epoch to compute a real RPE against) — the PRIMARY zone's own BN search window swept at a handful of points, each re-propagated with the *same real* (unperturbed) space weather; reports a re-entry-date range instead of a misleading point estimate. Directly re-implements the precedent in the ISRO monograph deep-read (`E:\Research\References\1714143800970.pdf`, Fig 8.6, GSLV-D1 spent-stage lifetime dispersion) — no Monte Carlo, no synthesized forecast-error model, only BN varied. See `src/bn_dispersion.F` and OREM issue #43.
 
 ### Notes
 
@@ -236,7 +244,7 @@ Ensemble ( 4 of  4 zones with a predicted re-entry):
 | `input/orem_42928.cfg` | PSLV-C39 R/B | IDRAG=0, fast test (no re-entry) |
 | `input/orem_42928_drag.cfg` | PSLV-C39 R/B | IDRAG=1, drag enabled, BN=[80,160] |
 
-To run on a different object: copy the config, change lines 1-3 (TLE file, NORAD, re-entry date), and line 6 (BN bounds).
+To run on a different object: copy the config, change lines 1-3 (TLE file, NORAD, re-entry date), and line 6 (BN bounds + `n_bn_sweep`).
 
 **Ballistic number (BN):** BN = m/(Cd×A) in kg/m². The GA optimizes BN directly, as in the original NPOE research. With the corrected J71 atmosphere (v1.17) and drag phase (v1.18), fitted values on the 7-object validation set fall in ~20–100 kg/m² per zone; the default [80,160] initial range works because the G2 physics floor automatically extends zone 1's search downward when the object's own decay rate warrants it, and later zones inherit trust-gated re-centered ranges.
 
@@ -315,13 +323,14 @@ Two-body energy conservation, orbit closure, multi-revolution propagation, re-en
 - Surface quality: higher e → higher ha, all finite (NaN check), physical range [5k-20k km], center nearest, repeatability
 - RSM→GA integration: feed real RSM surfaces into ga_optimize, e_opt/a_opt in bounds, rms valid, e_opt near TLE ecc, fitness>0.5
 
-### test_orem (34 tests) — includes issues #12/#13/#29
+### test_orem (37 tests) — includes issues #12/#13/#29/#43
 - compute_rpe: perfect RPE=0, 10-day late RPE~1.9%, mean/std (Mode 2), zero predictions
 - Error handling: bad TLE file, wrong NORAD ID
 - 42928 integration: full pipeline (TLE→zone→RSM→GA→propagation), e_opt physical, bn_opt physical (positive/finite — G2 floor + the corrected J71 table put fit-consistent BN below the caller's 80), rms valid, zone epochs valid
 - Failure recovery/diagnostics (#12): D15 propagator-divergence skip (BN=0 forces a division-by-zero in the drag term → NaN altitude → `zone_status=1`), D16 GA boundary detection with a [20,30] window pinned *below* the real BN (`zone_status=2`; a window pinned above gets un-pinned by the G2 floor), D17 all-zones-fail doesn't crash the driver loop (`nzones_valid=0`)
 - G2 physics-based BN floor (#12): 37151's zone 1 with the default `bn_min_init=80` — floor estimate extends `bn_lo` well below 80, letting `bn_opt(1)` land there (structurally impossible before this change)
 - Prediction report (#13): R1–R4 real-run report (header/zone table/ensemble/legend), R5–R7 synthetic-array report exercising the with-re-entry path (PRIMARY = latest zone, latest-zone RPE line)
+- BN-sweep dispersion band (#43): T1 `n_bn_sweep<=1` is a true no-op, T2 all 3 sweep points re-enter within cap from a synthetic 100km-altitude test orbit, T3 re-entry date is non-decreasing as swept BN increases (higher BN = less drag deceleration = longer lifetime — a real physical property, not just "some numbers came out")
 - Last-TLE perigee decay-phase indicator (#29, v1.47): R0 `tle_last_perigee` succeeds, R0b returns a physically plausible altitude, R4b report contains the new line
 
 ### test_e2e (20 tests) — Issue #16 (closed v1.20)
@@ -985,6 +994,12 @@ The filter does fire on real data (4 zones across the curated-7 alone), so this 
 Validated at n=1 (sanity: runs correctly, 100% propagation success, ~4.6x slower than baseline for an 8-zone object -- ~3m45s vs 49s), n=7 (curated-7: primary mean flat 25.85%→26.52%, median improves 22.00%→12.13% but driven by one large swing while another object worsens 31.89%→54.85%, 4/7 objects improve -- the same ambiguous small-n signature `irefine` showed before reversing at scale), and n=50 (4-way process-parallel, GitHub\CLAUDE.md 4-core cap): **primary mean roughly flat (44.34%→42.93%), primary median slightly worse (27.00%→29.42%), win rate 17/36 (47%, a coin flip)** -- no improvement, at ~4.6x the compute cost of the GA path. Re-ran DRAMA/OSCAR cross-validation on the n=50 results (31 comparable objects): OREM median 35.71%, no material change in character from baseline. **Verdict: does not close issue #36's interpolation-optimism gap in a way that improves the primary metric -- do not promote `isearch=1` to the default.**
 
 Initially kept opt-in/default-off on `HS-dev` (unlike issue #42's outlier filter, `isearch=1` cost nothing when off -- same reasoning as `irefine=1`/`irefine=2`'s own disposal) -- but per explicit user direction, subsequently disposed of entirely (`bo.F`/`test_bo.F` removed, `orem_run`'s `isearch` argument and all call-site updates reverted, test count back to 335/no `test_bo`). The campaign data, validation numbers above, and this write-up remain as the documented record of a real, working, but non-beneficial implementation. With this result, **all three of issue #40's originally-scoped options (hybrid refinement, reduced GA cost, full BO replacement) have now been tried and found non-beneficial** -- see issue #40 for the complete history and final disposition.
+
+**2026-08-13 — Issue #43: BN-sweep dispersion band for objects with no observed re-entry epoch.** `compute_rpe`'s Mode 1 (this document's own headline accuracy figures) needs a real observed epoch; Mode 2 (ensemble median across zones) is the only existing fallback and is self-referential -- every zone can share the same systematic bias and still "agree" (exactly what happened to object 33587 in #27, where a static atmosphere table under-representing real solar activity biased every zone the same direction). Rather than inventing a new statistical framework, this directly re-implements the precedent found in the ISRO monograph deep-read (`E:\Research\References\1714143800970.pdf`, Fig 8.6, GSLV-D1 spent-stage lifetime): real historical/forecast space weather held fixed, only the ballistic number swept across a plausible range, producing a dispersion band on the predicted re-entry date instead of a misleadingly precise point estimate.
+
+New `src/bn_dispersion.F` (`bn_dispersion_band`): sweeps BN across the PRIMARY zone's own already-fitted, G3-BSTAR-narrowed search window (`bn_lo_zone`/`bn_hi_zone` -- reusing the zone's own trusted range rather than inventing a second BN-uncertainty number), re-propagating with `propagate_ks` at each point using the *same* real epoch-resolved space weather the zone's deterministic prediction already used. Runs inline in `orem_run`'s existing zone loop, immediately after each zone's own re-entry propagation, gated on operational mode (`t_obs_cal` unknown -- with a real observed epoch, RPE itself is the honest error measure and a band adds nothing) and the new `n_bn_sweep` config field (0/1=off, default in all 7 shipped validation configs since they have real observed epochs; the two genuinely operational configs, `orem_11550.cfg`/`orem_11550_2015_2024.cfg`, ship with `n_bn_sweep=5`). No Monte Carlo, no RNG, no synthesized forecast-error model -- sidesteps the well-documented BN-carryover-chain fragility (#35) entirely, since the sweep only perturbs inputs to one already-trusted zone's *extra* propagations, never touching zone selection, RSM, GA, or the carryover chain itself.
+
+New report section (`report.F`) after the existing Ensemble block, printed only in operational mode when at least one sweep point re-entered within the propagation cap. `OREM-Watchlist`'s `write_orem_cfg` (the actual operational, no-ground-truth deployment path this feature targets) gains the same config field, defaulting **on** (`n_bn_sweep=5`) since that repo's whole purpose is predicting still-orbiting objects. 3 new tests (`test_orem.F` T1-T3): no-op at `n_sweep<=1`, all sweep points re-enter from a synthetic fast-decaying 100km-altitude test orbit, and re-entry date is verified non-decreasing as swept BN increases (higher BN = less drag deceleration = longer lifetime -- a real physical property). **388/388 tests pass** (385 + 3 new); the 7-object validation campaign's headline accuracy figures are unchanged, since the new code path is gated off for every one of them (all have real observed epochs). See issue #43 for the full option discussion (four other candidate approaches considered, not implemented).
 
 ---
 

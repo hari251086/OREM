@@ -72,6 +72,14 @@ c     ==============================================================
       call test_report(npass, nfail)
 
 c     ==============================================================
+c     Issue #43: BN-sweep dispersion band
+c     ==============================================================
+      write(*,*) ''
+      write(*,*) '  --- BN-sweep dispersion band (#43) ---'
+
+      call test_bn_sweep(npass, nfail)
+
+c     ==============================================================
 c     Summary
 c     ==============================================================
       write(*,*) ''
@@ -199,6 +207,8 @@ c     ============================================================
       double precision alt(ndim_a), den(ndim_a), sch(ndim_a)
       integer natm, ierr
       integer zstat(mxz), nzv
+      double precision bnb_t(10), tb_t(10)
+      integer nbv_t
 
       call read_atm_orem(alt, den, sch, ndim_a, natm)
 
@@ -213,7 +223,7 @@ c     D6: Bad TLE file → ierr=1
       call orem_run(
      &   'nonexistent.tle', 42928,
      &   t_obs, 4, 8, 10.d0, 0.90d0, -1.d0,
-     &   80.d0, 160.d0, 0, 0, 0,
+     &   80.d0, 160.d0, 0, 0, 0, 0,
      &   20, 500, 40, 16, 0.8d0, 0.01d0, 0.123d0,
      &   2, 0, 0,
      &   7.29d-5, 3.35d-3, 1.d0,
@@ -222,7 +232,8 @@ c     D6: Bad TLE file → ierr=1
      &   reentry, e_opt, bn_opt, rms_o,
      &   zepoch, nzu,
      &   zstat, nzv,
-     &   rpe, t_mean, t_std, ierr)
+     &   rpe, t_mean, t_std,
+     &   bnb_t, tb_t, nbv_t, ierr)
       call assert_i('D6 bad file ierr=1',
      &              ierr, 1, npass, nfail)
 
@@ -230,7 +241,7 @@ c     D7: Wrong NORAD → ierr=1 (no match)
       call orem_run(
      &   'input/example_42928_zone0.tle.txt', 99999,
      &   t_obs, 4, 8, 10.d0, 0.90d0, -1.d0,
-     &   80.d0, 160.d0, 0, 0, 0,
+     &   80.d0, 160.d0, 0, 0, 0, 0,
      &   20, 500, 40, 16, 0.8d0, 0.01d0, 0.123d0,
      &   2, 0, 0,
      &   7.29d-5, 3.35d-3, 1.d0,
@@ -239,7 +250,8 @@ c     D7: Wrong NORAD → ierr=1 (no match)
      &   reentry, e_opt, bn_opt, rms_o,
      &   zepoch, nzu,
      &   zstat, nzv,
-     &   rpe, t_mean, t_std, ierr)
+     &   rpe, t_mean, t_std,
+     &   bnb_t, tb_t, nbv_t, ierr)
       call assert_i('D7 wrong NORAD ierr=1',
      &              ierr, 1, npass, nfail)
 
@@ -261,6 +273,8 @@ c     ============================================================
       double precision alt(ndim_a), den(ndim_a), sch(ndim_a)
       integer natm, ierr, nzu
       integer zstat(mxz), nzv
+      double precision bnb_t(10), tb_t(10)
+      integer nbv_t
 
       call read_atm_orem(alt, den, sch, ndim_a, natm)
 
@@ -277,7 +291,7 @@ c     Observed re-entry: 2019-03-03
       call orem_run(
      &   'input/example_42928.tle.txt', 42928,
      &   t_obs, mxz, 8, 10.d0, 0.90d0, -1.d0,
-     &   80.d0, 160.d0, 0, 0, 0,
+     &   80.d0, 160.d0, 0, 0, 0, 0,
      &   20, 200, 40, 16, 0.8d0, 0.01d0, 0.123d0,
      &   2, 0, 0,
      &   7.2921150d-5, 3.35281066d-3, 1.d0,
@@ -287,7 +301,8 @@ c     Observed re-entry: 2019-03-03
      &   reentry, e_opt, bn_opt, rms_o,
      &   zepoch, nzu,
      &   zstat, nzv,
-     &   rpe, t_mean, t_std, ierr)
+     &   rpe, t_mean, t_std,
+     &   bnb_t, tb_t, nbv_t, ierr)
 
 c     D8: Pipeline completed (ierr=3 ok with IDRAG=0: no re-entry)
       if (ierr .eq. 0 .or. ierr .eq. 3) then
@@ -397,6 +412,8 @@ c     ============================================================
       integer natm, ierr, nzu
       integer zstat(mxz), nzv
       integer i, allfail
+      double precision bnb_t(10), tb_t(10)
+      integer nbv_t
 
       call read_atm_orem(alt, den, sch, ndim_a, natm)
 
@@ -413,7 +430,7 @@ c     Also confirms the call completes without crashing.
       call orem_run(
      &   'input/example_42928_zone0.tle.txt', 42928,
      &   t_obs, mxz, 8, 10.d0, 0.90d0, -1.d0,
-     &   0.d0, 0.d0, 0, 0, 0,
+     &   0.d0, 0.d0, 0, 0, 0, 0,
      &   20, 200, 40, 16, 0.8d0, 0.01d0, 0.123d0,
      &   2, 0, 0,
      &   7.2921150d-5, 3.35281066d-3, 1.d0,
@@ -423,7 +440,8 @@ c     Also confirms the call completes without crashing.
      &   reentry, e_opt, bn_opt, rms_o,
      &   zepoch, nzu,
      &   zstat, nzv,
-     &   rpe, t_mean, t_std, ierr)
+     &   rpe, t_mean, t_std,
+     &   bnb_t, tb_t, nbv_t, ierr)
 
       call assert_i('D15 propfail zone_status=1',
      &              zstat(1), 1, npass, nfail)
@@ -444,7 +462,7 @@ c     complete normally.
       call orem_run(
      &   'input/example_42928.tle.txt', 42928,
      &   t_obs, mxz, 8, 10.d0, 0.90d0, -1.d0,
-     &   20.d0, 30.d0, 0, 0, 0,
+     &   20.d0, 30.d0, 0, 0, 0, 0,
      &   20, 200, 40, 16, 0.8d0, 0.01d0, 0.123d0,
      &   2, 0, 0,
      &   7.2921150d-5, 3.35281066d-3, 1.d0,
@@ -454,7 +472,8 @@ c     complete normally.
      &   reentry, e_opt, bn_opt, rms_o,
      &   zepoch, nzu,
      &   zstat, nzv,
-     &   rpe, t_mean, t_std, ierr)
+     &   rpe, t_mean, t_std,
+     &   bnb_t, tb_t, nbv_t, ierr)
 
       call assert_i('D16 GA boundary zone_status=2',
      &              zstat(1), 2, npass, nfail)
@@ -466,7 +485,7 @@ c     and nzones_valid correctly reports 0 when every zone fails.
       call orem_run(
      &   'input/example_42928.tle.txt', 42928,
      &   t_obs, mxz, 8, 10.d0, 0.90d0, -1.d0,
-     &   0.d0, 0.d0, 0, 0, 0,
+     &   0.d0, 0.d0, 0, 0, 0, 0,
      &   20, 200, 40, 16, 0.8d0, 0.01d0, 0.123d0,
      &   2, 0, 0,
      &   7.2921150d-5, 3.35281066d-3, 1.d0,
@@ -476,7 +495,8 @@ c     and nzones_valid correctly reports 0 when every zone fails.
      &   reentry, e_opt, bn_opt, rms_o,
      &   zepoch, nzu,
      &   zstat, nzv,
-     &   rpe, t_mean, t_std, ierr)
+     &   rpe, t_mean, t_std,
+     &   bnb_t, tb_t, nbv_t, ierr)
 
       if (nzu .ge. 1) then
          call assert_i('D17 all-fail: zones still found',
@@ -518,6 +538,8 @@ c     ============================================================
       double precision alt(ndim_a), den(ndim_a), sch(ndim_a)
       integer natm, ierr, nzu
       integer zstat(mxz), nzv
+      double precision bnb_t(10), tb_t(10)
+      integer nbv_t
 
       call read_atm_orem(alt, den, sch, ndim_a, natm)
 
@@ -531,7 +553,7 @@ c     ============================================================
       call orem_run(
      &   'input/example_37151.tle.txt', 37151,
      &   t_obs, mxz, 8, 10.d0, 0.90d0, -1.d0,
-     &   80.d0, 160.d0, 0, 0, 0,
+     &   80.d0, 160.d0, 0, 0, 0, 0,
      &   20, 200, 40, 16, 0.8d0, 0.01d0, 0.123d0,
      &   2, 0, 0,
      &   7.2921150d-5, 3.35281066d-3, 1.d0,
@@ -541,7 +563,8 @@ c     ============================================================
      &   reentry, e_opt, bn_opt, rms_o,
      &   zepoch, nzu,
      &   zstat, nzv,
-     &   rpe, t_mean, t_std, ierr)
+     &   rpe, t_mean, t_std,
+     &   bnb_t, tb_t, nbv_t, ierr)
 
       if (bn_opt(1) .gt. 0.d0 .and. bn_opt(1) .eq. bn_opt(1)) then
          call assert_i('G2 37151 bn_opt physical',
@@ -580,6 +603,8 @@ c     ============================================================
       integer zstat(mxz), nzv
       double precision last_perigee
       integer ierr_lp
+      double precision bnb_t(10), tb_t(10)
+      integer nbv_t
 
       character*200 line
       integer ihdr, izone, iens, ilgd, iperi, iperi_ok
@@ -596,7 +621,7 @@ c     ============================================================
       call orem_run(
      &   'input/example_42928_zone0.tle.txt', 42928,
      &   t_obs, mxz, 8, 10.d0, 0.90d0, -1.d0,
-     &   80.d0, 160.d0, 0, 0, 0,
+     &   80.d0, 160.d0, 0, 0, 0, 0,
      &   20, 200, 40, 16, 0.8d0, 0.01d0, 0.123d0,
      &   2, 0, 0,
      &   7.2921150d-5, 3.35281066d-3, 1.d0,
@@ -606,7 +631,8 @@ c     ============================================================
      &   reentry, e_opt, bn_opt, rms_o,
      &   zepoch, nzu,
      &   zstat, nzv,
-     &   rpe, t_mean, t_std, ierr)
+     &   rpe, t_mean, t_std,
+     &   bnb_t, tb_t, nbv_t, ierr)
 
       call tle_last_perigee('input/example_42928_zone0.tle.txt',
      &   42928, last_perigee, ierr_lp)
@@ -627,7 +653,9 @@ c     plausible GTO-debris perigee altitude for this object
      &   reentry, e_opt, bn_opt, rms_o,
      &   zepoch, nzu,
      &   zstat, nzv,
-     &   rpe, t_mean, t_std, mxz, last_perigee, ierr_rep)
+     &   rpe, t_mean, t_std,
+     &   bnb_t, tb_t, nbv_t, 0,
+     &   mxz, last_perigee, ierr_rep)
 
 c     R1: report written without error
       call assert_i('R1 report ierr_rep=0', ierr_rep, 0,
@@ -696,7 +724,9 @@ c     median |RPE| 8.2% vs the uniform mean's 45% mean error).
      &   reentry, e_opt, bn_opt, rms_o,
      &   zepoch, nzu,
      &   zstat, 3,
-     &   rpe, t_mean, t_std, mxz, last_perigee, ierr_rep)
+     &   rpe, t_mean, t_std,
+     &   bnb_t, tb_t, 0, 0,
+     &   mxz, last_perigee, ierr_rep)
 
       call assert_i('R5 synthetic report ierr_rep=0', ierr_rep, 0,
      &              npass, nfail)
@@ -721,6 +751,87 @@ c     median |RPE| 8.2% vs the uniform mean's 45% mean error).
       return
  810  call assert_i('R5 synthetic report readable', 0, 1,
      &              npass, nfail)
+      return
+      end
+
+c     ============================================================
+c     Issue #43: bn_dispersion_band unit tests. Synthetic near-
+c     circular orbit at 100 km altitude (well inside the sensible-
+c     perigee range but far enough above 80 km that it survives a
+c     handful of revolutions), not real TLE data -- decays fast and
+c     deterministically regardless of BN in [50,150], so this stays
+c     cheap (small nrev cap) instead of needing a real multi-year
+c     decay like the full orem_run integration tests.
+c     ============================================================
+      subroutine test_bn_sweep(npass, nfail)
+      implicit double precision (a-h, o-z)
+      common /xy/ pi, d2r, r2d, amue, AU, R_Earth
+      integer npass, nfail
+
+      parameter(ndim_a = 291, nswmax = 10, mxpt = 2000)
+      double precision alt(ndim_a), den(ndim_a), sch(ndim_a)
+      integer natm
+      double precision a_kep(7), x0(3), xd0(3), cal0(6), jd0
+      integer n_force(3)
+      double precision bn_band(nswmax), t_band(nswmax)
+      integer n_band_valid, i
+      logical ordered_ok
+
+      call read_atm_orem(alt, den, sch, ndim_a, natm)
+
+c     Near-circular, 100 km altitude, i=30 deg (R_Earth is in km,
+c     per input/const_new.dat)
+      a_kep(1) = R_Earth + 100.d0
+      a_kep(2) = 0.001d0
+      a_kep(3) = 30.d0
+      a_kep(4) = 0.d0
+      a_kep(5) = 0.d0
+      a_kep(6) = 0.d0
+      a_kep(7) = 0.d0
+      call oe2car(a_kep, x0, xd0, 1.d-12)
+      jd0 = 2459000.d0
+      call jd2cal(jd0, cal0)
+
+      n_force(1) = 1
+      n_force(2) = 0
+      n_force(3) = 0
+
+c     T1: n_sweep<=1 is a true no-op
+      call bn_dispersion_band(
+     &   x0, xd0, cal0, 50.d0, 150.d0, 1,
+     &   n_force, 2, 0, 0,
+     &   1, 7.2921150d-5, 3.35281066d-3, 1.d0,
+     &   0.d0, 0.d0, 0, 0, 0.d0, 0.d0, 0.d0,
+     &   alt, den, sch, natm,
+     &   50, mxpt,
+     &   bn_band, t_band, n_band_valid)
+      call assert_i('T1 n_sweep<=1 is a no-op', n_band_valid, 0,
+     &              npass, nfail)
+
+c     T2: a real sweep from 100 km altitude decays within a modest
+c     revolution cap for every BN in [50,150] -- all points valid
+      call bn_dispersion_band(
+     &   x0, xd0, cal0, 50.d0, 150.d0, 3,
+     &   n_force, 2, 0, 0,
+     &   1, 7.2921150d-5, 3.35281066d-3, 1.d0,
+     &   0.d0, 0.d0, 0, 0, 0.d0, 0.d0, 0.d0,
+     &   alt, den, sch, natm,
+     &   50, mxpt,
+     &   bn_band, t_band, n_band_valid)
+      call assert_i('T2 all 3 sweep points re-entered', n_band_valid,
+     &              3, npass, nfail)
+
+c     T3: BN = m/(Cd*A) -- HIGHER BN means LESS drag deceleration
+c     (drag accel ~ 1/BN), hence a LONGER lifetime, not shorter.
+c     t_band must be non-decreasing as bn_band increases (a real,
+c     checkable physical property, not just "some numbers came out")
+      ordered_ok = .true.
+      do i = 2, n_band_valid
+         if (t_band(i) .lt. t_band(i-1)) ordered_ok = .false.
+      end do
+      call assert_i('T3 t_band non-decreasing with bn_band',
+     &              merge(1,0,ordered_ok), 1, npass, nfail)
+
       return
       end
 

@@ -29,6 +29,8 @@ c     -------------------------------------------------------
       integer npass, nfail, iz, nreentry
       double precision rpe_best
       integer zstat(mxz), nzv
+      double precision bnb_t(10), tb_t(10)
+      integer nbv_t
 
       call init_constants()
 
@@ -87,7 +89,7 @@ c     ============================================================
       call orem_run(
      &   'input/example_42928.tle.txt', 42928,
      &   t_obs, mxz, 8, 10.d0, 0.90d0, -1.d0,
-     &   80.d0, 160.d0, 1, 0, 0,
+     &   80.d0, 160.d0, 0, 1, 0, 0,
      &   20, 500, 40, 16, 0.8d0, 0.01d0, 0.123d0,
      &   20, 2, 3,
      &   7.2921150d-5, 3.35281066d-3, 1.d0,
@@ -97,7 +99,8 @@ c     ============================================================
      &   reentry, e_opt, bn_opt, rms_o,
      &   zepoch, nzu,
      &   zstat, nzv,
-     &   rpe, t_mean, t_std, ierr)
+     &   rpe, t_mean, t_std,
+     &   bnb_t, tb_t, nbv_t, ierr)
 
 c     ============================================================
 c     E1: Pipeline completes without crash
@@ -224,7 +227,7 @@ c     ============================================================
       call orem_run(
      &   'input/example_42928_zone0.tle.txt', 42928,
      &   t_obs, mxz, 8, 10.d0, 0.90d0, -1.d0,
-     &   80.d0, 160.d0, 1, 0, 0,
+     &   80.d0, 160.d0, 0, 1, 0, 0,
      &   20, 500, 40, 16, 0.8d0, 0.01d0, 0.123d0,
      &   20, 2, 3,
      &   7.2921150d-5, 3.35281066d-3, 1.d0,
@@ -234,7 +237,8 @@ c     ============================================================
      &   reentry, e_opt, bn_opt, rms_o,
      &   zepoch, nzu,
      &   zstat, nzv,
-     &   rpe, t_mean, t_std, ierr)
+     &   rpe, t_mean, t_std,
+     &   bnb_t, tb_t, nbv_t, ierr)
 
 c     E6: Pipeline completes
       if (ierr .eq. 0 .or. ierr .eq. 3) then
@@ -343,7 +347,7 @@ c     ============================================================
       call orem_run(
      &   'input/example_39615_zone1.tle.txt', 39615,
      &   t_obs, mxz, 5, 10.d0, 0.90d0, -1.d0,
-     &   50.d0, 500.d0, 1, 0, 0,
+     &   50.d0, 500.d0, 0, 1, 0, 0,
      &   20, 500, 40, 16, 0.8d0, 0.01d0, 0.123d0,
      &   20, 2, 3,
      &   7.2921150d-5, 3.35281066d-3, 1.d0,
@@ -353,7 +357,8 @@ c     ============================================================
      &   reentry, e_opt, bn_opt, rms_o,
      &   zepoch, nzu,
      &   zstat, nzv,
-     &   rpe, t_mean, t_std, ierr)
+     &   rpe, t_mean, t_std,
+     &   bnb_t, tb_t, nbv_t, ierr)
 
       if (ierr .eq. 0 .or. ierr .eq. 3) then
          write(*,'(A,I2,A)') '  [PASS]  E11 39615 pipeline ok (ierr=',
@@ -442,7 +447,7 @@ c     ============================================================
       call orem_run(
      &   'input/example_35497_zone2.tle.txt', 35497,
      &   t_obs, mxz, 5, 10.d0, 0.90d0, -1.d0,
-     &   50.d0, 500.d0, 1, 0, 0,
+     &   50.d0, 500.d0, 0, 1, 0, 0,
      &   20, 500, 40, 16, 0.8d0, 0.01d0, 0.123d0,
      &   20, 2, 3,
      &   7.2921150d-5, 3.35281066d-3, 1.d0,
@@ -452,7 +457,8 @@ c     ============================================================
      &   reentry, e_opt, bn_opt, rms_o,
      &   zepoch, nzu,
      &   zstat, nzv,
-     &   rpe, t_mean, t_std, ierr)
+     &   rpe, t_mean, t_std,
+     &   bnb_t, tb_t, nbv_t, ierr)
 
       if (ierr .eq. 0 .or. ierr .eq. 3) then
          write(*,'(A,I2,A)') '  [PASS]  E16 35497 pipeline ok (ierr=',

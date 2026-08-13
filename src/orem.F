@@ -12,7 +12,7 @@ c     ============================================================
      &   t_obs_cal,
      &   nzones_max, min_zone_pts, max_zone_days,
      &   r2_thresh, slope_thresh,
-     &   bn_min_init, bn_max_init,
+     &   bn_min_init, bn_max_init, n_bn_sweep,
      &   idrag_flag, iadapt_zone, irefine,
      &   ipopsize, maxgen, nbits_e, nbits_a,
      &   pcross, pmute, ga_seed,
@@ -25,6 +25,7 @@ c     ============================================================
      &   zone_epoch, nzones_used,
      &   zone_status, nzones_valid,
      &   rpe_out, t_mean, t_std,
+     &   bn_band, t_band, n_band_valid,
      &   ierr)
 c
 c     Input
@@ -60,6 +61,15 @@ c                          GA's pre-refinement optimum instead of the
 c                          refined one -- isolates whether irefine=1's
 c                          mixed curated-7 result traces to the same
 c                          carryover-chain amplification as issue #41.
+c       n_bn_sweep       : issue #43 -- BN-sweep dispersion band, only
+c                          computed in operational mode (t_obs_cal all
+c                          zero) for the latest zone with a valid
+c                          prediction. 0/1=off, >=2=sweep that many
+c                          points across the zone's own G3-narrowed
+c                          bn_lo_zone/bn_hi_zone window (real space
+c                          weather unchanged between points -- see
+c                          bn_dispersion.F header for the ISRO
+c                          monograph precedent this reuses).
 c       zone selection params, area bounds, mass, Cd, GA params,
 c       force model params, atmosphere tables
 c
@@ -84,11 +94,24 @@ c                                nobound, then boundary).
 c       nzones_valid            : count of zones with zone_status==0
 c       rpe_out(nzones_max)    : RPE per zone (%)
 c       t_mean, t_std          : mean/std re-entry prediction
+c       bn_band(NSWMAX), t_band(NSWMAX) : issue #43 dispersion band --
+c                                BN value and resulting re-entry JD
+c                                for each sweep point that re-entered
+c                                within cap, for the latest zone with
+c                                a valid prediction (0 in unused
+c                                slots, and always 0 unless operational
+c                                mode + n_bn_sweep>=2 + at least one
+c                                zone succeeded)
+c       n_band_valid           : how many of n_bn_sweep points
+c                                produced a re-entry within cap
 c       ierr                   : 0=ok, 1=TLE error, 2=no zones,
 c                                3=all zones failed
 c     ============================================================
       implicit double precision (a-h, o-z)
       common /xy/ pi, d2r, r2d, amue, AU, R_Earth
+
+      integer NSWMAX
+      parameter(NSWMAX = 10)
 
 c     --- Input arguments ---
       character*(*) tle_file
@@ -97,6 +120,7 @@ c     --- Input arguments ---
       double precision max_zone_days, r2_thresh, slope_thresh
       double precision t_obs_cal(6)
       double precision bn_min_init, bn_max_init
+      integer n_bn_sweep
       integer idrag_flag, iadapt_zone, irefine
       integer ipopsize, maxgen, nbits_e, nbits_a
       double precision pcross, pmute, ga_seed
@@ -120,6 +144,8 @@ c     --- Output arguments ---
       integer zone_status(nzones_max), nzones_valid
       double precision rpe_out(nzones_max)
       double precision t_mean, t_std
+      double precision bn_band(NSWMAX), t_band(NSWMAX)
+      integer n_band_valid
       integer ierr
 
 c     --- Internal arrays ---
@@ -244,6 +270,11 @@ c     as issue #41, or is independent of it.
       nzones_valid = 0
       t_mean = 0.d0
       t_std = 0.d0
+      n_band_valid = 0
+      do i = 1, NSWMAX
+         bn_band(i) = 0.d0
+         t_band(i) = 0.d0
+      end do
       do i = 1, nzones_max
          zone_status(i) = 0
       end do
@@ -755,6 +786,31 @@ c        Re-entry propagation with optimal (e, BN)
             else
                reentry_jd(iz) = 0.d0
             end if
+         end if
+
+c        Issue #43: BN-sweep dispersion band, operational mode only
+c        (no observed epoch -- with a known t_obs_jd, RPE itself is
+c        the honest error measure and a band adds nothing). Overwrite
+c        every time a zone succeeds: zones process in order and
+c        PRIMARY is defined (report.F) as the LAST zone with a valid
+c        prediction, so whatever survives after the loop ends is
+c        automatically PRIMARY's band -- same convention already used
+c        for reentry_jd(iz)/e_opt_out(iz) themselves, no extra
+c        state needed. Sweeps this zone's own G3-narrowed
+c        bn_lo_zone/bn_hi_zone window with the same x0/xd0/cal0 and
+c        real (unperturbed) space weather the deterministic call just
+c        used -- see bn_dispersion.F for the ISRO monograph precedent.
+         if (t_obs_jd .le. 0.d0 .and. n_bn_sweep .gt. 1 .and.
+     &       reentry_jd(iz) .gt. 0.d0) then
+            call bn_dispersion_band(
+     &         x0, xd0, cal0, bn_lo_zone, bn_hi_zone, n_bn_sweep,
+     &         n_force, ngeo_deg, nsun_deg, nmoon_deg,
+     &         idrag_flag, WE_rot, EPS_f, FR_rot,
+     &         CR_srp, AM_srp, IPSR, ISHAD,
+     &         PSR_srp, amuS, amuM,
+     &         ALT_atm, DEN_atm, SCH_atm, ndim_atm,
+     &         nrev_re, max_reentry,
+     &         bn_band, t_band, n_band_valid)
          end if
 
 c        Issue #41: RPE-driven band adjustment (ceiling study, adapt
