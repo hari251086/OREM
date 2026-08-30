@@ -15,7 +15,7 @@ c     late-life zones entirely (11550: 46-yr history, top-10 was
 c     9 zones from 2006-2009 + one from 2024, nothing closer to the
 c     2025-04 terminal decay even though qualifying windows exist up
 c     to 2025-03 -- see issue tracker for the 11550 case).
-      parameter(ndim_a = 291, mxz = 50)
+      parameter(ndim_a = 291, mxz = 50, nswmax = 10)
 
 c     Config
       character*200 cfg_file, tle_file
@@ -24,6 +24,7 @@ c     Config
       integer nzones_max, min_zone_pts
       double precision max_zone_days, r2_thresh, slope_thresh
       double precision bn_min, bn_max
+      integer n_bn_sweep
       integer idrag_flag
       integer ipopsize, maxgen, nbits_e, nbits_a
       double precision pcross, pmute, ga_seed
@@ -43,6 +44,8 @@ c     Output
       double precision t_mean, t_std
       integer nzu, ierr
       integer zstat(mxz), nzv
+      double precision bn_band(nswmax), t_band(nswmax)
+      integer n_band_valid
 
       double precision cal_out(6)
       integer iarg, ierr_rep, ivals(8)
@@ -78,7 +81,7 @@ c     ============================================================
       read(10,*) nzones_max
       read(10,*) min_zone_pts, max_zone_days,
      &           r2_thresh, slope_thresh
-      read(10,*) bn_min, bn_max
+      read(10,*) bn_min, bn_max, n_bn_sweep
       read(10,*) ipopsize, maxgen, nbits_e, nbits_a,
      &           pcross, pmute, ga_seed
       read(10,*) ngeo_deg, nsun_deg, nmoon_deg
@@ -140,6 +143,11 @@ c     ============================================================
       write(*,'(A,I3)') '  Max zones: ', nzones_max
       write(*,'(A,F6.1,A,F6.1,A)')
      &   '  BN:        [', bn_min, ', ', bn_max, ']'
+      if (n_bn_sweep .gt. 1) then
+         write(*,'(A,I2,A)')
+     &      '  BN sweep:  ', n_bn_sweep,
+     &      ' points (dispersion band, operational mode only)'
+      end if
       write(*,'(A,I1)') '  Drag:      ', idrag_flag
       write(*,*) ''
 
@@ -174,7 +182,7 @@ c     ============================================================
      &   t_obs_cal,
      &   nzones_max, min_zone_pts, max_zone_days,
      &   r2_thresh, slope_thresh,
-     &   bn_min, bn_max,
+     &   bn_min, bn_max, n_bn_sweep,
      &   idrag_flag, 0, 0,
      &   ipopsize, maxgen, nbits_e, nbits_a,
      &   pcross, pmute, ga_seed,
@@ -187,6 +195,7 @@ c     ============================================================
      &   zepoch, nzu,
      &   zstat, nzv,
      &   rpe, t_mean, t_std,
+     &   bn_band, t_band, n_band_valid,
      &   ierr)
 c     (zstat/nzv threaded 2026-07-14 -- this call site was missed in
 c      the v1.10 interface change; orem.exe was never rebuilt, so the
@@ -274,7 +283,9 @@ c     ============================================================
      &   reentry, e_opt, bn_opt, rms_o,
      &   zepoch, nzu,
      &   zstat, nzv,
-     &   rpe, t_mean, t_std, mxz, last_perigee, ierr_rep)
+     &   rpe, t_mean, t_std,
+     &   bn_band, t_band, n_band_valid, n_bn_sweep,
+     &   mxz, last_perigee, ierr_rep)
       if (ierr_rep .eq. 0) then
          write(*,'(A,A)') '  Report:  ', trim(rep_file)
       else

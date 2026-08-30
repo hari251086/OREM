@@ -10,12 +10,15 @@
 # (e.g. no fpm installed locally). Exits nonzero on the first compile
 # or test failure (set -e).
 #
-# ifx, not gfortran: propagate_ks.F relies on several ifx-specific
-# tolerances (implicit-real array dimensions, a function/array name
-# collision on `R`, non-standard function-result syntax) that
-# gfortran 13 rejects outright. Making that file portable is real,
-# separate surgery on the most validated file in the repo -- tracked
-# as its own issue (#28), not bundled into CI setup.
+# ifx, not gfortran: this script hardcodes the ifx invocation and the
+# ../KSROP/src/*.F sibling-checkout paths above -- it was never
+# updated to take a compiler/source-layout argument. gfortran itself
+# is NOT a portability blocker: #28 fixed the real gfortran issues
+# (implicit-typed array dimensions, an implicit-typing mismatch in
+# ga.F) and CI now runs a full green gfortran matrix job via
+# `fpm build/test --compiler gfortran` alongside ifx. Use that if you
+# want a gfortran run -- this script would need the same source-path
+# rework fpm already did, not a compiler swap, to follow suit.
 #
 # input/example_multi.tle.txt (94597-entry catalog, 13 MB) is
 # deliberately gitignored -- test_tle_evolution.F's T42-T50 skip

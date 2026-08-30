@@ -154,6 +154,8 @@ c     genuinely independent candidate pool is; not padded further.
       double precision t_obs(6), t_mean, t_std
       integer nzu, ierr, nzv
       integer zstat(mxz)
+      double precision bnb_t(10), tb_t(10)
+      integer nbv_t
 
       character*40 tle_file(nobj)
       character*24 obj_name(nobj)
@@ -558,7 +560,7 @@ c     range, unchanged output filename.
          call orem_run(
      &      tle_file(io), norad(io),
      &      t_obs, mxz, 8, 20.d0, 0.90d0, -1.d0,
-     &      80.d0, 160.d0, 1, 0, irefine_cli,
+     &      80.d0, 160.d0, 0, 1, 0, irefine_cli,
      &      20, 500, 40, 16, 0.8d0, 0.01d0, 0.123d0,
      &      20, 2, 3,
      &      7.2921150d-5, 3.35281066d-3, 1.d0,
@@ -568,7 +570,8 @@ c     range, unchanged output filename.
      &      reentry, e_opt, bn_opt, rms_o,
      &      zepoch, nzu,
      &      zstat, nzv,
-     &      rpe, t_mean, t_std, ierr)
+     &      rpe, t_mean, t_std,
+     &      bnb_t, tb_t, nbv_t, ierr)
 
          if (ierr .ne. 0 .and. ierr .ne. 3) then
             write(*,'(A,I3)') '  pipeline error ierr=', ierr

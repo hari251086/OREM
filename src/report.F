@@ -15,7 +15,9 @@ c     ============================================================
      &   reentry_jd, e_opt, bn_opt, rms_o,
      &   zone_epoch, nzones_used,
      &   zone_status, nzones_valid,
-     &   rpe, t_mean, t_std, nzmax, last_perigee_alt, ierr_rep)
+     &   rpe, t_mean, t_std,
+     &   bn_band, t_band, n_band_valid, n_bn_sweep,
+     &   nzmax, last_perigee_alt, ierr_rep)
 c
 c     Input
 c       rep_file        : output file path
@@ -27,6 +29,13 @@ c       reentry_jd(nzmax), e_opt(nzmax), bn_opt(nzmax),
 c       rms_o(nzmax), zone_epoch(nzmax), nzones_used,
 c       zone_status(nzmax), nzones_valid,
 c       rpe(nzmax), t_mean, t_std : orem_run outputs
+c       bn_band(NSWMAX), t_band(NSWMAX), n_band_valid, n_bn_sweep :
+c                         issue #43 BN-sweep dispersion band for the
+c                         PRIMARY zone (operational mode only; see
+c                         orem_run/bn_dispersion.F). n_bn_sweep is the
+c                         config value (echoed so the block can say
+c                         how many points were REQUESTED, not just how
+c                         many succeeded)
 c       last_perigee_alt : last-tracked-TLE perigee altitude (km),
 c                         from tle_last_perigee (issue #29 follow-up,
 c                         decay-phase-proximity indicator, NOT a
@@ -35,6 +44,9 @@ c     Output
 c       ierr_rep        : 0=ok, 1=cannot open rep_file
 c     ============================================================
       implicit double precision (a-h, o-z)
+
+      integer NSWMAX
+      parameter(NSWMAX = 10)
 
       character*(*) rep_file
       integer norad_id
@@ -48,6 +60,8 @@ c     ============================================================
       integer nzones_used
       integer zone_status(nzmax), nzones_valid
       double precision rpe(nzmax), t_mean, t_std
+      double precision bn_band(NSWMAX), t_band(NSWMAX)
+      integer n_band_valid, n_bn_sweep
       double precision last_perigee_alt
       integer ierr_rep
 
@@ -55,7 +69,8 @@ c     ============================================================
       character*20 datestr
       double precision cal(6), calz(6), t_obs_jd, horiz, rpe_ens
       double precision rel_spread
-      integer iz, nre, izl, ivals(8)
+      double precision cal_band(6), band_width
+      integer iz, nre, izl, ivals(8), i_band
 
       zslab(0) = 'ok        '
       zslab(1) = 'propfail  '
@@ -186,6 +201,33 @@ c        the median is far more robust to exactly that failure mode).
       else
          write(44,'(A)') 'Ensemble: no zone predicted a re-entry'//
      &      ' within the propagation cap'
+      end if
+
+c     Issue #43: BN-sweep dispersion band (operational mode only --
+c     when t_obs_jd is known, RPE itself is the honest error measure
+c     and a band adds nothing). Real space weather, only BN swept
+c     across the PRIMARY zone's own fitted search window -- see
+c     bn_dispersion.F for the ISRO monograph precedent (Fig 8.6,
+c     GSLV-D1) this reuses.
+      if (t_obs_jd .le. 0.d0 .and. n_band_valid .gt. 0) then
+         write(44,'(A)') ''
+         write(44,'(A)') 'Dispersion band (BN swept across the '//
+     &      'PRIMARY zone''s fitted search window, real space '//
+     &      'weather):'
+         write(44,'(A)') '  BN (kg/m2)   Re-entry (JD)   '//
+     &      'Re-entry (UTC)'
+         do i_band = 1, n_band_valid
+            call jd2cal(t_band(i_band), cal_band)
+            write(44,'(A,F10.2,F15.4,I7,I3,I3)')
+     &         '  ', bn_band(i_band), t_band(i_band),
+     &         int(cal_band(1)), int(cal_band(2)), int(cal_band(3))
+         end do
+         band_width = t_band(n_band_valid) - t_band(1)
+         if (band_width .lt. 0.d0) band_width = -band_width
+         write(44,'(A,F8.2,A,I2,A,I2,A)')
+     &      '  band width: ', band_width, ' days  (',
+     &      n_band_valid, ' of ', n_bn_sweep,
+     &      ' BN values re-entered within cap)'
       end if
 
       write(44,'(A)') ''

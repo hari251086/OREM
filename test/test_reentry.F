@@ -151,6 +151,8 @@ c     ============================================================
       double precision t_obs(6), t_mean, t_std
       integer nzu, ierr, i
       integer zstat(4), nzv
+      double precision bnb_t(10), tb_t(10)
+      integer nbv_t
 
       write(*,*) ''
       write(*,'(A,A)') '  --- ', obj_name
@@ -165,7 +167,7 @@ c     ============================================================
       call orem_run(
      &   tle_file, norad,
      &   t_obs, mxz, 8, 10.d0, 0.90d0, -1.d0,
-     &   80.d0, 160.d0, 0, 0, 0,
+     &   80.d0, 160.d0, 0, 0, 0, 0,
      &   20, 200, 40, 16, 0.8d0, 0.01d0, 0.123d0,
      &   2, 0, 0,
      &   7.2921150d-5, 3.35281066d-3, 1.d0,
@@ -175,7 +177,8 @@ c     ============================================================
      &   reentry, e_opt, bn_opt, rms_o,
      &   zepoch, nzu,
      &   zstat, nzv,
-     &   rpe, t_mean, t_std, ierr)
+     &   rpe, t_mean, t_std,
+     &   bnb_t, tb_t, nbv_t, ierr)
 
 c     V1: Pipeline completes (ierr=0 or 3 with no drag)
       if (ierr .eq. 0 .or. ierr .eq. 3) then
