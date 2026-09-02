@@ -17,7 +17,7 @@ OREM predicts re-entry times of HEO debris (GTO, Molniya, SSTO upper stages) by:
 5. Propagating each zone's fit with KSROP until re-entry (altitude < 80 km)
 6. Reporting the **latest-zone prediction as the primary estimate** plus the all-zone ensemble mean ± spread (`output/OREM_<NORAD>_<DATE>.txt`)
 
-Accuracy (v1.21, 7-object validation campaign, full force model): latest-zone RPE **median 2.4%, mean 4.1%, worst object 10.4%** — see `scratch_rpe/`.
+Accuracy (curated 7-object validation campaign, full force model, `scratch_rpe/rpe_campaign_new90.csv`): latest-zone RPE **median 22.0%, mean 25.9%, worst object 76.4%** (35497); ensemble RPE median 1.2%, mean 1.9%. Across the broader 90-object campaign (60% predict rate, 54/90 objects): latest-zone RPE median 27.0%/mean 49.9%, ensemble RPE median 10.7%/mean 19.7%. This line was stale (predated the #32 accuracy investigation) until corrected 2026-09-02 — see `scratch_rpe/` and §8 Version History for the full investigation.
 
 Running OREM on a new object beyond the curated validation set (TLE
 acquisition, mass/area/BN estimation, config, and how to read a
