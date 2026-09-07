@@ -1,0 +1,32 @@
+
+ ===== 7096 SKYNET 2A                
+  pipeline error ierr=  2
+ [PROGRESS]  14% ( 1 of  7 objects done, this chunk)
+
+ ===== 68538 ARTEMIS 2 (INTEGRITY)   
+  pipeline error ierr=  2
+ [PROGRESS]  28% ( 2 of  7 objects done, this chunk)
+
+ ===== 6294 MOLNIYA 1-22             
+  pipeline error ierr=  2
+ [PROGRESS]  42% ( 3 of  7 objects done, this chunk)
+
+ ===== 18954 ARIANE 3 DEB (SYLDA)    
+  pipeline error ierr=  2
+ [PROGRESS]  57% ( 4 of  7 objects done, this chunk)
+
+ ===== 29462 SL-12 DEB               
+  pipeline error ierr=  2
+ [PROGRESS]  71% ( 5 of  7 objects done, this chunk)
+
+ ===== 5941 PROGNOZ 1                
+  pipeline error ierr=  2
+ [PROGRESS]  85% ( 6 of  7 objects done, this chunk)
+
+ ===== 6231 MOLNIYA 1-21             
+  [WARN] tle_filter: epoch gap at point   147 (********** -> **********,     32.4 days)
+  [WARN] tle_filter: epoch gap at point   179 (********** -> **********,     54.3 days)
+  pipeline error ierr=  2
+ [PROGRESS] 100% ( 7 of  7 objects done, this chunk)
+
+ campaign complete -> scratch_rpe/rpe_campaign_resonance_new7.csv
