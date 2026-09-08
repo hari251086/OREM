@@ -37,3 +37,8 @@ secrets.*
 
 # Local-only Claude Code project notes (never committed)
 CLAUDE.md
+
+# Per-object single-page PDFs merged into resonance_plots' final PDF --
+# pure byproduct of merge_pdf.py, regenerate via plot_resonance.sce/
+# plot_frontmatter.sce rather than tracking (the merged PDF is tracked)
+scratch_rpe/resonance_plots/pages/
