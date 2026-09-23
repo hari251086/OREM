@@ -18,6 +18,11 @@ source-dir = "app"
 main = "main_orem.F"
 
 [[executable]]
+name = "object_detail_data"
+source-dir = "app"
+main = "object_detail_data.F"
+
+[[executable]]
 name = "campaign41"
 source-dir = "scratch_rpe/issue41"
 main = "rpe_campaign_7obj_issue41.F"

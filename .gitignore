@@ -21,6 +21,9 @@ input/example_multi.tle.txt
 
 # Generated test/run reports (output/.gitkeep marks the dir as tracked, contents are not)
 output/*.txt
+# object_detail_data.exe's per-object CSVs (OREM-Watchlist issue #33) --
+# generated run output, same as the .txt reports above.
+output/*.csv
 !output/.gitkeep
 
 # DRAMA validation venv + run outputs (drama/output/.gitkeep marks the dir as tracked)
