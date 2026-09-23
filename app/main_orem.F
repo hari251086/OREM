@@ -50,6 +50,7 @@ c     Output
       double precision cal_out(6)
       integer iarg, ierr_rep, ivals(8)
       character*60 rep_file
+      character*6 norad_str
       integer ierr_sw, ierr_a2
       double precision last_perigee
       integer ierr_lp
@@ -273,9 +274,21 @@ c     ============================================================
      &   ierr_lp)
       if (ierr_lp .ne. 0) last_perigee = 0.d0
 
+c     I5.5 alone overflows for Alpha-5 catalog numbers (>=100000,
+c     6 digits): Fortran fills an overflowing field with asterisks
+c     rather than widening it, producing an unopenable filename and a
+c     silently-missing report (OREM issue #57). Below 100000, keep the
+c     original 5-digit zero-padded form so existing filenames/paths
+c     (and orem_wrapper.py's f"{norad_id:05d}") are unaffected.
+      if (norad_id .lt. 100000) then
+         write(norad_str,'(I5.5)') norad_id
+      else
+         write(norad_str,'(I6)') norad_id
+      end if
+
       call date_and_time(values=ivals)
-      write(rep_file,'(A,I5.5,A,I4.4,I2.2,I2.2,A)')
-     &   'output/OREM_', norad_id, '_',
+      write(rep_file,'(A,A,A,I4.4,I2.2,I2.2,A)')
+     &   'output/OREM_', trim(norad_str), '_',
      &   ivals(1), ivals(2), ivals(3), '.txt'
       call orem_report(
      &   trim(rep_file), norad_id, t_obs_cal,
