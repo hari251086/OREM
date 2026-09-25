@@ -18,6 +18,11 @@ source-dir = "app"
 main = "main_orem.F"
 
 [[executable]]
+name = "object_detail_data"
+source-dir = "app"
+main = "object_detail_data.F"
+
+[[executable]]
 name = "campaign41"
 source-dir = "scratch_rpe/issue41"
 main = "rpe_campaign_7obj_issue41.F"
@@ -26,6 +31,16 @@ main = "rpe_campaign_7obj_issue41.F"
 name = "campaign40"
 source-dir = "scratch_rpe/issue40"
 main = "rpe_campaign_7obj_issue40.F"
+
+[[executable]]
+name = "valrpecampaign"
+source-dir = "scratch_rpe/validation_RPE"
+main = "validation_rpe_campaign.F"
+
+[[executable]]
+name = "valrpecampaignv2"
+source-dir = "scratch_rpe/validation_rpe_v2"
+main = "validation_rpe_campaign_v2.F"
 
 [[test]]
 name = "test_propagate_ks"

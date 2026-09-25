@@ -1,0 +1,2 @@
+zone,label,start_epoch,end_epoch,apogee_km_min,apogee_km_max,n_tle,days_before_last_tle
+1,pre-resonance (tile 1/1),1988-03-15,1989-01-16,8186.1,35528.7,27,0.0

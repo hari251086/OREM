@@ -1,0 +1,13 @@
+norad,name,n_tle_batched,n_tle_solo,verdict
+17,THOR ABLE R/B,1,1,MATCH (real sparse data)
+432,EXPLORER 14 (SERB 53A),2,2,MATCH (real sparse data)
+1460,ERS 17,2,2,MATCH (real sparse data)
+6068,PROGNOZ 2,1,1,MATCH (real sparse data)
+11700,COSMOS 1164,1,1,MATCH (real sparse data)
+28014,SL-12 DEB,1,1,MATCH (real sparse data)
+28015,SL-12 DEB,2,2,MATCH (real sparse data)
+28037,SL-12 DEB,2,2,MATCH (real sparse data)
+31801,CZ-3B R/B,1,1,MATCH (real sparse data)
+40006,DELTA 4 DEB,1,1,MATCH (real sparse data)
+68539,TACHELES,1,1,MATCH (real sparse data)
+68541,K-RADCUBE,1,1,MATCH (real sparse data)

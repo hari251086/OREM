@@ -21,6 +21,9 @@ input/example_multi.tle.txt
 
 # Generated test/run reports (output/.gitkeep marks the dir as tracked, contents are not)
 output/*.txt
+# object_detail_data.exe's per-object CSVs (OREM-Watchlist issue #33) --
+# generated run output, same as the .txt reports above.
+output/*.csv
 !output/.gitkeep
 
 # DRAMA validation venv + run outputs (drama/output/.gitkeep marks the dir as tracked)
@@ -37,3 +40,17 @@ secrets.*
 
 # Local-only Claude Code project notes (never committed)
 CLAUDE.md
+
+# Per-object single-page PDFs merged into resonance_plots' final PDF --
+# pure byproduct of merge_pdf.py, regenerate via plot_resonance.sce/
+# plot_frontmatter.sce rather than tracking (the merged PDF is tracked)
+scratch_rpe/resonance_plots/pages/
+
+# Full-GTO/HEO-pool (253-object) manual-review PDFs -- large (~50MB
+# merged, plus per-page byproducts), a one-time manual-review deliverable
+# sent directly to the user rather than a permanent repo artifact.
+# Regenerate via prepare_plot_data_fullpool.py + plot_resonance_fullpool.sce
+# + plot_frontmatter_fullpool.sce + merge_pdf_fullpool.py -- the per-object
+# data CSVs (data_fullpool/) and manifest stay tracked for reproducibility.
+scratch_rpe/resonance_plots/pages_fullpool/
+scratch_rpe/resonance_plots/OREM_solar_apsidal_resonance_plots_FULLPOOL*.pdf

@@ -1,0 +1,228 @@
+
+ ===== 35497 Ariane 5 ESC-A    
+  [INFO] G2 BN floor estimate=   63.31 -> bn_lo=   31.65
+  Z 1: exit= 1 pts=  6946 BN=   79.71
+  [WARN] Z 2: GA optimum at search boundary -- true value may lie outside the search range
+  Z 2: exit= 1 pts=  6147 BN=  104.18
+  [WARN] Z 3: GA optimum at search boundary -- true value may lie outside the search range
+  Z 3: exit= 1 pts=  3731 BN=  127.81
+  [INFO] Z 4: G3 BSTAR prior narrows BN to [  25.81, 151.90]
+  [WARN] Z 4: GA optimum at search boundary -- true value may lie outside the search range
+  Z 4: exit= 1 pts=  1826 BN=  151.72
+  [INFO] Z 5: G3 BSTAR prior narrows BN to [  26.54, 187.38]
+  [WARN] Z 5: RSM envelope does not bound   9 of  35 observations -- proceeding anyway
+  [WARN] Z 5: GA optimum at search boundary -- true value may lie outside the search range
+  Z 5: exit= 1 pts=   511 BN=  187.22
+  [INFO] Z 6: G3 BSTAR prior narrows BN to [  25.52, 231.73]
+  [WARN] Z 6: GA optimum at search boundary -- true value may lie outside the search range
+  Z 6: exit= 1 pts=   567 BN=  230.12
+  [INFO] Z 7: G3 BSTAR prior narrows BN to [  22.11, 263.19]
+  [WARN] Z 7: GA optimum at search boundary -- true value may lie outside the search range
+  Z 7: exit= 1 pts=   316 BN=  263.19
+  [INFO] Z 8: G3 BSTAR prior narrows BN to [  21.81, 259.59]
+  [WARN] Z 8: RSM envelope does not bound  38 of  44 observations -- proceeding anyway
+  [WARN] Z 8: GA optimum at search boundary -- true value may lie outside the search range
+  Z 8: exit= 1 pts=    19 BN=  258.16
+  Z1: e=  0.5799 BN=  79.71 RPE=  408.78%  zstat= 0
+  Z2: e=  0.5713 BN= 104.18 RPE=  380.96%  zstat= 2
+  Z3: e=  0.5620 BN= 127.81 RPE=  225.19%  zstat= 2
+  Z4: e=  0.5507 BN= 151.72 RPE=   78.44%  zstat= 2
+  Z5: e=  0.5431 BN= 187.22 RPE=  -34.00%  zstat= 2
+  Z6: e=  0.5013 BN= 230.12 RPE=  -10.35%  zstat= 2
+  Z7: e=  0.3711 BN= 263.19 RPE=   -8.64%  zstat= 2
+  Z8: e=  0.3124 BN= 258.16 RPE=  -85.78%  zstat= 2
+  ensemble (8 of 8 zones): mean JD=  2457736.017 std=  344.3 d
+  ENSEMBLE RPE =    24.90%
+ [PROGRESS]   6% ( 1 of 16 objects done, this chunk)
+
+ ===== 37151 Long March 3B     
+  [INFO] G2 BN floor estimate=   41.61 -> bn_lo=   20.80
+  Z 1: exit= 1 pts=  5211 BN=   73.28
+  Z 2: exit= 1 pts=  3873 BN=   53.16
+  Z 3: exit= 1 pts=  8372 BN=   48.37
+  [WARN] Z 4: GA optimum at search boundary -- true value may lie outside the search range
+  Z 4: exit= 1 pts=  6526 BN=   40.42
+  Z 5: exit= 1 pts=  4760 BN=   46.15
+  [WARN] Z 6: GA optimum at search boundary -- true value may lie outside the search range
+  Z 6: exit= 1 pts=  7787 BN=   51.90
+  [WARN] Z 7: GA optimum at search boundary -- true value may lie outside the search range
+  Z 7: exit= 1 pts=  1595 BN=   55.61
+  [WARN] Z 8: RSM envelope does not bound   7 of   9 observations -- proceeding anyway
+  Z 8: exit= 1 pts=    11 BN=   52.70
+  Z1: e=  0.4873 BN=  73.28 RPE=   36.52%  zstat= 0
+  Z2: e=  0.4798 BN=  53.16 RPE=    5.31%  zstat= 0
+  Z3: e=  0.4643 BN=  48.37 RPE=  123.77%  zstat= 0
+  Z4: e=  0.4562 BN=  40.42 RPE=   85.50%  zstat= 2
+  Z5: e=  0.4285 BN=  46.15 RPE=   53.38%  zstat= 0
+  Z6: e=  0.4170 BN=  51.90 RPE=  152.42%  zstat= 2
+  Z7: e=  0.3712 BN=  55.61 RPE=  -28.63%  zstat= 2
+  Z8: e=  0.0608 BN=  52.70 RPE=  -60.80%  zstat= 3
+  ensemble (8 of 8 zones): mean JD=  2457523.080 std=  204.7 d
+  ENSEMBLE RPE =    36.50%
+ [PROGRESS]  12% ( 2 of 16 objects done, this chunk)
+
+ ===== 27526 Ariane 5 R/B      
+  [INFO] G2 BN floor estimate=   34.32 -> bn_lo=   17.16
+  [INFO] Z 1: G3 BSTAR prior narrows BN to [  17.61, 160.00]
+  Z 1: exit= 1 pts=  6303 BN=   60.29
+  Z 2: exit= 1 pts=  7828 BN=   54.26
+  [WARN] Z 3: GA optimum at search boundary -- true value may lie outside the search range
+  Z 3: exit= 1 pts=  2209 BN=   67.36
+  [WARN] Z 4: GA optimum at search boundary -- true value may lie outside the search range
+  Z 4: exit= 1 pts=  2830 BN=   79.91
+  [INFO] Z 5: G3 BSTAR prior narrows BN to [  24.27,  94.43]
+  Z 5: exit= 1 pts=  1873 BN=   75.53
+  [WARN] Z 6: GA optimum at search boundary -- true value may lie outside the search range
+  Z 6: exit= 1 pts=  1432 BN=   55.52
+  [WARN] Z 7: GA optimum at search boundary -- true value may lie outside the search range
+  Z 7: exit= 1 pts=   844 BN=  105.41
+  Z 8: exit= 1 pts=   252 BN=   95.80
+  Z1: e=  0.5238 BN=  60.29 RPE=   88.61%  zstat= 0
+  Z2: e=  0.4982 BN=  54.26 RPE=  157.41%  zstat= 0
+  Z3: e=  0.4463 BN=  67.36 RPE=    1.74%  zstat= 2
+  Z4: e=  0.4286 BN=  79.91 RPE=   35.96%  zstat= 2
+  Z5: e=  0.4099 BN=  75.53 RPE=    0.57%  zstat= 0
+  Z6: e=  0.3902 BN=  55.52 RPE=  -14.21%  zstat= 2
+  Z7: e=  0.3770 BN= 105.41 RPE=  -43.59%  zstat= 2
+  Z8: e=  0.1340 BN=  95.80 RPE=   12.32%  zstat= 0
+  ensemble (8 of 8 zones): mean JD=  2456059.371 std=  250.8 d
+  ENSEMBLE RPE =     0.67%
+ [PROGRESS]  18% ( 3 of 16 objects done, this chunk)
+
+ ===== 37819 Proton-M R/B      
+  [INFO] G2 BN floor estimate=   36.19 -> bn_lo=   18.09
+  [INFO] Z 1: G3 BSTAR prior narrows BN to [  28.16, 160.00]
+  Z 1: exit= 1 pts=  3957 BN=   53.17
+  [INFO] Z 2: G3 BSTAR prior narrows BN to [  30.89,  88.65]
+  Z 2: exit= 1 pts=  2977 BN=   47.98
+  [INFO] Z 3: G3 BSTAR prior narrows BN to [  31.70,  65.72]
+  Z 3: exit= 1 pts=  2664 BN=   46.64
+  Z 4: exit= 1 pts=  2055 BN=   44.22
+  Z 5: exit= 1 pts=  1498 BN=   42.67
+  [WARN] Z 6: GA optimum at search boundary -- true value may lie outside the search range
+  Z 6: exit= 1 pts=   788 BN=   44.84
+  [WARN] Z 7: GA optimum at search boundary -- true value may lie outside the search range
+  Z 7: exit= 1 pts=   696 BN=   45.98
+  [INFO] Z 8: G3 BSTAR prior narrows BN to [  37.77,  47.66]
+  [WARN] Z 8: GA optimum at search boundary -- true value may lie outside the search range
+  Z 8: exit= 1 pts=   105 BN=   47.65
+  Z1: e=  0.3776 BN=  53.17 RPE=   14.65%  zstat= 0
+  Z2: e=  0.3549 BN=  47.98 RPE=   -4.84%  zstat= 0
+  Z3: e=  0.3450 BN=  46.64 RPE=   -9.91%  zstat= 0
+  Z4: e=  0.3218 BN=  44.22 RPE=  -20.65%  zstat= 0
+  Z5: e=  0.2764 BN=  42.67 RPE=  -27.07%  zstat= 0
+  Z6: e=  0.1651 BN=  44.84 RPE=  -14.32%  zstat= 2
+  Z7: e=  0.1337 BN=  45.98 RPE=    5.18%  zstat= 2
+  Z8: e=  0.0511 BN=  47.65 RPE=   26.15%  zstat= 2
+  ensemble (8 of 8 zones): mean JD=  2456535.766 std=   30.8 d
+  ENSEMBLE RPE =    -3.55%
+ [PROGRESS]  25% ( 4 of 16 objects done, this chunk)
+
+ ===== 59347 GTO R/B           
+  [WARN] Z 1: GA optimum at search boundary -- true value may lie outside the search range
+  Z 1: exit= 1 pts=   120 BN=  159.39
+  Z1: e=  0.3430 BN= 159.39 RPE=  -36.69%  zstat= 2
+  ensemble (1 of 1 zones): mean JD=  2461193.480 std=    0.0 d
+  ENSEMBLE RPE =   -36.69%
+ [PROGRESS]  31% ( 5 of 16 objects done, this chunk)
+
+ ===== 40943 GTO debris        
+  [INFO] G2 BN floor estimate=    7.81 -> bn_lo=    3.90
+  [INFO] Z 1: G3 BSTAR prior narrows BN to [   9.49, 112.93]
+  [WARN] Z 1: GA optimum at search boundary -- true value may lie outside the search range
+  Z 1: exit= 1 pts=  2146 BN=    9.49
+  [INFO] Z 2: G3 BSTAR prior narrows BN to [  10.00, 114.58]
+  [WARN] Z 2: GA optimum at search boundary -- true value may lie outside the search range
+  Z 2: exit= 1 pts=  1404 BN=   10.91
+  [INFO] Z 3: G3 BSTAR prior narrows BN to [  10.99, 130.79]
+  [WARN] Z 3: GA optimum at search boundary -- true value may lie outside the search range
+  Z 3: exit= 1 pts=  2021 BN=   26.01
+  [INFO] Z 4: G3 BSTAR prior narrows BN to [  12.49, 148.64]
+  Z 4: exit= 1 pts=  2452 BN=   46.02
+  [INFO] Z 5: G3 BSTAR prior narrows BN to [  13.19, 119.86]
+  Z 5: exit= 1 pts=  1169 BN=   46.88
+  [WARN] Z 6: GA optimum at search boundary -- true value may lie outside the search range
+  Z 6: exit= 1 pts=   495 BN=   19.48
+  [INFO] Z 7: G3 BSTAR prior narrows BN to [  13.49,  88.08]
+  [WARN] Z 7: GA optimum at search boundary -- true value may lie outside the search range
+  Z 7: exit= 1 pts=   312 BN=   20.79
+  Z1: e=  0.5747 BN=   9.49 RPE=   95.38%  zstat= 2
+  Z2: e=  0.5559 BN=  10.91 RPE=   40.68%  zstat= 2
+  Z3: e=  0.5284 BN=  26.01 RPE=  131.76%  zstat= 2
+  Z4: e=  0.4911 BN=  46.02 RPE=  221.63%  zstat= 0
+  Z5: e=  0.4427 BN=  46.88 RPE=   96.79%  zstat= 0
+  Z6: e=  0.3778 BN=  19.48 RPE=   16.07%  zstat= 2
+  Z7: e=  0.2816 BN=  20.79 RPE=   35.18%  zstat= 2
+  ensemble (7 of 7 zones): mean JD=  2458957.507 std=   72.3 d
+  ENSEMBLE RPE =    40.79%
+ [PROGRESS]  37% ( 6 of 16 objects done, this chunk)
+
+ ===== 60328 CZ-3B R/B         
+  pipeline error ierr=  1
+ [PROGRESS]  43% ( 7 of 16 objects done, this chunk)
+
+ ===== 18983 SL-6 R/B(2)       
+  [WARN] tle_filter: epoch gap at point   260 (********** -> **********,     33.0 days)
+  pipeline error ierr=  2
+ [PROGRESS]  50% ( 8 of 16 objects done, this chunk)
+
+ ===== 13112 SL-6 R/B(2)       
+  [WARN] tle_filter: epoch gap at point   157 (********** -> **********,     81.6 days)
+  [WARN] tle_filter: epoch gap at point   158 (********** -> **********,    301.9 days)
+  [INFO] G2 BN floor estimate=   16.11 -> bn_lo=    8.05
+  [INFO] Z 1: G3 BSTAR prior narrows BN to [  22.71, 160.00]
+  [WARN] Z 1: GA optimum at search boundary -- true value may lie outside the search range
+  Z 1: exit= 1 pts=   453 BN=   23.76
+  [INFO] Z 2: G3 BSTAR prior narrows BN to [  20.62, 197.99]
+  [WARN] Z 2: GA optimum at search boundary -- true value may lie outside the search range
+  Z 2: exit= 1 pts=   422 BN=   43.86
+  [INFO] Z 3: G3 BSTAR prior narrows BN to [  18.58, 221.07]
+  [WARN] Z 3: GA optimum at search boundary -- true value may lie outside the search range
+  Z 3: exit= 1 pts=   379 BN=   24.03
+  Z1: e=  0.7544 BN=  23.76 RPE=  -39.33%  zstat= 2
+  Z2: e=  0.7550 BN=  43.86 RPE=  -15.74%  zstat= 2
+  Z3: e=  0.7546 BN=  24.03 RPE=  -12.73%  zstat= 2
+  ensemble (3 of 3 zones): mean JD=  2448909.962 std=   38.7 d
+  ENSEMBLE RPE =   -14.19%
+ [PROGRESS]  56% ( 9 of 16 objects done, this chunk)
+
+ ===== 28141 CZ-2C R/B         
+  pipeline error ierr=  1
+ [PROGRESS]  62% (10 of 16 objects done, this chunk)
+
+ ===== 19881 Cosmos931 deb     
+  pipeline error ierr=  2
+ [PROGRESS]  68% (11 of 16 objects done, this chunk)
+
+ ===== 5980 Titan3C TS deb     
+  pipeline error ierr=  2
+ [PROGRESS]  75% (12 of 16 objects done, this chunk)
+
+ ===== 4570 SL-6 R/B(2)        
+  pipeline error ierr=  1
+ [PROGRESS]  81% (13 of 16 objects done, this chunk)
+
+ ===== 10724 AtlasCentaur deb  
+  [WARN] tle_filter: epoch gap at point    28 (********** -> **********,     34.9 days)
+  [WARN] tle_filter: epoch gap at point    31 (********** -> **********,     32.9 days)
+  [WARN] tle_filter: epoch gap at point    43 (********** -> **********,     31.0 days)
+  [WARN] tle_filter: epoch gap at point    48 (********** -> **********,     42.4 days)
+  [WARN] tle_filter: epoch gap at point    50 (********** -> **********,     35.0 days)
+  [INFO] G2 BN floor estimate=   17.66 -> bn_lo=    8.83
+  [INFO] Z 1: G3 BSTAR prior narrows BN to [  27.21, 160.00]
+  [WARN] Z 1: GA optimum at search boundary -- true value may lie outside the search range
+  Z 1: exit= 1 pts=  8224 BN=   29.50
+  Z1: e=  0.4657 BN=  29.50 RPE=   22.19%  zstat= 2
+  ensemble (1 of 1 zones): mean JD=  2445373.891 std=    0.0 d
+  ENSEMBLE RPE =    22.19%
+ [PROGRESS]  87% (14 of 16 objects done, this chunk)
+
+ ===== 28140 Doublestar TC-1   
+  pipeline error ierr=  2
+ [PROGRESS]  93% (15 of 16 objects done, this chunk)
+
+ ===== 44911 CZ-5 R/B          
+  pipeline error ierr=  1
+ [PROGRESS] 100% (16 of 16 objects done, this chunk)
+
+ campaign complete -> scratch_rpe/rpe_campaign_resonance16.csv

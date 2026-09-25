@@ -1,0 +1,27 @@
+p.  1 [Genuine, strong U-turn]  40943  40943 GTO debris
+p.  2 [Genuine, strong U-turn]  59347  59347 GTO R/B
+p.  3 [Genuine, strong U-turn]  35497  35497 Ariane 5 ESC-A
+p.  4 [Genuine, strong U-turn]  10724  10724 AtlasCentaur deb
+p.  5 [Weaker but plausible]  37151  37151 Long March 3B
+p.  6 [Weaker but plausible]  27526  27526 Ariane 5 R/B
+p.  7 [Weaker but plausible]  18954  ARIANE 3 DEB (SYLDA)
+p.  8 [Uncertain]  19881  19881 Cosmos931 deb
+p.  9 [False positive (detector artifact)]  18983  18983 SL-6 R/B(2)
+p. 10 [False positive (detector artifact)]  13112  13112 SL-6 R/B(2)
+p. 11 [False positive (detector artifact)]  5980  5980 Titan3C TS deb
+p. 12 [False positive (detector artifact)]  7096  SKYNET 2A
+p. 13 [False positive (detector artifact)]  60328  60328 CZ-3B R/B
+p. 14 [False positive (detector artifact)]  4570  4570 SL-6 R/B(2)
+p. 15 [False positive (detector artifact)]  28140  28140 Doublestar TC-1
+p. 16 [False positive (detector artifact)]  44911  44911 CZ-5 R/B
+p. 17 [False positive (detector artifact)]  6294  MOLNIYA 1-22
+p. 18 [False positive (detector artifact)]  6231  MOLNIYA 1-21
+p. 19 [False positive (detector artifact)]  29462  SL-12 DEB
+p. 20 [False positive (detector artifact)]  5941  PROGNOZ 1
+p. 21 [False positive (detector artifact)]  26463  26463 ClusterII-FM5
+p. 22 [False positive (detector artifact)]  68538  ARTEMIS 2 (INTEGRITY)
+p. 23 [False positive (detector artifact)]  37819  37819 Proton-M R/B
+p. 24 [Excluded independently (policy, not physics)]  39501  FALCON 9 R/B
+p. 25 [Excluded independently (policy, not physics)]  44187  FALCON 9 R/B
+p. 26 [Excluded independently (policy, not physics)]  42985  FALCON 9 R/B
+p. 27 [Excluded independently (policy, not physics)]  13913  SL-12 R/B(AUX MOTOR)
