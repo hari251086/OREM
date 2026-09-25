@@ -1,0 +1,2855 @@
+
+ ===== 35497 z1 pre-resonance (
+  [INFO] G2 BN floor estimate=   44.09 -> bn_lo=   22.04
+  Z 1: exit= 1 pts=  4195 BN=   58.20
+  Z1: e=  0.6297 BN=  58.20 RPE=  -35.42%  zstat= 0
+  ensemble (1 of 1 zones): mean JD=  2457299.180 std=    0.0 d
+  RPE =   -35.42%
+ [PROGRESS]   0% ( 1 of ** zones done, this chunk)
+
+ ===== 35497 z2 pre-resonance (
+  [INFO] G2 BN floor estimate=   41.90 -> bn_lo=   20.95
+  Z 1: exit= 1 pts=  3966 BN=   63.51
+  Z1: e=  0.6264 BN=  63.51 RPE=  -37.71%  zstat= 0
+  ensemble (1 of 1 zones): mean JD=  2457282.134 std=    0.0 d
+  RPE =   -37.71%
+ [PROGRESS]   0% ( 2 of ** zones done, this chunk)
+
+ ===== 35497 z3 pre-resonance (
+  [INFO] G2 BN floor estimate=   55.97 -> bn_lo=   27.99
+  [WARN] Z 1: GA optimum at search boundary -- true value may lie outside the search range
+  Z 1: exit= 1 pts=  5556 BN=   64.70
+  Z1: e=  0.6239 BN=  64.70 RPE=  -14.92%  zstat= 2
+  ensemble (1 of 1 zones): mean JD=  2457532.986 std=    0.0 d
+  RPE =   -14.92%
+ [PROGRESS]   0% ( 3 of ** zones done, this chunk)
+
+ ===== 35497 z4 pre-resonance (
+  [INFO] G2 BN floor estimate=   47.77 -> bn_lo=   23.89
+  [WARN] Z 1: GA optimum at search boundary -- true value may lie outside the search range
+  Z 1: exit= 0 pts=  6983 BN=   58.79
+  Z1: e=  0.6211 BN=  58.79 (no re-entry)  zstat= 2
+  no re-entry (weak-signal fit, or zone_select still rejected this window)
+ [PROGRESS]   1% ( 4 of ** zones done, this chunk)
+
+ ===== 35497 z5 pre-resonance (
+  [INFO] G2 BN floor estimate=   50.78 -> bn_lo=   25.39
+  [WARN] Z 1: GA optimum at search boundary -- true value may lie outside the search range
+  Z 1: exit= 0 pts=  7032 BN=   63.86
+  Z1: e=  0.6191 BN=  63.86 (no re-entry)  zstat= 2
+  no re-entry (weak-signal fit, or zone_select still rejected this window)
+ [PROGRESS]   1% ( 5 of ** zones done, this chunk)
+
+ ===== 35497 z6 pre-resonance (
+  [INFO] G2 BN floor estimate=   58.55 -> bn_lo=   29.28
+  [WARN] Z 1: RSM envelope does not bound   7 of  27 observations -- proceeding anyway
+  [WARN] Z 1: GA optimum at search boundary -- true value may lie outside the search range
+  Z 1: exit= 0 pts=  7087 BN=   82.13
+  Z1: e=  0.6168 BN=  82.13 (no re-entry)  zstat= 2
+  no re-entry (weak-signal fit, or zone_select still rejected this window)
+ [PROGRESS]   1% ( 6 of ** zones done, this chunk)
+
+ ===== 35497 z7 pre-resonance (
+  [INFO] G2 BN floor estimate=   50.89 -> bn_lo=   25.45
+  [WARN] Z 1: GA optimum at search boundary -- true value may lie outside the search range
+  Z 1: exit= 0 pts=  7113 BN=   62.96
+  Z1: e=  0.6156 BN=  62.96 (no re-entry)  zstat= 2
+  no re-entry (weak-signal fit, or zone_select still rejected this window)
+ [PROGRESS]   2% ( 7 of ** zones done, this chunk)
+
+ ===== 35497 z8 pre-resonance (
+  [INFO] G2 BN floor estimate=   48.86 -> bn_lo=   24.43
+  Z 1: exit= 0 pts=  7143 BN=   63.54
+  Z1: e=  0.6142 BN=  63.54 (no re-entry)  zstat= 0
+  no re-entry (weak-signal fit, or zone_select still rejected this window)
+ [PROGRESS]   2% ( 8 of ** zones done, this chunk)
+
+ ===== 35497 z9 pre-resonance (
+  [INFO] G2 BN floor estimate=   46.93 -> bn_lo=   23.46
+  [WARN] Z 1: GA optimum at search boundary -- true value may lie outside the search range
+  Z 1: exit= 0 pts=  7173 BN=   55.01
+  Z1: e=  0.6125 BN=  55.01 (no re-entry)  zstat= 2
+  no re-entry (weak-signal fit, or zone_select still rejected this window)
+ [PROGRESS]   2% ( 9 of ** zones done, this chunk)
+
+ ===== 35497 z10 pre-resonance 
+  [INFO] G2 BN floor estimate=   68.42 -> bn_lo=   34.21
+  Z 1: exit= 0 pts=  7200 BN=   56.11
+  Z1: e=  0.6110 BN=  56.11 (no re-entry)  zstat= 0
+  no re-entry (weak-signal fit, or zone_select still rejected this window)
+ [PROGRESS]   2% (10 of ** zones done, this chunk)
+
+ ===== 35497 z11 pre-resonance 
+  [WARN] Z 1: RSM envelope does not bound  17 of  29 observations -- proceeding anyway
+  [WARN] Z 1: GA optimum at search boundary -- true value may lie outside the search range
+  Z 1: exit= 0 pts=  7224 BN=  122.37
+  Z1: e=  0.6095 BN= 122.37 (no re-entry)  zstat= 2
+  no re-entry (weak-signal fit, or zone_select still rejected this window)
+ [PROGRESS]   3% (11 of ** zones done, this chunk)
+
+ ===== 35497 z12 pre-resonance 
+  [WARN] Z 1: RSM envelope does not bound  28 of  28 observations -- proceeding anyway
+  [WARN] Z 1: GA optimum at search boundary -- true value may lie outside the search range
+  Z 1: exit= 0 pts=  7240 BN=  155.69
+  Z1: e=  0.6085 BN= 155.69 (no re-entry)  zstat= 2
+  no re-entry (weak-signal fit, or zone_select still rejected this window)
+ [PROGRESS]   3% (12 of ** zones done, this chunk)
+
+ ===== 35497 z13 pre-resonance 
+  [WARN] Z 1: RSM envelope does not bound  27 of  29 observations -- proceeding anyway
+  [WARN] Z 1: GA optimum at search boundary -- true value may lie outside the search range
+  Z 1: exit= 0 pts=  7249 BN=  155.70
+  Z1: e=  0.6079 BN= 155.70 (no re-entry)  zstat= 2
+  no re-entry (weak-signal fit, or zone_select still rejected this window)
+ [PROGRESS]   3% (13 of ** zones done, this chunk)
+
+ ===== 35497 z14 pre-resonance 
+  [WARN] Z 1: RSM envelope does not bound  25 of  25 observations -- proceeding anyway
+  [WARN] Z 1: GA optimum at search boundary -- true value may lie outside the search range
+  Z 1: exit= 0 pts=  7261 BN=  155.69
+  Z1: e=  0.6071 BN= 155.69 (no re-entry)  zstat= 2
+  no re-entry (weak-signal fit, or zone_select still rejected this window)
+ [PROGRESS]   4% (14 of ** zones done, this chunk)
+
+ ===== 35497 z15 pre-resonance 
+  [INFO] G2 BN floor estimate=   34.18 -> bn_lo=   17.09
+  [INFO] Z 1: G3 BSTAR prior narrows BN to [  20.44, 160.00]
+  [WARN] Z 1: GA optimum at search boundary -- true value may lie outside the search range
+  Z 1: exit= 0 pts=  7262 BN=   41.18
+  Z1: e=  0.6068 BN=  41.18 (no re-entry)  zstat= 2
+  no re-entry (weak-signal fit, or zone_select still rejected this window)
+ [PROGRESS]   4% (15 of ** zones done, this chunk)
+
+ ===== 35497 z16 pre-resonance 
+  [WARN] Z 1: RSM envelope does not bound  28 of  28 observations -- proceeding anyway
+  [WARN] Z 1: GA optimum at search boundary -- true value may lie outside the search range
+  Z 1: exit= 0 pts=  7280 BN=  155.69
+  Z1: e=  0.6056 BN= 155.69 (no re-entry)  zstat= 2
+  no re-entry (weak-signal fit, or zone_select still rejected this window)
+ [PROGRESS]   4% (16 of ** zones done, this chunk)
+
+ ===== 35497 z17 pre-resonance 
+  [WARN] Z 1: GA optimum at search boundary -- true value may lie outside the search range
+  Z 1: exit= 0 pts=  7282 BN=   80.38
+  Z1: e=  0.6055 BN=  80.38 (no re-entry)  zstat= 2
+  no re-entry (weak-signal fit, or zone_select still rejected this window)
+ [PROGRESS]   5% (17 of ** zones done, this chunk)
+
+ ===== 35497 z18 pre-resonance 
+  [WARN] Z 1: RSM envelope does not bound  18 of  28 observations -- proceeding anyway
+  [WARN] Z 1: GA optimum at search boundary -- true value may lie outside the search range
+  Z 1: exit= 0 pts=  7292 BN=  106.31
+  Z1: e=  0.6053 BN= 106.31 (no re-entry)  zstat= 2
+  no re-entry (weak-signal fit, or zone_select still rejected this window)
+ [PROGRESS]   5% (18 of ** zones done, this chunk)
+
+ ===== 35497 z19 pre-resonance 
+  [WARN] Z 1: RSM envelope does not bound  19 of  28 observations -- proceeding anyway
+  [WARN] Z 1: GA optimum at search boundary -- true value may lie outside the search range
+  Z 1: exit= 0 pts=  7304 BN=  155.69
+  Z1: e=  0.6053 BN= 155.69 (no re-entry)  zstat= 2
+  no re-entry (weak-signal fit, or zone_select still rejected this window)
+ [PROGRESS]   5% (19 of ** zones done, this chunk)
+
+ ===== 35497 z20 pre-resonance 
+  [WARN] Z 1: RSM envelope does not bound  12 of  28 observations -- proceeding anyway
+  [WARN] Z 1: GA optimum at search boundary -- true value may lie outside the search range
+  Z 1: exit= 0 pts=  7316 BN=   84.06
+  Z1: e=  0.6053 BN=  84.06 (no re-entry)  zstat= 2
+  no re-entry (weak-signal fit, or zone_select still rejected this window)
+ [PROGRESS]   5% (20 of ** zones done, this chunk)
+
+ ===== 35497 z21 pre-resonance 
+  [WARN] Z 1: RSM envelope does not bound  19 of  27 observations -- proceeding anyway
+  [WARN] Z 1: GA optimum at search boundary -- true value may lie outside the search range
+  Z 1: exit= 0 pts=  7332 BN=  155.69
+  Z1: e=  0.6050 BN= 155.69 (no re-entry)  zstat= 2
+  no re-entry (weak-signal fit, or zone_select still rejected this window)
+ [PROGRESS]   6% (21 of ** zones done, this chunk)
+
+ ===== 35497 z22 pre-resonance 
+  [WARN] Z 1: RSM envelope does not bound  12 of  26 observations -- proceeding anyway
+  [WARN] Z 1: GA optimum at search boundary -- true value may lie outside the search range
+  Z 1: exit= 0 pts=  7341 BN=   86.45
+  Z1: e=  0.6049 BN=  86.45 (no re-entry)  zstat= 2
+  no re-entry (weak-signal fit, or zone_select still rejected this window)
+ [PROGRESS]   6% (22 of ** zones done, this chunk)
+
+ ===== 35497 z23 pre-resonance 
+  [WARN] Z 1: RSM envelope does not bound  15 of  29 observations -- proceeding anyway
+  [WARN] Z 1: GA optimum at search boundary -- true value may lie outside the search range
+  Z 1: exit= 0 pts=  7357 BN=   99.42
+  Z1: e=  0.6049 BN=  99.42 (no re-entry)  zstat= 2
+  no re-entry (weak-signal fit, or zone_select still rejected this window)
+ [PROGRESS]   6% (23 of ** zones done, this chunk)
+
+ ===== 35497 z24 pre-resonance 
+  [WARN] Z 1: RSM envelope does not bound  18 of  27 observations -- proceeding anyway
+  [WARN] Z 1: GA optimum at search boundary -- true value may lie outside the search range
+  Z 1: exit= 0 pts=  7374 BN=  155.69
+  Z1: e=  0.6048 BN= 155.69 (no re-entry)  zstat= 2
+  no re-entry (weak-signal fit, or zone_select still rejected this window)
+ [PROGRESS]   7% (24 of ** zones done, this chunk)
+
+ ===== 35497 z25 pre-resonance 
+  [WARN] Z 1: RSM envelope does not bound  18 of  29 observations -- proceeding anyway
+  [WARN] Z 1: GA optimum at search boundary -- true value may lie outside the search range
+  Z 1: exit= 0 pts=  7388 BN=  155.69
+  Z1: e=  0.6047 BN= 155.69 (no re-entry)  zstat= 2
+  no re-entry (weak-signal fit, or zone_select still rejected this window)
+ [PROGRESS]   7% (25 of ** zones done, this chunk)
+
+ ===== 35497 z26 pre-resonance 
+  [INFO] G2 BN floor estimate=   64.18 -> bn_lo=   32.09
+  Z 1: exit= 1 pts=  5707 BN=   72.20
+  Z1: e=  0.6050 BN=  72.20 RPE=  150.23%  zstat= 0
+  ensemble (1 of 1 zones): mean JD=  2458284.642 std=    0.0 d
+  RPE =   150.23%
+ [PROGRESS]   7% (26 of ** zones done, this chunk)
+
+ ===== 35497 z27 pre-resonance 
+  [INFO] G2 BN floor estimate=   60.01 -> bn_lo=   30.00
+  [WARN] Z 1: RSM envelope does not bound  19 of  28 observations -- proceeding anyway
+  [WARN] Z 1: GA optimum at search boundary -- true value may lie outside the search range
+  Z 1: exit= 1 pts=  5767 BN=  153.00
+  Z1: e=  0.6043 BN= 153.00 RPE=  176.89%  zstat= 2
+  ensemble (1 of 1 zones): mean JD=  2458370.692 std=    0.0 d
+  RPE =   176.89%
+ [PROGRESS]   7% (27 of ** zones done, this chunk)
+
+ ===== 35497 z28 pre-resonance 
+  [INFO] G2 BN floor estimate=   59.28 -> bn_lo=   29.64
+  Z 1: exit= 0 pts=  7430 BN=   71.83
+  Z1: e=  0.6044 BN=  71.83 (no re-entry)  zstat= 0
+  no re-entry (weak-signal fit, or zone_select still rejected this window)
+ [PROGRESS]   8% (28 of ** zones done, this chunk)
+
+ ===== 35497 z29 pre-resonance 
+  [INFO] G2 BN floor estimate=   62.83 -> bn_lo=   31.42
+  Z 1: exit= 0 pts=  7452 BN=   80.17
+  Z1: e=  0.6039 BN=  80.17 (no re-entry)  zstat= 0
+  no re-entry (weak-signal fit, or zone_select still rejected this window)
+ [PROGRESS]   8% (29 of ** zones done, this chunk)
+
+ ===== 35497 z30 pre-resonance 
+  [INFO] G2 BN floor estimate=   71.08 -> bn_lo=   35.54
+  [WARN] Z 1: RSM envelope does not bound  17 of  26 observations -- proceeding anyway
+  [WARN] Z 1: GA optimum at search boundary -- true value may lie outside the search range
+  Z 1: exit= 0 pts=  7487 BN=  153.27
+  Z1: e=  0.6028 BN= 153.27 (no re-entry)  zstat= 2
+  no re-entry (weak-signal fit, or zone_select still rejected this window)
+ [PROGRESS]   8% (30 of ** zones done, this chunk)
+
+ ===== 35497 z31 pre-resonance 
+  [INFO] G2 BN floor estimate=   67.62 -> bn_lo=   33.81
+  Z 1: exit= 0 pts=  7503 BN=   77.92
+  Z1: e=  0.6024 BN=  77.92 (no re-entry)  zstat= 0
+  no re-entry (weak-signal fit, or zone_select still rejected this window)
+ [PROGRESS]   9% (31 of ** zones done, this chunk)
+
+ ===== 35497 z32 pre-resonance 
+  [INFO] G2 BN floor estimate=   77.10 -> bn_lo=   38.55
+  Z 1: exit= 0 pts=  7544 BN=   86.03
+  Z1: e=  0.6012 BN=  86.03 (no re-entry)  zstat= 0
+  no re-entry (weak-signal fit, or zone_select still rejected this window)
+ [PROGRESS]   9% (32 of ** zones done, this chunk)
+
+ ===== 35497 z33 pre-resonance 
+  [INFO] G2 BN floor estimate=   74.71 -> bn_lo=   37.35
+  Z 1: exit= 0 pts=  7572 BN=   85.84
+  Z1: e=  0.6004 BN=  85.84 (no re-entry)  zstat= 0
+  no re-entry (weak-signal fit, or zone_select still rejected this window)
+ [PROGRESS]   9% (33 of ** zones done, this chunk)
+
+ ===== 35497 z34 pre-resonance 
+  [INFO] G2 BN floor estimate=   70.94 -> bn_lo=   35.47
+  Z 1: exit= 0 pts=  7601 BN=   79.23
+  Z1: e=  0.5995 BN=  79.23 (no re-entry)  zstat= 0
+  no re-entry (weak-signal fit, or zone_select still rejected this window)
+ [PROGRESS]  10% (34 of ** zones done, this chunk)
+
+ ===== 35497 z35 pre-resonance 
+  [INFO] G2 BN floor estimate=   63.22 -> bn_lo=   31.61
+  Z 1: exit= 0 pts=  7650 BN=   81.70
+  Z1: e=  0.5980 BN=  81.70 (no re-entry)  zstat= 0
+  no re-entry (weak-signal fit, or zone_select still rejected this window)
+ [PROGRESS]  10% (35 of ** zones done, this chunk)
+
+ ===== 35497 z36 pre-resonance 
+  [INFO] G2 BN floor estimate=   69.09 -> bn_lo=   34.54
+  Z 1: exit= 1 pts=  6751 BN=   78.20
+  Z1: e=  0.5964 BN=  78.20 RPE=  302.49%  zstat= 0
+  ensemble (1 of 1 zones): mean JD=  2458441.816 std=    0.0 d
+  RPE =   302.49%
+ [PROGRESS]  10% (36 of ** zones done, this chunk)
+
+ ===== 35497 z37 pre-resonance 
+  [INFO] G2 BN floor estimate=   65.36 -> bn_lo=   32.68
+  Z 1: exit= 1 pts=  5071 BN=   75.24
+  Z1: e=  0.5948 BN=  75.24 RPE=  221.42%  zstat= 0
+  ensemble (1 of 1 zones): mean JD=  2458213.780 std=    0.0 d
+  RPE =   221.42%
+ [PROGRESS]  10% (37 of ** zones done, this chunk)
+
+ ===== 35497 z38 pre-resonance 
+  [INFO] G2 BN floor estimate=   64.59 -> bn_lo=   32.30
+  [WARN] Z 1: RSM envelope does not bound   1 of  25 observations -- proceeding anyway
+  [WARN] Z 1: GA optimum at search boundary -- true value may lie outside the search range
+  Z 1: exit= 1 pts=  4830 BN=   76.22
+  Z1: e=  0.5921 BN=  76.22 RPE=  222.82%  zstat= 2
+  ensemble (1 of 1 zones): mean JD=  2458182.588 std=    0.0 d
+  RPE =   222.82%
+ [PROGRESS]  11% (38 of ** zones done, this chunk)
+
+ ===== 35497 z39 pre-resonance 
+  [INFO] G2 BN floor estimate=   66.49 -> bn_lo=   33.25
+  [WARN] Z 1: GA optimum at search boundary -- true value may lie outside the search range
+  Z 1: exit= 1 pts=  4954 BN=   78.72
+  Z1: e=  0.5899 BN=  78.72 RPE=  238.41%  zstat= 2
+  ensemble (1 of 1 zones): mean JD=  2458190.858 std=    0.0 d
+  RPE =   238.41%
+ [PROGRESS]  11% (39 of ** zones done, this chunk)
+
+ ===== 35497 z40 pre-resonance 
+  [INFO] G2 BN floor estimate=   63.33 -> bn_lo=   31.66
+  Z 1: exit= 1 pts=  5594 BN=   83.89
+  Z1: e=  0.5870 BN=  83.89 RPE=  291.94%  zstat= 0
+  ensemble (1 of 1 zones): mean JD=  2458269.853 std=    0.0 d
+  RPE =   291.94%
+ [PROGRESS]  11% (40 of ** zones done, this chunk)
+
+ ===== 35497 z41 pre-resonance 
+  [INFO] G2 BN floor estimate=   67.92 -> bn_lo=   33.96
+  Z 1: exit= 1 pts=  6338 BN=   78.73
+  Z1: e=  0.5837 BN=  78.73 RPE=  353.86%  zstat= 0
+  ensemble (1 of 1 zones): mean JD=  2458349.685 std=    0.0 d
+  RPE =   353.86%
+ [PROGRESS]  12% (41 of ** zones done, this chunk)
+
+ ===== 35497 z42 post-resonance
+  [INFO] G2 BN floor estimate=   71.55 -> bn_lo=   35.77
+  Z 1: exit= 1 pts=  6825 BN=   77.16
+  Z1: e=  0.5802 BN=  77.16 RPE=  398.81%  zstat= 0
+  ensemble (1 of 1 zones): mean JD=  2458392.913 std=    0.0 d
+  RPE =   398.81%
+ [PROGRESS]  12% (42 of ** zones done, this chunk)
+
+ ===== 35497 z43 post-resonance
+  [INFO] G2 BN floor estimate=   84.51 -> bn_lo=   42.25
+  Z 1: exit= 1 pts=  6766 BN=   91.95
+  Z1: e=  0.5758 BN=  91.95 RPE=  411.49%  zstat= 0
+  ensemble (1 of 1 zones): mean JD=  2458368.826 std=    0.0 d
+  RPE =   411.49%
+ [PROGRESS]  12% (43 of ** zones done, this chunk)
+
+ ===== 35497 z44 post-resonance
+  [INFO] G2 BN floor estimate=   94.07 -> bn_lo=   47.04
+  Z 1: exit= 1 pts=  6172 BN=  101.32
+  Z1: e=  0.5716 BN= 101.32 RPE=  381.81%  zstat= 0
+  ensemble (1 of 1 zones): mean JD=  2458285.181 std=    0.0 d
+  RPE =   381.81%
+ [PROGRESS]  12% (44 of ** zones done, this chunk)
+
+ ===== 35497 z45 post-resonance
+  [INFO] G2 BN floor estimate=  112.86 -> bn_lo=   56.43
+  Z 1: exit= 1 pts=  5865 BN=  108.74
+  Z1: e=  0.5671 BN= 108.74 RPE=  378.04%  zstat= 0
+  ensemble (1 of 1 zones): mean JD=  2458244.524 std=    0.0 d
+  RPE =   378.04%
+ [PROGRESS]  13% (45 of ** zones done, this chunk)
+
+ ===== 35497 z46 post-resonance
+  [INFO] G2 BN floor estimate=  151.23 -> bn_lo=   75.61
+  [WARN] Z 1: GA optimum at search boundary -- true value may lie outside the search range
+  Z 1: exit= 1 pts=  5073 BN=  157.00
+  Z1: e=  0.5603 BN= 157.00 RPE=  340.65%  zstat= 2
+  ensemble (1 of 1 zones): mean JD=  2458147.801 std=    0.0 d
+  RPE =   340.65%
+ [PROGRESS]  13% (46 of ** zones done, this chunk)
+
+ ===== 35497 z47 post-resonance
+  [WARN] Z 1: GA optimum at search boundary -- true value may lie outside the search range
+  Z 1: exit= 1 pts=  2240 BN=  159.26
+  Z1: e=  0.5546 BN= 159.26 RPE=  107.69%  zstat= 2
+  ensemble (1 of 1 zones): mean JD=  2457824.556 std=    0.0 d
+  RPE =   107.69%
+ [PROGRESS]  13% (47 of ** zones done, this chunk)
+
+ ===== 35497 z48 post-resonance
+  [WARN] Z 1: GA optimum at search boundary -- true value may lie outside the search range
+  Z 1: exit= 1 pts=   991 BN=  158.93
+  Z1: e=  0.5500 BN= 158.93 RPE=    4.58%  zstat= 2
+  ensemble (1 of 1 zones): mean JD=  2457697.536 std=    0.0 d
+  RPE =     4.58%
+ [PROGRESS]  14% (48 of ** zones done, this chunk)
+
+ ===== 35497 z49 post-resonance
+  [WARN] Z 1: RSM envelope does not bound   6 of  23 observations -- proceeding anyway
+  [WARN] Z 1: GA optimum at search boundary -- true value may lie outside the search range
+  Z 1: exit= 1 pts=   512 BN=  159.35
+  Z1: e=  0.5368 BN= 159.35 RPE=  -34.86%  zstat= 2
+  ensemble (1 of 1 zones): mean JD=  2457659.526 std=    0.0 d
+  RPE =   -34.86%
+ [PROGRESS]  14% (49 of ** zones done, this chunk)
+
+ ===== 35497 z50 post-resonance
+  [WARN] Z 1: RSM envelope does not bound   5 of  22 observations -- proceeding anyway
+  [WARN] Z 1: GA optimum at search boundary -- true value may lie outside the search range
+  Z 1: exit= 1 pts=   433 BN=  159.48
+  Z1: e=  0.5218 BN= 159.48 RPE=  -36.68%  zstat= 2
+  ensemble (1 of 1 zones): mean JD=  2457662.824 std=    0.0 d
+  RPE =   -36.68%
+ [PROGRESS]  14% (50 of ** zones done, this chunk)
+
+ ===== 35497 z51 post-resonance
+  [WARN] Z 1: GA optimum at search boundary -- true value may lie outside the search range
+  Z 1: exit= 1 pts=   410 BN=  158.30
+  Z1: e=  0.4939 BN= 158.30 RPE=  -30.36%  zstat= 2
+  ensemble (1 of 1 zones): mean JD=  2457672.254 std=    0.0 d
+  RPE =   -30.36%
+ [PROGRESS]  15% (51 of ** zones done, this chunk)
+
+ ===== 35497 z52 post-resonance
+  [WARN] Z 1: GA optimum at search boundary -- true value may lie outside the search range
+  Z 1: exit= 1 pts=   368 BN=  159.84
+  Z1: e=  0.4544 BN= 159.84 RPE=  -21.53%  zstat= 2
+  ensemble (1 of 1 zones): mean JD=  2457681.815 std=    0.0 d
+  RPE =   -21.53%
+ [PROGRESS]  15% (52 of ** zones done, this chunk)
+
+ ===== 35497 z53 post-resonance
+  [WARN] Z 1: RSM envelope does not bound  21 of  24 observations -- proceeding anyway
+  [WARN] Z 1: GA optimum at search boundary -- true value may lie outside the search range
+  Z 1: exit= 1 pts=    44 BN=  158.93
+  Z1: e=  0.3291 BN= 158.93 RPE=  -79.11%  zstat= 2
+  ensemble (1 of 1 zones): mean JD=  2457678.862 std=    0.0 d
+  RPE =   -79.11%
+ [PROGRESS]  15% (53 of ** zones done, this chunk)
+
+ ===== 35497 z54 post-resonance
+  [WARN] Z 1: RSM envelope does not bound  15 of  23 observations -- proceeding anyway
+  [WARN] Z 1: GA optimum at search boundary -- true value may lie outside the search range
+  Z 1: exit= 1 pts=    29 BN=  158.00
+  Z1: e=  0.2452 BN= 158.00 RPE=  -62.01%  zstat= 2
+  ensemble (1 of 1 zones): mean JD=  2457689.074 std=    0.0 d
+  RPE =   -62.01%
+ [PROGRESS]  15% (54 of ** zones done, this chunk)
+
+ ===== 37151 z1 pre-resonance (
+  [INFO] G2 BN floor estimate=   91.16 -> bn_lo=   45.58
+  Z 1: exit= 0 pts=  5154 BN=   88.56
+  Z1: e=  0.6912 BN=  88.56 (no re-entry)  zstat= 0
+  no re-entry (weak-signal fit, or zone_select still rejected this window)
+ [PROGRESS]  16% (55 of ** zones done, this chunk)
+
+ ===== 37151 z2 pre-resonance (
+  [INFO] G2 BN floor estimate=   47.11 -> bn_lo=   23.56
+  Z 1: exit= 0 pts=  5199 BN=   67.35
+  Z1: e=  0.6891 BN=  67.35 (no re-entry)  zstat= 0
+  no re-entry (weak-signal fit, or zone_select still rejected this window)
+ [PROGRESS]  16% (56 of ** zones done, this chunk)
+
+ ===== 37151 z3 pre-resonance (
+  [INFO] G2 BN floor estimate=   42.23 -> bn_lo=   21.12
+  Z 1: exit= 0 pts=  5253 BN=   69.73
+  Z1: e=  0.6870 BN=  69.73 (no re-entry)  zstat= 0
+  no re-entry (weak-signal fit, or zone_select still rejected this window)
+ [PROGRESS]  16% (57 of ** zones done, this chunk)
+
+ ===== 37151 z4 pre-resonance (
+  [INFO] G2 BN floor estimate=   20.48 -> bn_lo=   10.24
+  [INFO] Z 1: G3 BSTAR prior narrows BN to [  13.22, 157.38]
+  Z 1: exit= 1 pts=  4110 BN=   63.78
+  Z1: e=  0.6824 BN=  63.78 RPE=  -48.10%  zstat= 0
+  ensemble (1 of 1 zones): mean JD=  2456586.108 std=    0.0 d
+  RPE =   -48.10%
+ [PROGRESS]  17% (58 of ** zones done, this chunk)
+
+ ===== 37151 z5 pre-resonance (
+  [INFO] G2 BN floor estimate=   18.51 -> bn_lo=    9.26
+  [INFO] Z 1: G3 BSTAR prior narrows BN to [  13.57, 160.00]
+  Z 1: exit= 1 pts=  1687 BN=   43.12
+  Z1: e=  0.6764 BN=  43.12 RPE=  -79.11%  zstat= 0
+  ensemble (1 of 1 zones): mean JD=  2456111.842 std=    0.0 d
+  RPE =   -79.11%
+ [PROGRESS]  17% (59 of ** zones done, this chunk)
+
+ ===== 37151 z6 pre-resonance (
+  [INFO] G2 BN floor estimate=   32.25 -> bn_lo=   16.12
+  Z 1: exit= 1 pts=  2258 BN=   49.75
+  Z1: e=  0.6582 BN=  49.75 RPE=  -72.94%  zstat= 0
+  ensemble (1 of 1 zones): mean JD=  2456239.793 std=    0.0 d
+  RPE =   -72.94%
+ [PROGRESS]  17% (60 of ** zones done, this chunk)
+
+ ===== 37151 z7 pre-resonance (
+  [INFO] G2 BN floor estimate=   59.12 -> bn_lo=   29.56
+  Z 1: exit= 0 pts=  6449 BN=   62.16
+  Z1: e=  0.6422 BN=  62.16 (no re-entry)  zstat= 0
+  no re-entry (weak-signal fit, or zone_select still rejected this window)
+ [PROGRESS]  17% (61 of ** zones done, this chunk)
+
+ ===== 37151 z8 pre-resonance (
+  [INFO] G2 BN floor estimate=   44.36 -> bn_lo=   22.18
+  Z 1: exit= 0 pts=  6631 BN=   54.30
+  Z1: e=  0.6346 BN=  54.30 (no re-entry)  zstat= 0
+  no re-entry (weak-signal fit, or zone_select still rejected this window)
+ [PROGRESS]  18% (62 of ** zones done, this chunk)
+
+ ===== 37151 z9 pre-resonance (
+  [INFO] G2 BN floor estimate=   69.29 -> bn_lo=   34.64
+  Z 1: exit= 0 pts=  6722 BN=   71.03
+  Z1: e=  0.6310 BN=  71.03 (no re-entry)  zstat= 0
+  no re-entry (weak-signal fit, or zone_select still rejected this window)
+ [PROGRESS]  18% (63 of ** zones done, this chunk)
+
+ ===== 37151 z10 pre-resonance 
+  [INFO] G2 BN floor estimate=   78.26 -> bn_lo=   39.13
+  Z 1: exit= 0 pts=  6791 BN=   82.80
+  Z1: e=  0.6282 BN=  82.80 (no re-entry)  zstat= 0
+  no re-entry (weak-signal fit, or zone_select still rejected this window)
+ [PROGRESS]  18% (64 of ** zones done, this chunk)
+
+ ===== 37151 z11 pre-resonance 
+  [INFO] G2 BN floor estimate=   85.80 -> bn_lo=   42.90
+  [WARN] Z 1: GA optimum at search boundary -- true value may lie outside the search range
+  Z 1: exit= 0 pts=  6829 BN=   86.42
+  Z1: e=  0.6266 BN=  86.42 (no re-entry)  zstat= 2
+  no re-entry (weak-signal fit, or zone_select still rejected this window)
+ [PROGRESS]  19% (65 of ** zones done, this chunk)
+
+ ===== 37151 z12 pre-resonance 
+  [INFO] G2 BN floor estimate=   64.15 -> bn_lo=   32.07
+  Z 1: exit= 0 pts=  6862 BN=   81.19
+  Z1: e=  0.6255 BN=  81.19 (no re-entry)  zstat= 0
+  no re-entry (weak-signal fit, or zone_select still rejected this window)
+ [PROGRESS]  19% (66 of ** zones done, this chunk)
+
+ ===== 37151 z13 pre-resonance 
+  [INFO] G2 BN floor estimate=   63.67 -> bn_lo=   31.83
+  Z 1: exit= 1 pts=  2877 BN=   79.97
+  Z1: e=  0.6241 BN=  79.97 RPE=  -63.54%  zstat= 0
+  ensemble (1 of 1 zones): mean JD=  2456504.696 std=    0.0 d
+  RPE =   -63.54%
+ [PROGRESS]  19% (67 of ** zones done, this chunk)
+
+ ===== 37151 z14 pre-resonance 
+  [INFO] G2 BN floor estimate=   56.60 -> bn_lo=   28.30
+  Z 1: exit= 1 pts=  1617 BN=   82.56
+  Z1: e=  0.6229 BN=  82.56 RPE=  -77.09%  zstat= 0
+  ensemble (1 of 1 zones): mean JD=  2456337.918 std=    0.0 d
+  RPE =   -77.09%
+ [PROGRESS]  20% (68 of ** zones done, this chunk)
+
+ ===== 37151 z15 pre-resonance 
+  [INFO] G2 BN floor estimate=   32.27 -> bn_lo=   16.13
+  [INFO] Z 1: G3 BSTAR prior narrows BN to [  17.82, 160.00]
+  Z 1: exit= 1 pts=  3158 BN=   66.69
+  Z1: e=  0.6201 BN=  66.69 RPE=  -59.27%  zstat= 0
+  ensemble (1 of 1 zones): mean JD=  2456589.373 std=    0.0 d
+  RPE =   -59.27%
+ [PROGRESS]  20% (69 of ** zones done, this chunk)
+
+ ===== 37151 z16 pre-resonance 
+  [INFO] G2 BN floor estimate=   42.95 -> bn_lo=   21.47
+  Z 1: exit= 0 pts=  7137 BN=   65.34
+  Z1: e=  0.6164 BN=  65.34 (no re-entry)  zstat= 0
+  no re-entry (weak-signal fit, or zone_select still rejected this window)
+ [PROGRESS]  20% (70 of ** zones done, this chunk)
+
+ ===== 37151 z17 pre-resonance 
+  [INFO] G2 BN floor estimate=   55.23 -> bn_lo=   27.61
+  Z 1: exit= 0 pts=  7269 BN=   65.56
+  Z1: e=  0.6120 BN=  65.56 (no re-entry)  zstat= 0
+  no re-entry (weak-signal fit, or zone_select still rejected this window)
+ [PROGRESS]  20% (71 of ** zones done, this chunk)
+
+ ===== 37151 z18 pre-resonance 
+  [INFO] G2 BN floor estimate=   43.81 -> bn_lo=   21.91
+  Z 1: exit= 0 pts=  7431 BN=   60.98
+  Z1: e=  0.6057 BN=  60.98 (no re-entry)  zstat= 0
+  no re-entry (weak-signal fit, or zone_select still rejected this window)
+ [PROGRESS]  21% (72 of ** zones done, this chunk)
+
+ ===== 37151 z19 pre-resonance 
+  [INFO] G2 BN floor estimate=   58.61 -> bn_lo=   29.30
+  Z 1: exit= 0 pts=  7541 BN=   77.08
+  Z1: e=  0.6021 BN=  77.08 (no re-entry)  zstat= 0
+  no re-entry (weak-signal fit, or zone_select still rejected this window)
+ [PROGRESS]  21% (73 of ** zones done, this chunk)
+
+ ===== 37151 z20 pre-resonance 
+  [INFO] G2 BN floor estimate=   33.62 -> bn_lo=   16.81
+  Z 1: exit= 1 pts=  3130 BN=   62.25
+  Z1: e=  0.5983 BN=  62.25 RPE=  -56.51%  zstat= 0
+  ensemble (1 of 1 zones): mean JD=  2456696.571 std=    0.0 d
+  RPE =   -56.51%
+ [PROGRESS]  21% (74 of ** zones done, this chunk)
+
+ ===== 37151 z21 pre-resonance 
+  [INFO] G2 BN floor estimate=   33.41 -> bn_lo=   16.71
+  [INFO] Z 1: G3 BSTAR prior narrows BN to [  18.31, 160.00]
+  Z 1: exit= 1 pts=  1982 BN=   58.22
+  Z1: e=  0.5929 BN=  58.22 RPE=  -72.02%  zstat= 0
+  ensemble (1 of 1 zones): mean JD=  2456536.168 std=    0.0 d
+  RPE =   -72.02%
+ [PROGRESS]  22% (75 of ** zones done, this chunk)
+
+ ===== 37151 z22 pre-resonance 
+  [INFO] G2 BN floor estimate=   29.43 -> bn_lo=   14.71
+  [INFO] Z 1: G3 BSTAR prior narrows BN to [  18.62, 160.00]
+  [WARN] Z 1: GA optimum at search boundary -- true value may lie outside the search range
+  Z 1: exit= 0 pts=  8015 BN=   39.80
+  Z1: e=  0.5845 BN=  39.80 (no re-entry)  zstat= 2
+  no re-entry (weak-signal fit, or zone_select still rejected this window)
+ [PROGRESS]  22% (76 of ** zones done, this chunk)
+
+ ===== 37151 z23 pre-resonance 
+  [INFO] G2 BN floor estimate=   42.73 -> bn_lo=   21.37
+  [WARN] Z 1: RSM envelope does not bound   1 of  28 observations -- proceeding anyway
+  [WARN] Z 1: GA optimum at search boundary -- true value may lie outside the search range
+  Z 1: exit= 0 pts=  8105 BN=   63.49
+  Z1: e=  0.5815 BN=  63.49 (no re-entry)  zstat= 2
+  no re-entry (weak-signal fit, or zone_select still rejected this window)
+ [PROGRESS]  22% (77 of ** zones done, this chunk)
+
+ ===== 37151 z24 pre-resonance 
+  [INFO] G2 BN floor estimate=   54.54 -> bn_lo=   27.27
+  Z 1: exit= 0 pts=  8160 BN=   68.28
+  Z1: e=  0.5798 BN=  68.28 (no re-entry)  zstat= 0
+  no re-entry (weak-signal fit, or zone_select still rejected this window)
+ [PROGRESS]  22% (78 of ** zones done, this chunk)
+
+ ===== 37151 z25 pre-resonance 
+  [INFO] G2 BN floor estimate=   65.52 -> bn_lo=   32.76
+  Z 1: exit= 0 pts=  8216 BN=   71.54
+  Z1: e=  0.5778 BN=  71.54 (no re-entry)  zstat= 0
+  no re-entry (weak-signal fit, or zone_select still rejected this window)
+ [PROGRESS]  23% (79 of ** zones done, this chunk)
+
+ ===== 37151 z26 pre-resonance 
+  [INFO] G2 BN floor estimate=   67.26 -> bn_lo=   33.63
+  Z 1: exit= 0 pts=  8255 BN=   71.79
+  Z1: e=  0.5763 BN=  71.79 (no re-entry)  zstat= 0
+  no re-entry (weak-signal fit, or zone_select still rejected this window)
+ [PROGRESS]  23% (80 of ** zones done, this chunk)
+
+ ===== 37151 z27 pre-resonance 
+  [WARN] Z 1: RSM envelope does not bound  15 of  27 observations -- proceeding anyway
+  [WARN] Z 1: GA optimum at search boundary -- true value may lie outside the search range
+  Z 1: exit= 0 pts=  8295 BN=  155.69
+  Z1: e=  0.5747 BN= 155.69 (no re-entry)  zstat= 2
+  no re-entry (weak-signal fit, or zone_select still rejected this window)
+ [PROGRESS]  23% (81 of ** zones done, this chunk)
+
+ ===== 37151 z28 pre-resonance 
+  [INFO] G2 BN floor estimate=   61.03 -> bn_lo=   30.52
+  [WARN] Z 1: RSM envelope does not bound   6 of  27 observations -- proceeding anyway
+  [WARN] Z 1: GA optimum at search boundary -- true value may lie outside the search range
+  Z 1: exit= 0 pts=  8317 BN=   78.45
+  Z1: e=  0.5738 BN=  78.45 (no re-entry)  zstat= 2
+  no re-entry (weak-signal fit, or zone_select still rejected this window)
+ [PROGRESS]  24% (82 of ** zones done, this chunk)
+
+ ===== 37151 z29 pre-resonance 
+  [INFO] G2 BN floor estimate=   58.58 -> bn_lo=   29.29
+  Z 1: exit= 0 pts=  8342 BN=   69.74
+  Z1: e=  0.5729 BN=  69.74 (no re-entry)  zstat= 0
+  no re-entry (weak-signal fit, or zone_select still rejected this window)
+ [PROGRESS]  24% (83 of ** zones done, this chunk)
+
+ ===== 37151 z30 pre-resonance 
+  [INFO] G2 BN floor estimate=   52.16 -> bn_lo=   26.08
+  [WARN] Z 1: RSM envelope does not bound  11 of  28 observations -- proceeding anyway
+  [WARN] Z 1: GA optimum at search boundary -- true value may lie outside the search range
+  Z 1: exit= 0 pts=  8390 BN=   87.30
+  Z1: e=  0.5708 BN=  87.30 (no re-entry)  zstat= 2
+  no re-entry (weak-signal fit, or zone_select still rejected this window)
+ [PROGRESS]  24% (84 of ** zones done, this chunk)
+
+ ===== 37151 z31 pre-resonance 
+  [INFO] G2 BN floor estimate=   51.37 -> bn_lo=   25.69
+  Z 1: exit= 0 pts=  8423 BN=   78.25
+  Z1: e=  0.5698 BN=  78.25 (no re-entry)  zstat= 0
+  no re-entry (weak-signal fit, or zone_select still rejected this window)
+ [PROGRESS]  25% (85 of ** zones done, this chunk)
+
+ ===== 37151 z32 pre-resonance 
+  [INFO] G2 BN floor estimate=   51.50 -> bn_lo=   25.75
+  Z 1: exit= 0 pts=  8449 BN=   62.19
+  Z1: e=  0.5687 BN=  62.19 (no re-entry)  zstat= 0
+  no re-entry (weak-signal fit, or zone_select still rejected this window)
+ [PROGRESS]  25% (86 of ** zones done, this chunk)
+
+ ===== 37151 z33 pre-resonance 
+  [INFO] G2 BN floor estimate=   55.25 -> bn_lo=   27.62
+  [WARN] Z 1: RSM envelope does not bound   7 of  28 observations -- proceeding anyway
+  [WARN] Z 1: GA optimum at search boundary -- true value may lie outside the search range
+  Z 1: exit= 0 pts=  8475 BN=   80.68
+  Z1: e=  0.5676 BN=  80.68 (no re-entry)  zstat= 2
+  no re-entry (weak-signal fit, or zone_select still rejected this window)
+ [PROGRESS]  25% (87 of ** zones done, this chunk)
+
+ ===== 37151 z34 pre-resonance 
+  [INFO] G2 BN floor estimate=   58.73 -> bn_lo=   29.36
+  [WARN] Z 1: RSM envelope does not bound  13 of  29 observations -- proceeding anyway
+  [WARN] Z 1: GA optimum at search boundary -- true value may lie outside the search range
+  Z 1: exit= 0 pts=  8496 BN=  136.63
+  Z1: e=  0.5668 BN= 136.63 (no re-entry)  zstat= 2
+  no re-entry (weak-signal fit, or zone_select still rejected this window)
+ [PROGRESS]  25% (88 of ** zones done, this chunk)
+
+ ===== 37151 z35 pre-resonance 
+  [INFO] G2 BN floor estimate=   42.72 -> bn_lo=   21.36
+  Z 1: exit= 0 pts=  8509 BN=   62.35
+  Z1: e=  0.5663 BN=  62.35 (no re-entry)  zstat= 0
+  no re-entry (weak-signal fit, or zone_select still rejected this window)
+ [PROGRESS]  26% (89 of ** zones done, this chunk)
+
+ ===== 37151 z36 pre-resonance 
+  [INFO] G2 BN floor estimate=   45.90 -> bn_lo=   22.95
+  Z 1: exit= 0 pts=  8539 BN=   60.52
+  Z1: e=  0.5651 BN=  60.52 (no re-entry)  zstat= 0
+  no re-entry (weak-signal fit, or zone_select still rejected this window)
+ [PROGRESS]  26% (90 of ** zones done, this chunk)
+
+ ===== 37151 z37 pre-resonance 
+  [INFO] G2 BN floor estimate=   49.20 -> bn_lo=   24.60
+  [WARN] Z 1: RSM envelope does not bound  15 of  28 observations -- proceeding anyway
+  [WARN] Z 1: GA optimum at search boundary -- true value may lie outside the search range
+  Z 1: exit= 0 pts=  8560 BN=  135.78
+  Z1: e=  0.5644 BN= 135.78 (no re-entry)  zstat= 2
+  no re-entry (weak-signal fit, or zone_select still rejected this window)
+ [PROGRESS]  26% (91 of ** zones done, this chunk)
+
+ ===== 37151 z38 pre-resonance 
+  [INFO] G2 BN floor estimate=   44.03 -> bn_lo=   22.01
+  Z 1: exit= 1 pts=  3870 BN=   63.81
+  Z1: e=  0.5643 BN=  63.81 RPE=  -28.51%  zstat= 0
+  ensemble (1 of 1 zones): mean JD=  2457119.324 std=    0.0 d
+  RPE =   -28.51%
+ [PROGRESS]  27% (92 of ** zones done, this chunk)
+
+ ===== 37151 z39 pre-resonance 
+  [INFO] G2 BN floor estimate=   43.40 -> bn_lo=   21.70
+  [WARN] Z 1: RSM envelope does not bound  12 of  29 observations -- proceeding anyway
+  [WARN] Z 1: GA optimum at search boundary -- true value may lie outside the search range
+  Z 1: exit= 1 pts=  2622 BN=   93.41
+  Z1: e=  0.5631 BN=  93.41 RPE=  -46.84%  zstat= 2
+  ensemble (1 of 1 zones): mean JD=  2456971.652 std=    0.0 d
+  RPE =   -46.84%
+ [PROGRESS]  27% (93 of ** zones done, this chunk)
+
+ ===== 37151 z40 pre-resonance 
+  [INFO] G2 BN floor estimate=   47.20 -> bn_lo=   23.60
+  [WARN] Z 1: RSM envelope does not bound  15 of  28 observations -- proceeding anyway
+  [WARN] Z 1: GA optimum at search boundary -- true value may lie outside the search range
+  Z 1: exit= 1 pts=  2581 BN=  135.60
+  Z1: e=  0.5624 BN= 135.60 RPE=  -44.99%  zstat= 2
+  ensemble (1 of 1 zones): mean JD=  2456994.672 std=    0.0 d
+  RPE =   -44.99%
+ [PROGRESS]  27% (94 of ** zones done, this chunk)
+
+ ===== 37151 z41 pre-resonance 
+  [INFO] G2 BN floor estimate=   43.64 -> bn_lo=   21.82
+  [WARN] Z 1: GA optimum at search boundary -- true value may lie outside the search range
+  Z 1: exit= 1 pts=  4588 BN=   60.68
+  Z1: e=  0.5621 BN=  60.68 RPE=  -13.56%  zstat= 2
+  ensemble (1 of 1 zones): mean JD=  2457251.439 std=    0.0 d
+  RPE =   -13.56%
+ [PROGRESS]  27% (95 of ** zones done, this chunk)
+
+ ===== 37151 z42 pre-resonance 
+  [INFO] G2 BN floor estimate=   42.09 -> bn_lo=   21.04
+  [WARN] Z 1: GA optimum at search boundary -- true value may lie outside the search range
+  Z 1: exit= 0 pts=  8697 BN=   59.66
+  Z1: e=  0.5610 BN=  59.66 (no re-entry)  zstat= 2
+  no re-entry (weak-signal fit, or zone_select still rejected this window)
+ [PROGRESS]  28% (96 of ** zones done, this chunk)
+
+ ===== 37151 z43 pre-resonance 
+  [INFO] G2 BN floor estimate=   40.33 -> bn_lo=   20.16
+  Z 1: exit= 0 pts=  8746 BN=   67.93
+  Z1: e=  0.5594 BN=  67.93 (no re-entry)  zstat= 0
+  no re-entry (weak-signal fit, or zone_select still rejected this window)
+ [PROGRESS]  28% (97 of ** zones done, this chunk)
+
+ ===== 37151 z44 pre-resonance 
+  [INFO] G2 BN floor estimate=   36.18 -> bn_lo=   18.09
+  [WARN] Z 1: RSM envelope does not bound   1 of  28 observations -- proceeding anyway
+  [WARN] Z 1: GA optimum at search boundary -- true value may lie outside the search range
+  Z 1: exit= 0 pts=  8788 BN=   56.30
+  Z1: e=  0.5579 BN=  56.30 (no re-entry)  zstat= 2
+  no re-entry (weak-signal fit, or zone_select still rejected this window)
+ [PROGRESS]  28% (98 of ** zones done, this chunk)
+
+ ===== 37151 z45 pre-resonance 
+  [INFO] G2 BN floor estimate=   40.86 -> bn_lo=   20.43
+  [WARN] Z 1: RSM envelope does not bound   8 of  27 observations -- proceeding anyway
+  [WARN] Z 1: GA optimum at search boundary -- true value may lie outside the search range
+  Z 1: exit= 0 pts=  8849 BN=   85.31
+  Z1: e=  0.5557 BN=  85.31 (no re-entry)  zstat= 2
+  no re-entry (weak-signal fit, or zone_select still rejected this window)
+ [PROGRESS]  29% (99 of ** zones done, this chunk)
+
+ ===== 37151 z46 pre-resonance 
+  [INFO] G2 BN floor estimate=   37.42 -> bn_lo=   18.71
+  [WARN] Z 1: GA optimum at search boundary -- true value may lie outside the search range
+  Z 1: exit= 0 pts=  8872 BN=   58.60
+  Z1: e=  0.5551 BN=  58.60 (no re-entry)  zstat= 2
+  no re-entry (weak-signal fit, or zone_select still rejected this window)
+ [PROGRESS]  29% (** of ** zones done, this chunk)
+
+ ===== 37151 z47 pre-resonance 
+  [INFO] G2 BN floor estimate=   32.85 -> bn_lo=   16.42
+  [INFO] Z 1: G3 BSTAR prior narrows BN to [  17.19, 160.00]
+  [WARN] Z 1: RSM envelope does not bound   3 of  28 observations -- proceeding anyway
+  [WARN] Z 1: GA optimum at search boundary -- true value may lie outside the search range
+  Z 1: exit= 0 pts=  8916 BN=   63.40
+  Z1: e=  0.5535 BN=  63.40 (no re-entry)  zstat= 2
+  no re-entry (weak-signal fit, or zone_select still rejected this window)
+ [PROGRESS]  29% (** of ** zones done, this chunk)
+
+ ===== 37151 z48 pre-resonance 
+  [INFO] G2 BN floor estimate=   33.43 -> bn_lo=   16.72
+  [INFO] Z 1: G3 BSTAR prior narrows BN to [  17.94, 160.00]
+  [WARN] Z 1: GA optimum at search boundary -- true value may lie outside the search range
+  Z 1: exit= 0 pts=  8960 BN=   60.19
+  Z1: e=  0.5522 BN=  60.19 (no re-entry)  zstat= 2
+  no re-entry (weak-signal fit, or zone_select still rejected this window)
+ [PROGRESS]  30% (** of ** zones done, this chunk)
+
+ ===== 37151 z49 pre-resonance 
+  [INFO] G2 BN floor estimate=   34.09 -> bn_lo=   17.05
+  [INFO] Z 1: G3 BSTAR prior narrows BN to [  18.25, 160.00]
+  Z 1: exit= 1 pts=  8969 BN=   61.18
+  Z1: e=  0.5510 BN=  61.18 RPE=   76.80%  zstat= 0
+  ensemble (1 of 1 zones): mean JD=  2457892.938 std=    0.0 d
+  RPE =    76.80%
+ [PROGRESS]  30% (** of ** zones done, this chunk)
+
+ ===== 37151 z50 pre-resonance 
+  [INFO] G2 BN floor estimate=   35.31 -> bn_lo=   17.65
+  [INFO] Z 1: G3 BSTAR prior narrows BN to [  18.08, 160.00]
+  Z 1: exit= 0 pts=  9058 BN=   61.64
+  Z1: e=  0.5494 BN=  61.64 (no re-entry)  zstat= 0
+  no re-entry (weak-signal fit, or zone_select still rejected this window)
+ [PROGRESS]  30% (** of ** zones done, this chunk)
+
+ ===== 37151 z51 pre-resonance 
+  [INFO] G2 BN floor estimate=   34.16 -> bn_lo=   17.08
+  [INFO] Z 1: G3 BSTAR prior narrows BN to [  17.58, 160.00]
+  Z 1: exit= 0 pts=  9128 BN=   63.12
+  Z1: e=  0.5472 BN=  63.12 (no re-entry)  zstat= 0
+  no re-entry (weak-signal fit, or zone_select still rejected this window)
+ [PROGRESS]  30% (** of ** zones done, this chunk)
+
+ ===== 37151 z52 pre-resonance 
+  [INFO] G2 BN floor estimate=   33.98 -> bn_lo=   16.99
+  Z 1: exit= 0 pts=  9189 BN=   56.51
+  Z1: e=  0.5452 BN=  56.51 (no re-entry)  zstat= 0
+  no re-entry (weak-signal fit, or zone_select still rejected this window)
+ [PROGRESS]  31% (** of ** zones done, this chunk)
+
+ ===== 37151 z53 pre-resonance 
+  [INFO] G2 BN floor estimate=   35.97 -> bn_lo=   17.99
+  Z 1: exit= 0 pts=  9263 BN=   60.28
+  Z1: e=  0.5430 BN=  60.28 (no re-entry)  zstat= 0
+  no re-entry (weak-signal fit, or zone_select still rejected this window)
+ [PROGRESS]  31% (** of ** zones done, this chunk)
+
+ ===== 37151 z54 pre-resonance 
+  [INFO] G2 BN floor estimate=   41.72 -> bn_lo=   20.86
+  Z 1: exit= 0 pts=  9351 BN=   66.38
+  Z1: e=  0.5405 BN=  66.38 (no re-entry)  zstat= 0
+  no re-entry (weak-signal fit, or zone_select still rejected this window)
+ [PROGRESS]  31% (** of ** zones done, this chunk)
+
+ ===== 37151 z55 pre-resonance 
+  [INFO] G2 BN floor estimate=   37.87 -> bn_lo=   18.94
+  Z 1: exit= 0 pts=  9445 BN=   67.47
+  Z1: e=  0.5375 BN=  67.47 (no re-entry)  zstat= 0
+  no re-entry (weak-signal fit, or zone_select still rejected this window)
+ [PROGRESS]  32% (** of ** zones done, this chunk)
+
+ ===== 37151 z56 pre-resonance 
+  [INFO] G2 BN floor estimate=   31.98 -> bn_lo=   15.99
+  Z 1: exit= 0 pts=  9543 BN=   62.22
+  Z1: e=  0.5343 BN=  62.22 (no re-entry)  zstat= 0
+  no re-entry (weak-signal fit, or zone_select still rejected this window)
+ [PROGRESS]  32% (** of ** zones done, this chunk)
+
+ ===== 37151 z57 pre-resonance 
+  [INFO] G2 BN floor estimate=   32.72 -> bn_lo=   16.36
+  Z 1: exit= 0 pts=  9667 BN=   56.41
+  Z1: e=  0.5305 BN=  56.41 (no re-entry)  zstat= 0
+  no re-entry (weak-signal fit, or zone_select still rejected this window)
+ [PROGRESS]  32% (** of ** zones done, this chunk)
+
+ ===== 37151 z58 pre-resonance 
+  [INFO] G2 BN floor estimate=   38.08 -> bn_lo=   19.04
+  Z 1: exit= 0 pts=  9797 BN=   61.57
+  Z1: e=  0.5264 BN=  61.57 (no re-entry)  zstat= 0
+  no re-entry (weak-signal fit, or zone_select still rejected this window)
+ [PROGRESS]  32% (** of ** zones done, this chunk)
+
+ ===== 37151 z59 pre-resonance 
+  [INFO] G2 BN floor estimate=   35.48 -> bn_lo=   17.74
+  Z 1: exit= 1 pts=  9577 BN=   52.97
+  Z1: e=  0.5213 BN=  52.97 RPE=  100.18%  zstat= 0
+  ensemble (1 of 1 zones): mean JD=  2457926.676 std=    0.0 d
+  RPE =   100.18%
+ [PROGRESS]  33% (** of ** zones done, this chunk)
+
+ ===== 37151 z60 pre-resonance 
+  [INFO] G2 BN floor estimate=   44.83 -> bn_lo=   22.41
+  Z 1: exit= 1 pts=  4379 BN=   62.63
+  Z1: e=  0.5167 BN=  62.63 RPE=   -0.11%  zstat= 0
+  ensemble (1 of 1 zones): mean JD=  2457358.899 std=    0.0 d
+  RPE =    -0.11%
+ [PROGRESS]  33% (** of ** zones done, this chunk)
+
+ ===== 37151 z61 pre-resonance 
+  [INFO] G2 BN floor estimate=   56.48 -> bn_lo=   28.24
+  Z 1: exit= 1 pts=  3182 BN=   79.88
+  Z1: e=  0.5131 BN=  79.88 RPE=  -23.66%  zstat= 0
+  ensemble (1 of 1 zones): mean JD=  2457231.593 std=    0.0 d
+  RPE =   -23.66%
+ [PROGRESS]  33% (** of ** zones done, this chunk)
+
+ ===== 37151 z62 pre-resonance 
+  [INFO] G2 BN floor estimate=   53.75 -> bn_lo=   26.87
+  Z 1: exit= 1 pts=  3747 BN=   72.89
+  Z1: e=  0.5096 BN=  72.89 RPE=   -9.48%  zstat= 0
+  ensemble (1 of 1 zones): mean JD=  2457309.309 std=    0.0 d
+  RPE =    -9.48%
+ [PROGRESS]  34% (** of ** zones done, this chunk)
+
+ ===== 37151 z63 pre-resonance 
+  [INFO] G2 BN floor estimate=   50.52 -> bn_lo=   25.26
+  Z 1: exit= 1 pts=  6923 BN=   69.68
+  Z1: e=  0.5066 BN=  69.68 RPE=   61.02%  zstat= 0
+  ensemble (1 of 1 zones): mean JD=  2457675.237 std=    0.0 d
+  RPE =    61.02%
+ [PROGRESS]  34% (** of ** zones done, this chunk)
+
+ ===== 37151 z64 pre-resonance 
+  [INFO] G2 BN floor estimate=   66.77 -> bn_lo=   33.38
+  Z 1: exit= 0 pts= 10522 BN=   82.62
+  Z1: e=  0.5034 BN=  82.62 (no re-entry)  zstat= 0
+  no re-entry (weak-signal fit, or zone_select still rejected this window)
+ [PROGRESS]  34% (** of ** zones done, this chunk)
+
+ ===== 37151 z65 pre-resonance 
+  [INFO] G2 BN floor estimate=   50.22 -> bn_lo=   25.11
+  Z 1: exit= 0 pts= 10625 BN=   67.94
+  Z1: e=  0.5000 BN=  67.94 (no re-entry)  zstat= 0
+  no re-entry (weak-signal fit, or zone_select still rejected this window)
+ [PROGRESS]  35% (** of ** zones done, this chunk)
+
+ ===== 37151 z66 pre-resonance 
+  [INFO] G2 BN floor estimate=   47.91 -> bn_lo=   23.96
+  Z 1: exit= 0 pts= 10749 BN=   67.39
+  Z1: e=  0.4960 BN=  67.39 (no re-entry)  zstat= 0
+  no re-entry (weak-signal fit, or zone_select still rejected this window)
+ [PROGRESS]  35% (** of ** zones done, this chunk)
+
+ ===== 37151 z67 pre-resonance 
+  [INFO] G2 BN floor estimate=   44.53 -> bn_lo=   22.26
+  Z 1: exit= 0 pts= 10899 BN=   65.06
+  Z1: e=  0.4913 BN=  65.06 (no re-entry)  zstat= 0
+  no re-entry (weak-signal fit, or zone_select still rejected this window)
+ [PROGRESS]  35% (** of ** zones done, this chunk)
+
+ ===== 37151 z68 post-resonance
+  [INFO] G2 BN floor estimate=   44.20 -> bn_lo=   22.10
+  Z 1: exit= 1 pts=  4436 BN=   66.33
+  Z1: e=  0.4871 BN=  66.33 RPE=   17.13%  zstat= 0
+  ensemble (1 of 1 zones): mean JD=  2457435.862 std=    0.0 d
+  RPE =    17.13%
+ [PROGRESS]  35% (** of ** zones done, this chunk)
+
+ ===== 37151 z69 post-resonance
+  [INFO] G2 BN floor estimate=   36.83 -> bn_lo=   18.41
+  Z 1: exit= 1 pts=  3913 BN=   60.16
+  Z1: e=  0.4828 BN=  60.16 RPE=    7.27%  zstat= 0
+  ensemble (1 of 1 zones): mean JD=  2457391.016 std=    0.0 d
+  RPE =     7.27%
+ [PROGRESS]  36% (** of ** zones done, this chunk)
+
+ ===== 37151 z70 post-resonance
+  [INFO] G2 BN floor estimate=   44.43 -> bn_lo=   22.21
+  Z 1: exit= 1 pts=  5230 BN=   68.79
+  Z1: e=  0.4778 BN=  68.79 RPE=   41.76%  zstat= 0
+  ensemble (1 of 1 zones): mean JD=  2457535.039 std=    0.0 d
+  RPE =    41.76%
+ [PROGRESS]  36% (** of ** zones done, this chunk)
+
+ ===== 37151 z71 post-resonance
+  [INFO] G2 BN floor estimate=   48.98 -> bn_lo=   24.49
+  Z 1: exit= 1 pts= 10391 BN=   68.39
+  Z1: e=  0.4718 BN=  68.39 RPE=  170.18%  zstat= 0
+  ensemble (1 of 1 zones): mean JD=  2458049.490 std=    0.0 d
+  RPE =   170.18%
+ [PROGRESS]  36% (** of ** zones done, this chunk)
+
+ ===== 37151 z72 post-resonance
+  [INFO] G2 BN floor estimate=   43.05 -> bn_lo=   21.53
+  Z 1: exit= 0 pts= 11828 BN=   66.75
+  Z1: e=  0.4629 BN=  66.75 (no re-entry)  zstat= 0
+  no re-entry (weak-signal fit, or zone_select still rejected this window)
+ [PROGRESS]  37% (** of ** zones done, this chunk)
+
+ ===== 37151 z73 post-resonance
+  [INFO] G2 BN floor estimate=   43.15 -> bn_lo=   21.57
+  Z 1: exit= 1 pts=  9447 BN=   66.15
+  Z1: e=  0.4571 BN=  66.15 RPE=  168.57%  zstat= 0
+  ensemble (1 of 1 zones): mean JD=  2457980.794 std=    0.0 d
+  RPE =   168.57%
+ [PROGRESS]  37% (** of ** zones done, this chunk)
+
+ ===== 37151 z74 post-resonance
+  [INFO] G2 BN floor estimate=   38.97 -> bn_lo=   19.48
+  Z 1: exit= 1 pts= 11004 BN=   72.47
+  Z1: e=  0.4508 BN=  72.47 RPE=  220.07%  zstat= 0
+  ensemble (1 of 1 zones): mean JD=  2458138.313 std=    0.0 d
+  RPE =   220.07%
+ [PROGRESS]  37% (** of ** zones done, this chunk)
+
+ ===== 37151 z75 post-resonance
+  [INFO] G2 BN floor estimate=   37.77 -> bn_lo=   18.88
+  [INFO] Z 1: G3 BSTAR prior narrows BN to [  19.10, 160.00]
+  Z 1: exit= 1 pts=  7909 BN=   61.22
+  Z1: e=  0.4458 BN=  61.22 RPE=  139.57%  zstat= 0
+  ensemble (1 of 1 zones): mean JD=  2457835.648 std=    0.0 d
+  RPE =   139.57%
+ [PROGRESS]  37% (** of ** zones done, this chunk)
+
+ ===== 37151 z76 post-resonance
+  [INFO] G2 BN floor estimate=   44.28 -> bn_lo=   22.14
+  Z 1: exit= 1 pts=  5651 BN=   67.04
+  Z1: e=  0.4395 BN=  67.04 RPE=   79.00%  zstat= 0
+  ensemble (1 of 1 zones): mean JD=  2457618.739 std=    0.0 d
+  RPE =    79.00%
+ [PROGRESS]  38% (** of ** zones done, this chunk)
+
+ ===== 37151 z77 post-resonance
+  [INFO] G2 BN floor estimate=   65.39 -> bn_lo=   32.70
+  Z 1: exit= 1 pts=  4966 BN=   84.47
+  Z1: e=  0.4329 BN=  84.47 RPE=   60.46%  zstat= 0
+  ensemble (1 of 1 zones): mean JD=  2457549.828 std=    0.0 d
+  RPE =    60.46%
+ [PROGRESS]  38% (** of ** zones done, this chunk)
+
+ ===== 37151 z78 post-resonance
+  [INFO] G2 BN floor estimate=   59.72 -> bn_lo=   29.86
+  Z 1: exit= 1 pts=  9258 BN=   74.82
+  Z1: e=  0.4258 BN=  74.82 RPE=  192.12%  zstat= 0
+  ensemble (1 of 1 zones): mean JD=  2457937.536 std=    0.0 d
+  RPE =   192.12%
+ [PROGRESS]  38% (** of ** zones done, this chunk)
+
+ ===== 37151 z79 post-resonance
+  [INFO] G2 BN floor estimate=   48.57 -> bn_lo=   24.29
+  Z 1: exit= 0 pts= 13354 BN=   69.40
+  Z1: e=  0.4184 BN=  69.40 (no re-entry)  zstat= 0
+  no re-entry (weak-signal fit, or zone_select still rejected this window)
+ [PROGRESS]  39% (** of ** zones done, this chunk)
+
+ ===== 37151 z80 post-resonance
+  [INFO] G2 BN floor estimate=   56.78 -> bn_lo=   28.39
+  Z 1: exit= 1 pts=  7130 BN=   78.38
+  Z1: e=  0.4102 BN=  78.38 RPE=  145.84%  zstat= 0
+  ensemble (1 of 1 zones): mean JD=  2457761.047 std=    0.0 d
+  RPE =   145.84%
+ [PROGRESS]  39% (** of ** zones done, this chunk)
+
+ ===== 37151 z81 post-resonance
+  [INFO] G2 BN floor estimate=   61.27 -> bn_lo=   30.63
+  Z 1: exit= 1 pts=  3296 BN=   81.82
+  Z1: e=  0.4024 BN=  81.82 RPE=   24.75%  zstat= 0
+  ensemble (1 of 1 zones): mean JD=  2457424.267 std=    0.0 d
+  RPE =    24.75%
+ [PROGRESS]  39% (** of ** zones done, this chunk)
+
+ ===== 37151 z82 post-resonance
+  [INFO] G2 BN floor estimate=   60.80 -> bn_lo=   30.40
+  Z 1: exit= 1 pts=  3109 BN=   77.28
+  Z1: e=  0.3957 BN=  77.28 RPE=   22.94%  zstat= 0
+  ensemble (1 of 1 zones): mean JD=  2457416.595 std=    0.0 d
+  RPE =    22.94%
+ [PROGRESS]  40% (** of ** zones done, this chunk)
+
+ ===== 37151 z83 post-resonance
+  [INFO] G2 BN floor estimate=   52.63 -> bn_lo=   26.32
+  Z 1: exit= 1 pts=  4265 BN=   70.32
+  Z1: e=  0.3905 BN=  70.32 RPE=   70.91%  zstat= 0
+  ensemble (1 of 1 zones): mean JD=  2457528.877 std=    0.0 d
+  RPE =    70.91%
+ [PROGRESS]  40% (** of ** zones done, this chunk)
+
+ ===== 37151 z84 post-resonance
+  [INFO] G2 BN floor estimate=   67.33 -> bn_lo=   33.67
+  Z 1: exit= 1 pts=  5406 BN=   82.84
+  Z1: e=  0.3842 BN=  82.84 RPE=  117.27%  zstat= 0
+  ensemble (1 of 1 zones): mean JD=  2457626.717 std=    0.0 d
+  RPE =   117.27%
+ [PROGRESS]  40% (** of ** zones done, this chunk)
+
+ ===== 37151 z85 post-resonance
+  [INFO] G2 BN floor estimate=   93.50 -> bn_lo=   46.75
+  Z 1: exit= 1 pts=  3239 BN=   99.20
+  Z1: e=  0.3762 BN=  99.20 RPE=   36.73%  zstat= 0
+  ensemble (1 of 1 zones): mean JD=  2457438.353 std=    0.0 d
+  RPE =    36.73%
+ [PROGRESS]  40% (** of ** zones done, this chunk)
+
+ ===== 37151 z86 post-resonance
+  [INFO] G2 BN floor estimate=   67.33 -> bn_lo=   33.66
+  Z 1: exit= 1 pts=  2658 BN=   88.95
+  Z1: e=  0.3642 BN=  88.95 RPE=   20.03%  zstat= 0
+  ensemble (1 of 1 zones): mean JD=  2457399.730 std=    0.0 d
+  RPE =    20.03%
+ [PROGRESS]  41% (** of ** zones done, this chunk)
+
+ ===== 37151 z87 post-resonance
+  [INFO] G2 BN floor estimate=   61.71 -> bn_lo=   30.86
+  Z 1: exit= 1 pts=  2294 BN=   77.18
+  Z1: e=  0.3529 BN=  77.18 RPE=    9.74%  zstat= 0
+  ensemble (1 of 1 zones): mean JD=  2457377.719 std=    0.0 d
+  RPE =     9.74%
+ [PROGRESS]  41% (** of ** zones done, this chunk)
+
+ ===== 37151 z88 post-resonance
+  [INFO] G2 BN floor estimate=   83.20 -> bn_lo=   41.60
+  Z 1: exit= 1 pts=  2243 BN=   93.88
+  Z1: e=  0.3399 BN=  93.88 RPE=   13.73%  zstat= 0
+  ensemble (1 of 1 zones): mean JD=  2457383.400 std=    0.0 d
+  RPE =    13.73%
+ [PROGRESS]  41% (** of ** zones done, this chunk)
+
+ ===== 37151 z89 post-resonance
+  [INFO] G2 BN floor estimate=   97.87 -> bn_lo=   48.93
+  Z 1: exit= 1 pts=  2543 BN=   97.54
+  Z1: e=  0.3301 BN=  97.54 RPE=   37.21%  zstat= 0
+  ensemble (1 of 1 zones): mean JD=  2457419.600 std=    0.0 d
+  RPE =    37.21%
+ [PROGRESS]  42% (** of ** zones done, this chunk)
+
+ ===== 37151 z90 post-resonance
+  [INFO] G2 BN floor estimate=   75.52 -> bn_lo=   37.76
+  Z 1: exit= 1 pts=  2670 BN=   84.46
+  Z1: e=  0.3207 BN=  84.46 RPE=   54.84%  zstat= 0
+  ensemble (1 of 1 zones): mean JD=  2457440.775 std=    0.0 d
+  RPE =    54.84%
+ [PROGRESS]  42% (** of ** zones done, this chunk)
+
+ ===== 37151 z91 post-resonance
+  [INFO] G2 BN floor estimate=  115.48 -> bn_lo=   57.74
+  Z 1: exit= 1 pts=  1801 BN=  121.80
+  Z1: e=  0.3116 BN= 121.80 RPE=   13.60%  zstat= 0
+  ensemble (1 of 1 zones): mean JD=  2457378.064 std=    0.0 d
+  RPE =    13.60%
+ [PROGRESS]  42% (** of ** zones done, this chunk)
+
+ ===== 37151 z92 post-resonance
+  [INFO] G2 BN floor estimate=   63.30 -> bn_lo=   31.65
+  Z 1: exit= 1 pts=  1703 BN=   80.41
+  Z1: e=  0.3001 BN=  80.41 RPE=   15.92%  zstat= 0
+  ensemble (1 of 1 zones): mean JD=  2457379.376 std=    0.0 d
+  RPE =    15.92%
+ [PROGRESS]  42% (** of ** zones done, this chunk)
+
+ ===== 37151 z93 post-resonance
+  [INFO] G2 BN floor estimate=   57.84 -> bn_lo=   28.92
+  Z 1: exit= 1 pts=  1967 BN=   74.99
+  Z1: e=  0.2849 BN=  74.99 RPE=   44.89%  zstat= 0
+  ensemble (1 of 1 zones): mean JD=  2457409.710 std=    0.0 d
+  RPE =    44.89%
+ [PROGRESS]  43% (** of ** zones done, this chunk)
+
+ ===== 37151 z94 post-resonance
+  [INFO] G2 BN floor estimate=  129.58 -> bn_lo=   64.79
+  Z 1: exit= 1 pts=  1621 BN=  122.04
+  Z1: e=  0.2675 BN= 122.04 RPE=   32.16%  zstat= 0
+  ensemble (1 of 1 zones): mean JD=  2457391.160 std=    0.0 d
+  RPE =    32.16%
+ [PROGRESS]  43% (** of ** zones done, this chunk)
+
+ ===== 37151 z95 post-resonance
+  [INFO] G2 BN floor estimate=   83.33 -> bn_lo=   41.67
+  Z 1: exit= 1 pts=  1752 BN=   89.17
+  Z1: e=  0.2541 BN=  89.17 RPE=   60.08%  zstat= 0
+  ensemble (1 of 1 zones): mean JD=  2457411.813 std=    0.0 d
+  RPE =    60.08%
+ [PROGRESS]  43% (** of ** zones done, this chunk)
+
+ ===== 37151 z96 post-resonance
+  [INFO] G2 BN floor estimate=   64.04 -> bn_lo=   32.02
+  Z 1: exit= 1 pts=  1941 BN=   79.53
+  Z1: e=  0.2445 BN=  79.53 RPE=   95.29%  zstat= 0
+  ensemble (1 of 1 zones): mean JD=  2457433.935 std=    0.0 d
+  RPE =    95.29%
+ [PROGRESS]  44% (** of ** zones done, this chunk)
+
+ ===== 37151 z97 post-resonance
+  [INFO] G2 BN floor estimate=   55.47 -> bn_lo=   27.74
+  Z 1: exit= 1 pts=  1335 BN=   74.82
+  Z1: e=  0.2342 BN=  74.82 RPE=   51.54%  zstat= 0
+  ensemble (1 of 1 zones): mean JD=  2457394.636 std=    0.0 d
+  RPE =    51.54%
+ [PROGRESS]  44% (** of ** zones done, this chunk)
+
+ ===== 37151 z98 post-resonance
+  [INFO] G2 BN floor estimate=   79.00 -> bn_lo=   39.50
+  Z 1: exit= 1 pts=   885 BN=   89.89
+  Z1: e=  0.2138 BN=  89.89 RPE=   20.00%  zstat= 0
+  ensemble (1 of 1 zones): mean JD=  2457370.654 std=    0.0 d
+  RPE =    20.00%
+ [PROGRESS]  44% (** of ** zones done, this chunk)
+
+ ===== 37151 z99 post-resonance
+  [INFO] G2 BN floor estimate=  156.50 -> bn_lo=   78.25
+  [WARN] Z 1: GA optimum at search boundary -- true value may lie outside the search range
+  Z 1: exit= 1 pts=   688 BN=  156.04
+  Z1: e=  0.1918 BN= 156.04 RPE=   14.78%  zstat= 2
+  ensemble (1 of 1 zones): mean JD=  2457366.028 std=    0.0 d
+  RPE =    14.78%
+ [PROGRESS]  45% (** of ** zones done, this chunk)
+
+ ===== 37151 z100 post-resonanc
+  [INFO] G2 BN floor estimate=  102.88 -> bn_lo=   51.44
+  Z 1: exit= 1 pts=   797 BN=  116.17
+  Z1: e=  0.1745 BN= 116.17 RPE=   60.83%  zstat= 0
+  ensemble (1 of 1 zones): mean JD=  2457381.288 std=    0.0 d
+  RPE =    60.83%
+ [PROGRESS]  45% (** of ** zones done, this chunk)
+
+ ===== 37151 z101 post-resonanc
+  [INFO] G2 BN floor estimate=   45.87 -> bn_lo=   22.94
+  [INFO] Z 1: G3 BSTAR prior narrows BN to [  24.51, 160.00]
+  Z 1: exit= 1 pts=   737 BN=   74.56
+  Z1: e=  0.1573 BN=  74.56 RPE=   93.15%  zstat= 0
+  ensemble (1 of 1 zones): mean JD=  2457384.725 std=    0.0 d
+  RPE =    93.15%
+ [PROGRESS]  45% (** of ** zones done, this chunk)
+
+ ===== 37151 z102 post-resonanc
+  [INFO] G2 BN floor estimate=   52.10 -> bn_lo=   26.05
+  Z 1: exit= 1 pts=   402 BN=   81.05
+  Z1: e=  0.1327 BN=  81.05 RPE=   54.91%  zstat= 0
+  ensemble (1 of 1 zones): mean JD=  2457369.318 std=    0.0 d
+  RPE =    54.91%
+ [PROGRESS]  45% (** of ** zones done, this chunk)
+
+ ===== 37151 z103 post-resonanc
+  [WARN] Z 1: GA optimum at search boundary -- true value may lie outside the search range
+  Z 1: exit= 1 pts=    87 BN=  158.62
+  Z1: e=  0.0995 BN= 158.62 RPE=    1.08%  zstat= 2
+  ensemble (1 of 1 zones): mean JD=  2457359.561 std=    0.0 d
+  RPE =     1.08%
+ [PROGRESS]  46% (** of ** zones done, this chunk)
+
+ ===== 27526 z1 pre-resonance (
+  [INFO] G2 BN floor estimate=   57.40 -> bn_lo=   28.70
+  Z 1: exit= 0 pts=  7688 BN=   73.23
+  Z1: e=  0.5937 BN=  73.23 (no re-entry)  zstat= 0
+  no re-entry (weak-signal fit, or zone_select still rejected this window)
+ [PROGRESS]  46% (** of ** zones done, this chunk)
+
+ ===== 27526 z2 pre-resonance (
+  [INFO] G2 BN floor estimate=   50.66 -> bn_lo=   25.33
+  Z 1: exit= 0 pts=  7702 BN=   78.19
+  Z1: e=  0.5932 BN=  78.19 (no re-entry)  zstat= 0
+  no re-entry (weak-signal fit, or zone_select still rejected this window)
+ [PROGRESS]  46% (** of ** zones done, this chunk)
+
+ ===== 27526 z3 pre-resonance (
+  [INFO] G2 BN floor estimate=   33.83 -> bn_lo=   16.91
+  [INFO] Z 1: G3 BSTAR prior narrows BN to [  20.20, 160.00]
+  [WARN] Z 1: RSM envelope does not bound   4 of  27 observations -- proceeding anyway
+  [WARN] Z 1: GA optimum at search boundary -- true value may lie outside the search range
+  Z 1: exit= 1 pts=  4320 BN=   72.87
+  Z1: e=  0.5929 BN=  72.87 RPE=   -8.03%  zstat= 2
+  ensemble (1 of 1 zones): mean JD=  2455989.509 std=    0.0 d
+  RPE =    -8.03%
+ [PROGRESS]  47% (** of ** zones done, this chunk)
+
+ ===== 27526 z4 pre-resonance (
+  [INFO] G2 BN floor estimate=   30.46 -> bn_lo=   15.23
+  [INFO] Z 1: G3 BSTAR prior narrows BN to [  18.78, 160.00]
+  [WARN] Z 1: RSM envelope does not bound   3 of  27 observations -- proceeding anyway
+  [WARN] Z 1: GA optimum at search boundary -- true value may lie outside the search range
+  Z 1: exit= 1 pts=  4099 BN=   67.39
+  Z1: e=  0.5922 BN=  67.39 RPE=  -12.20%  zstat= 2
+  ensemble (1 of 1 zones): mean JD=  2455958.202 std=    0.0 d
+  RPE =   -12.20%
+ [PROGRESS]  47% (** of ** zones done, this chunk)
+
+ ===== 27526 z5 pre-resonance (
+  [INFO] G2 BN floor estimate=   31.91 -> bn_lo=   15.95
+  [INFO] Z 1: G3 BSTAR prior narrows BN to [  17.63, 160.00]
+  [WARN] Z 1: RSM envelope does not bound   5 of  26 observations -- proceeding anyway
+  [WARN] Z 1: GA optimum at search boundary -- true value may lie outside the search range
+  Z 1: exit= 0 pts=  7801 BN=   61.74
+  Z1: e=  0.5910 BN=  61.74 (no re-entry)  zstat= 2
+  no re-entry (weak-signal fit, or zone_select still rejected this window)
+ [PROGRESS]  47% (** of ** zones done, this chunk)
+
+ ===== 27526 z6 pre-resonance (
+  [INFO] G2 BN floor estimate=   34.01 -> bn_lo=   17.00
+  [WARN] Z 1: RSM envelope does not bound   3 of  26 observations -- proceeding anyway
+  [WARN] Z 1: GA optimum at search boundary -- true value may lie outside the search range
+  Z 1: exit= 0 pts=  7847 BN=   65.23
+  Z1: e=  0.5896 BN=  65.23 (no re-entry)  zstat= 2
+  no re-entry (weak-signal fit, or zone_select still rejected this window)
+ [PROGRESS]  47% (** of ** zones done, this chunk)
+
+ ===== 27526 z7 pre-resonance (
+  [INFO] G2 BN floor estimate=   33.76 -> bn_lo=   16.88
+  [WARN] Z 1: GA optimum at search boundary -- true value may lie outside the search range
+  Z 1: exit= 0 pts=  7895 BN=   54.04
+  Z1: e=  0.5882 BN=  54.04 (no re-entry)  zstat= 2
+  no re-entry (weak-signal fit, or zone_select still rejected this window)
+ [PROGRESS]  48% (** of ** zones done, this chunk)
+
+ ===== 27526 z8 pre-resonance (
+  [INFO] G2 BN floor estimate=   34.02 -> bn_lo=   17.01
+  Z 1: exit= 0 pts=  7970 BN=   62.72
+  Z1: e=  0.5860 BN=  62.72 (no re-entry)  zstat= 0
+  no re-entry (weak-signal fit, or zone_select still rejected this window)
+ [PROGRESS]  48% (** of ** zones done, this chunk)
+
+ ===== 27526 z9 pre-resonance (
+  [INFO] G2 BN floor estimate=   36.72 -> bn_lo=   18.36
+  Z 1: exit= 0 pts=  8053 BN=   63.36
+  Z1: e=  0.5834 BN=  63.36 (no re-entry)  zstat= 0
+  no re-entry (weak-signal fit, or zone_select still rejected this window)
+ [PROGRESS]  48% (** of ** zones done, this chunk)
+
+ ===== 27526 z10 pre-resonance 
+  [INFO] G2 BN floor estimate=   46.14 -> bn_lo=   23.07
+  Z 1: exit= 0 pts=  8153 BN=   68.06
+  Z1: e=  0.5803 BN=  68.06 (no re-entry)  zstat= 0
+  no re-entry (weak-signal fit, or zone_select still rejected this window)
+ [PROGRESS]  49% (** of ** zones done, this chunk)
+
+ ===== 27526 z11 pre-resonance 
+  [INFO] G2 BN floor estimate=   41.87 -> bn_lo=   20.94
+  Z 1: exit= 0 pts=  8257 BN=   67.33
+  Z1: e=  0.5768 BN=  67.33 (no re-entry)  zstat= 0
+  no re-entry (weak-signal fit, or zone_select still rejected this window)
+ [PROGRESS]  49% (** of ** zones done, this chunk)
+
+ ===== 27526 z12 pre-resonance 
+  [INFO] G2 BN floor estimate=   47.71 -> bn_lo=   23.85
+  Z 1: exit= 0 pts=  8377 BN=   66.00
+  Z1: e=  0.5728 BN=  66.00 (no re-entry)  zstat= 0
+  no re-entry (weak-signal fit, or zone_select still rejected this window)
+ [PROGRESS]  49% (** of ** zones done, this chunk)
+
+ ===== 27526 z13 pre-resonance 
+  [INFO] G2 BN floor estimate=   38.88 -> bn_lo=   19.44
+  Z 1: exit= 0 pts=  8503 BN=   59.36
+  Z1: e=  0.5684 BN=  59.36 (no re-entry)  zstat= 0
+  no re-entry (weak-signal fit, or zone_select still rejected this window)
+ [PROGRESS]  50% (** of ** zones done, this chunk)
+
+ ===== 27526 z14 pre-resonance 
+  [INFO] G2 BN floor estimate=   28.09 -> bn_lo=   14.04
+  [INFO] Z 1: G3 BSTAR prior narrows BN to [  16.65, 160.00]
+  Z 1: exit= 0 pts=  8643 BN=   51.68
+  Z1: e=  0.5636 BN=  51.68 (no re-entry)  zstat= 0
+  no re-entry (weak-signal fit, or zone_select still rejected this window)
+ [PROGRESS]  50% (** of ** zones done, this chunk)
+
+ ===== 27526 z15 pre-resonance 
+  [INFO] G2 BN floor estimate=   27.92 -> bn_lo=   13.96
+  [INFO] Z 1: G3 BSTAR prior narrows BN to [  15.92, 160.00]
+  Z 1: exit= 1 pts=  2670 BN=   54.86
+  Z1: e=  0.5569 BN=  54.86 RPE=  -28.00%  zstat= 0
+  ensemble (1 of 1 zones): mean JD=  2455903.139 std=    0.0 d
+  RPE =   -28.00%
+ [PROGRESS]  50% (** of ** zones done, this chunk)
+
+ ===== 27526 z16 pre-resonance 
+  [INFO] G2 BN floor estimate=   44.50 -> bn_lo=   22.25
+  Z 1: exit= 1 pts=  4580 BN=   63.99
+  Z1: e=  0.5488 BN=  63.99 RPE=   17.77%  zstat= 0
+  ensemble (1 of 1 zones): mean JD=  2456148.863 std=    0.0 d
+  RPE =    17.77%
+ [PROGRESS]  50% (** of ** zones done, this chunk)
+
+ ===== 27526 z17 pre-resonance 
+  [INFO] G2 BN floor estimate=   46.78 -> bn_lo=   23.39
+  Z 1: exit= 0 pts=  9269 BN=   65.28
+  Z1: e=  0.5437 BN=  65.28 (no re-entry)  zstat= 0
+  no re-entry (weak-signal fit, or zone_select still rejected this window)
+ [PROGRESS]  51% (** of ** zones done, this chunk)
+
+ ===== 27526 z18 post-resonance
+  [INFO] G2 BN floor estimate=   58.65 -> bn_lo=   29.32
+  Z 1: exit= 0 pts=  9485 BN=   74.38
+  Z1: e=  0.5365 BN=  74.38 (no re-entry)  zstat= 0
+  no re-entry (weak-signal fit, or zone_select still rejected this window)
+ [PROGRESS]  51% (** of ** zones done, this chunk)
+
+ ===== 27526 z19 post-resonance
+  [INFO] G2 BN floor estimate=   47.95 -> bn_lo=   23.97
+  Z 1: exit= 0 pts=  9652 BN=   69.35
+  Z1: e=  0.5308 BN=  69.35 (no re-entry)  zstat= 0
+  no re-entry (weak-signal fit, or zone_select still rejected this window)
+ [PROGRESS]  51% (** of ** zones done, this chunk)
+
+ ===== 27526 z20 post-resonance
+  [INFO] G2 BN floor estimate=   39.19 -> bn_lo=   19.60
+  Z 1: exit= 1 pts=  6721 BN=   61.76
+  Z1: e=  0.5265 BN=  61.76 RPE=   94.89%  zstat= 0
+  ensemble (1 of 1 zones): mean JD=  2456471.831 std=    0.0 d
+  RPE =    94.89%
+ [PROGRESS]  52% (** of ** zones done, this chunk)
+
+ ===== 27526 z21 post-resonance
+  [INFO] G2 BN floor estimate=   32.36 -> bn_lo=   16.18
+  [INFO] Z 1: G3 BSTAR prior narrows BN to [  17.25, 160.00]
+  Z 1: exit= 1 pts=  7254 BN=   52.84
+  Z1: e=  0.5211 BN=  52.84 RPE=  116.03%  zstat= 0
+  ensemble (1 of 1 zones): mean JD=  2456539.244 std=    0.0 d
+  RPE =   116.03%
+ [PROGRESS]  52% (** of ** zones done, this chunk)
+
+ ===== 27526 z22 post-resonance
+  [INFO] G2 BN floor estimate=   31.35 -> bn_lo=   15.67
+  [INFO] Z 1: G3 BSTAR prior narrows BN to [  15.98, 160.00]
+  Z 1: exit= 0 pts= 10135 BN=   58.28
+  Z1: e=  0.5149 BN=  58.28 (no re-entry)  zstat= 0
+  no re-entry (weak-signal fit, or zone_select still rejected this window)
+ [PROGRESS]  52% (** of ** zones done, this chunk)
+
+ ===== 27526 z23 post-resonance
+  [INFO] G2 BN floor estimate=   31.67 -> bn_lo=   15.83
+  [INFO] Z 1: G3 BSTAR prior narrows BN to [  15.94, 160.00]
+  Z 1: exit= 0 pts= 10308 BN=   53.88
+  Z1: e=  0.5095 BN=  53.88 (no re-entry)  zstat= 0
+  no re-entry (weak-signal fit, or zone_select still rejected this window)
+ [PROGRESS]  52% (** of ** zones done, this chunk)
+
+ ===== 27526 z24 post-resonance
+  [INFO] G2 BN floor estimate=   40.83 -> bn_lo=   20.41
+  Z 1: exit= 0 pts= 10532 BN=   62.79
+  Z1: e=  0.5029 BN=  62.79 (no re-entry)  zstat= 0
+  no re-entry (weak-signal fit, or zone_select still rejected this window)
+ [PROGRESS]  53% (** of ** zones done, this chunk)
+
+ ===== 27526 z25 post-resonance
+  [INFO] G2 BN floor estimate=   54.51 -> bn_lo=   27.26
+  Z 1: exit= 1 pts=  8157 BN=   80.26
+  Z1: e=  0.4963 BN=  80.26 RPE=  175.23%  zstat= 0
+  ensemble (1 of 1 zones): mean JD=  2456647.687 std=    0.0 d
+  RPE =   175.23%
+ [PROGRESS]  53% (** of ** zones done, this chunk)
+
+ ===== 27526 z26 post-resonance
+  [INFO] G2 BN floor estimate=   64.40 -> bn_lo=   32.20
+  Z 1: exit= 1 pts=  7186 BN=   83.68
+  Z1: e=  0.4897 BN=  83.68 RPE=  156.52%  zstat= 0
+  ensemble (1 of 1 zones): mean JD=  2456551.967 std=    0.0 d
+  RPE =   156.52%
+ [PROGRESS]  53% (** of ** zones done, this chunk)
+
+ ===== 27526 z27 post-resonance
+  [INFO] G2 BN floor estimate=   60.14 -> bn_lo=   30.07
+  Z 1: exit= 0 pts= 11184 BN=   76.89
+  Z1: e=  0.4830 BN=  76.89 (no re-entry)  zstat= 0
+  no re-entry (weak-signal fit, or zone_select still rejected this window)
+ [PROGRESS]  54% (** of ** zones done, this chunk)
+
+ ===== 27526 z28 post-resonance
+  [INFO] G2 BN floor estimate=   48.95 -> bn_lo=   24.47
+  Z 1: exit= 0 pts= 11434 BN=   67.82
+  Z1: e=  0.4752 BN=  67.82 (no re-entry)  zstat= 0
+  no re-entry (weak-signal fit, or zone_select still rejected this window)
+ [PROGRESS]  54% (** of ** zones done, this chunk)
+
+ ===== 27526 z29 post-resonance
+  [INFO] G2 BN floor estimate=   41.90 -> bn_lo=   20.95
+  Z 1: exit= 1 pts=  3546 BN=   65.17
+  Z1: e=  0.4679 BN=  65.17 RPE=   55.42%  zstat= 0
+  ensemble (1 of 1 zones): mean JD=  2456195.942 std=    0.0 d
+  RPE =    55.42%
+ [PROGRESS]  54% (** of ** zones done, this chunk)
+
+ ===== 27526 z30 post-resonance
+  [INFO] G2 BN floor estimate=   47.41 -> bn_lo=   23.70
+  Z 1: exit= 1 pts=  2225 BN=   70.08
+  Z1: e=  0.4590 BN=  70.08 RPE=    2.10%  zstat= 0
+  ensemble (1 of 1 zones): mean JD=  2456061.454 std=    0.0 d
+  RPE =     2.10%
+ [PROGRESS]  55% (** of ** zones done, this chunk)
+
+ ===== 27526 z31 post-resonance
+  [INFO] G2 BN floor estimate=   63.19 -> bn_lo=   31.59
+  Z 1: exit= 1 pts=  2740 BN=   82.69
+  Z1: e=  0.4452 BN=  82.69 RPE=   26.95%  zstat= 0
+  ensemble (1 of 1 zones): mean JD=  2456115.638 std=    0.0 d
+  RPE =    26.95%
+ [PROGRESS]  55% (** of ** zones done, this chunk)
+
+ ===== 27526 z32 post-resonance
+  [INFO] G2 BN floor estimate=   85.65 -> bn_lo=   42.82
+  Z 1: exit= 1 pts=  3185 BN=   94.87
+  Z1: e=  0.4307 BN=  94.87 RPE=   51.33%  zstat= 0
+  ensemble (1 of 1 zones): mean JD=  2456160.373 std=    0.0 d
+  RPE =    51.33%
+ [PROGRESS]  55% (** of ** zones done, this chunk)
+
+ ===== 27526 z33 post-resonance
+  [INFO] G2 BN floor estimate=   81.12 -> bn_lo=   40.56
+  Z 1: exit= 1 pts=  2067 BN=   93.59
+  Z1: e=  0.4129 BN=  93.59 RPE=    8.79%  zstat= 0
+  ensemble (1 of 1 zones): mean JD=  2456072.576 std=    0.0 d
+  RPE =     8.79%
+ [PROGRESS]  55% (** of ** zones done, this chunk)
+
+ ===== 27526 z34 post-resonance
+  [INFO] G2 BN floor estimate=   57.54 -> bn_lo=   28.77
+  Z 1: exit= 1 pts=  1943 BN=   77.12
+  Z1: e=  0.3983 BN=  77.12 RPE=   11.01%  zstat= 0
+  ensemble (1 of 1 zones): mean JD=  2456074.962 std=    0.0 d
+  RPE =    11.01%
+ [PROGRESS]  56% (** of ** zones done, this chunk)
+
+ ===== 27526 z35 post-resonance
+  [INFO] G2 BN floor estimate=   68.68 -> bn_lo=   34.34
+  Z 1: exit= 1 pts=  1530 BN=   83.51
+  Z1: e=  0.3840 BN=  83.51 RPE=   -5.43%  zstat= 0
+  ensemble (1 of 1 zones): mean JD=  2456048.153 std=    0.0 d
+  RPE =    -5.43%
+ [PROGRESS]  56% (** of ** zones done, this chunk)
+
+ ===== 27526 z36 post-resonance
+  [INFO] G2 BN floor estimate=   69.64 -> bn_lo=   34.82
+  Z 1: exit= 1 pts=  1535 BN=   83.20
+  Z1: e=  0.3619 BN=  83.20 RPE=    3.61%  zstat= 0
+  ensemble (1 of 1 zones): mean JD=  2456061.413 std=    0.0 d
+  RPE =     3.61%
+ [PROGRESS]  56% (** of ** zones done, this chunk)
+
+ ===== 27526 z37 post-resonance
+  [INFO] G2 BN floor estimate=   74.41 -> bn_lo=   37.21
+  Z 1: exit= 1 pts=  1632 BN=   88.35
+  Z1: e=  0.3455 BN=  88.35 RPE=   17.10%  zstat= 0
+  ensemble (1 of 1 zones): mean JD=  2456077.906 std=    0.0 d
+  RPE =    17.10%
+ [PROGRESS]  57% (** of ** zones done, this chunk)
+
+ ===== 27526 z38 post-resonance
+  [INFO] G2 BN floor estimate=   93.29 -> bn_lo=   46.65
+  Z 1: exit= 1 pts=  1510 BN=   96.19
+  Z1: e=  0.3279 BN=  96.19 RPE=   17.76%  zstat= 0
+  ensemble (1 of 1 zones): mean JD=  2456076.442 std=    0.0 d
+  RPE =    17.76%
+ [PROGRESS]  57% (** of ** zones done, this chunk)
+
+ ===== 27526 z39 post-resonance
+  [INFO] G2 BN floor estimate=   77.61 -> bn_lo=   38.80
+  Z 1: exit= 1 pts=  2117 BN=   86.87
+  Z1: e=  0.3041 BN=  86.87 RPE=   89.92%  zstat= 0
+  ensemble (1 of 1 zones): mean JD=  2456140.611 std=    0.0 d
+  RPE =    89.92%
+ [PROGRESS]  57% (** of ** zones done, this chunk)
+
+ ===== 27526 z40 post-resonance
+  [INFO] G2 BN floor estimate=  106.48 -> bn_lo=   53.24
+  Z 1: exit= 1 pts=  1359 BN=  104.61
+  Z1: e=  0.2914 BN= 104.61 RPE=   35.81%  zstat= 0
+  ensemble (1 of 1 zones): mean JD=  2456086.015 std=    0.0 d
+  RPE =    35.81%
+ [PROGRESS]  57% (** of ** zones done, this chunk)
+
+ ===== 27526 z41 post-resonance
+  [INFO] G2 BN floor estimate=   84.18 -> bn_lo=   42.09
+  Z 1: exit= 1 pts=   957 BN=   94.48
+  Z1: e=  0.2733 BN=  94.48 RPE=   10.52%  zstat= 0
+  ensemble (1 of 1 zones): mean JD=  2456063.906 std=    0.0 d
+  RPE =    10.52%
+ [PROGRESS]  58% (** of ** zones done, this chunk)
+
+ ===== 27526 z42 post-resonance
+  [INFO] G2 BN floor estimate=   61.25 -> bn_lo=   30.63
+  Z 1: exit= 1 pts=  1011 BN=   78.82
+  Z1: e=  0.2442 BN=  78.82 RPE=   42.27%  zstat= 0
+  ensemble (1 of 1 zones): mean JD=  2456080.048 std=    0.0 d
+  RPE =    42.27%
+ [PROGRESS]  58% (** of ** zones done, this chunk)
+
+ ===== 27526 z43 post-resonance
+  [INFO] G2 BN floor estimate=  130.15 -> bn_lo=   65.07
+  Z 1: exit= 1 pts=   737 BN=  135.24
+  Z1: e=  0.2216 BN= 135.24 RPE=   27.54%  zstat= 0
+  ensemble (1 of 1 zones): mean JD=  2456068.631 std=    0.0 d
+  RPE =    27.54%
+ [PROGRESS]  58% (** of ** zones done, this chunk)
+
+ ===== 27526 z44 post-resonance
+  [INFO] G2 BN floor estimate=   68.71 -> bn_lo=   34.36
+  Z 1: exit= 1 pts=   602 BN=   84.65
+  Z1: e=  0.2011 BN=  84.65 RPE=   28.63%  zstat= 0
+  ensemble (1 of 1 zones): mean JD=  2456066.461 std=    0.0 d
+  RPE =    28.63%
+ [PROGRESS]  59% (** of ** zones done, this chunk)
+
+ ===== 27526 z45 post-resonance
+  [INFO] G2 BN floor estimate=   73.70 -> bn_lo=   36.85
+  Z 1: exit= 1 pts=   363 BN=   91.71
+  Z1: e=  0.1653 BN=  91.71 RPE=   12.28%  zstat= 0
+  ensemble (1 of 1 zones): mean JD=  2456059.328 std=    0.0 d
+  RPE =    12.28%
+ [PROGRESS]  59% (** of ** zones done, this chunk)
+
+ ===== 27526 z46 post-resonance
+  [WARN] Z 1: GA optimum at search boundary -- true value may lie outside the search range
+  Z 1: exit= 1 pts=   136 BN=  159.23
+  Z1: e=  0.1021 BN= 159.23 RPE=   -1.65%  zstat= 2
+  ensemble (1 of 1 zones): mean JD=  2456056.349 std=    0.0 d
+  RPE =    -1.65%
+ [PROGRESS]  59% (** of ** zones done, this chunk)
+
+ ===== 27526 z47 post-resonance
+  [WARN] Z 1: GA optimum at search boundary -- true value may lie outside the search range
+  Z 1: exit= 1 pts=    53 BN=  159.95
+  Z1: e=  0.0896 BN= 159.95 RPE=  -14.69%  zstat= 2
+  ensemble (1 of 1 zones): mean JD=  2456055.920 std=    0.0 d
+  RPE =   -14.69%
+ [PROGRESS]  60% (** of ** zones done, this chunk)
+
+ ===== 59347 z1 pre-resonance (
+  [INFO] G2 BN floor estimate=    5.00 -> bn_lo=    2.50
+  [INFO] Z 1: G3 BSTAR prior narrows BN to [   9.37, 111.51]
+  [WARN] Z 1: GA optimum at search boundary -- true value may lie outside the search range
+  Z 1: exit= 0 pts=  2232 BN=    9.44
+  Z1: e=  0.8204 BN=   9.44 (no re-entry)  zstat= 2
+  no re-entry (weak-signal fit, or zone_select still rejected this window)
+ [PROGRESS]  60% (** of ** zones done, this chunk)
+
+ ===== 59347 z2 pre-resonance (
+  [INFO] G2 BN floor estimate=   36.76 -> bn_lo=   18.38
+  [INFO] Z 1: G3 BSTAR prior narrows BN to [  18.38, 138.25]
+  [WARN] Z 1: GA optimum at search boundary -- true value may lie outside the search range
+  Z 1: exit= 0 pts=  2235 BN=  129.89
+  Z1: e=  0.8202 BN= 129.89 (no re-entry)  zstat= 2
+  no re-entry (weak-signal fit, or zone_select still rejected this window)
+ [PROGRESS]  60% (** of ** zones done, this chunk)
+
+ ===== 59347 z3 pre-resonance (
+  [WARN] Z 1: GA optimum at search boundary -- true value may lie outside the search range
+  Z 1: exit= 0 pts=  2237 BN=  159.85
+  Z1: e=  0.8199 BN= 159.85 (no re-entry)  zstat= 2
+  no re-entry (weak-signal fit, or zone_select still rejected this window)
+ [PROGRESS]  60% (** of ** zones done, this chunk)
+
+ ===== 59347 z4 pre-resonance (
+  [WARN] Z 1: RSM envelope does not bound  10 of  13 observations -- proceeding anyway
+  [WARN] Z 1: GA optimum at search boundary -- true value may lie outside the search range
+  Z 1: exit= 0 pts=  2237 BN=  155.69
+  Z1: e=  0.8197 BN= 155.69 (no re-entry)  zstat= 2
+  no re-entry (weak-signal fit, or zone_select still rejected this window)
+ [PROGRESS]  61% (** of ** zones done, this chunk)
+
+ ===== 59347 z5 pre-resonance (
+  [WARN] Z 1: RSM envelope does not bound  15 of  15 observations -- proceeding anyway
+  [WARN] Z 1: GA optimum at search boundary -- true value may lie outside the search range
+  Z 1: exit= 0 pts=  2239 BN=  155.69
+  Z1: e=  0.8195 BN= 155.69 (no re-entry)  zstat= 2
+  no re-entry (weak-signal fit, or zone_select still rejected this window)
+ [PROGRESS]  61% (** of ** zones done, this chunk)
+
+ ===== 59347 z6 pre-resonance (
+  [WARN] Z 1: RSM envelope does not bound   8 of  19 observations -- proceeding anyway
+  [WARN] Z 1: GA optimum at search boundary -- true value may lie outside the search range
+  Z 1: exit= 0 pts=  2238 BN=  120.80
+  Z1: e=  0.8195 BN= 120.80 (no re-entry)  zstat= 2
+  no re-entry (weak-signal fit, or zone_select still rejected this window)
+ [PROGRESS]  61% (** of ** zones done, this chunk)
+
+ ===== 59347 z7 pre-resonance (
+  [WARN] Z 1: GA optimum at search boundary -- true value may lie outside the search range
+  Z 1: exit= 0 pts=  2238 BN=   82.56
+  Z1: e=  0.8196 BN=  82.56 (no re-entry)  zstat= 2
+  no re-entry (weak-signal fit, or zone_select still rejected this window)
+ [PROGRESS]  62% (** of ** zones done, this chunk)
+
+ ===== 59347 z8 pre-resonance (
+  [WARN] Z 1: GA optimum at search boundary -- true value may lie outside the search range
+  Z 1: exit= 0 pts=  2239 BN=   91.74
+  Z1: e=  0.8196 BN=  91.74 (no re-entry)  zstat= 2
+  no re-entry (weak-signal fit, or zone_select still rejected this window)
+ [PROGRESS]  62% (** of ** zones done, this chunk)
+
+ ===== 59347 z9 pre-resonance (
+  Z 1: exit= 0 pts=  2240 BN=   97.11
+  Z1: e=  0.8196 BN=  97.11 (no re-entry)  zstat= 0
+  no re-entry (weak-signal fit, or zone_select still rejected this window)
+ [PROGRESS]  62% (** of ** zones done, this chunk)
+
+ ===== 59347 z10 pre-resonance 
+  [INFO] Z 1: G3 BSTAR prior narrows BN to [  80.00, 133.23]
+  [WARN] Z 1: GA optimum at search boundary -- true value may lie outside the search range
+  Z 1: exit= 0 pts=  2242 BN=   86.81
+  Z1: e=  0.8197 BN=  86.81 (no re-entry)  zstat= 2
+  no re-entry (weak-signal fit, or zone_select still rejected this window)
+ [PROGRESS]  62% (** of ** zones done, this chunk)
+
+ ===== 59347 z11 pre-resonance 
+  [INFO] Z 1: G3 BSTAR prior narrows BN to [  80.00, 109.68]
+  Z 1: exit= 0 pts=  2244 BN=   87.61
+  Z1: e=  0.8196 BN=  87.61 (no re-entry)  zstat= 0
+  no re-entry (weak-signal fit, or zone_select still rejected this window)
+ [PROGRESS]  63% (** of ** zones done, this chunk)
+
+ ===== 59347 z12 pre-resonance 
+  [INFO] G2 BN floor estimate=   19.18 -> bn_lo=    9.59
+  [INFO] Z 1: G3 BSTAR prior narrows BN to [   9.59,  91.24]
+  [WARN] Z 1: GA optimum at search boundary -- true value may lie outside the search range
+  Z 1: exit= 0 pts=  2248 BN=   11.03
+  Z1: e=  0.8194 BN=  11.03 (no re-entry)  zstat= 2
+  no re-entry (weak-signal fit, or zone_select still rejected this window)
+ [PROGRESS]  63% (** of ** zones done, this chunk)
+
+ ===== 59347 z13 pre-resonance 
+  [INFO] G2 BN floor estimate=   25.86 -> bn_lo=   12.93
+  [INFO] Z 1: G3 BSTAR prior narrows BN to [  12.93,  80.94]
+  [WARN] Z 1: GA optimum at search boundary -- true value may lie outside the search range
+  Z 1: exit= 0 pts=  2254 BN=   14.11
+  Z1: e=  0.8190 BN=  14.11 (no re-entry)  zstat= 2
+  no re-entry (weak-signal fit, or zone_select still rejected this window)
+ [PROGRESS]  63% (** of ** zones done, this chunk)
+
+ ===== 59347 z14 pre-resonance 
+  [INFO] G2 BN floor estimate=   26.38 -> bn_lo=   13.19
+  [INFO] Z 1: G3 BSTAR prior narrows BN to [  13.19,  82.23]
+  Z 1: exit= 0 pts=  2260 BN=   25.57
+  Z1: e=  0.8185 BN=  25.57 (no re-entry)  zstat= 0
+  no re-entry (weak-signal fit, or zone_select still rejected this window)
+ [PROGRESS]  64% (** of ** zones done, this chunk)
+
+ ===== 59347 z15 pre-resonance 
+  [INFO] Z 1: G3 BSTAR prior narrows BN to [  80.00, 101.48]
+  [WARN] Z 1: GA optimum at search boundary -- true value may lie outside the search range
+  Z 1: exit= 0 pts=  2265 BN=   82.74
+  Z1: e=  0.8177 BN=  82.74 (no re-entry)  zstat= 2
+  no re-entry (weak-signal fit, or zone_select still rejected this window)
+ [PROGRESS]  64% (** of ** zones done, this chunk)
+
+ ===== 59347 z16 pre-resonance 
+  Z 1: exit= 0 pts=  2266 BN=  139.99
+  Z1: e=  0.8169 BN= 139.99 (no re-entry)  zstat= 0
+  no re-entry (weak-signal fit, or zone_select still rejected this window)
+ [PROGRESS]  64% (** of ** zones done, this chunk)
+
+ ===== 59347 z17 pre-resonance 
+  Z 1: exit= 0 pts=  2268 BN=  106.47
+  Z1: e=  0.8157 BN= 106.47 (no re-entry)  zstat= 0
+  no re-entry (weak-signal fit, or zone_select still rejected this window)
+ [PROGRESS]  65% (** of ** zones done, this chunk)
+
+ ===== 59347 z18 pre-resonance 
+  [WARN] Z 1: GA optimum at search boundary -- true value may lie outside the search range
+  Z 1: exit= 0 pts=  2271 BN=   88.23
+  Z1: e=  0.8150 BN=  88.23 (no re-entry)  zstat= 2
+  no re-entry (weak-signal fit, or zone_select still rejected this window)
+ [PROGRESS]  65% (** of ** zones done, this chunk)
+
+ ===== 59347 z19 pre-resonance 
+  [WARN] Z 1: GA optimum at search boundary -- true value may lie outside the search range
+  Z 1: exit= 0 pts=  2268 BN=  152.08
+  Z1: e=  0.8144 BN= 152.08 (no re-entry)  zstat= 2
+  no re-entry (weak-signal fit, or zone_select still rejected this window)
+ [PROGRESS]  65% (** of ** zones done, this chunk)
+
+ ===== 59347 z20 pre-resonance 
+  [WARN] Z 1: GA optimum at search boundary -- true value may lie outside the search range
+  Z 1: exit= 1 pts=  1092 BN=  143.00
+  Z1: e=  0.8143 BN= 143.00 RPE=  140.41%  zstat= 2
+  ensemble (1 of 1 zones): mean JD=  2461701.588 std=    0.0 d
+  RPE =   140.41%
+ [PROGRESS]  65% (** of ** zones done, this chunk)
+
+ ===== 59347 z21 pre-resonance 
+  Z 1: exit= 1 pts=   568 BN=  139.35
+  Z1: e=  0.8143 BN= 139.35 RPE=   36.32%  zstat= 0
+  ensemble (1 of 1 zones): mean JD=  2461316.518 std=    0.0 d
+  RPE =    36.32%
+ [PROGRESS]  66% (** of ** zones done, this chunk)
+
+ ===== 59347 z22 pre-resonance 
+  [WARN] Z 1: GA optimum at search boundary -- true value may lie outside the search range
+  Z 1: exit= 1 pts=   338 BN=   87.95
+  Z1: e=  0.8148 BN=  87.95 RPE=  -16.26%  zstat= 2
+  ensemble (1 of 1 zones): mean JD=  2461150.395 std=    0.0 d
+  RPE =   -16.26%
+ [PROGRESS]  66% (** of ** zones done, this chunk)
+
+ ===== 59347 z23 pre-resonance 
+  [WARN] Z 1: GA optimum at search boundary -- true value may lie outside the search range
+  Z 1: exit= 1 pts=   288 BN=   82.74
+  Z1: e=  0.8153 BN=  82.74 RPE=  -22.14%  zstat= 2
+  ensemble (1 of 1 zones): mean JD=  2461136.561 std=    0.0 d
+  RPE =   -22.14%
+ [PROGRESS]  66% (** of ** zones done, this chunk)
+
+ ===== 59347 z24 pre-resonance 
+  [WARN] Z 1: GA optimum at search boundary -- true value may lie outside the search range
+  Z 1: exit= 1 pts=   259 BN=   80.93
+  Z1: e=  0.8160 BN=  80.93 RPE=  -27.20%  zstat= 2
+  ensemble (1 of 1 zones): mean JD=  2461127.199 std=    0.0 d
+  RPE =   -27.20%
+ [PROGRESS]  67% (** of ** zones done, this chunk)
+
+ ===== 59347 z25 pre-resonance 
+  [INFO] Z 1: G3 BSTAR prior narrows BN to [  80.00, 138.27]
+  [WARN] Z 1: GA optimum at search boundary -- true value may lie outside the search range
+  Z 1: exit= 1 pts=   229 BN=   83.79
+  Z1: e=  0.8167 BN=  83.79 RPE=  -30.44%  zstat= 2
+  ensemble (1 of 1 zones): mean JD=  2461123.501 std=    0.0 d
+  RPE =   -30.44%
+ [PROGRESS]  67% (** of ** zones done, this chunk)
+
+ ===== 59347 z26 pre-resonance 
+  [INFO] Z 1: G3 BSTAR prior narrows BN to [  80.00, 126.18]
+  [WARN] Z 1: GA optimum at search boundary -- true value may lie outside the search range
+  Z 1: exit= 1 pts=   214 BN=   80.91
+  Z1: e=  0.8173 BN=  80.91 RPE=  -31.90%  zstat= 2
+  ensemble (1 of 1 zones): mean JD=  2461123.965 std=    0.0 d
+  RPE =   -31.90%
+ [PROGRESS]  67% (** of ** zones done, this chunk)
+
+ ===== 59347 z27 pre-resonance 
+  [INFO] Z 1: G3 BSTAR prior narrows BN to [  80.00, 115.81]
+  [WARN] Z 1: GA optimum at search boundary -- true value may lie outside the search range
+  Z 1: exit= 1 pts=   205 BN=   80.41
+  Z1: e=  0.8178 BN=  80.41 RPE=  -32.67%  zstat= 2
+  ensemble (1 of 1 zones): mean JD=  2461125.536 std=    0.0 d
+  RPE =   -32.67%
+ [PROGRESS]  67% (** of ** zones done, this chunk)
+
+ ===== 59347 z28 pre-resonance 
+  [INFO] Z 1: G3 BSTAR prior narrows BN to [  80.00, 104.12]
+  [WARN] Z 1: GA optimum at search boundary -- true value may lie outside the search range
+  Z 1: exit= 1 pts=   191 BN=   81.31
+  Z1: e=  0.8182 BN=  81.31 RPE=  -34.77%  zstat= 2
+  ensemble (1 of 1 zones): mean JD=  2461124.145 std=    0.0 d
+  RPE =   -34.77%
+ [PROGRESS]  68% (** of ** zones done, this chunk)
+
+ ===== 59347 z29 pre-resonance 
+  [INFO] Z 1: G3 BSTAR prior narrows BN to [  80.00, 100.37]
+  [WARN] Z 1: GA optimum at search boundary -- true value may lie outside the search range
+  Z 1: exit= 1 pts=   180 BN=   81.70
+  Z1: e=  0.8184 BN=  81.70 RPE=  -35.98%  zstat= 2
+  ensemble (1 of 1 zones): mean JD=  2461125.277 std=    0.0 d
+  RPE =   -35.98%
+ [PROGRESS]  68% (** of ** zones done, this chunk)
+
+ ===== 59347 z30 pre-resonance 
+  [INFO] Z 1: G3 BSTAR prior narrows BN to [  80.00,  93.77]
+  [WARN] Z 1: RSM envelope does not bound   3 of  11 observations -- proceeding anyway
+  [WARN] Z 1: GA optimum at search boundary -- true value may lie outside the search range
+  Z 1: exit= 1 pts=   179 BN=   82.76
+  Z1: e=  0.8185 BN=  82.76 RPE=  -36.06%  zstat= 2
+  ensemble (1 of 1 zones): mean JD=  2461128.289 std=    0.0 d
+  RPE =   -36.06%
+ [PROGRESS]  68% (** of ** zones done, this chunk)
+
+ ===== 59347 z31 pre-resonance 
+  [INFO] G2 BN floor estimate=    9.79 -> bn_lo=    4.89
+  [INFO] Z 1: G3 BSTAR prior narrows BN to [   6.40,  76.22]
+  [WARN] Z 1: GA optimum at search boundary -- true value may lie outside the search range
+  Z 1: exit= 1 pts=   199 BN=    6.69
+  Z1: e=  0.8181 BN=   6.69 RPE=  -36.75%  zstat= 2
+  ensemble (1 of 1 zones): mean JD=  2461130.165 std=    0.0 d
+  RPE =   -36.75%
+ [PROGRESS]  69% (** of ** zones done, this chunk)
+
+ ===== 59347 z32 pre-resonance 
+  [INFO] G2 BN floor estimate=    5.00 -> bn_lo=    2.50
+  [INFO] Z 1: G3 BSTAR prior narrows BN to [   4.82,  57.38]
+  [WARN] Z 1: GA optimum at search boundary -- true value may lie outside the search range
+  Z 1: exit= 1 pts=   193 BN=    7.35
+  Z1: e=  0.8131 BN=   7.35 RPE=  -31.26%  zstat= 2
+  ensemble (1 of 1 zones): mean JD=  2461143.491 std=    0.0 d
+  RPE =   -31.26%
+ [PROGRESS]  69% (** of ** zones done, this chunk)
+
+ ===== 59347 z33 pre-resonance 
+  [INFO] G2 BN floor estimate=    5.00 -> bn_lo=    2.50
+  [INFO] Z 1: G3 BSTAR prior narrows BN to [  15.34, 160.00]
+  [WARN] Z 1: RSM envelope does not bound   2 of  15 observations -- proceeding anyway
+  [WARN] Z 1: GA optimum at search boundary -- true value may lie outside the search range
+  Z 1: exit= 1 pts=   237 BN=   26.05
+  Z1: e=  0.7854 BN=  26.05 RPE=  -18.94%  zstat= 2
+  ensemble (1 of 1 zones): mean JD=  2461169.161 std=    0.0 d
+  RPE =   -18.94%
+ [PROGRESS]  69% (** of ** zones done, this chunk)
+
+ ===== 59347 z34 pre-resonance 
+  [WARN] Z 1: RSM envelope does not bound   5 of  10 observations -- proceeding anyway
+  [WARN] Z 1: GA optimum at search boundary -- true value may lie outside the search range
+  Z 1: exit= 1 pts=   183 BN=  159.87
+  Z1: e=  0.7742 BN= 159.87 RPE=  -64.34%  zstat= 2
+  ensemble (1 of 1 zones): mean JD=  2461119.556 std=    0.0 d
+  RPE =   -64.34%
+ [PROGRESS]  70% (** of ** zones done, this chunk)
+
+ ===== 59347 z35 pre-resonance 
+  [WARN] Z 1: RSM envelope does not bound   6 of  15 observations -- proceeding anyway
+  [WARN] Z 1: GA optimum at search boundary -- true value may lie outside the search range
+  Z 1: exit= 2 pts=     4 BN=  105.93
+  Z1: e=  0.8713 BN= 105.93 (no re-entry)  zstat= 2
+  no re-entry (weak-signal fit, or zone_select still rejected this window)
+ [PROGRESS]  70% (** of ** zones done, this chunk)
+
+ ===== 59347 z36 post-resonance
+ Kesolve did not converge
+ Kesolve did not converge
+ Kesolve did not converge
+  [WARN] Z 1: RSM envelope does not bound  12 of  12 observations -- proceeding anyway
+  [WARN] Z 1: GA optimum at search boundary -- true value may lie outside the search range
+  Z 1: exit= 1 pts=   145 BN=  157.30
+  Z1: e=  0.5665 BN= 157.30 RPE=  -67.73%  zstat= 2
+  ensemble (1 of 1 zones): mean JD=  2461162.505 std=    0.0 d
+  RPE =   -67.73%
+ [PROGRESS]  70% (** of ** zones done, this chunk)
+
+ ===== 40943 z1 pre-resonance (
+  [INFO] G2 BN floor estimate=    8.37 -> bn_lo=    4.19
+  [INFO] Z 1: G3 BSTAR prior narrows BN to [   9.40, 111.83]
+  [WARN] Z 1: GA optimum at search boundary -- true value may lie outside the search range
+  Z 1: exit= 0 pts=  4174 BN=   10.15
+  Z1: e=  0.7283 BN=  10.15 (no re-entry)  zstat= 2
+  no re-entry (weak-signal fit, or zone_select still rejected this window)
+ [PROGRESS]  70% (** of ** zones done, this chunk)
+
+ ===== 40943 z2 pre-resonance (
+  [INFO] G2 BN floor estimate=    5.00 -> bn_lo=    2.50
+  [INFO] Z 1: G3 BSTAR prior narrows BN to [   9.72, 115.71]
+  [WARN] Z 1: GA optimum at search boundary -- true value may lie outside the search range
+  Z 1: exit= 0 pts=  4193 BN=   10.02
+  Z1: e=  0.7271 BN=  10.02 (no re-entry)  zstat= 2
+  no re-entry (weak-signal fit, or zone_select still rejected this window)
+ [PROGRESS]  71% (** of ** zones done, this chunk)
+
+ ===== 40943 z3 pre-resonance (
+  [INFO] G2 BN floor estimate=    5.00 -> bn_lo=    2.50
+  [INFO] Z 1: G3 BSTAR prior narrows BN to [  10.44, 124.30]
+  [WARN] Z 1: GA optimum at search boundary -- true value may lie outside the search range
+  Z 1: exit= 0 pts=  4208 BN=   18.88
+  Z1: e=  0.7263 BN=  18.88 (no re-entry)  zstat= 2
+  no re-entry (weak-signal fit, or zone_select still rejected this window)
+ [PROGRESS]  71% (** of ** zones done, this chunk)
+
+ ===== 40943 z4 pre-resonance (
+  [INFO] G2 BN floor estimate=    5.00 -> bn_lo=    2.50
+  [INFO] Z 1: G3 BSTAR prior narrows BN to [  10.50, 124.99]
+  [WARN] Z 1: RSM envelope does not bound   7 of  22 observations -- proceeding anyway
+  [WARN] Z 1: GA optimum at search boundary -- true value may lie outside the search range
+  Z 1: exit= 0 pts=  4221 BN=   22.56
+  Z1: e=  0.7258 BN=  22.56 (no re-entry)  zstat= 2
+  no re-entry (weak-signal fit, or zone_select still rejected this window)
+ [PROGRESS]  71% (** of ** zones done, this chunk)
+
+ ===== 40943 z5 pre-resonance (
+  [INFO] G2 BN floor estimate=   10.37 -> bn_lo=    5.19
+  [INFO] Z 1: G3 BSTAR prior narrows BN to [   9.42, 112.09]
+  [WARN] Z 1: RSM envelope does not bound   4 of  29 observations -- proceeding anyway
+  [WARN] Z 1: GA optimum at search boundary -- true value may lie outside the search range
+  Z 1: exit= 1 pts=  3967 BN=    9.66
+  Z1: e=  0.7256 BN=   9.66 RPE=  -39.99%  zstat= 2
+  ensemble (1 of 1 zones): mean JD=  2458299.794 std=    0.0 d
+  RPE =   -39.99%
+ [PROGRESS]  72% (** of ** zones done, this chunk)
+
+ ===== 40943 z6 pre-resonance (
+  [INFO] G2 BN floor estimate=    9.52 -> bn_lo=    4.76
+  [INFO] Z 1: G3 BSTAR prior narrows BN to [   8.02,  95.48]
+  [WARN] Z 1: RSM envelope does not bound   3 of  24 observations -- proceeding anyway
+  [WARN] Z 1: GA optimum at search boundary -- true value may lie outside the search range
+  Z 1: exit= 1 pts=  2852 BN=    8.73
+  Z1: e=  0.7250 BN=   8.73 RPE=  -56.55%  zstat= 2
+  ensemble (1 of 1 zones): mean JD=  2458065.765 std=    0.0 d
+  RPE =   -56.55%
+ [PROGRESS]  72% (** of ** zones done, this chunk)
+
+ ===== 40943 z7 pre-resonance (
+  [INFO] G2 BN floor estimate=    5.00 -> bn_lo=    2.50
+  [INFO] Z 1: G3 BSTAR prior narrows BN to [   7.70,  91.69]
+  [WARN] Z 1: RSM envelope does not bound   2 of  23 observations -- proceeding anyway
+  [WARN] Z 1: GA optimum at search boundary -- true value may lie outside the search range
+  Z 1: exit= 1 pts=  3048 BN=   12.98
+  Z1: e=  0.7239 BN=  12.98 RPE=  -50.45%  zstat= 2
+  ensemble (1 of 1 zones): mean JD=  2458165.488 std=    0.0 d
+  RPE =   -50.45%
+ [PROGRESS]  72% (** of ** zones done, this chunk)
+
+ ===== 40943 z8 pre-resonance (
+  [INFO] G2 BN floor estimate=    5.00 -> bn_lo=    2.50
+  [INFO] Z 1: G3 BSTAR prior narrows BN to [   7.15,  85.04]
+  [WARN] Z 1: RSM envelope does not bound   2 of  24 observations -- proceeding anyway
+  [WARN] Z 1: GA optimum at search boundary -- true value may lie outside the search range
+  Z 1: exit= 1 pts=  3079 BN=    8.59
+  Z1: e=  0.7219 BN=   8.59 RPE=  -52.35%  zstat= 2
+  ensemble (1 of 1 zones): mean JD=  2458146.434 std=    0.0 d
+  RPE =   -52.35%
+ [PROGRESS]  72% (** of ** zones done, this chunk)
+
+ ===== 40943 z9 pre-resonance (
+  [INFO] G2 BN floor estimate=    5.00 -> bn_lo=    2.50
+  [INFO] Z 1: G3 BSTAR prior narrows BN to [   7.08,  84.21]
+  [WARN] Z 1: GA optimum at search boundary -- true value may lie outside the search range
+  Z 1: exit= 1 pts=  3379 BN=    8.14
+  Z1: e=  0.7200 BN=   8.14 RPE=  -48.64%  zstat= 2
+  ensemble (1 of 1 zones): mean JD=  2458205.961 std=    0.0 d
+  RPE =   -48.64%
+ [PROGRESS]  73% (** of ** zones done, this chunk)
+
+ ===== 40943 z10 pre-resonance 
+  [INFO] G2 BN floor estimate=    5.00 -> bn_lo=    2.50
+  [INFO] Z 1: G3 BSTAR prior narrows BN to [   6.58,  78.27]
+  [WARN] Z 1: GA optimum at search boundary -- true value may lie outside the search range
+  Z 1: exit= 1 pts=  3731 BN=    9.41
+  Z1: e=  0.7173 BN=   9.41 RPE=  -42.91%  zstat= 2
+  ensemble (1 of 1 zones): mean JD=  2458292.760 std=    0.0 d
+  RPE =   -42.91%
+ [PROGRESS]  73% (** of ** zones done, this chunk)
+
+ ===== 40943 z11 pre-resonance 
+  [INFO] G2 BN floor estimate=    5.00 -> bn_lo=    2.50
+  [INFO] Z 1: G3 BSTAR prior narrows BN to [   6.52,  77.55]
+  [WARN] Z 1: GA optimum at search boundary -- true value may lie outside the search range
+  Z 1: exit= 1 pts=  3598 BN=    6.75
+  Z1: e=  0.7148 BN=   6.75 RPE=  -48.98%  zstat= 2
+  ensemble (1 of 1 zones): mean JD=  2458211.312 std=    0.0 d
+  RPE =   -48.98%
+ [PROGRESS]  73% (** of ** zones done, this chunk)
+
+ ===== 40943 z12 pre-resonance 
+  [INFO] G2 BN floor estimate=    5.00 -> bn_lo=    2.50
+  [INFO] Z 1: G3 BSTAR prior narrows BN to [   6.50,  77.36]
+  [WARN] Z 1: GA optimum at search boundary -- true value may lie outside the search range
+  Z 1: exit= 1 pts=  4184 BN=    6.61
+  Z1: e=  0.7110 BN=   6.61 RPE=  -40.63%  zstat= 2
+  ensemble (1 of 1 zones): mean JD=  2458332.577 std=    0.0 d
+  RPE =   -40.63%
+ [PROGRESS]  74% (** of ** zones done, this chunk)
+
+ ===== 40943 z13 pre-resonance 
+  [INFO] G2 BN floor estimate=    5.00 -> bn_lo=    2.50
+  [INFO] Z 1: G3 BSTAR prior narrows BN to [   6.28,  74.77]
+  [WARN] Z 1: GA optimum at search boundary -- true value may lie outside the search range
+  Z 1: exit= 1 pts=  4728 BN=    7.03
+  Z1: e=  0.7070 BN=   7.03 RPE=  -34.61%  zstat= 2
+  ensemble (1 of 1 zones): mean JD=  2458419.877 std=    0.0 d
+  RPE =   -34.61%
+ [PROGRESS]  74% (** of ** zones done, this chunk)
+
+ ===== 40943 z14 pre-resonance 
+  [INFO] G2 BN floor estimate=    5.00 -> bn_lo=    2.50
+  [INFO] Z 1: G3 BSTAR prior narrows BN to [   6.24,  74.24]
+  [WARN] Z 1: GA optimum at search boundary -- true value may lie outside the search range
+  Z 1: exit= 1 pts=  4697 BN=    6.83
+  Z1: e=  0.7029 BN=   6.83 RPE=  -37.30%  zstat= 2
+  ensemble (1 of 1 zones): mean JD=  2458386.014 std=    0.0 d
+  RPE =   -37.30%
+ [PROGRESS]  74% (** of ** zones done, this chunk)
+
+ ===== 40943 z15 pre-resonance 
+  [INFO] G2 BN floor estimate=    5.00 -> bn_lo=    2.50
+  [INFO] Z 1: G3 BSTAR prior narrows BN to [   6.69,  79.59]
+  [WARN] Z 1: GA optimum at search boundary -- true value may lie outside the search range
+  Z 1: exit= 0 pts=  4965 BN=    7.01
+  Z1: e=  0.6976 BN=   7.01 (no re-entry)  zstat= 2
+  no re-entry (weak-signal fit, or zone_select still rejected this window)
+ [PROGRESS]  75% (** of ** zones done, this chunk)
+
+ ===== 40943 z16 pre-resonance 
+  [INFO] G2 BN floor estimate=    5.00 -> bn_lo=    2.50
+  [INFO] Z 1: G3 BSTAR prior narrows BN to [   6.65,  79.15]
+  [WARN] Z 1: GA optimum at search boundary -- true value may lie outside the search range
+  Z 1: exit= 0 pts=  5129 BN=    6.76
+  Z1: e=  0.6910 BN=   6.76 (no re-entry)  zstat= 2
+  no re-entry (weak-signal fit, or zone_select still rejected this window)
+ [PROGRESS]  75% (** of ** zones done, this chunk)
+
+ ===== 40943 z17 pre-resonance 
+  [INFO] G2 BN floor estimate=    5.00 -> bn_lo=    2.50
+  [INFO] Z 1: G3 BSTAR prior narrows BN to [   7.23,  86.04]
+  [WARN] Z 1: GA optimum at search boundary -- true value may lie outside the search range
+  Z 1: exit= 0 pts=  5318 BN=    7.34
+  Z1: e=  0.6835 BN=   7.34 (no re-entry)  zstat= 2
+  no re-entry (weak-signal fit, or zone_select still rejected this window)
+ [PROGRESS]  75% (** of ** zones done, this chunk)
+
+ ===== 40943 z18 pre-resonance 
+  [INFO] G2 BN floor estimate=    5.00 -> bn_lo=    2.50
+  [INFO] Z 1: G3 BSTAR prior narrows BN to [   7.36,  87.61]
+  [WARN] Z 1: GA optimum at search boundary -- true value may lie outside the search range
+  Z 1: exit= 0 pts=  5425 BN=    8.44
+  Z1: e=  0.6792 BN=   8.44 (no re-entry)  zstat= 2
+  no re-entry (weak-signal fit, or zone_select still rejected this window)
+ [PROGRESS]  75% (** of ** zones done, this chunk)
+
+ ===== 40943 z19 pre-resonance 
+  [INFO] G2 BN floor estimate=    6.38 -> bn_lo=    3.19
+  [INFO] Z 1: G3 BSTAR prior narrows BN to [   7.66,  91.13]
+  [WARN] Z 1: GA optimum at search boundary -- true value may lie outside the search range
+  Z 1: exit= 0 pts=  5531 BN=    8.22
+  Z1: e=  0.6749 BN=   8.22 (no re-entry)  zstat= 2
+  no re-entry (weak-signal fit, or zone_select still rejected this window)
+ [PROGRESS]  76% (** of ** zones done, this chunk)
+
+ ===== 40943 z20 pre-resonance 
+  [INFO] G2 BN floor estimate=    7.54 -> bn_lo=    3.77
+  [INFO] Z 1: G3 BSTAR prior narrows BN to [   8.06,  95.96]
+  [WARN] Z 1: GA optimum at search boundary -- true value may lie outside the search range
+  Z 1: exit= 0 pts=  5632 BN=   12.39
+  Z1: e=  0.6708 BN=  12.39 (no re-entry)  zstat= 2
+  no re-entry (weak-signal fit, or zone_select still rejected this window)
+ [PROGRESS]  76% (** of ** zones done, this chunk)
+
+ ===== 40943 z21 pre-resonance 
+  [INFO] G2 BN floor estimate=    5.79 -> bn_lo=    2.90
+  [INFO] Z 1: G3 BSTAR prior narrows BN to [   8.14,  96.84]
+  [WARN] Z 1: GA optimum at search boundary -- true value may lie outside the search range
+  Z 1: exit= 0 pts=  5720 BN=    8.42
+  Z1: e=  0.6668 BN=   8.42 (no re-entry)  zstat= 2
+  no re-entry (weak-signal fit, or zone_select still rejected this window)
+ [PROGRESS]  76% (** of ** zones done, this chunk)
+
+ ===== 40943 z22 pre-resonance 
+  [INFO] G2 BN floor estimate=    7.97 -> bn_lo=    3.98
+  [INFO] Z 1: G3 BSTAR prior narrows BN to [   8.51, 101.30]
+  [WARN] Z 1: GA optimum at search boundary -- true value may lie outside the search range
+  Z 1: exit= 0 pts=  5780 BN=   13.87
+  Z1: e=  0.6646 BN=  13.87 (no re-entry)  zstat= 2
+  no re-entry (weak-signal fit, or zone_select still rejected this window)
+ [PROGRESS]  77% (** of ** zones done, this chunk)
+
+ ===== 40943 z23 pre-resonance 
+  [INFO] G2 BN floor estimate=    7.83 -> bn_lo=    3.92
+  [INFO] Z 1: G3 BSTAR prior narrows BN to [   8.70, 103.59]
+  [WARN] Z 1: GA optimum at search boundary -- true value may lie outside the search range
+  Z 1: exit= 0 pts=  5829 BN=   12.63
+  Z1: e=  0.6625 BN=  12.63 (no re-entry)  zstat= 2
+  no re-entry (weak-signal fit, or zone_select still rejected this window)
+ [PROGRESS]  77% (** of ** zones done, this chunk)
+
+ ===== 40943 z24 pre-resonance 
+  [INFO] G2 BN floor estimate=    7.67 -> bn_lo=    3.84
+  [INFO] Z 1: G3 BSTAR prior narrows BN to [   9.00, 107.16]
+  [WARN] Z 1: GA optimum at search boundary -- true value may lie outside the search range
+  Z 1: exit= 0 pts=  5884 BN=   11.51
+  Z1: e=  0.6601 BN=  11.51 (no re-entry)  zstat= 2
+  no re-entry (weak-signal fit, or zone_select still rejected this window)
+ [PROGRESS]  77% (** of ** zones done, this chunk)
+
+ ===== 40943 z25 pre-resonance 
+  [INFO] G2 BN floor estimate=    8.16 -> bn_lo=    4.08
+  [INFO] Z 1: G3 BSTAR prior narrows BN to [   9.43, 112.21]
+  [WARN] Z 1: GA optimum at search boundary -- true value may lie outside the search range
+  Z 1: exit= 0 pts=  5918 BN=    9.56
+  Z1: e=  0.6586 BN=   9.56 (no re-entry)  zstat= 2
+  no re-entry (weak-signal fit, or zone_select still rejected this window)
+ [PROGRESS]  77% (** of ** zones done, this chunk)
+
+ ===== 40943 z26 pre-resonance 
+  [INFO] G2 BN floor estimate=   10.12 -> bn_lo=    5.06
+  [INFO] Z 1: G3 BSTAR prior narrows BN to [  10.09, 120.14]
+  [WARN] Z 1: GA optimum at search boundary -- true value may lie outside the search range
+  Z 1: exit= 0 pts=  5947 BN=   11.99
+  Z1: e=  0.6572 BN=  11.99 (no re-entry)  zstat= 2
+  no re-entry (weak-signal fit, or zone_select still rejected this window)
+ [PROGRESS]  78% (** of ** zones done, this chunk)
+
+ ===== 40943 z27 pre-resonance 
+  [INFO] G2 BN floor estimate=   10.43 -> bn_lo=    5.21
+  [INFO] Z 1: G3 BSTAR prior narrows BN to [  10.91, 129.87]
+  [WARN] Z 1: GA optimum at search boundary -- true value may lie outside the search range
+  Z 1: exit= 0 pts=  5970 BN=   14.15
+  Z1: e=  0.6559 BN=  14.15 (no re-entry)  zstat= 2
+  no re-entry (weak-signal fit, or zone_select still rejected this window)
+ [PROGRESS]  78% (** of ** zones done, this chunk)
+
+ ===== 40943 z28 pre-resonance 
+  [INFO] G2 BN floor estimate=    9.08 -> bn_lo=    4.54
+  [INFO] Z 1: G3 BSTAR prior narrows BN to [  12.21, 145.33]
+  [WARN] Z 1: GA optimum at search boundary -- true value may lie outside the search range
+  Z 1: exit= 0 pts=  5990 BN=   12.89
+  Z1: e=  0.6547 BN=  12.89 (no re-entry)  zstat= 2
+  no re-entry (weak-signal fit, or zone_select still rejected this window)
+ [PROGRESS]  78% (** of ** zones done, this chunk)
+
+ ===== 40943 z29 pre-resonance 
+  [INFO] G2 BN floor estimate=   16.25 -> bn_lo=    8.13
+  [INFO] Z 1: G3 BSTAR prior narrows BN to [  14.11, 160.00]
+  [WARN] Z 1: GA optimum at search boundary -- true value may lie outside the search range
+  Z 1: exit= 0 pts=  6003 BN=   16.24
+  Z1: e=  0.6538 BN=  16.24 (no re-entry)  zstat= 2
+  no re-entry (weak-signal fit, or zone_select still rejected this window)
+ [PROGRESS]  79% (** of ** zones done, this chunk)
+
+ ===== 40943 z30 pre-resonance 
+  [WARN] Z 1: RSM envelope does not bound   7 of  21 observations -- proceeding anyway
+  [WARN] Z 1: GA optimum at search boundary -- true value may lie outside the search range
+  Z 1: exit= 0 pts=  6022 BN=   84.73
+  Z1: e=  0.6526 BN=  84.73 (no re-entry)  zstat= 2
+  no re-entry (weak-signal fit, or zone_select still rejected this window)
+ [PROGRESS]  79% (** of ** zones done, this chunk)
+
+ ===== 40943 z31 pre-resonance 
+  [WARN] Z 1: RSM envelope does not bound  15 of  24 observations -- proceeding anyway
+  [WARN] Z 1: GA optimum at search boundary -- true value may lie outside the search range
+  Z 1: exit= 0 pts=  6028 BN=   80.65
+  Z1: e=  0.6521 BN=  80.65 (no re-entry)  zstat= 2
+  no re-entry (weak-signal fit, or zone_select still rejected this window)
+ [PROGRESS]  79% (** of ** zones done, this chunk)
+
+ ===== 40943 z32 pre-resonance 
+  [WARN] Z 1: RSM envelope does not bound  12 of  22 observations -- proceeding anyway
+  [WARN] Z 1: GA optimum at search boundary -- true value may lie outside the search range
+  Z 1: exit= 1 pts=  5164 BN=   82.27
+  Z1: e=  0.6519 BN=  82.27 RPE=    8.49%  zstat= 2
+  ensemble (1 of 1 zones): mean JD=  2458993.396 std=    0.0 d
+  RPE =     8.49%
+ [PROGRESS]  80% (** of ** zones done, this chunk)
+
+ ===== 40943 z33 pre-resonance 
+  [WARN] Z 1: RSM envelope does not bound   9 of  26 observations -- proceeding anyway
+  [WARN] Z 1: GA optimum at search boundary -- true value may lie outside the search range
+  Z 1: exit= 1 pts=  3977 BN=   88.43
+  Z1: e=  0.6517 BN=  88.43 RPE=  -13.99%  zstat= 2
+  ensemble (1 of 1 zones): mean JD=  2458747.128 std=    0.0 d
+  RPE =   -13.99%
+ [PROGRESS]  80% (** of ** zones done, this chunk)
+
+ ===== 40943 z34 pre-resonance 
+  [INFO] Z 1: G3 BSTAR prior narrows BN to [  80.00, 152.23]
+  [WARN] Z 1: RSM envelope does not bound   9 of  26 observations -- proceeding anyway
+  [WARN] Z 1: GA optimum at search boundary -- true value may lie outside the search range
+  Z 1: exit= 1 pts=  4002 BN=   84.31
+  Z1: e=  0.6513 BN=  84.31 RPE=  -12.69%  zstat= 2
+  ensemble (1 of 1 zones): mean JD=  2458763.668 std=    0.0 d
+  RPE =   -12.69%
+ [PROGRESS]  80% (** of ** zones done, this chunk)
+
+ ===== 40943 z35 pre-resonance 
+  [INFO] G2 BN floor estimate=   10.56 -> bn_lo=    5.28
+  [INFO] Z 1: G3 BSTAR prior narrows BN to [  13.23, 157.42]
+  [WARN] Z 1: RSM envelope does not bound   8 of  25 observations -- proceeding anyway
+  [WARN] Z 1: GA optimum at search boundary -- true value may lie outside the search range
+  Z 1: exit= 0 pts=  6079 BN=   42.07
+  Z1: e=  0.6511 BN=  42.07 (no re-entry)  zstat= 2
+  no re-entry (weak-signal fit, or zone_select still rejected this window)
+ [PROGRESS]  80% (** of ** zones done, this chunk)
+
+ ===== 40943 z36 pre-resonance 
+  [INFO] G2 BN floor estimate=   15.54 -> bn_lo=    7.77
+  [INFO] Z 1: G3 BSTAR prior narrows BN to [  13.21, 157.25]
+  [WARN] Z 1: GA optimum at search boundary -- true value may lie outside the search range
+  Z 1: exit= 0 pts=  6093 BN=   15.31
+  Z1: e=  0.6509 BN=  15.31 (no re-entry)  zstat= 2
+  no re-entry (weak-signal fit, or zone_select still rejected this window)
+ [PROGRESS]  81% (** of ** zones done, this chunk)
+
+ ===== 40943 z37 pre-resonance 
+  [INFO] G2 BN floor estimate=   13.57 -> bn_lo=    6.79
+  [INFO] Z 1: G3 BSTAR prior narrows BN to [  12.78, 152.04]
+  [WARN] Z 1: GA optimum at search boundary -- true value may lie outside the search range
+  Z 1: exit= 0 pts=  6123 BN=   17.47
+  Z1: e=  0.6500 BN=  17.47 (no re-entry)  zstat= 2
+  no re-entry (weak-signal fit, or zone_select still rejected this window)
+ [PROGRESS]  81% (** of ** zones done, this chunk)
+
+ ===== 40943 z38 pre-resonance 
+  [INFO] G2 BN floor estimate=   11.29 -> bn_lo=    5.64
+  [INFO] Z 1: G3 BSTAR prior narrows BN to [  11.75, 139.85]
+  [WARN] Z 1: GA optimum at search boundary -- true value may lie outside the search range
+  Z 1: exit= 0 pts=  6147 BN=   16.19
+  Z1: e=  0.6492 BN=  16.19 (no re-entry)  zstat= 2
+  no re-entry (weak-signal fit, or zone_select still rejected this window)
+ [PROGRESS]  81% (** of ** zones done, this chunk)
+
+ ===== 40943 z39 pre-resonance 
+  [INFO] G2 BN floor estimate=    8.49 -> bn_lo=    4.25
+  [INFO] Z 1: G3 BSTAR prior narrows BN to [  10.26, 122.06]
+  [WARN] Z 1: GA optimum at search boundary -- true value may lie outside the search range
+  Z 1: exit= 0 pts=  6183 BN=   10.62
+  Z1: e=  0.6480 BN=  10.62 (no re-entry)  zstat= 2
+  no re-entry (weak-signal fit, or zone_select still rejected this window)
+ [PROGRESS]  82% (** of ** zones done, this chunk)
+
+ ===== 40943 z40 pre-resonance 
+  [INFO] G2 BN floor estimate=    6.62 -> bn_lo=    3.31
+  [INFO] Z 1: G3 BSTAR prior narrows BN to [   8.96, 106.64]
+  [WARN] Z 1: GA optimum at search boundary -- true value may lie outside the search range
+  Z 1: exit= 0 pts=  6288 BN=   10.68
+  Z1: e=  0.6441 BN=  10.68 (no re-entry)  zstat= 2
+  no re-entry (weak-signal fit, or zone_select still rejected this window)
+ [PROGRESS]  82% (** of ** zones done, this chunk)
+
+ ===== 40943 z41 pre-resonance 
+  [INFO] G2 BN floor estimate=    5.00 -> bn_lo=    2.50
+  [INFO] Z 1: G3 BSTAR prior narrows BN to [   8.92, 106.11]
+  [WARN] Z 1: GA optimum at search boundary -- true value may lie outside the search range
+  Z 1: exit= 0 pts=  6401 BN=    9.14
+  Z1: e=  0.6400 BN=   9.14 (no re-entry)  zstat= 2
+  no re-entry (weak-signal fit, or zone_select still rejected this window)
+ [PROGRESS]  82% (** of ** zones done, this chunk)
+
+ ===== 40943 z42 pre-resonance 
+  [INFO] G2 BN floor estimate=    7.64 -> bn_lo=    3.82
+  [INFO] Z 1: G3 BSTAR prior narrows BN to [   9.18, 109.22]
+  [WARN] Z 1: GA optimum at search boundary -- true value may lie outside the search range
+  Z 1: exit= 0 pts=  6480 BN=   11.88
+  Z1: e=  0.6371 BN=  11.88 (no re-entry)  zstat= 2
+  no re-entry (weak-signal fit, or zone_select still rejected this window)
+ [PROGRESS]  82% (** of ** zones done, this chunk)
+
+ ===== 40943 z43 pre-resonance 
+  [INFO] G2 BN floor estimate=    6.18 -> bn_lo=    3.09
+  [INFO] Z 1: G3 BSTAR prior narrows BN to [   9.87, 117.46]
+  [WARN] Z 1: RSM envelope does not bound   3 of  23 observations -- proceeding anyway
+  [WARN] Z 1: GA optimum at search boundary -- true value may lie outside the search range
+  Z 1: exit= 0 pts=  6542 BN=   11.41
+  Z1: e=  0.6348 BN=  11.41 (no re-entry)  zstat= 2
+  no re-entry (weak-signal fit, or zone_select still rejected this window)
+ [PROGRESS]  83% (** of ** zones done, this chunk)
+
+ ===== 40943 z44 pre-resonance 
+  [INFO] G2 BN floor estimate=    9.82 -> bn_lo=    4.91
+  [INFO] Z 1: G3 BSTAR prior narrows BN to [  10.22, 121.61]
+  [WARN] Z 1: RSM envelope does not bound   3 of  23 observations -- proceeding anyway
+  [WARN] Z 1: GA optimum at search boundary -- true value may lie outside the search range
+  Z 1: exit= 0 pts=  6595 BN=   10.82
+  Z1: e=  0.6328 BN=  10.82 (no re-entry)  zstat= 2
+  no re-entry (weak-signal fit, or zone_select still rejected this window)
+ [PROGRESS]  83% (** of ** zones done, this chunk)
+
+ ===== 40943 z45 pre-resonance 
+  [INFO] G2 BN floor estimate=   12.43 -> bn_lo=    6.21
+  [INFO] Z 1: G3 BSTAR prior narrows BN to [  10.66, 126.91]
+  [WARN] Z 1: GA optimum at search boundary -- true value may lie outside the search range
+  Z 1: exit= 0 pts=  6636 BN=   11.90
+  Z1: e=  0.6312 BN=  11.90 (no re-entry)  zstat= 2
+  no re-entry (weak-signal fit, or zone_select still rejected this window)
+ [PROGRESS]  83% (** of ** zones done, this chunk)
+
+ ===== 40943 z46 pre-resonance 
+  [INFO] G2 BN floor estimate=   10.46 -> bn_lo=    5.23
+  [INFO] Z 1: G3 BSTAR prior narrows BN to [  11.30, 134.51]
+  [WARN] Z 1: GA optimum at search boundary -- true value may lie outside the search range
+  Z 1: exit= 0 pts=  6674 BN=   15.32
+  Z1: e=  0.6296 BN=  15.32 (no re-entry)  zstat= 2
+  no re-entry (weak-signal fit, or zone_select still rejected this window)
+ [PROGRESS]  84% (** of ** zones done, this chunk)
+
+ ===== 40943 z47 pre-resonance 
+  [INFO] G2 BN floor estimate=   12.40 -> bn_lo=    6.20
+  [INFO] Z 1: G3 BSTAR prior narrows BN to [  11.49, 136.69]
+  [WARN] Z 1: GA optimum at search boundary -- true value may lie outside the search range
+  Z 1: exit= 0 pts=  6711 BN=   18.90
+  Z1: e=  0.6280 BN=  18.90 (no re-entry)  zstat= 2
+  no re-entry (weak-signal fit, or zone_select still rejected this window)
+ [PROGRESS]  84% (** of ** zones done, this chunk)
+
+ ===== 40943 z48 pre-resonance 
+  [INFO] G2 BN floor estimate=   11.03 -> bn_lo=    5.52
+  [INFO] Z 1: G3 BSTAR prior narrows BN to [  11.77, 140.07]
+  [WARN] Z 1: GA optimum at search boundary -- true value may lie outside the search range
+  Z 1: exit= 0 pts=  6736 BN=   23.84
+  Z1: e=  0.6268 BN=  23.84 (no re-entry)  zstat= 2
+  no re-entry (weak-signal fit, or zone_select still rejected this window)
+ [PROGRESS]  84% (** of ** zones done, this chunk)
+
+ ===== 40943 z49 pre-resonance 
+  [INFO] G2 BN floor estimate=   11.85 -> bn_lo=    5.92
+  [INFO] Z 1: G3 BSTAR prior narrows BN to [  12.57, 149.64]
+  [WARN] Z 1: GA optimum at search boundary -- true value may lie outside the search range
+  Z 1: exit= 0 pts=  6756 BN=   23.84
+  Z1: e=  0.6257 BN=  23.84 (no re-entry)  zstat= 2
+  no re-entry (weak-signal fit, or zone_select still rejected this window)
+ [PROGRESS]  85% (** of ** zones done, this chunk)
+
+ ===== 40943 z50 pre-resonance 
+  [INFO] G2 BN floor estimate=   13.77 -> bn_lo=    6.89
+  [INFO] Z 1: G3 BSTAR prior narrows BN to [  13.31, 158.43]
+  [WARN] Z 1: GA optimum at search boundary -- true value may lie outside the search range
+  Z 1: exit= 0 pts=  6770 BN=   19.47
+  Z1: e=  0.6249 BN=  19.47 (no re-entry)  zstat= 2
+  no re-entry (weak-signal fit, or zone_select still rejected this window)
+ [PROGRESS]  85% (** of ** zones done, this chunk)
+
+ ===== 40943 z51 pre-resonance 
+  [WARN] Z 1: RSM envelope does not bound   8 of  25 observations -- proceeding anyway
+  [WARN] Z 1: GA optimum at search boundary -- true value may lie outside the search range
+  Z 1: exit= 0 pts=  6784 BN=   93.74
+  Z1: e=  0.6240 BN=  93.74 (no re-entry)  zstat= 2
+  no re-entry (weak-signal fit, or zone_select still rejected this window)
+ [PROGRESS]  85% (** of ** zones done, this chunk)
+
+ ===== 40943 z52 pre-resonance 
+  [WARN] Z 1: RSM envelope does not bound  13 of  21 observations -- proceeding anyway
+  [WARN] Z 1: GA optimum at search boundary -- true value may lie outside the search range
+  Z 1: exit= 0 pts=  6795 BN=  155.69
+  Z1: e=  0.6232 BN= 155.69 (no re-entry)  zstat= 2
+  no re-entry (weak-signal fit, or zone_select still rejected this window)
+ [PROGRESS]  85% (** of ** zones done, this chunk)
+
+ ===== 40943 z53 pre-resonance 
+  [WARN] Z 1: RSM envelope does not bound  14 of  23 observations -- proceeding anyway
+  [WARN] Z 1: GA optimum at search boundary -- true value may lie outside the search range
+  Z 1: exit= 0 pts=  6803 BN=  120.81
+  Z1: e=  0.6226 BN= 120.81 (no re-entry)  zstat= 2
+  no re-entry (weak-signal fit, or zone_select still rejected this window)
+ [PROGRESS]  86% (** of ** zones done, this chunk)
+
+ ===== 40943 z54 pre-resonance 
+  [WARN] Z 1: RSM envelope does not bound  18 of  27 observations -- proceeding anyway
+  [WARN] Z 1: GA optimum at search boundary -- true value may lie outside the search range
+  Z 1: exit= 0 pts=  6810 BN=  155.69
+  Z1: e=  0.6221 BN= 155.69 (no re-entry)  zstat= 2
+  no re-entry (weak-signal fit, or zone_select still rejected this window)
+ [PROGRESS]  86% (** of ** zones done, this chunk)
+
+ ===== 40943 z55 pre-resonance 
+  [WARN] Z 1: RSM envelope does not bound  19 of  29 observations -- proceeding anyway
+  [WARN] Z 1: GA optimum at search boundary -- true value may lie outside the search range
+  Z 1: exit= 1 pts=  5579 BN=   84.42
+  Z1: e=  0.6219 BN=  84.42 RPE=  109.00%  zstat= 2
+  ensemble (1 of 1 zones): mean JD=  2459534.672 std=    0.0 d
+  RPE =   109.00%
+ [PROGRESS]  86% (** of ** zones done, this chunk)
+
+ ===== 40943 z56 pre-resonance 
+  [WARN] Z 1: RSM envelope does not bound  20 of  26 observations -- proceeding anyway
+  [WARN] Z 1: GA optimum at search boundary -- true value may lie outside the search range
+  Z 1: exit= 1 pts=  4730 BN=  155.69
+  Z1: e=  0.6216 BN= 155.69 RPE=   93.33%  zstat= 2
+  ensemble (1 of 1 zones): mean JD=  2459426.379 std=    0.0 d
+  RPE =    93.33%
+ [PROGRESS]  87% (** of ** zones done, this chunk)
+
+ ===== 40943 z57 pre-resonance 
+  [WARN] Z 1: RSM envelope does not bound  19 of  22 observations -- proceeding anyway
+  [WARN] Z 1: GA optimum at search boundary -- true value may lie outside the search range
+  Z 1: exit= 1 pts=  6569 BN=  155.69
+  Z1: e=  0.6213 BN= 155.69 RPE=  164.10%  zstat= 2
+  ensemble (1 of 1 zones): mean JD=  2459795.131 std=    0.0 d
+  RPE =   164.10%
+ [PROGRESS]  87% (** of ** zones done, this chunk)
+
+ ===== 40943 z58 pre-resonance 
+  [WARN] Z 1: RSM envelope does not bound  23 of  23 observations -- proceeding anyway
+  [WARN] Z 1: GA optimum at search boundary -- true value may lie outside the search range
+  Z 1: exit= 0 pts=  6849 BN=  155.69
+  Z1: e=  0.6210 BN= 155.69 (no re-entry)  zstat= 2
+  no re-entry (weak-signal fit, or zone_select still rejected this window)
+ [PROGRESS]  87% (** of ** zones done, this chunk)
+
+ ===== 40943 z59 pre-resonance 
+  [WARN] Z 1: RSM envelope does not bound   6 of  24 observations -- proceeding anyway
+  [WARN] Z 1: GA optimum at search boundary -- true value may lie outside the search range
+  Z 1: exit= 0 pts=  6854 BN=   81.93
+  Z1: e=  0.6209 BN=  81.93 (no re-entry)  zstat= 2
+  no re-entry (weak-signal fit, or zone_select still rejected this window)
+ [PROGRESS]  87% (** of ** zones done, this chunk)
+
+ ===== 40943 z60 pre-resonance 
+  [INFO] G2 BN floor estimate=   19.38 -> bn_lo=    9.69
+  [INFO] Z 1: G3 BSTAR prior narrows BN to [  13.81, 160.00]
+  [WARN] Z 1: GA optimum at search boundary -- true value may lie outside the search range
+  Z 1: exit= 0 pts=  6860 BN=   14.62
+  Z1: e=  0.6207 BN=  14.62 (no re-entry)  zstat= 2
+  no re-entry (weak-signal fit, or zone_select still rejected this window)
+ [PROGRESS]  88% (** of ** zones done, this chunk)
+
+ ===== 40943 z61 pre-resonance 
+  [INFO] G2 BN floor estimate=   13.35 -> bn_lo=    6.67
+  [INFO] Z 1: G3 BSTAR prior narrows BN to [  13.80, 160.00]
+  [WARN] Z 1: GA optimum at search boundary -- true value may lie outside the search range
+  Z 1: exit= 0 pts=  6868 BN=   20.89
+  Z1: e=  0.6203 BN=  20.89 (no re-entry)  zstat= 2
+  no re-entry (weak-signal fit, or zone_select still rejected this window)
+ [PROGRESS]  88% (** of ** zones done, this chunk)
+
+ ===== 40943 z62 pre-resonance 
+  [INFO] G2 BN floor estimate=   14.02 -> bn_lo=    7.01
+  [INFO] Z 1: G3 BSTAR prior narrows BN to [  14.14, 160.00]
+  [WARN] Z 1: GA optimum at search boundary -- true value may lie outside the search range
+  Z 1: exit= 0 pts=  6877 BN=   34.89
+  Z1: e=  0.6200 BN=  34.89 (no re-entry)  zstat= 2
+  no re-entry (weak-signal fit, or zone_select still rejected this window)
+ [PROGRESS]  88% (** of ** zones done, this chunk)
+
+ ===== 40943 z63 pre-resonance 
+  [WARN] Z 1: RSM envelope does not bound  26 of  26 observations -- proceeding anyway
+  [WARN] Z 1: GA optimum at search boundary -- true value may lie outside the search range
+  Z 1: exit= 0 pts=  6892 BN=  155.69
+  Z1: e=  0.6195 BN= 155.69 (no re-entry)  zstat= 2
+  no re-entry (weak-signal fit, or zone_select still rejected this window)
+ [PROGRESS]  89% (** of ** zones done, this chunk)
+
+ ===== 40943 z64 pre-resonance 
+  [WARN] Z 1: RSM envelope does not bound  13 of  25 observations -- proceeding anyway
+  [WARN] Z 1: GA optimum at search boundary -- true value may lie outside the search range
+  Z 1: exit= 0 pts=  6899 BN=  155.69
+  Z1: e=  0.6194 BN= 155.69 (no re-entry)  zstat= 2
+  no re-entry (weak-signal fit, or zone_select still rejected this window)
+ [PROGRESS]  89% (** of ** zones done, this chunk)
+
+ ===== 40943 z65 pre-resonance 
+  [INFO] Z 1: G3 BSTAR prior narrows BN to [  80.00, 145.99]
+  [WARN] Z 1: RSM envelope does not bound   5 of  24 observations -- proceeding anyway
+  [WARN] Z 1: GA optimum at search boundary -- true value may lie outside the search range
+  Z 1: exit= 0 pts=  6913 BN=   84.41
+  Z1: e=  0.6192 BN=  84.41 (no re-entry)  zstat= 2
+  no re-entry (weak-signal fit, or zone_select still rejected this window)
+ [PROGRESS]  89% (** of ** zones done, this chunk)
+
+ ===== 40943 z66 pre-resonance 
+  [INFO] Z 1: G3 BSTAR prior narrows BN to [  80.00, 144.60]
+  [WARN] Z 1: RSM envelope does not bound   8 of  26 observations -- proceeding anyway
+  [WARN] Z 1: GA optimum at search boundary -- true value may lie outside the search range
+  Z 1: exit= 0 pts=  6930 BN=   81.49
+  Z1: e=  0.6189 BN=  81.49 (no re-entry)  zstat= 2
+  no re-entry (weak-signal fit, or zone_select still rejected this window)
+ [PROGRESS]  90% (** of ** zones done, this chunk)
+
+ ===== 40943 z67 pre-resonance 
+  [INFO] Z 1: G3 BSTAR prior narrows BN to [  80.00, 134.46]
+  [WARN] Z 1: RSM envelope does not bound   5 of  27 observations -- proceeding anyway
+  [WARN] Z 1: GA optimum at search boundary -- true value may lie outside the search range
+  Z 1: exit= 0 pts=  6950 BN=   81.65
+  Z1: e=  0.6185 BN=  81.65 (no re-entry)  zstat= 2
+  no re-entry (weak-signal fit, or zone_select still rejected this window)
+ [PROGRESS]  90% (** of ** zones done, this chunk)
+
+ ===== 40943 z68 pre-resonance 
+  [INFO] Z 1: G3 BSTAR prior narrows BN to [  80.00, 131.29]
+  [WARN] Z 1: RSM envelope does not bound   6 of  27 observations -- proceeding anyway
+  [WARN] Z 1: GA optimum at search boundary -- true value may lie outside the search range
+  Z 1: exit= 0 pts=  6978 BN=   85.48
+  Z1: e=  0.6179 BN=  85.48 (no re-entry)  zstat= 2
+  no re-entry (weak-signal fit, or zone_select still rejected this window)
+ [PROGRESS]  90% (** of ** zones done, this chunk)
+
+ ===== 40943 z69 pre-resonance 
+  [INFO] G2 BN floor estimate=    8.40 -> bn_lo=    4.20
+  [INFO] Z 1: G3 BSTAR prior narrows BN to [  10.17, 121.10]
+  [WARN] Z 1: RSM envelope does not bound   6 of  25 observations -- proceeding anyway
+  [WARN] Z 1: GA optimum at search boundary -- true value may lie outside the search range
+  Z 1: exit= 0 pts=  7001 BN=   13.71
+  Z1: e=  0.6175 BN=  13.71 (no re-entry)  zstat= 2
+  no re-entry (weak-signal fit, or zone_select still rejected this window)
+ [PROGRESS]  90% (** of ** zones done, this chunk)
+
+ ===== 40943 z70 pre-resonance 
+  [INFO] G2 BN floor estimate=   12.07 -> bn_lo=    6.03
+  [INFO] Z 1: G3 BSTAR prior narrows BN to [  10.63, 126.51]
+  [WARN] Z 1: RSM envelope does not bound   4 of  23 observations -- proceeding anyway
+  [WARN] Z 1: GA optimum at search boundary -- true value may lie outside the search range
+  Z 1: exit= 0 pts=  7046 BN=   25.12
+  Z1: e=  0.6163 BN=  25.12 (no re-entry)  zstat= 2
+  no re-entry (weak-signal fit, or zone_select still rejected this window)
+ [PROGRESS]  91% (** of ** zones done, this chunk)
+
+ ===== 40943 z71 pre-resonance 
+  [INFO] G2 BN floor estimate=    9.38 -> bn_lo=    4.69
+  [INFO] Z 1: G3 BSTAR prior narrows BN to [  10.20, 121.34]
+  [WARN] Z 1: GA optimum at search boundary -- true value may lie outside the search range
+  Z 1: exit= 0 pts=  7083 BN=   10.64
+  Z1: e=  0.6154 BN=  10.64 (no re-entry)  zstat= 2
+  no re-entry (weak-signal fit, or zone_select still rejected this window)
+ [PROGRESS]  91% (** of ** zones done, this chunk)
+
+ ===== 40943 z72 pre-resonance 
+  [INFO] G2 BN floor estimate=   10.82 -> bn_lo=    5.41
+  [INFO] Z 1: G3 BSTAR prior narrows BN to [  10.70, 127.34]
+  [WARN] Z 1: GA optimum at search boundary -- true value may lie outside the search range
+  Z 1: exit= 0 pts=  7150 BN=   14.10
+  Z1: e=  0.6135 BN=  14.10 (no re-entry)  zstat= 2
+  no re-entry (weak-signal fit, or zone_select still rejected this window)
+ [PROGRESS]  91% (** of ** zones done, this chunk)
+
+ ===== 40943 z73 pre-resonance 
+  [INFO] G2 BN floor estimate=   11.60 -> bn_lo=    5.80
+  [INFO] Z 1: G3 BSTAR prior narrows BN to [  10.75, 127.97]
+  [WARN] Z 1: GA optimum at search boundary -- true value may lie outside the search range
+  Z 1: exit= 0 pts=  7213 BN=   14.99
+  Z1: e=  0.6116 BN=  14.99 (no re-entry)  zstat= 2
+  no re-entry (weak-signal fit, or zone_select still rejected this window)
+ [PROGRESS]  92% (** of ** zones done, this chunk)
+
+ ===== 40943 z74 pre-resonance 
+  [INFO] G2 BN floor estimate=   12.49 -> bn_lo=    6.25
+  [INFO] Z 1: G3 BSTAR prior narrows BN to [  10.77, 128.20]
+  [WARN] Z 1: GA optimum at search boundary -- true value may lie outside the search range
+  Z 1: exit= 0 pts=  7271 BN=   17.39
+  Z1: e=  0.6098 BN=  17.39 (no re-entry)  zstat= 2
+  no re-entry (weak-signal fit, or zone_select still rejected this window)
+ [PROGRESS]  92% (** of ** zones done, this chunk)
+
+ ===== 40943 z75 pre-resonance 
+  [INFO] G2 BN floor estimate=   12.54 -> bn_lo=    6.27
+  [INFO] Z 1: G3 BSTAR prior narrows BN to [  10.67, 127.02]
+  [WARN] Z 1: GA optimum at search boundary -- true value may lie outside the search range
+  Z 1: exit= 0 pts=  7326 BN=   25.35
+  Z1: e=  0.6080 BN=  25.35 (no re-entry)  zstat= 2
+  no re-entry (weak-signal fit, or zone_select still rejected this window)
+ [PROGRESS]  92% (** of ** zones done, this chunk)
+
+ ===== 40943 z76 pre-resonance 
+  [INFO] G2 BN floor estimate=   12.53 -> bn_lo=    6.27
+  [INFO] Z 1: G3 BSTAR prior narrows BN to [  10.83, 128.89]
+  [WARN] Z 1: GA optimum at search boundary -- true value may lie outside the search range
+  Z 1: exit= 0 pts=  7371 BN=   16.73
+  Z1: e=  0.6065 BN=  16.73 (no re-entry)  zstat= 2
+  no re-entry (weak-signal fit, or zone_select still rejected this window)
+ [PROGRESS]  92% (** of ** zones done, this chunk)
+
+ ===== 40943 z77 pre-resonance 
+  [INFO] G2 BN floor estimate=   13.67 -> bn_lo=    6.84
+  [INFO] Z 1: G3 BSTAR prior narrows BN to [  10.83, 128.93]
+  [WARN] Z 1: GA optimum at search boundary -- true value may lie outside the search range
+  Z 1: exit= 0 pts=  7434 BN=   21.77
+  Z1: e=  0.6044 BN=  21.77 (no re-entry)  zstat= 2
+  no re-entry (weak-signal fit, or zone_select still rejected this window)
+ [PROGRESS]  93% (** of ** zones done, this chunk)
+
+ ===== 40943 z78 pre-resonance 
+  [INFO] G2 BN floor estimate=   12.82 -> bn_lo=    6.41
+  [INFO] Z 1: G3 BSTAR prior narrows BN to [  10.76, 128.03]
+  [WARN] Z 1: GA optimum at search boundary -- true value may lie outside the search range
+  Z 1: exit= 0 pts=  7500 BN=   24.95
+  Z1: e=  0.6022 BN=  24.95 (no re-entry)  zstat= 2
+  no re-entry (weak-signal fit, or zone_select still rejected this window)
+ [PROGRESS]  93% (** of ** zones done, this chunk)
+
+ ===== 40943 z79 pre-resonance 
+  [INFO] G2 BN floor estimate=   11.62 -> bn_lo=    5.81
+  [INFO] Z 1: G3 BSTAR prior narrows BN to [  10.73, 127.73]
+  [WARN] Z 1: GA optimum at search boundary -- true value may lie outside the search range
+  Z 1: exit= 0 pts=  7581 BN=   14.03
+  Z1: e=  0.5994 BN=  14.03 (no re-entry)  zstat= 2
+  no re-entry (weak-signal fit, or zone_select still rejected this window)
+ [PROGRESS]  93% (** of ** zones done, this chunk)
+
+ ===== 40943 z80 pre-resonance 
+  [INFO] G2 BN floor estimate=   10.26 -> bn_lo=    5.13
+  [INFO] Z 1: G3 BSTAR prior narrows BN to [  10.28, 122.33]
+  [WARN] Z 1: GA optimum at search boundary -- true value may lie outside the search range
+  Z 1: exit= 0 pts=  7739 BN=   14.77
+  Z1: e=  0.5940 BN=  14.77 (no re-entry)  zstat= 2
+  no re-entry (weak-signal fit, or zone_select still rejected this window)
+ [PROGRESS]  94% (** of ** zones done, this chunk)
+
+ ===== 40943 z81 pre-resonance 
+  [INFO] G2 BN floor estimate=   10.14 -> bn_lo=    5.07
+  [INFO] Z 1: G3 BSTAR prior narrows BN to [  10.30, 122.54]
+  [WARN] Z 1: GA optimum at search boundary -- true value may lie outside the search range
+  Z 1: exit= 1 pts=  5539 BN=   10.85
+  Z1: e=  0.5891 BN=  10.85 RPE=  321.26%  zstat= 2
+  ensemble (1 of 1 zones): mean JD=  2459437.166 std=    0.0 d
+  RPE =   321.26%
+ [PROGRESS]  94% (** of ** zones done, this chunk)
+
+ ===== 40943 z82 pre-resonance 
+  [INFO] G2 BN floor estimate=   10.34 -> bn_lo=    5.17
+  [INFO] Z 1: G3 BSTAR prior narrows BN to [  10.07, 119.86]
+  [WARN] Z 1: GA optimum at search boundary -- true value may lie outside the search range
+  Z 1: exit= 1 pts=  3604 BN=   10.17
+  Z1: e=  0.5846 BN=  10.17 RPE=  198.87%  zstat= 2
+  ensemble (1 of 1 zones): mean JD=  2459212.673 std=    0.0 d
+  RPE =   198.87%
+ [PROGRESS]  94% (** of ** zones done, this chunk)
+
+ ===== 40943 z83 pre-resonance 
+  [INFO] G2 BN floor estimate=    8.56 -> bn_lo=    4.28
+  [INFO] Z 1: G3 BSTAR prior narrows BN to [   9.46, 112.54]
+  [WARN] Z 1: GA optimum at search boundary -- true value may lie outside the search range
+  Z 1: exit= 1 pts=  2791 BN=   11.66
+  Z1: e=  0.5798 BN=  11.66 RPE=  145.14%  zstat= 2
+  ensemble (1 of 1 zones): mean JD=  2459115.271 std=    0.0 d
+  RPE =   145.14%
+ [PROGRESS]  95% (** of ** zones done, this chunk)
+
+ ===== 40943 z84 post-resonance
+  [INFO] G2 BN floor estimate=    8.91 -> bn_lo=    4.45
+  [INFO] Z 1: G3 BSTAR prior narrows BN to [   9.52, 113.32]
+  [WARN] Z 1: GA optimum at search boundary -- true value may lie outside the search range
+  Z 1: exit= 1 pts=  1868 BN=    9.74
+  Z1: e=  0.5719 BN=   9.74 RPE=   73.56%  zstat= 2
+  ensemble (1 of 1 zones): mean JD=  2459000.734 std=    0.0 d
+  RPE =    73.56%
+ [PROGRESS]  95% (** of ** zones done, this chunk)
+
+ ===== 40943 z85 post-resonance
+  [INFO] G2 BN floor estimate=    9.39 -> bn_lo=    4.69
+  [INFO] Z 1: G3 BSTAR prior narrows BN to [   9.49, 112.98]
+  [WARN] Z 1: GA optimum at search boundary -- true value may lie outside the search range
+  Z 1: exit= 1 pts=  1558 BN=    9.51
+  Z1: e=  0.5652 BN=   9.51 RPE=   49.75%  zstat= 2
+  ensemble (1 of 1 zones): mean JD=  2458963.901 std=    0.0 d
+  RPE =    49.75%
+ [PROGRESS]  95% (** of ** zones done, this chunk)
+
+ ===== 40943 z86 post-resonance
+  [INFO] G2 BN floor estimate=    8.89 -> bn_lo=    4.45
+  [INFO] Z 1: G3 BSTAR prior narrows BN to [   9.56, 113.82]
+  [WARN] Z 1: GA optimum at search boundary -- true value may lie outside the search range
+  Z 1: exit= 1 pts=  1772 BN=   15.89
+  Z1: e=  0.5534 BN=  15.89 RPE=   83.44%  zstat= 2
+  ensemble (1 of 1 zones): mean JD=  2458998.812 std=    0.0 d
+  RPE =    83.44%
+ [PROGRESS]  95% (** of ** zones done, this chunk)
+
+ ===== 40943 z87 post-resonance
+  [INFO] G2 BN floor estimate=   13.28 -> bn_lo=    6.64
+  [INFO] Z 1: G3 BSTAR prior narrows BN to [  10.66, 126.87]
+  [WARN] Z 1: GA optimum at search boundary -- true value may lie outside the search range
+  Z 1: exit= 1 pts=  2152 BN=   27.97
+  Z1: e=  0.5278 BN=  27.97 RPE=  147.65%  zstat= 2
+  ensemble (1 of 1 zones): mean JD=  2459048.338 std=    0.0 d
+  RPE =   147.65%
+ [PROGRESS]  96% (** of ** zones done, this chunk)
+
+ ===== 40943 z88 post-resonance
+  [INFO] G2 BN floor estimate=   20.76 -> bn_lo=   10.38
+  [INFO] Z 1: G3 BSTAR prior narrows BN to [  11.93, 141.95]
+  Z 1: exit= 1 pts=  2659 BN=   44.40
+  Z1: e=  0.4998 BN=  44.40 RPE=  235.66%  zstat= 0
+  ensemble (1 of 1 zones): mean JD=  2459100.292 std=    0.0 d
+  RPE =   235.66%
+ [PROGRESS]  96% (** of ** zones done, this chunk)
+
+ ===== 40943 z89 post-resonance
+  [INFO] G2 BN floor estimate=   24.25 -> bn_lo=   12.13
+  [INFO] Z 1: G3 BSTAR prior narrows BN to [  12.53, 149.12]
+  Z 1: exit= 1 pts=  1887 BN=   46.63
+  Z1: e=  0.4821 BN=  46.63 RPE=  159.57%  zstat= 0
+  ensemble (1 of 1 zones): mean JD=  2459019.558 std=    0.0 d
+  RPE =   159.57%
+ [PROGRESS]  96% (** of ** zones done, this chunk)
+
+ ===== 40943 z90 post-resonance
+  [INFO] G2 BN floor estimate=   27.25 -> bn_lo=   13.63
+  [INFO] Z 1: G3 BSTAR prior narrows BN to [  13.63, 150.11]
+  Z 1: exit= 1 pts=  1350 BN=   47.74
+  Z1: e=  0.4563 BN=  47.74 RPE=  112.85%  zstat= 0
+  ensemble (1 of 1 zones): mean JD=  2458972.295 std=    0.0 d
+  RPE =   112.85%
+ [PROGRESS]  97% (** of ** zones done, this chunk)
+
+ ===== 40943 z91 post-resonance
+  [INFO] G2 BN floor estimate=   25.55 -> bn_lo=   12.77
+  [INFO] Z 1: G3 BSTAR prior narrows BN to [  13.36, 159.04]
+  Z 1: exit= 1 pts=  1336 BN=   56.01
+  Z1: e=  0.4291 BN=  56.01 RPE=  140.21%  zstat= 0
+  ensemble (1 of 1 zones): mean JD=  2458976.737 std=    0.0 d
+  RPE =   140.21%
+ [PROGRESS]  97% (** of ** zones done, this chunk)
+
+ ===== 40943 z92 post-resonance
+  [INFO] G2 BN floor estimate=   19.25 -> bn_lo=    9.62
+  [INFO] Z 1: G3 BSTAR prior narrows BN to [  13.46, 160.00]
+  Z 1: exit= 1 pts=   920 BN=   41.84
+  Z1: e=  0.3902 BN=  41.84 RPE=  105.39%  zstat= 0
+  ensemble (1 of 1 zones): mean JD=  2458944.597 std=    0.0 d
+  RPE =   105.39%
+ [PROGRESS]  97% (** of ** zones done, this chunk)
+
+ ===== 40943 z93 post-resonance
+  [INFO] G2 BN floor estimate=   16.90 -> bn_lo=    8.45
+  [INFO] Z 1: G3 BSTAR prior narrows BN to [  13.93, 160.00]
+  [WARN] Z 1: GA optimum at search boundary -- true value may lie outside the search range
+  Z 1: exit= 1 pts=   802 BN=   34.31
+  Z1: e=  0.3435 BN=  34.31 RPE=  128.78%  zstat= 2
+  ensemble (1 of 1 zones): mean JD=  2458939.869 std=    0.0 d
+  RPE =   128.78%
+ [PROGRESS]  97% (** of ** zones done, this chunk)
+
+ ===== 40943 z94 post-resonance
+  [INFO] G2 BN floor estimate=   13.14 -> bn_lo=    6.57
+  [INFO] Z 1: G3 BSTAR prior narrows BN to [  13.35, 158.91]
+  [WARN] Z 1: GA optimum at search boundary -- true value may lie outside the search range
+  Z 1: exit= 1 pts=   348 BN=   19.68
+  Z1: e=  0.2937 BN=  19.68 RPE=   38.84%  zstat= 2
+  ensemble (1 of 1 zones): mean JD=  2458907.556 std=    0.0 d
+  RPE =    38.84%
+ [PROGRESS]  98% (** of ** zones done, this chunk)
+
+ ===== 40943 z95 post-resonance
+  [INFO] G2 BN floor estimate=   40.50 -> bn_lo=   20.25
+  Z 1: exit= 1 pts=   105 BN=   71.97
+  Z1: e=  0.1435 BN=  71.97 RPE=   60.67%  zstat= 0
+  ensemble (1 of 1 zones): mean JD=  2458902.219 std=    0.0 d
+  RPE =    60.67%
+ [PROGRESS]  98% (** of ** zones done, this chunk)
+
+ ===== 10724 z1 pre-resonance (
+  [WARN] tle_filter: epoch gap at point     3 (********** -> **********,     94.3 days)
+  [INFO] G2 BN floor estimate=   34.13 -> bn_lo=   17.07
+  [WARN] Z 1: GA optimum at search boundary -- true value may lie outside the search range
+  Z 1: exit= 0 pts=  5424 BN=   19.11
+  Z1: e=  0.6801 BN=  19.11 (no re-entry)  zstat= 2
+  no re-entry (weak-signal fit, or zone_select still rejected this window)
+ [PROGRESS]  98% (** of ** zones done, this chunk)
+
+ ===== 10724 z2 pre-resonance (
+  [WARN] tle_filter: epoch gap at point     9 (********** -> **********,    113.2 days)
+  [WARN] tle_filter: epoch gap at point    10 (********** -> **********,    238.8 days)
+  [INFO] G2 BN floor estimate=   10.31 -> bn_lo=    5.15
+  [INFO] Z 1: G3 BSTAR prior narrows BN to [  11.92, 141.85]
+  [WARN] Z 1: RSM envelope does not bound   6 of  15 observations -- proceeding anyway
+  [WARN] Z 1: GA optimum at search boundary -- true value may lie outside the search range
+  Z 1: exit= 1 pts=  1842 BN=  141.84
+  Z1: e=  0.6502 BN= 141.84 RPE=  -68.06%  zstat= 2
+  ensemble (1 of 1 zones): mean JD=  2444254.328 std=    0.0 d
+  RPE =   -68.06%
+ [PROGRESS]  99% (** of ** zones done, this chunk)
+
+ ===== 10724 z3 post-resonance 
+  [WARN] tle_filter: epoch gap at point    12 (********** -> **********,    186.3 days)
+  [INFO] G2 BN floor estimate=    5.00 -> bn_lo=    2.50
+  [INFO] Z 1: G3 BSTAR prior narrows BN to [  25.08, 160.00]
+  [WARN] Z 1: GA optimum at search boundary -- true value may lie outside the search range
+  Z 1: exit= 0 pts=  8166 BN=   37.92
+  Z1: e=  0.5782 BN=  37.92 (no re-entry)  zstat= 2
+  no re-entry (weak-signal fit, or zone_select still rejected this window)
+ [PROGRESS]  99% (** of ** zones done, this chunk)
+
+ ===== 10724 z4 post-resonance 
+  [INFO] G2 BN floor estimate=   14.33 -> bn_lo=    7.17
+  [INFO] Z 1: G3 BSTAR prior narrows BN to [  25.63, 160.00]
+  [WARN] Z 1: GA optimum at search boundary -- true value may lie outside the search range
+  Z 1: exit= 0 pts= 11038 BN=   26.81
+  Z1: e=  0.4858 BN=  26.81 (no re-entry)  zstat= 2
+  no re-entry (weak-signal fit, or zone_select still rejected this window)
+ [PROGRESS]  99% (** of ** zones done, this chunk)
+
+ ===== 18954 z1 pre-resonance (
+  [WARN] tle_filter: epoch gap at point     3 (********** -> **********,     34.3 days)
+  [WARN] tle_filter: epoch gap at point     6 (********** -> **********,     68.6 days)
+  [WARN] tle_filter: epoch gap at point    20 (********** -> **********,     97.6 days)
+  [INFO] G2 BN floor estimate=    5.00 -> bn_lo=    2.50
+  [INFO] Z 1: G3 BSTAR prior narrows BN to [  48.13, 160.00]
+ Kesolve did not converge
+ Kesolve did not converge
+ Kesolve did not converge
+  [WARN] Z 1: RSM envelope does not bound   1 of  21 observations -- proceeding anyway
+  [WARN] Z 1: GA optimum at search boundary -- true value may lie outside the search range
+  Z 1: exit= 0 pts=  5176 BN=   56.46
+  Z1: e=  0.6876 BN=  56.46 (no re-entry)  zstat= 2
+  no re-entry (weak-signal fit, or zone_select still rejected this window)
+ [PROGRESS] 100% (** of ** zones done, this chunk)
+
+ campaign complete -> scratch_rpe/validation_RPE/valrpe_campaign.csv
