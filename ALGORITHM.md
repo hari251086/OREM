@@ -119,6 +119,32 @@ BN and e) against the TLE's own apogee-altitude history.
       `propagate_ks` from the zone's IC, and interpolate each resulting
       apogee-altitude trajectory onto the zone's own TLE observation
       epochs — producing `surfaces(nobs,3,3)`.
+
+      **Eccentricity search range** (`orem.F`, computed before RSM
+      runs): centered on the zone's own first-TLE eccentricity, half-
+      width = that zone's own observed TLE-to-TLE eccentricity scatter
+      (floored at 5×10⁻⁴) — narrow by construction, not a wide blind
+      search. This automates the manual method in Sellamuthu's PhD
+      thesis (Ch.5, pp.141–142): each zone's e-bound there was
+      back-derived from a **fixed apogee-altitude tolerance (±3.5 km)**
+      via apogee = a(1+e), not chosen directly in eccentricity space
+      (Table 5.4's Case (ii) Zone 1 bound `[0.6292873, 0.6296835]` is
+      a ±3.5 km apogee window on object 35497 — the same bound later
+      hand-typed into the pre-OREM COSPAR-ASR GA config,
+      `gene9.txt`). **Why apogee is the well-constrained side to bound,
+      not perigee**: Früh & Schildknecht (2012, *J. Guidance, Control,
+      and Dynamics* 35(5), 1483–1491, DOI 10.2514/1.55843), validating
+      TLEs against independent optical tracking, found *"HEO objects
+      are observed mainly in apogee, which may result[s] in orbits
+      which are not well defined in perigee"* (p.1484) — ground-station
+      tracking opportunity concentrates near apogee (slower angular
+      motion there, Kepler's 2nd law), so a TLE's fitted eccentricity
+      inherits tight apogee-side precision and loose perigee-side
+      precision. This independently corroborates the same thesis's own
+      finding (p.139) that mean apogee altitude evolves smoothly while
+      mean perigee is erratic — the reason this whole pipeline fits
+      apogee, not perigee, as its primary decay signal throughout
+      (`zone_select.F`, `rsm.F`, this step).
    d. **GA fit** (`ga_optimize`, `ga.F`): a binary-encoded genetic
       algorithm searches the (e, BN) space (bilinearly interpolated within
       the RSM grid) to minimize RMS(predicted apogee − observed apogee)

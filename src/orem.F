@@ -568,6 +568,31 @@ c        investigation.)
             maz(1)   = a_kep_osc1(6)
          end if
 
+c        Eccentricity search half-width: center on the zone's own
+c        first-TLE eccentricity, sized to that zone's own observed
+c        TLE-to-TLE eccentricity scatter (floored at 5e-4). This is
+c        the automated descendant of the manual apogee-tolerance
+c        method in Sellamuthu's PhD thesis (Ch.5, p.141-142): there,
+c        each zone's e-bound was back-derived from a FIXED apogee-
+c        altitude tolerance (+/-3.5 km) via apogee=a(1+e), not chosen
+c        directly in eccentricity space -- e.g. Table 5.4's Case (ii)
+c        Zone 1 bound [0.6292873,0.6296835] is a +/-3.5km apogee
+c        window on object 35497, the same object/bound later hand-
+c        typed into the pre-OREM GA config (COSPAR ASR gene9.txt).
+c        Why apogee, not perigee, is the well-constrained quantity to
+c        bound: Fruh & Schildknecht (2012, J. Guidance Control Dyn.
+c        35(5), 1483-1491, DOI 10.2514/1.55843), comparing TLEs
+c        against independent optical tracking, found "HEO objects are
+c        observed mainly in apogee, which may result[s] in orbits
+c        which are not well defined in perigee" (p.1484) -- ground-
+c        station tracking opportunity concentrates near apogee (slower
+c        angular motion there per Kepler's 2nd law), so a TLE's own
+c        fitted eccentricity inherits tight apogee-side precision and
+c        loose perigee-side precision. This independently corroborates
+c        the same thesis finding (Ch.5, p.139) that mean APOGEE
+c        altitude evolves smoothly while mean PERIGEE is erratic --
+c        the reason this whole pipeline fits apogee, not perigee, as
+c        its primary decay signal (zone_select.F, rsm.F).
          e_mid = ez(1)
          de = 0.d0
          do i = 1, nzone
