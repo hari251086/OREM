@@ -135,7 +135,7 @@ c     re-entry propagation
 
       integer iz, i, j, iarg
       double precision e_mid, de, rp, period_d, lsun, psi
-      integer nrev_re
+      integer nrev_re, ire_flag
 
       data n_force /1, 1, 1/
 
@@ -283,7 +283,7 @@ c     ============================================================
       open(unit=23, file=path_obs)
       write(23,'(A)') 'zone,t_days,apogee_km'
       open(unit=24, file=path_traj)
-      write(24,'(A)') 'zone,epoch_jd,apogee_km,e_opt,bn_opt'
+      write(24,'(A)') 'zone,epoch_jd,apogee_km,e_opt,bn_opt,reentered'
 
       do iz = 1, nzones_do
          nzone = zone_end(iz) - zone_start(iz) + 1
@@ -389,6 +389,13 @@ c        orem.F's own a_kep/x0/xd0 construction (lines ~736-751).
      &      traj_jd, traj_x, traj_xd,
      &      exit_code_re)
 
+c        1 = propagate_ks stopped on re-entry (same test as orem.F's
+c        exit_code_re .eq. 1); 0 = hit the revolution cap first. The
+c        final apogee alone can't tell these apart -- high-e orbits
+c        re-enter through perigee with apogee still far above 100 km.
+         ire_flag = 0
+         if (exit_code_re .eq. 1) ire_flag = 1
+
 c        Osculating apogee from Cartesian state -- same method as
 c        scratch_rpe/diag_osc_vs_mean_apogee.F.
          do i = 1, idump_re
@@ -405,9 +412,9 @@ c        scratch_rpe/diag_osc_vs_mean_apogee.F.
             p_sl = h_mag**2/amue
             ecc_pt = dsqrt(dabs(1.d0 - p_sl/sma_pt))
             ha_pt = sma_pt*(1.d0+ecc_pt) - R_Earth
-            write(24,'(I2,A,F14.5,A,F10.3,A,F9.6,A,F8.2)')
+            write(24,'(I2,A,F14.5,A,F10.3,A,F9.6,A,F8.2,A,I1)')
      &         iz, ',', traj_jd(i), ',', ha_pt, ',',
-     &         e_opt, ',', bn_opt
+     &         e_opt, ',', bn_opt, ',', ire_flag
          end do
  40      continue
 
