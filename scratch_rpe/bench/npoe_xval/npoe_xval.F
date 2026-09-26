@@ -4,7 +4,7 @@ c     (the independent third-party reference propagator the original
 c     Sharma-lineage papers validated against -- see the literature
 c     review in project memory / issue #36).
 c
-c     Reference data: E:\Research\1. R&D\Re-entry\COSPAR ASR\42928\
+c     Reference data: <research-library>\1. R&D\Re-entry\COSPAR ASR\42928\
 c     Zone - 2\ -- NPOE's own input file (RSM Surfaces\Z2.in) gives
 c     exact IC + force model for a real propagation of object 42928
 c     from 2017-10-03 14:35:56 UTC, and NPOE's own output (Z2.out

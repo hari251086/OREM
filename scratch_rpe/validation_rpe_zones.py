@@ -15,7 +15,7 @@ that regime too):
      Wang & Gurfil Eq.12 detector). Zones continue through last TLE.
   2. 3-29 TLEs per zone.
   3. Spread across the full observed range with gaps, matching the
-     COSPAR ASR reference style (E:\\Research\\1. R&D\\Re-entry\\COSPAR ASR
+     COSPAR ASR reference style (<research-library>\\1. R&D\\Re-entry\\COSPAR ASR
      35497/Zone-0,2,3,4: 4 non-contiguous zones, ~6-11 day real-time
      width, TLE counts 8/12/14/33 -- increasing density approaching
      decay). Target 4 anchors: early baseline, pre-resonance approach,
