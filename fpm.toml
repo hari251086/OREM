@@ -42,6 +42,11 @@ name = "valrpecampaignv2"
 source-dir = "scratch_rpe/validation_rpe_v2"
 main = "validation_rpe_campaign_v2.F"
 
+[[executable]]
+name = "manuscript23"
+source-dir = "scratch_rpe/manuscript23"
+main = "manuscript23_leadtime.F"
+
 [[test]]
 name = "test_propagate_ks"
 source-dir = "test"

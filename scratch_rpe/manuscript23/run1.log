@@ -1,0 +1,445 @@
+
+ ===== run   1: NORAD  35497  lead   30 d
+  [INFO] G2 BN floor estimate=   44.53 -> bn_lo=   22.26
+  Z 1: exit= 0 pts=  7115 BN=   59.36
+  Z 2: exit= 0 pts=  7375 BN=   75.60
+  [WARN] Z 3: RSM envelope does not bound  13 of  36 observations -- proceeding anyway
+  [WARN] Z 3: GA optimum at search boundary -- true value may lie outside the search range
+  Z 3: exit= 0 pts=  7475 BN=   90.48
+  Z 4: exit= 0 pts=  7504 BN=   82.70
+  Z 5: exit= 0 pts=  7646 BN=   82.72
+  [INFO] Z 6: G3 BSTAR prior narrows BN to [  22.44, 160.00]
+  Z 6: exit= 1 pts=  6376 BN=   84.33
+  [WARN] Z 7: GA optimum at search boundary -- true value may lie outside the search range
+  Z 7: exit= 1 pts=  1414 BN=  118.68
+  [WARN] Z 8: GA optimum at search boundary -- true value may lie outside the search range
+  Z 8: exit= 1 pts=   417 BN=  135.78
+  PRIMARY Z 8 RPE=   -22.13%   ENSEMBLE RPE=     3.99%
+ [PROGRESS] run   1 done (chunk   1- 21
+
+ ===== run   2: NORAD  35497  lead   90 d
+  [INFO] G2 BN floor estimate=   44.53 -> bn_lo=   22.26
+  Z 1: exit= 0 pts=  7115 BN=   59.36
+  Z 2: exit= 0 pts=  7375 BN=   75.60
+  [WARN] Z 3: RSM envelope does not bound  13 of  36 observations -- proceeding anyway
+  [WARN] Z 3: GA optimum at search boundary -- true value may lie outside the search range
+  Z 3: exit= 0 pts=  7475 BN=   90.48
+  Z 4: exit= 0 pts=  7504 BN=   82.70
+  Z 5: exit= 0 pts=  7646 BN=   82.72
+  [INFO] Z 6: G3 BSTAR prior narrows BN to [  22.44, 160.00]
+  Z 6: exit= 1 pts=  6376 BN=   84.33
+  [WARN] Z 7: GA optimum at search boundary -- true value may lie outside the search range
+  Z 7: exit= 1 pts=  1414 BN=  118.68
+  [WARN] Z 8: RSM envelope does not bound   2 of  19 observations -- proceeding anyway
+  [WARN] Z 8: GA optimum at search boundary -- true value may lie outside the search range
+  Z 8: exit= 1 pts=   628 BN=  135.41
+  PRIMARY Z 8 RPE=   -24.88%   ENSEMBLE RPE=     3.99%
+ [PROGRESS] run   2 done (chunk   1- 21
+
+ ===== run   3: NORAD  35497  lead  180 d
+  [INFO] G2 BN floor estimate=   50.94 -> bn_lo=   25.47
+  Z 1: exit= 0 pts=  6984 BN=   63.79
+  Z 2: exit= 0 pts=  7114 BN=   53.09
+  Z 3: exit= 0 pts=  7376 BN=   86.00
+  [WARN] Z 4: RSM envelope does not bound  21 of  39 observations -- proceeding anyway
+  [WARN] Z 4: GA optimum at search boundary -- true value may lie outside the search range
+  Z 4: exit= 1 pts=  5723 BN=   92.85
+  [WARN] Z 5: RSM envelope does not bound  17 of  36 observations -- proceeding anyway
+  [WARN] Z 5: GA optimum at search boundary -- true value may lie outside the search range
+  Z 5: exit= 0 pts=  7475 BN=   88.02
+  Z 6: exit= 0 pts=  7504 BN=   69.74
+  [WARN] Z 7: GA optimum at search boundary -- true value may lie outside the search range
+  Z 7: exit= 0 pts=  7645 BN=   65.05
+  [WARN] Z 8: GA optimum at search boundary -- true value may lie outside the search range
+  Z 8: exit= 1 pts=  4864 BN=   60.45
+  PRIMARY Z 8 RPE=   232.45%   ENSEMBLE RPE=    51.97%
+ [PROGRESS] run   3 done (chunk   1- 21
+
+ ===== run   4: NORAD  35497  lead  365 d
+  [INFO] G2 BN floor estimate=   44.93 -> bn_lo=   22.47
+  Z 1: exit= 1 pts=  4193 BN=   58.00
+  Z 2: exit= 1 pts=  3646 BN=   48.41
+  Z 3: exit= 1 pts=  5227 BN=   43.32
+  Z 4: exit= 0 pts=  6984 BN=   43.93
+  Z 5: exit= 0 pts=  7115 BN=   37.94
+  [WARN] Z 6: RSM envelope does not bound  21 of  21 observations -- proceeding anyway
+  [WARN] Z 6: GA optimum at search boundary -- true value may lie outside the search range
+  Z 6: exit= 0 pts=  7341 BN=   50.99
+  [WARN] Z 7: GA optimum at search boundary -- true value may lie outside the search range
+  Z 7: exit= 0 pts=  7374 BN=   51.68
+  [WARN] Z 8: RSM envelope does not bound  39 of  39 observations -- proceeding anyway
+  [WARN] Z 8: GA optimum at search boundary -- true value may lie outside the search range
+  Z 8: exit= 1 pts=  5592 BN=   50.99
+  PRIMARY Z 8 RPE=   141.61%   ENSEMBLE RPE=   -28.40%
+ [PROGRESS] run   4 done (chunk   1- 21
+
+ ===== run   5: NORAD  37151  lead   30 d
+  [INFO] G2 BN floor estimate=   34.51 -> bn_lo=   17.26
+  Z 1: exit= 0 pts=  8779 BN=   57.64
+  Z 2: exit= 0 pts=  9664 BN=   53.01
+  [INFO] Z 3: G3 BSTAR prior narrows BN to [  17.78, 160.00]
+  Z 3: exit= 1 pts=  4550 BN=   70.41
+  Z 4: exit= 1 pts=  3298 BN=   64.14
+  [WARN] Z 5: GA optimum at search boundary -- true value may lie outside the search range
+  Z 5: exit= 1 pts=  3334 BN=   46.55
+  Z 6: exit= 1 pts= 10216 BN=   58.77
+  [WARN] Z 7: GA optimum at search boundary -- true value may lie outside the search range
+  Z 7: exit= 1 pts=  2057 BN=   69.93
+  [WARN] Z 8: RSM envelope does not bound   3 of  44 observations -- proceeding anyway
+  [WARN] Z 8: GA optimum at search boundary -- true value may lie outside the search range
+  Z 8: exit= 1 pts=   381 BN=   78.76
+  PRIMARY Z 8 RPE=   -34.34%   ENSEMBLE RPE=    -2.21%
+ [PROGRESS] run   5 done (chunk   1- 21
+
+ ===== run   6: NORAD  37151  lead   90 d
+  [INFO] G2 BN floor estimate=   34.51 -> bn_lo=   17.26
+  Z 1: exit= 0 pts=  8779 BN=   57.64
+  Z 2: exit= 0 pts=  9664 BN=   53.01
+  [INFO] Z 3: G3 BSTAR prior narrows BN to [  17.78, 160.00]
+  Z 3: exit= 1 pts=  4550 BN=   70.41
+  Z 4: exit= 1 pts=  3298 BN=   64.14
+  [WARN] Z 5: GA optimum at search boundary -- true value may lie outside the search range
+  Z 5: exit= 1 pts=  3334 BN=   46.55
+  Z 6: exit= 1 pts= 10216 BN=   58.77
+  [WARN] Z 7: GA optimum at search boundary -- true value may lie outside the search range
+  Z 7: exit= 1 pts=  2057 BN=   69.93
+  [WARN] Z 8: GA optimum at search boundary -- true value may lie outside the search range
+  Z 8: exit= 1 pts=  1389 BN=   78.76
+  PRIMARY Z 8 RPE=     7.78%   ENSEMBLE RPE=    -0.70%
+ [PROGRESS] run   6 done (chunk   1- 21
+
+ ===== run   7: NORAD  37151  lead  180 d
+  [INFO] G2 BN floor estimate=   34.51 -> bn_lo=   17.26
+  Z 1: exit= 0 pts=  8779 BN=   57.64
+  Z 2: exit= 0 pts=  9664 BN=   53.01
+  [INFO] Z 3: G3 BSTAR prior narrows BN to [  17.78, 160.00]
+  Z 3: exit= 1 pts=  4550 BN=   70.41
+  Z 4: exit= 1 pts=  3298 BN=   64.14
+  [WARN] Z 5: GA optimum at search boundary -- true value may lie outside the search range
+  Z 5: exit= 1 pts=  3334 BN=   46.55
+  Z 6: exit= 1 pts= 10216 BN=   58.77
+  [WARN] Z 7: GA optimum at search boundary -- true value may lie outside the search range
+  Z 7: exit= 1 pts=  2057 BN=   69.93
+  [WARN] Z 8: GA optimum at search boundary -- true value may lie outside the search range
+  Z 8: exit= 1 pts=  1769 BN=   78.11
+  PRIMARY Z 8 RPE=   -14.43%   ENSEMBLE RPE=    -3.00%
+ [PROGRESS] run   7 done (chunk   1- 21
+
+ ===== run   8: NORAD  37151  lead  365 d
+  [INFO] G2 BN floor estimate=   34.51 -> bn_lo=   17.26
+  Z 1: exit= 0 pts=  8779 BN=   57.64
+  Z 2: exit= 0 pts=  9664 BN=   53.01
+  [INFO] Z 3: G3 BSTAR prior narrows BN to [  17.78, 160.00]
+  Z 3: exit= 1 pts=  4550 BN=   70.41
+  Z 4: exit= 1 pts=  3298 BN=   64.14
+  [WARN] Z 5: GA optimum at search boundary -- true value may lie outside the search range
+  Z 5: exit= 1 pts=  4538 BN=   46.34
+  [WARN] Z 6: GA optimum at search boundary -- true value may lie outside the search range
+  Z 6: exit= 1 pts=  3277 BN=   44.70
+  Z 7: exit= 1 pts=  9665 BN=   56.41
+  [WARN] Z 8: RSM envelope does not bound   3 of   8 observations -- proceeding anyway
+  [WARN] Z 8: GA optimum at search boundary -- true value may lie outside the search range
+  Z 8: exit= 1 pts=  9664 BN=   59.47
+  PRIMARY Z 8 RPE=   173.95%   ENSEMBLE RPE=     6.12%
+ [PROGRESS] run   8 done (chunk   1- 21
+
+ ===== run   9: NORAD  27526  lead   30 d
+  [INFO] G2 BN floor estimate=   48.19 -> bn_lo=   24.09
+  Z 1: exit= 0 pts=  8427 BN=   72.51
+  Z 2: exit= 1 pts=  9919 BN=   72.09
+  Z 3: exit= 1 pts=  2252 BN=   68.69
+  Z 4: exit= 1 pts=  2792 BN=   79.11
+  [WARN] Z 5: GA optimum at search boundary -- true value may lie outside the search range
+  Z 5: exit= 1 pts=  1772 BN=   71.98
+  [WARN] Z 6: GA optimum at search boundary -- true value may lie outside the search range
+  Z 6: exit= 1 pts=  1696 BN=   66.48
+  [WARN] Z 7: GA optimum at search boundary -- true value may lie outside the search range
+  Z 7: exit= 1 pts=   799 BN=   98.22
+  Z 8: exit= 1 pts=   563 BN=   83.93
+  PRIMARY Z 8 RPE=    13.36%   ENSEMBLE RPE=     0.81%
+ [PROGRESS] run   9 done (chunk   1- 21
+
+ ===== run  10: NORAD  27526  lead   90 d
+  [INFO] G2 BN floor estimate=   48.19 -> bn_lo=   24.09
+  Z 1: exit= 0 pts=  8427 BN=   72.51
+  Z 2: exit= 1 pts=  9919 BN=   72.09
+  Z 3: exit= 1 pts=  2252 BN=   68.69
+  Z 4: exit= 1 pts=  2792 BN=   79.11
+  [WARN] Z 5: GA optimum at search boundary -- true value may lie outside the search range
+  Z 5: exit= 1 pts=  1772 BN=   71.98
+  [WARN] Z 6: GA optimum at search boundary -- true value may lie outside the search range
+  Z 6: exit= 1 pts=  1696 BN=   66.48
+  [WARN] Z 7: GA optimum at search boundary -- true value may lie outside the search range
+  Z 7: exit= 1 pts=   799 BN=   98.22
+  [WARN] Z 8: GA optimum at search boundary -- true value may lie outside the search range
+  Z 8: exit= 1 pts=  1656 BN=  105.04
+  PRIMARY Z 8 RPE=    42.47%   ENSEMBLE RPE=     1.35%
+ [PROGRESS] run  10 done (chunk   1- 21
+
+ ===== run  11: NORAD  27526  lead  180 d
+  [INFO] G2 BN floor estimate=   32.02 -> bn_lo=   16.01
+  [INFO] Z 1: G3 BSTAR prior narrows BN to [  16.43, 160.00]
+  [WARN] Z 1: RSM envelope does not bound   4 of  30 observations -- proceeding anyway
+  [WARN] Z 1: GA optimum at search boundary -- true value may lie outside the search range
+  Z 1: exit= 0 pts=  7849 BN=   57.89
+  [INFO] Z 2: G3 BSTAR prior narrows BN to [  18.61, 160.00]
+  Z 2: exit= 0 pts=  8428 BN=   76.14
+  [INFO] Z 3: G3 BSTAR prior narrows BN to [  18.14, 160.00]
+  Z 3: exit= 0 pts=  8526 BN=   63.05
+  [INFO] Z 4: G3 BSTAR prior narrows BN to [  16.03, 160.00]
+  Z 4: exit= 1 pts=  2911 BN=   58.83
+  Z 5: exit= 1 pts=  5446 BN=   41.16
+  Z 6: exit= 1 pts=  6789 BN=   45.86
+  [WARN] Z 7: GA optimum at search boundary -- true value may lie outside the search range
+  Z 7: exit= 1 pts=  1789 BN=   54.83
+  [WARN] Z 8: GA optimum at search boundary -- true value may lie outside the search range
+  Z 8: exit= 1 pts=  1881 BN=   59.35
+  PRIMARY Z 8 RPE=    -8.66%   ENSEMBLE RPE=    -2.29%
+ [PROGRESS] run  11 done (chunk   1- 21
+
+ ===== run  12: NORAD  27526  lead  365 d
+  [INFO] G2 BN floor estimate=   32.02 -> bn_lo=   16.01
+  [INFO] Z 1: G3 BSTAR prior narrows BN to [  16.43, 160.00]
+  [WARN] Z 1: RSM envelope does not bound   4 of  30 observations -- proceeding anyway
+  [WARN] Z 1: GA optimum at search boundary -- true value may lie outside the search range
+  Z 1: exit= 0 pts=  7849 BN=   57.89
+  [INFO] Z 2: G3 BSTAR prior narrows BN to [  18.61, 160.00]
+  Z 2: exit= 0 pts=  8428 BN=   76.14
+  [INFO] Z 3: G3 BSTAR prior narrows BN to [  18.14, 160.00]
+  Z 3: exit= 0 pts=  8526 BN=   63.05
+  [INFO] Z 4: G3 BSTAR prior narrows BN to [  16.03, 160.00]
+  Z 4: exit= 1 pts=  2911 BN=   58.83
+  Z 5: exit= 1 pts=  2650 BN=   50.01
+  [WARN] Z 6: GA optimum at search boundary -- true value may lie outside the search range
+  Z 6: exit= 1 pts=  5032 BN=   35.05
+  [WARN] Z 7: GA optimum at search boundary -- true value may lie outside the search range
+  Z 7: exit= 1 pts=  6453 BN=   30.56
+  [INFO] Z 8: G3 BSTAR prior narrows BN to [  15.87,  90.51]
+  Z 8: exit= 0 pts= 10214 BN=   36.96
+  PRIMARY Z 7 RPE=    88.33%   ENSEMBLE RPE=     4.84%
+ [PROGRESS] run  12 done (chunk   1- 21
+
+ ===== run  13: NORAD  37819  lead   30 d
+  [INFO] G2 BN floor estimate=   43.93 -> bn_lo=   21.96
+  [INFO] Z 1: G3 BSTAR prior narrows BN to [  28.59, 160.00]
+  Z 1: exit= 1 pts=  5136 BN=   61.75
+  [INFO] Z 2: G3 BSTAR prior narrows BN to [  28.26,  96.26]
+  Z 2: exit= 1 pts=  3430 BN=   44.46
+  [INFO] Z 3: G3 BSTAR prior narrows BN to [  31.05,  61.72]
+  Z 3: exit= 1 pts=  2856 BN=   40.13
+  [INFO] Z 4: G3 BSTAR prior narrows BN to [  31.71,  48.76]
+  Z 4: exit= 1 pts=  2524 BN=   45.15
+  Z 5: exit= 1 pts=  2034 BN=   43.41
+  [WARN] Z 6: GA optimum at search boundary -- true value may lie outside the search range
+  Z 6: exit= 1 pts=  1611 BN=   45.53
+  Z 7: exit= 1 pts=  1507 BN=   44.03
+  [WARN] Z 8: GA optimum at search boundary -- true value may lie outside the search range
+  Z 8: exit= 1 pts=   565 BN=   45.63
+  PRIMARY Z 8 RPE=   -13.70%   ENSEMBLE RPE=    -7.97%
+ [PROGRESS] run  13 done (chunk   1- 21
+
+ ===== run  14: NORAD  37819  lead   90 d
+  [INFO] G2 BN floor estimate=   43.93 -> bn_lo=   21.96
+  [INFO] Z 1: G3 BSTAR prior narrows BN to [  28.59, 160.00]
+  Z 1: exit= 1 pts=  5136 BN=   61.75
+  [INFO] Z 2: G3 BSTAR prior narrows BN to [  28.26,  96.26]
+  Z 2: exit= 1 pts=  3430 BN=   44.46
+  [INFO] Z 3: G3 BSTAR prior narrows BN to [  31.05,  61.72]
+  Z 3: exit= 1 pts=  2856 BN=   40.13
+  [INFO] Z 4: G3 BSTAR prior narrows BN to [  31.71,  48.76]
+  Z 4: exit= 1 pts=  2524 BN=   45.15
+  Z 5: exit= 1 pts=  2034 BN=   43.41
+  [WARN] Z 6: GA optimum at search boundary -- true value may lie outside the search range
+  Z 6: exit= 1 pts=  1611 BN=   45.53
+  Z 7: exit= 1 pts=  1507 BN=   44.03
+  [WARN] Z 8: GA optimum at search boundary -- true value may lie outside the search range
+  Z 8: exit= 1 pts=  1202 BN=   45.58
+  PRIMARY Z 8 RPE=   -15.15%   ENSEMBLE RPE=    -7.97%
+ [PROGRESS] run  14 done (chunk   1- 21
+
+ ===== run  15: NORAD  37819  lead  180 d
+  [INFO] G2 BN floor estimate=   24.67 -> bn_lo=   12.33
+  [INFO] Z 1: G3 BSTAR prior narrows BN to [  20.77, 160.00]
+  [WARN] Z 1: GA optimum at search boundary -- true value may lie outside the search range
+  Z 1: exit= 1 pts=  3976 BN=   37.90
+  [INFO] Z 2: G3 BSTAR prior narrows BN to [  22.91, 196.92]
+  Z 2: exit= 1 pts=  2742 BN=   63.90
+  [INFO] Z 3: G3 BSTAR prior narrows BN to [  28.59, 110.63]
+  Z 3: exit= 1 pts=  4394 BN=   48.91
+  [INFO] Z 4: G3 BSTAR prior narrows BN to [  28.26,  72.28]
+  Z 4: exit= 1 pts=  3177 BN=   39.96
+  [INFO] Z 5: G3 BSTAR prior narrows BN to [  31.05,  51.64]
+  Z 5: exit= 1 pts=  2810 BN=   39.18
+  [WARN] Z 6: GA optimum at search boundary -- true value may lie outside the search range
+  Z 6: exit= 1 pts=  2506 BN=   44.67
+  [INFO] Z 7: G3 BSTAR prior narrows BN to [  31.79,  47.94]
+  Z 7: exit= 1 pts=  2058 BN=   44.16
+  Z 8: exit= 1 pts=  1634 BN=   46.32
+  PRIMARY Z 8 RPE=   -26.86%   ENSEMBLE RPE=    -6.77%
+ [PROGRESS] run  15 done (chunk   1- 21
+
+ ===== run  16: NORAD  37819  lead  365 d
+  [INFO] G2 BN floor estimate=   24.58 -> bn_lo=   12.29
+  [INFO] Z 1: G3 BSTAR prior narrows BN to [  20.42, 160.00]
+  [WARN] Z 1: GA optimum at search boundary -- true value may lie outside the search range
+  Z 1: exit= 1 pts=  4220 BN=   34.48
+  [INFO] Z 2: G3 BSTAR prior narrows BN to [  20.77, 196.93]
+  [WARN] Z 2: GA optimum at search boundary -- true value may lie outside the search range
+  Z 2: exit= 1 pts=  4024 BN=   41.09
+  [INFO] Z 3: G3 BSTAR prior narrows BN to [  21.96, 243.66]
+  Z 3: exit= 1 pts=  3718 BN=   66.52
+  [INFO] Z 4: G3 BSTAR prior narrows BN to [  22.46, 124.93]
+  Z 4: exit= 1 pts=  2937 BN=   45.48
+  [INFO] Z 5: G3 BSTAR prior narrows BN to [  21.29,  74.21]
+  Z 5: exit= 1 pts=  2478 BN=   34.96
+  [INFO] Z 6: G3 BSTAR prior narrows BN to [  22.91,  49.32]
+  Z 6: exit= 1 pts=  2434 BN=   36.59
+  [WARN] Z 7: GA optimum at search boundary -- true value may lie outside the search range
+  Z 7: exit= 1 pts=  3983 BN=   42.71
+  [INFO] Z 8: G3 BSTAR prior narrows BN to [  28.66,  47.36]
+  Z 8: exit= 1 pts=  3691 BN=   40.06
+  PRIMARY Z 8 RPE=    -3.33%   ENSEMBLE RPE=   -24.79%
+ [PROGRESS] run  16 done (chunk   1- 21
+
+ ===== run  17: NORAD  59347  lead   30 d
+  [INFO] G2 BN floor estimate=   52.05 -> bn_lo=   26.03
+  [WARN] Z 1: GA optimum at search boundary -- true value may lie outside the search range
+  Z 1: exit= 0 pts=  2237 BN=  148.58
+  [INFO] Z 2: G3 BSTAR prior narrows BN to [  26.03, 109.59]
+  [WARN] Z 2: GA optimum at search boundary -- true value may lie outside the search range
+  Z 2: exit= 0 pts=  2245 BN=   26.30
+  [INFO] Z 3: G3 BSTAR prior narrows BN to [  26.03,  87.04]
+  [WARN] Z 3: GA optimum at search boundary -- true value may lie outside the search range
+  Z 3: exit= 0 pts=  2251 BN=   28.44
+  [INFO] Z 4: G3 BSTAR prior narrows BN to [  26.03,  77.54]
+  [WARN] Z 4: GA optimum at search boundary -- true value may lie outside the search range
+  Z 4: exit= 0 pts=  2259 BN=   26.98
+  [WARN] Z 5: GA optimum at search boundary -- true value may lie outside the search range
+  Z 5: exit= 0 pts=  2268 BN=  151.20
+  [WARN] Z 6: RSM envelope does not bound   7 of  15 observations -- proceeding anyway
+  [WARN] Z 6: GA optimum at search boundary -- true value may lie outside the search range
+  Z 6: exit= 1 pts=   207 BN=  159.73
+  [INFO] Z 7: G3 BSTAR prior narrows BN to [  19.54, 193.49]
+  [WARN] Z 7: RSM envelope does not bound   7 of   8 observations -- proceeding anyway
+  [WARN] Z 7: GA optimum at search boundary -- true value may lie outside the search range
+  Z 7: exit= 1 pts=    75 BN=  191.15
+  [INFO] Z 8: G3 BSTAR prior narrows BN to [  16.67, 198.44]
+  [WARN] Z 8: GA optimum at search boundary -- true value may lie outside the search range
+  Z 8: exit= 1 pts=   127 BN=  197.83
+  PRIMARY Z 8 RPE=   -69.80%   ENSEMBLE RPE=   -10.63%
+ [PROGRESS] run  17 done (chunk   1- 21
+
+ ===== run  18: NORAD  59347  lead   90 d
+  [INFO] G2 BN floor estimate=   52.05 -> bn_lo=   26.03
+  [WARN] Z 1: GA optimum at search boundary -- true value may lie outside the search range
+  Z 1: exit= 0 pts=  2237 BN=  148.58
+  [INFO] Z 2: G3 BSTAR prior narrows BN to [  26.03, 145.00]
+  [WARN] Z 2: GA optimum at search boundary -- true value may lie outside the search range
+  Z 2: exit= 0 pts=  2241 BN=   26.40
+  [INFO] Z 3: G3 BSTAR prior narrows BN to [  26.03, 109.59]
+  [WARN] Z 3: GA optimum at search boundary -- true value may lie outside the search range
+  Z 3: exit= 0 pts=  2245 BN=   26.30
+  [INFO] Z 4: G3 BSTAR prior narrows BN to [  26.03,  87.04]
+  [WARN] Z 4: GA optimum at search boundary -- true value may lie outside the search range
+  Z 4: exit= 0 pts=  2251 BN=   28.44
+  [INFO] Z 5: G3 BSTAR prior narrows BN to [  26.03,  77.54]
+  [WARN] Z 5: GA optimum at search boundary -- true value may lie outside the search range
+  Z 5: exit= 0 pts=  2259 BN=   26.98
+  [INFO] Z 6: G3 BSTAR prior narrows BN to [  26.03,  92.64]
+  [WARN] Z 6: GA optimum at search boundary -- true value may lie outside the search range
+  Z 6: exit= 0 pts=  2265 BN=   30.20
+  [WARN] Z 7: GA optimum at search boundary -- true value may lie outside the search range
+  Z 7: exit= 0 pts=  2268 BN=  151.20
+  [WARN] Z 8: RSM envelope does not bound   7 of  15 observations -- proceeding anyway
+  [WARN] Z 8: GA optimum at search boundary -- true value may lie outside the search range
+  Z 8: exit= 1 pts=   207 BN=  159.73
+  PRIMARY Z 8 RPE=   -60.21%   ENSEMBLE RPE=   -10.63%
+ [PROGRESS] run  18 done (chunk   1- 21
+
+ ===== run  19: NORAD  59347  lead  180 d
+  [INFO] G2 BN floor estimate=   52.05 -> bn_lo=   26.03
+  [WARN] Z 1: GA optimum at search boundary -- true value may lie outside the search range
+  Z 1: exit= 0 pts=  2237 BN=  148.58
+  [INFO] Z 2: G3 BSTAR prior narrows BN to [  26.03, 145.00]
+  [WARN] Z 2: GA optimum at search boundary -- true value may lie outside the search range
+  Z 2: exit= 0 pts=  2241 BN=   26.40
+  [INFO] Z 3: G3 BSTAR prior narrows BN to [  26.03, 109.59]
+  [WARN] Z 3: GA optimum at search boundary -- true value may lie outside the search range
+  Z 3: exit= 0 pts=  2245 BN=   26.30
+  [INFO] Z 4: G3 BSTAR prior narrows BN to [  26.03,  87.04]
+  [WARN] Z 4: GA optimum at search boundary -- true value may lie outside the search range
+  Z 4: exit= 0 pts=  2251 BN=   28.44
+  [INFO] Z 5: G3 BSTAR prior narrows BN to [  26.03,  77.54]
+  [WARN] Z 5: GA optimum at search boundary -- true value may lie outside the search range
+  Z 5: exit= 0 pts=  2259 BN=   26.98
+  [INFO] Z 6: G3 BSTAR prior narrows BN to [  26.03,  92.64]
+  [WARN] Z 6: GA optimum at search boundary -- true value may lie outside the search range
+  Z 6: exit= 0 pts=  2265 BN=   30.20
+  [WARN] Z 7: GA optimum at search boundary -- true value may lie outside the search range
+  Z 7: exit= 0 pts=  2268 BN=  151.20
+  [INFO] Z 8: G3 BSTAR prior narrows BN to [  26.03,  97.15]
+  [WARN] Z 8: GA optimum at search boundary -- true value may lie outside the search range
+  Z 8: exit= 1 pts=   186 BN=   27.01
+  PRIMARY Z 8 RPE=   -35.57%   ENSEMBLE RPE=    -9.58%
+ [PROGRESS] run  19 done (chunk   1- 21
+
+ ===== run  20: NORAD  59347  lead  365 d
+  [INFO] G2 BN floor estimate=    5.00 -> bn_lo=    2.50
+  [INFO] Z 1: G3 BSTAR prior narrows BN to [   9.40, 111.91]
+  [WARN] Z 1: GA optimum at search boundary -- true value may lie outside the search range
+  Z 1: exit= 0 pts=  2232 BN=   10.03
+  [INFO] Z 2: G3 BSTAR prior narrows BN to [  13.60, 160.00]
+  [WARN] Z 2: GA optimum at search boundary -- true value may lie outside the search range
+  Z 2: exit= 0 pts=  2237 BN=  158.18
+  [INFO] Z 3: G3 BSTAR prior narrows BN to [  12.18, 145.00]
+  [WARN] Z 3: GA optimum at search boundary -- true value may lie outside the search range
+  Z 3: exit= 0 pts=  2241 BN=   15.86
+  [INFO] Z 4: G3 BSTAR prior narrows BN to [   9.21, 109.59]
+  [WARN] Z 4: GA optimum at search boundary -- true value may lie outside the search range
+  Z 4: exit= 0 pts=  2244 BN=   11.05
+  [INFO] Z 5: G3 BSTAR prior narrows BN to [   7.31,  87.04]
+  [WARN] Z 5: GA optimum at search boundary -- true value may lie outside the search range
+  Z 5: exit= 0 pts=  2249 BN=   10.17
+  [INFO] Z 6: G3 BSTAR prior narrows BN to [   6.52,  77.54]
+  [WARN] Z 6: GA optimum at search boundary -- true value may lie outside the search range
+  Z 6: exit= 0 pts=  2258 BN=    7.61
+  [INFO] Z 7: G3 BSTAR prior narrows BN to [   7.78,  92.64]
+  [WARN] Z 7: GA optimum at search boundary -- true value may lie outside the search range
+  Z 7: exit= 0 pts=  2264 BN=    7.92
+  [INFO] Z 8: G3 BSTAR prior narrows BN to [  21.81, 160.00]
+  [WARN] Z 8: GA optimum at search boundary -- true value may lie outside the search range
+  Z 8: exit= 0 pts=  2268 BN=   98.20
+  no zone predicted a re-entry
+ [PROGRESS] run  20 done (chunk   1- 21
+
+ ===== run  21: NORAD  40943  lead   30 d
+  [INFO] G2 BN floor estimate=    6.87 -> bn_lo=    3.43
+  [INFO] Z 1: G3 BSTAR prior narrows BN to [   8.90, 105.98]
+  [WARN] Z 1: GA optimum at search boundary -- true value may lie outside the search range
+  Z 1: exit= 0 pts=  6388 BN=   11.02
+  [INFO] Z 2: G3 BSTAR prior narrows BN to [  12.12, 144.19]
+  [WARN] Z 2: RSM envelope does not bound   6 of  32 observations -- proceeding anyway
+  [WARN] Z 2: GA optimum at search boundary -- true value may lie outside the search range
+  Z 2: exit= 0 pts=  6919 BN=   26.03
+  [INFO] Z 3: G3 BSTAR prior narrows BN to [  10.16, 120.97]
+  [WARN] Z 3: RSM envelope does not bound   8 of  28 observations -- proceeding anyway
+  [WARN] Z 3: GA optimum at search boundary -- true value may lie outside the search range
+  Z 3: exit= 0 pts=  7006 BN=   10.72
+  [INFO] Z 4: G3 BSTAR prior narrows BN to [  10.80, 128.55]
+  [WARN] Z 4: GA optimum at search boundary -- true value may lie outside the search range
+  Z 4: exit= 0 pts=  7421 BN=   27.96
+  [INFO] Z 5: G3 BSTAR prior narrows BN to [  10.68, 127.09]
+  [WARN] Z 5: GA optimum at search boundary -- true value may lie outside the search range
+  Z 5: exit= 0 pts=  7559 BN=   17.29
+  [INFO] Z 6: G3 BSTAR prior narrows BN to [   9.65, 114.87]
+  [WARN] Z 6: GA optimum at search boundary -- true value may lie outside the search range
+  Z 6: exit= 1 pts=  1764 BN=   15.78
+  [INFO] Z 7: G3 BSTAR prior narrows BN to [  11.21, 133.47]
+  [WARN] Z 7: GA optimum at search boundary -- true value may lie outside the search range
+  Z 7: exit= 1 pts=  2159 BN=   28.38
+  [INFO] Z 8: G3 BSTAR prior narrows BN to [  14.01, 166.79]
+  Z 8: exit= 1 pts=   927 BN=   40.53
+  PRIMARY Z 8 RPE=   127.74%   ENSEMBLE RPE=    11.46%
+ [PROGRESS] run  21 done (chunk   1- 21
+
+ campaign complete -> scratch_rpe/manuscript23/results_summary_part_001_021.csv

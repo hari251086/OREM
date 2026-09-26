@@ -1,0 +1,194 @@
+
+ ===== run  62: NORAD  44911  lead  180 d
+  Z 1: exit= 0 pts=  1759 BN=  140.02
+  [WARN] Z 2: GA optimum at search boundary -- true value may lie outside the search range
+  Z 2: exit= 0 pts=  1760 BN=   87.62
+  [WARN] Z 3: GA optimum at search boundary -- true value may lie outside the search range
+  Z 3: exit= 0 pts=  1760 BN=   84.81
+  [WARN] Z 4: RSM envelope does not bound   5 of  17 observations -- proceeding anyway
+  [WARN] Z 4: GA optimum at search boundary -- true value may lie outside the search range
+  Z 4: exit= 0 pts=  1759 BN=   89.71
+  [WARN] Z 5: RSM envelope does not bound   5 of  16 observations -- proceeding anyway
+  [WARN] Z 5: GA optimum at search boundary -- true value may lie outside the search range
+  Z 5: exit= 0 pts=  1759 BN=  131.49
+  [WARN] Z 6: RSM envelope does not bound  10 of  13 observations -- proceeding anyway
+  [WARN] Z 6: GA optimum at search boundary -- true value may lie outside the search range
+  Z 6: exit= 0 pts=  1759 BN=  133.93
+  [WARN] Z 7: RSM envelope does not bound  13 of  14 observations -- proceeding anyway
+  [WARN] Z 7: GA optimum at search boundary -- true value may lie outside the search range
+  Z 7: exit= 0 pts=  1760 BN=   83.70
+  [WARN] Z 8: RSM envelope does not bound  12 of  19 observations -- proceeding anyway
+  [WARN] Z 8: GA optimum at search boundary -- true value may lie outside the search range
+  Z 8: exit= 0 pts=  1759 BN=   88.88
+  no zone predicted a re-entry
+ [PROGRESS] run  62 done (chunk  62- 82
+
+ ===== run  63: NORAD  44911  lead  365 d
+  Z 1: exit= 0 pts=  1759 BN=  140.02
+  [WARN] Z 2: GA optimum at search boundary -- true value may lie outside the search range
+  Z 2: exit= 0 pts=  1760 BN=   87.62
+  [WARN] Z 3: GA optimum at search boundary -- true value may lie outside the search range
+  Z 3: exit= 0 pts=  1760 BN=   84.81
+  [WARN] Z 4: RSM envelope does not bound   5 of  17 observations -- proceeding anyway
+  [WARN] Z 4: GA optimum at search boundary -- true value may lie outside the search range
+  Z 4: exit= 0 pts=  1759 BN=   89.71
+  [WARN] Z 5: RSM envelope does not bound   5 of  16 observations -- proceeding anyway
+  [WARN] Z 5: GA optimum at search boundary -- true value may lie outside the search range
+  Z 5: exit= 0 pts=  1759 BN=  131.49
+  [WARN] Z 6: RSM envelope does not bound  10 of  13 observations -- proceeding anyway
+  [WARN] Z 6: GA optimum at search boundary -- true value may lie outside the search range
+  Z 6: exit= 0 pts=  1759 BN=  133.93
+  [WARN] Z 7: RSM envelope does not bound  13 of  14 observations -- proceeding anyway
+  [WARN] Z 7: GA optimum at search boundary -- true value may lie outside the search range
+  Z 7: exit= 0 pts=  1760 BN=   83.70
+  [WARN] Z 8: RSM envelope does not bound  12 of  19 observations -- proceeding anyway
+  [WARN] Z 8: GA optimum at search boundary -- true value may lie outside the search range
+  Z 8: exit= 0 pts=  1759 BN=   88.88
+  no zone predicted a re-entry
+ [PROGRESS] run  63 done (chunk  62- 82
+
+ ===== run  64: NORAD   6294  lead   30 d
+  [WARN] tle_filter: epoch gap at point   108 (********** -> **********,     31.9 days)
+  [WARN] tle_filter: epoch gap at point   110 (********** -> **********,     54.3 days)
+  [WARN] tle_filter: epoch gap at point   156 (********** -> **********,     36.9 days)
+  [WARN] tle_filter: epoch gap at point   157 (********** -> **********,     32.9 days)
+  [WARN] tle_filter: epoch gap at point   204 (********** -> **********,     33.0 days)
+  pipeline error ierr=  2
+ [PROGRESS] run  64 done (chunk  62- 82
+
+ ===== run  65: NORAD   6294  lead   90 d
+  [WARN] tle_filter: epoch gap at point   108 (********** -> **********,     31.9 days)
+  [WARN] tle_filter: epoch gap at point   110 (********** -> **********,     54.3 days)
+  [WARN] tle_filter: epoch gap at point   156 (********** -> **********,     36.9 days)
+  [WARN] tle_filter: epoch gap at point   157 (********** -> **********,     32.9 days)
+  [WARN] tle_filter: epoch gap at point   204 (********** -> **********,     33.0 days)
+  pipeline error ierr=  2
+ [PROGRESS] run  65 done (chunk  62- 82
+
+ ===== run  66: NORAD   6294  lead  180 d
+  [WARN] tle_filter: epoch gap at point   108 (********** -> **********,     31.9 days)
+  [WARN] tle_filter: epoch gap at point   110 (********** -> **********,     54.3 days)
+  [WARN] tle_filter: epoch gap at point   156 (********** -> **********,     36.9 days)
+  [WARN] tle_filter: epoch gap at point   157 (********** -> **********,     32.9 days)
+  pipeline error ierr=  2
+ [PROGRESS] run  66 done (chunk  62- 82
+
+ ===== run  67: NORAD   6294  lead  365 d
+  [WARN] tle_filter: epoch gap at point   108 (********** -> **********,     31.9 days)
+  [WARN] tle_filter: epoch gap at point   110 (********** -> **********,     54.3 days)
+  [WARN] tle_filter: epoch gap at point   156 (********** -> **********,     36.9 days)
+  [WARN] tle_filter: epoch gap at point   157 (********** -> **********,     32.9 days)
+  pipeline error ierr=  2
+ [PROGRESS] run  67 done (chunk  62- 82
+
+ ===== run  68: NORAD  18954  lead   30 d
+  [WARN] tle_filter: epoch gap at point     3 (********** -> **********,     34.3 days)
+  [WARN] tle_filter: epoch gap at point     6 (********** -> **********,     68.6 days)
+  pipeline error ierr=  2
+ [PROGRESS] run  68 done (chunk  62- 82
+
+ ===== run  69: NORAD  18954  lead   90 d
+  [WARN] tle_filter: epoch gap at point     3 (********** -> **********,     34.3 days)
+  [WARN] tle_filter: epoch gap at point     6 (********** -> **********,     68.6 days)
+  pipeline error ierr=  2
+ [PROGRESS] run  69 done (chunk  62- 82
+
+ ===== run  70: NORAD  18954  lead  180 d
+  [WARN] tle_filter: epoch gap at point     3 (********** -> **********,     34.3 days)
+  [WARN] tle_filter: epoch gap at point     6 (********** -> **********,     68.6 days)
+  pipeline error ierr=  2
+ [PROGRESS] run  70 done (chunk  62- 82
+
+ ===== run  71: NORAD  29462  lead   30 d
+  [WARN] tle_filter: epoch gap at point    12 (********** -> **********,     72.8 days)
+  [WARN] tle_filter: epoch gap at point    13 (********** -> **********,    346.6 days)
+  [WARN] tle_filter: epoch gap at point    30 (********** -> **********,     39.5 days)
+  [WARN] tle_filter: epoch gap at point    98 (********** -> **********,     45.8 days)
+  [WARN] tle_filter: epoch gap at point   121 (********** -> **********,     56.6 days)
+  [WARN] tle_filter: epoch gap at point   122 (********** -> **********,     40.9 days)
+  [WARN] tle_filter: epoch gap at point   124 (********** -> **********,     52.7 days)
+  [WARN] tle_filter: epoch gap at point   125 (********** -> **********,     35.9 days)
+  pipeline error ierr=  2
+ [PROGRESS] run  71 done (chunk  62- 82
+
+ ===== run  72: NORAD  29462  lead   90 d
+  [WARN] tle_filter: epoch gap at point    12 (********** -> **********,     72.8 days)
+  [WARN] tle_filter: epoch gap at point    13 (********** -> **********,    346.6 days)
+  [WARN] tle_filter: epoch gap at point    30 (********** -> **********,     39.5 days)
+  [WARN] tle_filter: epoch gap at point    98 (********** -> **********,     45.8 days)
+  [WARN] tle_filter: epoch gap at point   121 (********** -> **********,     56.6 days)
+  [WARN] tle_filter: epoch gap at point   122 (********** -> **********,     40.9 days)
+  [WARN] tle_filter: epoch gap at point   124 (********** -> **********,     52.7 days)
+  [WARN] tle_filter: epoch gap at point   125 (********** -> **********,     35.9 days)
+  pipeline error ierr=  2
+ [PROGRESS] run  72 done (chunk  62- 82
+
+ ===== run  73: NORAD  29462  lead  180 d
+  [WARN] tle_filter: epoch gap at point    12 (********** -> **********,     72.8 days)
+  [WARN] tle_filter: epoch gap at point    13 (********** -> **********,    346.6 days)
+  [WARN] tle_filter: epoch gap at point    30 (********** -> **********,     39.5 days)
+  [WARN] tle_filter: epoch gap at point    98 (********** -> **********,     45.8 days)
+  [WARN] tle_filter: epoch gap at point   121 (********** -> **********,     56.6 days)
+  [WARN] tle_filter: epoch gap at point   122 (********** -> **********,     40.9 days)
+  [WARN] tle_filter: epoch gap at point   124 (********** -> **********,     52.7 days)
+  [WARN] tle_filter: epoch gap at point   125 (********** -> **********,     35.9 days)
+  pipeline error ierr=  2
+ [PROGRESS] run  73 done (chunk  62- 82
+
+ ===== run  74: NORAD  29462  lead  365 d
+  [WARN] tle_filter: epoch gap at point    12 (********** -> **********,     72.8 days)
+  [WARN] tle_filter: epoch gap at point    13 (********** -> **********,    346.6 days)
+  [WARN] tle_filter: epoch gap at point    30 (********** -> **********,     39.5 days)
+  [WARN] tle_filter: epoch gap at point    98 (********** -> **********,     45.8 days)
+  [WARN] tle_filter: epoch gap at point   121 (********** -> **********,     56.6 days)
+  [WARN] tle_filter: epoch gap at point   122 (********** -> **********,     40.9 days)
+  [WARN] tle_filter: epoch gap at point   124 (********** -> **********,     52.7 days)
+  [WARN] tle_filter: epoch gap at point   125 (********** -> **********,     35.9 days)
+  pipeline error ierr=  2
+ [PROGRESS] run  74 done (chunk  62- 82
+
+ ===== run  75: NORAD   5941  lead   30 d
+  [WARN] tle_filter: epoch gap at point     2 (********** -> **********,   1227.9 days)
+  pipeline error ierr=  2
+ [PROGRESS] run  75 done (chunk  62- 82
+
+ ===== run  76: NORAD   5941  lead   90 d
+  [WARN] tle_filter: epoch gap at point     2 (********** -> **********,   1227.9 days)
+  pipeline error ierr=  2
+ [PROGRESS] run  76 done (chunk  62- 82
+
+ ===== run  77: NORAD   5941  lead  180 d
+  [WARN] tle_filter: epoch gap at point     2 (********** -> **********,   1227.9 days)
+  pipeline error ierr=  2
+ [PROGRESS] run  77 done (chunk  62- 82
+
+ ===== run  78: NORAD   5941  lead  365 d
+  [WARN] tle_filter: epoch gap at point     2 (********** -> **********,   1227.9 days)
+  pipeline error ierr=  2
+ [PROGRESS] run  78 done (chunk  62- 82
+
+ ===== run  79: NORAD   6231  lead   30 d
+  [WARN] tle_filter: epoch gap at point   150 (********** -> **********,     32.4 days)
+  [WARN] tle_filter: epoch gap at point   182 (********** -> **********,     54.3 days)
+  pipeline error ierr=  2
+ [PROGRESS] run  79 done (chunk  62- 82
+
+ ===== run  80: NORAD   6231  lead   90 d
+  [WARN] tle_filter: epoch gap at point   150 (********** -> **********,     32.4 days)
+  [WARN] tle_filter: epoch gap at point   182 (********** -> **********,     54.3 days)
+  pipeline error ierr=  2
+ [PROGRESS] run  80 done (chunk  62- 82
+
+ ===== run  81: NORAD   6231  lead  180 d
+  [WARN] tle_filter: epoch gap at point   150 (********** -> **********,     32.4 days)
+  [WARN] tle_filter: epoch gap at point   182 (********** -> **********,     54.3 days)
+  pipeline error ierr=  2
+ [PROGRESS] run  81 done (chunk  62- 82
+
+ ===== run  82: NORAD   6231  lead  365 d
+  [WARN] tle_filter: epoch gap at point   150 (********** -> **********,     32.4 days)
+  [WARN] tle_filter: epoch gap at point   182 (********** -> **********,     54.3 days)
+  pipeline error ierr=  2
+ [PROGRESS] run  82 done (chunk  62- 82
+
+ campaign complete -> scratch_rpe/manuscript23/results_summary_part_062_082.csv
