@@ -25,11 +25,22 @@ c     lineage) -- same formula, moved into Fortran so this tool has no
 c     Python dependency, rather than duplicating orbital-mechanics
 c     logic in OREM-Watchlist's own Python code.
 c
-c     Zones are capped at MAX_ZONES_OUT (5) -- rsm_generate+ga_optimize
-c     +propagate_ks is a real propagation per zone (not a DB read),
-c     ~5-10s each; OREM-Watchlist's dashboard is expected to cache the
-c     resulting CSVs per object (see issue #33's acceptance criteria),
-c     not call this on every page view.
+c     Zones are capped at MAX_ZONES_OUT (50, matching production's own
+c     nzones_max cap -- see main_orem.F/orem_wrapper.py) -- rsm_generate
+c     +ga_optimize+propagate_ks is a real propagation per zone (not a DB
+c     read), ~5-10s each; OREM-Watchlist's dashboard is expected to
+c     cache the resulting CSVs per object (see issue #33's acceptance
+c     criteria), not call this on every page view.
+c
+c     Was 5 until 2026-09-26: zone_select's own Pass 3 sorts its output
+c     chronologically, so a cap of 5 silently kept only the EARLIEST 5
+c     zones of a multi-year TLE record and discarded every later,
+c     usually far more accurate, zone -- e.g. NORAD 37151's cached
+c     trajectory CSV showed only 2011-era zones while the real 50-zone
+c     production run's late-2015 zones (the ones actually driving the
+c     0.23% ensemble RPE shown elsewhere on the same page) never
+c     appeared in the plot. Raised to match production so the plotted
+c     zones are the same set the accuracy numbers come from.
 c
 c     Usage:
 c       object_detail_data.exe <orem.cfg> <output_prefix>
@@ -44,7 +55,7 @@ c     ============================================================
       common /xy/ pi, d2r, r2d, amue, AU, R_Earth
 
       parameter (maxpts = 15000, maxtle = 100000, max_surf = 5000)
-      parameter (max_traj = 20000, ndim_a = 291, max_zones_out = 5)
+      parameter (max_traj = 20000, ndim_a = 291, max_zones_out = 50)
       integer norad_id
       character*200 cfg_file, tle_file, out_prefix
       character*260 path_evo, path_surf, path_obs, path_traj
