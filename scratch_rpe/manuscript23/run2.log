@@ -1,0 +1,405 @@
+
+ ===== run  22: NORAD  40943  lead   90 d
+  [INFO] G2 BN floor estimate=    6.87 -> bn_lo=    3.43
+  [INFO] Z 1: G3 BSTAR prior narrows BN to [   8.90, 105.98]
+  [WARN] Z 1: GA optimum at search boundary -- true value may lie outside the search range
+  Z 1: exit= 0 pts=  6388 BN=   11.02
+  [INFO] Z 2: G3 BSTAR prior narrows BN to [  14.00, 160.00]
+  [WARN] Z 2: GA optimum at search boundary -- true value may lie outside the search range
+  Z 2: exit= 0 pts=  6880 BN=   15.02
+  [INFO] Z 3: G3 BSTAR prior narrows BN to [  12.12, 144.19]
+  [WARN] Z 3: RSM envelope does not bound   6 of  32 observations -- proceeding anyway
+  [WARN] Z 3: GA optimum at search boundary -- true value may lie outside the search range
+  Z 3: exit= 0 pts=  6919 BN=   26.03
+  [INFO] Z 4: G3 BSTAR prior narrows BN to [  10.16, 120.97]
+  [WARN] Z 4: RSM envelope does not bound   8 of  28 observations -- proceeding anyway
+  [WARN] Z 4: GA optimum at search boundary -- true value may lie outside the search range
+  Z 4: exit= 0 pts=  7006 BN=   10.72
+  [INFO] Z 5: G3 BSTAR prior narrows BN to [  10.80, 128.55]
+  [WARN] Z 5: GA optimum at search boundary -- true value may lie outside the search range
+  Z 5: exit= 0 pts=  7421 BN=   27.96
+  [INFO] Z 6: G3 BSTAR prior narrows BN to [  10.68, 127.09]
+  [WARN] Z 6: GA optimum at search boundary -- true value may lie outside the search range
+  Z 6: exit= 0 pts=  7559 BN=   17.29
+  [INFO] Z 7: G3 BSTAR prior narrows BN to [   9.65, 114.87]
+  [WARN] Z 7: GA optimum at search boundary -- true value may lie outside the search range
+  Z 7: exit= 1 pts=  1764 BN=   15.78
+  [INFO] Z 8: G3 BSTAR prior narrows BN to [  10.53, 125.37]
+  [WARN] Z 8: GA optimum at search boundary -- true value may lie outside the search range
+  Z 8: exit= 1 pts=  2107 BN=   27.60
+  PRIMARY Z 8 RPE=   145.13%   ENSEMBLE RPE=    14.08%
+ [PROGRESS] run  22 done (chunk  22- 41
+
+ ===== run  23: NORAD  40943  lead  180 d
+  [INFO] G2 BN floor estimate=    6.87 -> bn_lo=    3.43
+  [INFO] Z 1: G3 BSTAR prior narrows BN to [   8.90, 105.98]
+  [WARN] Z 1: GA optimum at search boundary -- true value may lie outside the search range
+  Z 1: exit= 0 pts=  6388 BN=   11.02
+  [INFO] Z 2: G3 BSTAR prior narrows BN to [   8.95, 106.46]
+  [WARN] Z 2: GA optimum at search boundary -- true value may lie outside the search range
+  Z 2: exit= 0 pts=  6453 BN=   10.20
+  [INFO] Z 3: G3 BSTAR prior narrows BN to [  14.00, 160.00]
+  [WARN] Z 3: GA optimum at search boundary -- true value may lie outside the search range
+  Z 3: exit= 0 pts=  6880 BN=   15.02
+  [INFO] Z 4: G3 BSTAR prior narrows BN to [  12.12, 144.19]
+  [WARN] Z 4: RSM envelope does not bound   6 of  32 observations -- proceeding anyway
+  [WARN] Z 4: GA optimum at search boundary -- true value may lie outside the search range
+  Z 4: exit= 0 pts=  6919 BN=   26.03
+  [INFO] Z 5: G3 BSTAR prior narrows BN to [  10.16, 120.97]
+  [WARN] Z 5: RSM envelope does not bound   8 of  28 observations -- proceeding anyway
+  [WARN] Z 5: GA optimum at search boundary -- true value may lie outside the search range
+  Z 5: exit= 0 pts=  7006 BN=   10.72
+  [INFO] Z 6: G3 BSTAR prior narrows BN to [  10.58, 125.97]
+  [WARN] Z 6: GA optimum at search boundary -- true value may lie outside the search range
+  Z 6: exit= 0 pts=  7126 BN=   15.50
+  [INFO] Z 7: G3 BSTAR prior narrows BN to [  10.80, 128.55]
+  [WARN] Z 7: GA optimum at search boundary -- true value may lie outside the search range
+  Z 7: exit= 0 pts=  7421 BN=   27.96
+  [INFO] Z 8: G3 BSTAR prior narrows BN to [  10.68, 127.09]
+  [WARN] Z 8: GA optimum at search boundary -- true value may lie outside the search range
+  Z 8: exit= 0 pts=  7559 BN=   17.29
+  no zone predicted a re-entry
+ [PROGRESS] run  23 done (chunk  22- 41
+
+ ===== run  24: NORAD  40943  lead  365 d
+  [INFO] G2 BN floor estimate=    5.00 -> bn_lo=    2.50
+  [INFO] Z 1: G3 BSTAR prior narrows BN to [   7.29,  86.80]
+  [WARN] Z 1: GA optimum at search boundary -- true value may lie outside the search range
+  Z 1: exit= 0 pts=  5332 BN=    8.57
+  [INFO] Z 2: G3 BSTAR prior narrows BN to [   8.90, 105.98]
+  [WARN] Z 2: GA optimum at search boundary -- true value may lie outside the search range
+  Z 2: exit= 0 pts=  6388 BN=   11.02
+  [INFO] Z 3: G3 BSTAR prior narrows BN to [   8.95, 106.46]
+  [WARN] Z 3: GA optimum at search boundary -- true value may lie outside the search range
+  Z 3: exit= 0 pts=  6453 BN=   10.20
+  [INFO] Z 4: G3 BSTAR prior narrows BN to [  10.81, 128.70]
+  [WARN] Z 4: GA optimum at search boundary -- true value may lie outside the search range
+  Z 4: exit= 0 pts=  6627 BN=   10.85
+  [INFO] Z 5: G3 BSTAR prior narrows BN to [  13.58, 160.00]
+  [WARN] Z 5: RSM envelope does not bound   6 of  28 observations -- proceeding anyway
+  [WARN] Z 5: GA optimum at search boundary -- true value may lie outside the search range
+  Z 5: exit= 0 pts=  6851 BN=   29.00
+  [INFO] Z 6: G3 BSTAR prior narrows BN to [  14.07, 160.00]
+  [WARN] Z 6: GA optimum at search boundary -- true value may lie outside the search range
+  Z 6: exit= 0 pts=  6870 BN=   20.78
+  [INFO] Z 7: G3 BSTAR prior narrows BN to [  14.00, 160.00]
+  [WARN] Z 7: GA optimum at search boundary -- true value may lie outside the search range
+  Z 7: exit= 0 pts=  6880 BN=   15.02
+  [INFO] Z 8: G3 BSTAR prior narrows BN to [  12.12, 144.20]
+  [WARN] Z 8: RSM envelope does not bound   6 of  27 observations -- proceeding anyway
+  [WARN] Z 8: GA optimum at search boundary -- true value may lie outside the search range
+  Z 8: exit= 0 pts=  6917 BN=   26.02
+  no zone predicted a re-entry
+ [PROGRESS] run  24 done (chunk  22- 41
+
+ ===== run  25: NORAD  60328  lead   30 d
+  [WARN] tle_filter: epoch gap at point    76 (********** -> **********,     82.6 days)
+  [INFO] G2 BN floor estimate=   28.66 -> bn_lo=   14.33
+  [INFO] Z 1: G3 BSTAR prior narrows BN to [  14.33, 152.92]
+  Z 1: exit= 0 pts=  4398 BN=   48.96
+  Z 2: exit= 0 pts=  4557 BN=   51.21
+  [WARN] Z 3: GA optimum at search boundary -- true value may lie outside the search range
+  Z 3: exit= 1 pts=  1777 BN=   30.73
+  [INFO] Z 4: G3 BSTAR prior narrows BN to [  15.23, 181.32]
+  Z 4: exit= 1 pts=   504 BN=   57.10
+  [INFO] Z 5: G3 BSTAR prior narrows BN to [  24.19, 103.71]
+  [WARN] Z 5: GA optimum at search boundary -- true value may lie outside the search range
+  Z 5: exit= 1 pts=   260 BN=  103.61
+  [INFO] Z 6: G3 BSTAR prior narrows BN to [  18.78, 127.01]
+  [WARN] Z 6: GA optimum at search boundary -- true value may lie outside the search range
+  Z 6: exit= 1 pts=   259 BN=  126.97
+  PRIMARY Z 6 RPE=    -3.63%   ENSEMBLE RPE=    -3.30%
+ [PROGRESS] run  25 done (chunk  22- 41
+
+ ===== run  26: NORAD  60328  lead   90 d
+  [INFO] G2 BN floor estimate=   28.66 -> bn_lo=   14.33
+  [INFO] Z 1: G3 BSTAR prior narrows BN to [  14.33, 152.92]
+  Z 1: exit= 0 pts=  4398 BN=   48.96
+  Z 2: exit= 0 pts=  4557 BN=   51.21
+  [WARN] Z 3: GA optimum at search boundary -- true value may lie outside the search range
+  Z 3: exit= 1 pts=  1777 BN=   30.73
+  [INFO] Z 4: G3 BSTAR prior narrows BN to [  15.23, 181.32]
+  Z 4: exit= 1 pts=   504 BN=   57.10
+  PRIMARY Z 4 RPE=   -17.70%   ENSEMBLE RPE=    36.23%
+ [PROGRESS] run  26 done (chunk  22- 41
+
+ ===== run  27: NORAD  60328  lead  180 d
+  [INFO] G2 BN floor estimate=   28.66 -> bn_lo=   14.33
+  [INFO] Z 1: G3 BSTAR prior narrows BN to [  14.33, 152.92]
+  Z 1: exit= 0 pts=  4398 BN=   48.96
+  Z 2: exit= 0 pts=  4557 BN=   51.21
+  [WARN] Z 3: GA optimum at search boundary -- true value may lie outside the search range
+  Z 3: exit= 1 pts=  1781 BN=   30.11
+  PRIMARY Z 3 RPE=   104.77%   ENSEMBLE RPE=    85.08%
+ [PROGRESS] run  27 done (chunk  22- 41
+
+ ===== run  28: NORAD  18983  lead   30 d
+  [WARN] tle_filter: epoch gap at point     2 (********** -> **********,   1983.5 days)
+  [INFO] G2 BN floor estimate=    9.35 -> bn_lo=    4.68
+  [INFO] Z 1: G3 BSTAR prior narrows BN to [  48.13, 160.00]
+  [WARN] Z 1: GA optimum at search boundary -- true value may lie outside the search range
+  Z 1: exit= 0 pts=  3595 BN=  151.43
+  [INFO] Z 2: G3 BSTAR prior narrows BN to [  48.13, 160.00]
+  Z 2: exit= 0 pts=  3594 BN=   70.52
+  [INFO] Z 3: G3 BSTAR prior narrows BN to [  48.13, 160.00]
+  Z 3: exit= 0 pts=  3594 BN=   78.24
+  [INFO] Z 4: G3 BSTAR prior narrows BN to [  48.13, 160.00]
+  Z 4: exit= 0 pts=  3595 BN=  106.93
+  [INFO] Z 5: G3 BSTAR prior narrows BN to [  48.13, 160.00]
+  Z 5: exit= 0 pts=  3594 BN=  116.24
+  Z 6: exit= 0 pts=  3594 BN=  129.46
+  [INFO] Z 7: G3 BSTAR prior narrows BN to [  48.13, 160.00]
+  Z 7: exit= 0 pts=  3594 BN=   87.99
+  [INFO] Z 8: G3 BSTAR prior narrows BN to [  29.36, 160.00]
+  Z 8: exit= 0 pts=  3595 BN=   75.39
+  no zone predicted a re-entry
+ [PROGRESS] run  28 done (chunk  22- 41
+
+ ===== run  29: NORAD  18983  lead   90 d
+  [WARN] tle_filter: epoch gap at point     2 (********** -> **********,   1983.5 days)
+  [INFO] G2 BN floor estimate=    9.35 -> bn_lo=    4.68
+  [INFO] Z 1: G3 BSTAR prior narrows BN to [  48.13, 160.00]
+  [WARN] Z 1: GA optimum at search boundary -- true value may lie outside the search range
+  Z 1: exit= 0 pts=  3595 BN=  151.43
+  [INFO] Z 2: G3 BSTAR prior narrows BN to [  48.13, 160.00]
+  Z 2: exit= 0 pts=  3594 BN=   70.52
+  [INFO] Z 3: G3 BSTAR prior narrows BN to [  48.13, 160.00]
+  Z 3: exit= 0 pts=  3594 BN=   78.24
+  [INFO] Z 4: G3 BSTAR prior narrows BN to [  48.13, 160.00]
+  Z 4: exit= 0 pts=  3595 BN=  106.93
+  [INFO] Z 5: G3 BSTAR prior narrows BN to [  48.13, 160.00]
+  Z 5: exit= 0 pts=  3594 BN=  116.24
+  Z 6: exit= 0 pts=  3594 BN=  129.46
+  [INFO] Z 7: G3 BSTAR prior narrows BN to [  48.13, 160.00]
+  Z 7: exit= 0 pts=  3594 BN=   87.99
+  [INFO] Z 8: G3 BSTAR prior narrows BN to [  29.36, 160.00]
+  Z 8: exit= 0 pts=  3595 BN=   75.39
+  no zone predicted a re-entry
+ [PROGRESS] run  29 done (chunk  22- 41
+
+ ===== run  30: NORAD  18983  lead  180 d
+  [WARN] tle_filter: epoch gap at point     2 (********** -> **********,   1983.5 days)
+  [INFO] G2 BN floor estimate=    9.35 -> bn_lo=    4.68
+  [INFO] Z 1: G3 BSTAR prior narrows BN to [  48.13, 160.00]
+  [WARN] Z 1: GA optimum at search boundary -- true value may lie outside the search range
+  Z 1: exit= 0 pts=  3595 BN=  151.43
+  [INFO] Z 2: G3 BSTAR prior narrows BN to [  48.13, 160.00]
+  Z 2: exit= 0 pts=  3594 BN=   70.52
+  [INFO] Z 3: G3 BSTAR prior narrows BN to [  48.13, 160.00]
+  Z 3: exit= 0 pts=  3594 BN=   78.24
+  [INFO] Z 4: G3 BSTAR prior narrows BN to [  48.13, 160.00]
+  Z 4: exit= 0 pts=  3595 BN=  106.93
+  [INFO] Z 5: G3 BSTAR prior narrows BN to [  48.13, 160.00]
+  Z 5: exit= 0 pts=  3594 BN=  116.24
+  Z 6: exit= 0 pts=  3594 BN=  129.46
+  [INFO] Z 7: G3 BSTAR prior narrows BN to [  48.13, 160.00]
+  Z 7: exit= 0 pts=  3594 BN=   87.99
+  [INFO] Z 8: G3 BSTAR prior narrows BN to [  29.36, 160.00]
+  Z 8: exit= 0 pts=  3595 BN=   75.39
+  no zone predicted a re-entry
+ [PROGRESS] run  30 done (chunk  22- 41
+
+ ===== run  31: NORAD  18983  lead  365 d
+  [WARN] tle_filter: epoch gap at point     2 (********** -> **********,   1983.5 days)
+  [INFO] G2 BN floor estimate=    9.35 -> bn_lo=    4.68
+  [INFO] Z 1: G3 BSTAR prior narrows BN to [  48.13, 160.00]
+  [WARN] Z 1: GA optimum at search boundary -- true value may lie outside the search range
+  Z 1: exit= 0 pts=  3595 BN=  151.43
+  [INFO] Z 2: G3 BSTAR prior narrows BN to [  48.13, 160.00]
+  Z 2: exit= 0 pts=  3594 BN=   70.52
+  [INFO] Z 3: G3 BSTAR prior narrows BN to [  48.13, 160.00]
+  Z 3: exit= 0 pts=  3594 BN=   78.24
+  [INFO] Z 4: G3 BSTAR prior narrows BN to [  48.13, 160.00]
+  Z 4: exit= 0 pts=  3595 BN=  106.93
+  [INFO] Z 5: G3 BSTAR prior narrows BN to [  48.13, 160.00]
+  Z 5: exit= 0 pts=  3594 BN=  116.24
+  Z 6: exit= 0 pts=  3594 BN=  129.46
+  [INFO] Z 7: G3 BSTAR prior narrows BN to [  48.13, 160.00]
+  Z 7: exit= 0 pts=  3594 BN=   87.99
+  [INFO] Z 8: G3 BSTAR prior narrows BN to [  29.36, 160.00]
+  Z 8: exit= 0 pts=  3595 BN=   75.39
+  no zone predicted a re-entry
+ [PROGRESS] run  31 done (chunk  22- 41
+
+ ===== run  32: NORAD  13112  lead   30 d
+  [WARN] tle_filter: epoch gap at point     2 (********** -> **********,    223.3 days)
+  [WARN] tle_filter: epoch gap at point    49 (********** -> **********,     33.6 days)
+  [WARN] tle_filter: epoch gap at point   351 (********** -> **********,     53.9 days)
+  [WARN] tle_filter: epoch gap at point  1055 (********** -> **********,     81.6 days)
+  [WARN] Z 1: GA optimum at search boundary -- true value may lie outside the search range
+  Z 1: exit= 0 pts=  3591 BN=  149.80
+  [WARN] Z 2: GA optimum at search boundary -- true value may lie outside the search range
+  Z 2: exit= 0 pts=  3592 BN=  155.73
+  [WARN] Z 3: GA optimum at search boundary -- true value may lie outside the search range
+  Z 3: exit= 1 pts=   540 BN=   89.16
+  [WARN] Z 4: GA optimum at search boundary -- true value may lie outside the search range
+  Z 4: exit= 1 pts=   390 BN=   61.66
+  [WARN] Z 5: GA optimum at search boundary -- true value may lie outside the search range
+  Z 5: exit= 1 pts=   358 BN=   31.48
+  PRIMARY Z 5 RPE=   -13.43%   ENSEMBLE RPE=    -1.01%
+ [PROGRESS] run  32 done (chunk  22- 41
+
+ ===== run  33: NORAD  13112  lead   90 d
+  [WARN] tle_filter: epoch gap at point     2 (********** -> **********,    223.3 days)
+  [WARN] tle_filter: epoch gap at point    49 (********** -> **********,     33.6 days)
+  [WARN] tle_filter: epoch gap at point   351 (********** -> **********,     53.9 days)
+  [WARN] Z 1: GA optimum at search boundary -- true value may lie outside the search range
+  Z 1: exit= 0 pts=  3591 BN=  149.80
+  [WARN] Z 2: GA optimum at search boundary -- true value may lie outside the search range
+  Z 2: exit= 0 pts=  3592 BN=  155.73
+  [WARN] Z 3: GA optimum at search boundary -- true value may lie outside the search range
+  Z 3: exit= 1 pts=   540 BN=   89.16
+  [WARN] Z 4: GA optimum at search boundary -- true value may lie outside the search range
+  Z 4: exit= 1 pts=   390 BN=   61.66
+  [WARN] Z 5: GA optimum at search boundary -- true value may lie outside the search range
+  Z 5: exit= 1 pts=   358 BN=   31.48
+  PRIMARY Z 5 RPE=   -13.43%   ENSEMBLE RPE=    -1.01%
+ [PROGRESS] run  33 done (chunk  22- 41
+
+ ===== run  34: NORAD  13112  lead  180 d
+  [WARN] tle_filter: epoch gap at point     2 (********** -> **********,    223.3 days)
+  [WARN] tle_filter: epoch gap at point    49 (********** -> **********,     33.6 days)
+  [WARN] tle_filter: epoch gap at point   351 (********** -> **********,     53.9 days)
+  [WARN] Z 1: GA optimum at search boundary -- true value may lie outside the search range
+  Z 1: exit= 0 pts=  3591 BN=  149.80
+  [WARN] Z 2: GA optimum at search boundary -- true value may lie outside the search range
+  Z 2: exit= 0 pts=  3592 BN=  155.73
+  [WARN] Z 3: GA optimum at search boundary -- true value may lie outside the search range
+  Z 3: exit= 1 pts=   540 BN=   89.16
+  [WARN] Z 4: GA optimum at search boundary -- true value may lie outside the search range
+  Z 4: exit= 1 pts=   389 BN=   63.75
+  PRIMARY Z 4 RPE=   -13.92%   ENSEMBLE RPE=    -1.41%
+ [PROGRESS] run  34 done (chunk  22- 41
+
+ ===== run  35: NORAD  13112  lead  365 d
+  [WARN] tle_filter: epoch gap at point     2 (********** -> **********,    223.3 days)
+  [WARN] tle_filter: epoch gap at point    49 (********** -> **********,     33.6 days)
+  [WARN] tle_filter: epoch gap at point   351 (********** -> **********,     53.9 days)
+  [WARN] Z 1: GA optimum at search boundary -- true value may lie outside the search range
+  Z 1: exit= 0 pts=  3591 BN=  149.80
+  [WARN] Z 2: GA optimum at search boundary -- true value may lie outside the search range
+  Z 2: exit= 0 pts=  3592 BN=  155.73
+  no zone predicted a re-entry
+ [PROGRESS] run  35 done (chunk  22- 41
+
+ ===== run  36: NORAD  28141  lead   30 d
+  [WARN] Z 1: GA optimum at search boundary -- true value may lie outside the search range
+  Z 1: exit= 0 pts=  1589 BN=   89.72
+  Z 2: exit= 0 pts=  1589 BN=  101.06
+  Z 3: exit= 0 pts=  1589 BN=   93.05
+  [WARN] Z 4: GA optimum at search boundary -- true value may lie outside the search range
+  Z 4: exit= 0 pts=  1589 BN=   80.61
+  [WARN] Z 5: GA optimum at search boundary -- true value may lie outside the search range
+  Z 5: exit= 0 pts=  1588 BN=   80.17
+  Z 6: exit= 0 pts=  1588 BN=   95.72
+  Z 7: exit= 0 pts=  1589 BN=   92.20
+  Z 8: exit= 0 pts=  1589 BN=  114.98
+  no zone predicted a re-entry
+ [PROGRESS] run  36 done (chunk  22- 41
+
+ ===== run  37: NORAD  28141  lead   90 d
+  [WARN] Z 1: GA optimum at search boundary -- true value may lie outside the search range
+  Z 1: exit= 0 pts=  1589 BN=   89.72
+  Z 2: exit= 0 pts=  1589 BN=  101.06
+  Z 3: exit= 0 pts=  1589 BN=   93.05
+  [WARN] Z 4: GA optimum at search boundary -- true value may lie outside the search range
+  Z 4: exit= 0 pts=  1589 BN=   80.61
+  [WARN] Z 5: GA optimum at search boundary -- true value may lie outside the search range
+  Z 5: exit= 0 pts=  1588 BN=   80.17
+  Z 6: exit= 0 pts=  1588 BN=   95.72
+  Z 7: exit= 0 pts=  1589 BN=   92.20
+  Z 8: exit= 0 pts=  1589 BN=  114.98
+  no zone predicted a re-entry
+ [PROGRESS] run  37 done (chunk  22- 41
+
+ ===== run  38: NORAD  28141  lead  180 d
+  [WARN] Z 1: GA optimum at search boundary -- true value may lie outside the search range
+  Z 1: exit= 0 pts=  1589 BN=   89.72
+  Z 2: exit= 0 pts=  1589 BN=  101.06
+  Z 3: exit= 0 pts=  1589 BN=   93.05
+  [WARN] Z 4: GA optimum at search boundary -- true value may lie outside the search range
+  Z 4: exit= 0 pts=  1589 BN=   80.61
+  [WARN] Z 5: GA optimum at search boundary -- true value may lie outside the search range
+  Z 5: exit= 0 pts=  1588 BN=   80.17
+  Z 6: exit= 0 pts=  1588 BN=   95.72
+  Z 7: exit= 0 pts=  1589 BN=   92.20
+  Z 8: exit= 0 pts=  1589 BN=  114.98
+  no zone predicted a re-entry
+ [PROGRESS] run  38 done (chunk  22- 41
+
+ ===== run  39: NORAD  28141  lead  365 d
+  [WARN] Z 1: GA optimum at search boundary -- true value may lie outside the search range
+  Z 1: exit= 0 pts=  1589 BN=   89.72
+  Z 2: exit= 0 pts=  1589 BN=  101.06
+  Z 3: exit= 0 pts=  1589 BN=   93.05
+  [WARN] Z 4: GA optimum at search boundary -- true value may lie outside the search range
+  Z 4: exit= 0 pts=  1589 BN=   80.61
+  [WARN] Z 5: GA optimum at search boundary -- true value may lie outside the search range
+  Z 5: exit= 0 pts=  1588 BN=   80.17
+  Z 6: exit= 0 pts=  1588 BN=   95.72
+  Z 7: exit= 0 pts=  1589 BN=   92.20
+  Z 8: exit= 0 pts=  1589 BN=  114.98
+  no zone predicted a re-entry
+ [PROGRESS] run  39 done (chunk  22- 41
+
+ ===== run  40: NORAD  19881  lead   30 d
+  [WARN] tle_filter: epoch gap at point     2 (********** -> **********,     35.9 days)
+  [WARN] tle_filter: epoch gap at point     3 (********** -> **********,     34.9 days)
+  [WARN] tle_filter: epoch gap at point     4 (********** -> **********,     33.9 days)
+  [WARN] tle_filter: epoch gap at point     6 (********** -> **********,   1078.5 days)
+  [WARN] tle_filter: epoch gap at point    54 (********** -> **********,    855.3 days)
+  [WARN] tle_filter: epoch gap at point   110 (********** -> **********,    161.0 days)
+  [WARN] tle_filter: epoch gap at point   149 (********** -> **********,     94.8 days)
+  [WARN] tle_filter: epoch gap at point   203 (********** -> **********,     64.8 days)
+  [WARN] tle_filter: epoch gap at point   250 (********** -> **********,     50.0 days)
+  [WARN] tle_filter: epoch gap at point   258 (********** -> **********,     41.9 days)
+  [WARN] tle_filter: epoch gap at point   259 (********** -> **********,     31.0 days)
+  [WARN] tle_filter: epoch gap at point   260 (********** -> **********,     41.9 days)
+  [WARN] tle_filter: epoch gap at point   263 (********** -> **********,     51.0 days)
+  [WARN] tle_filter: epoch gap at point   265 (********** -> **********,     31.9 days)
+  [WARN] tle_filter: epoch gap at point   266 (********** -> **********,    129.6 days)
+  [WARN] tle_filter: epoch gap at point   267 (********** -> **********,     30.0 days)
+  [WARN] tle_filter: epoch gap at point   311 (********** -> **********,     62.9 days)
+  [WARN] tle_filter: epoch gap at point   312 (********** -> **********,     75.7 days)
+  [WARN] tle_filter: epoch gap at point   319 (********** -> **********,     53.8 days)
+  [WARN] tle_filter: epoch gap at point   321 (********** -> **********,     35.7 days)
+  [WARN] tle_filter: epoch gap at point   322 (********** -> **********,     30.9 days)
+  [WARN] tle_filter: epoch gap at point   370 (********** -> **********,     30.9 days)
+  [WARN] tle_filter: epoch gap at point   371 (********** -> **********,     30.9 days)
+  [WARN] tle_filter: epoch gap at point   373 (********** -> **********,     68.8 days)
+  [WARN] tle_filter: epoch gap at point   383 (********** -> **********,     44.3 days)
+  Z 1: exit= 0 pts=  3837 BN=  123.19
+  no zone predicted a re-entry
+ [PROGRESS] run  40 done (chunk  22- 41
+
+ ===== run  41: NORAD  19881  lead   90 d
+  [WARN] tle_filter: epoch gap at point     2 (********** -> **********,     35.9 days)
+  [WARN] tle_filter: epoch gap at point     3 (********** -> **********,     34.9 days)
+  [WARN] tle_filter: epoch gap at point     4 (********** -> **********,     33.9 days)
+  [WARN] tle_filter: epoch gap at point     6 (********** -> **********,   1078.5 days)
+  [WARN] tle_filter: epoch gap at point    54 (********** -> **********,    855.3 days)
+  [WARN] tle_filter: epoch gap at point   110 (********** -> **********,    161.0 days)
+  [WARN] tle_filter: epoch gap at point   149 (********** -> **********,     94.8 days)
+  [WARN] tle_filter: epoch gap at point   203 (********** -> **********,     64.8 days)
+  [WARN] tle_filter: epoch gap at point   250 (********** -> **********,     50.0 days)
+  [WARN] tle_filter: epoch gap at point   258 (********** -> **********,     41.9 days)
+  [WARN] tle_filter: epoch gap at point   259 (********** -> **********,     31.0 days)
+  [WARN] tle_filter: epoch gap at point   260 (********** -> **********,     41.9 days)
+  [WARN] tle_filter: epoch gap at point   263 (********** -> **********,     51.0 days)
+  [WARN] tle_filter: epoch gap at point   265 (********** -> **********,     31.9 days)
+  [WARN] tle_filter: epoch gap at point   266 (********** -> **********,    129.6 days)
+  [WARN] tle_filter: epoch gap at point   267 (********** -> **********,     30.0 days)
+  [WARN] tle_filter: epoch gap at point   311 (********** -> **********,     62.9 days)
+  [WARN] tle_filter: epoch gap at point   312 (********** -> **********,     75.7 days)
+  [WARN] tle_filter: epoch gap at point   319 (********** -> **********,     53.8 days)
+  [WARN] tle_filter: epoch gap at point   321 (********** -> **********,     35.7 days)
+  [WARN] tle_filter: epoch gap at point   322 (********** -> **********,     30.9 days)
+  [WARN] tle_filter: epoch gap at point   370 (********** -> **********,     30.9 days)
+  [WARN] tle_filter: epoch gap at point   371 (********** -> **********,     30.9 days)
+  [WARN] tle_filter: epoch gap at point   373 (********** -> **********,     68.8 days)
+  [WARN] tle_filter: epoch gap at point   383 (********** -> **********,     44.3 days)
+  Z 1: exit= 0 pts=  3837 BN=  123.19
+  no zone predicted a re-entry
+ [PROGRESS] run  41 done (chunk  22- 41
+
+ campaign complete -> scratch_rpe/manuscript23/results_summary_part_022_041.csv
