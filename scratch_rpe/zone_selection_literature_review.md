@@ -18,7 +18,7 @@
 - **Authors**: Ram Krishan Sharma, A. K. Anil Kumar, Adimurthy Vipparthi
 - **Year**: 2024 ("Monograph-2024")
 - **Venue/publisher**: Indian Space Research Organisation (ISRO)
-- **File**: `E:\Research\References\00_Author_Collections\1714143725793.pdf`
+- **File**: `<research-library>\References\00_Author_Collections\1714143725793.pdf`
   (10.06 MB, text-extractable, not scanned — `pdftotext -layout` succeeded
   cleanly, 8430 lines of text)
 - **Relevant chapter**: Chapter 8, "Re-entry Prediction Studies," pp.

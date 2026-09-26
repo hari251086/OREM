@@ -12,7 +12,7 @@ c     PRE-SELECTED zone ({nobj} total, from
 c     scratch_rpe/validation_rpe_zones.py + prepare_validation_zones.py
 c     -- 3-29 TLEs/zone, first zone >=6mo before each object's own
 c     U-turn epoch, spread through to the last tracked TLE, matching
-c     the "E:\\Research\\1. R&D\\Re-entry\\COSPAR ASR" reference's own
+c     the "<research-library>\\1. R&D\\Re-entry\\COSPAR ASR" reference's own
 c     per-zone TLE-split style), rather than letting zone_select.F
 c     pick zones itself.
 c

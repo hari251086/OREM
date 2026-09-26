@@ -3,7 +3,7 @@ against the NPOE reference propagator's own output for object 42928,
 epoch 2017-10-03 (see npoe_xval.F's header for the full context).
 
 Reference data lives outside this repo -- it's the original NPOE run
-under E:\\Research\\1. R&D\\Re-entry\\COSPAR ASR\\42928\\Zone - 2\\,
+under <research-library>\\1. R&D\\Re-entry\\COSPAR ASR\\42928\\Zone - 2\\,
 not something this script can regenerate. Kept here as the analysis
 that produced the numbers in issue #38 / README.md Version History,
 not as a rerunnable CI-style check.

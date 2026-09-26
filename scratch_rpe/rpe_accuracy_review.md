@@ -38,7 +38,7 @@ own output, not re-derived.)
 
 **Scope note (ambiguous input resolved per task instructions):**
 `<PATH_TO_VALIDATION_RPE_OUTPUTS>` → resolved to
-`E:\GitHub\OREM\scratch_rpe\validation_RPE\` (this session's own
+`<GitHub>\OREM\scratch_rpe\validation_RPE\` (this session's own
 340-zone campaign output) plus its driver
 `scratch_rpe\validation_rpe\validation_rpe_campaign.F` and generator
 scripts `scratch_rpe\validation_rpe_zones.py` /
@@ -48,7 +48,7 @@ location for investigation write-ups).
 
 ## Step 1 — Inventory
 
-**COSPAR ASR** (`E:\Research\1. R&D\Re-entry\COSPAR ASR`), 4 objects
+**COSPAR ASR** (`<research-library>\1. R&D\Re-entry\COSPAR ASR`), 4 objects
 (35497, 37151, 39615, 42928), ~2017–2021 (research predates OREM's
 Fortran pipeline entirely — this is Scilab + a standalone Fortran GA
 executable, not an OREM run):
@@ -62,7 +62,7 @@ executable, not an OREM run):
 | Documents | none (no README/notes text file in this folder) | Zone-selection rationale is undocumented here — consistent with the literature review's finding that the Mutyalarao/Sharma-lineage papers describe zones as visually/"roughly" segmented, not algorithmically |
 | Raw data | `<obj>.txt`/`<obj>-N.txt` (TLE files), `IO/*.OUT` (KEP/KS/PV propagation dumps, tens of MB each), `.png` plots | Not opened in bulk — sizes/`head` used only where a specific value was needed |
 
-**Validation RPE campaign** (`E:\GitHub\OREM\scratch_rpe\validation_RPE\`
+**Validation RPE campaign** (`<GitHub>\OREM\scratch_rpe\validation_RPE\`
 + driver), all from this repo, this session:
 
 | Class | Files | Notes |
