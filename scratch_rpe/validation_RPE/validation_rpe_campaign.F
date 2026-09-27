@@ -1006,7 +1006,7 @@ c     tle_file/obj_name string assignments (executable statements)
 
          call orem_run(
      &      tle_file(io), norad(io),
-     &      t_obs, mxz, 3, 900.d0, 0.d0, 1.d6,
+     &      t_obs, mxz, 3, 900.d0, 0.d0, 0.d0, 1.d6,
      &      80.d0, 160.d0, 0, 1, 0, 0,
      &      20, 500, 40, 16, 0.8d0, 0.01d0, 0.123d0,
      &      20, 2, 3,

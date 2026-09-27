@@ -97,7 +97,7 @@ c     20 points, ha = 30000 - 100*t, t = 0..19 days
          ha(i) = 30000.d0 - 200.d0*dble(i-1)*0.5d0
       end do
       call zone_select(epochs, ha, 20,
-     &                 8, 15.d0, 0.90d0, -1.d0, 4,
+     &                 8, 15.d0, 0.d0, 0.90d0, -1.d0, 4,
      &                 zone_start, zone_end, nzones)
       if (nzones .ge. 1) then
          call assert_i('Z5 linear decay: >=1 zone',
@@ -113,7 +113,7 @@ c     Z6: Flat apogee (no decay) → 0 zones
          ha(i) = 30000.d0
       end do
       call zone_select(epochs, ha, 20,
-     &                 8, 15.d0, 0.90d0, -1.d0, 4,
+     &                 8, 15.d0, 0.d0, 0.90d0, -1.d0, 4,
      &                 zone_start, zone_end, nzones)
       call assert_i('Z6 flat apogee: 0 zones',
      &              nzones, 0, npass, nfail)
@@ -125,7 +125,7 @@ c     High frequency + low amplitude so no segment is linear
          ha(i) = 30000.d0 + 500.d0*dsin(dble(i-1)*2.d0)
       end do
       call zone_select(epochs, ha, 40,
-     &                 8, 15.d0, 0.98d0, -1.d0, 4,
+     &                 8, 15.d0, 0.d0, 0.98d0, -1.d0, 4,
      &                 zone_start, zone_end, nzones)
       call assert_i('Z7 oscillating: 0 zones',
      &              nzones, 0, npass, nfail)
@@ -136,21 +136,21 @@ c     Z8: Rising apogee → 0 zones
          ha(i) = 30000.d0 + 100.d0*dble(i-1)*0.5d0
       end do
       call zone_select(epochs, ha, 20,
-     &                 8, 15.d0, 0.90d0, -1.d0, 4,
+     &                 8, 15.d0, 0.d0, 0.90d0, -1.d0, 4,
      &                 zone_start, zone_end, nzones)
       call assert_i('Z8 rising apogee: 0 zones',
      &              nzones, 0, npass, nfail)
 
 c     Z9: Empty input → 0 zones
       call zone_select(epochs, ha, 0,
-     &                 8, 15.d0, 0.90d0, -1.d0, 4,
+     &                 8, 15.d0, 0.d0, 0.90d0, -1.d0, 4,
      &                 zone_start, zone_end, nzones)
       call assert_i('Z9 empty: 0 zones',
      &              nzones, 0, npass, nfail)
 
 c     Z10: Single point → 0 zones
       call zone_select(epochs, ha, 1,
-     &                 8, 15.d0, 0.90d0, -1.d0, 4,
+     &                 8, 15.d0, 0.d0, 0.90d0, -1.d0, 4,
      &                 zone_start, zone_end, nzones)
       call assert_i('Z10 single pt: 0 zones',
      &              nzones, 0, npass, nfail)
@@ -161,7 +161,7 @@ c     Z11: nzones_max cap — long linear decay, request 1 zone
          ha(i) = 30000.d0 - 50.d0*dble(i-1)*0.3d0
       end do
       call zone_select(epochs, ha, 50,
-     &                 8, 15.d0, 0.90d0, -1.d0, 1,
+     &                 8, 15.d0, 0.d0, 0.90d0, -1.d0, 1,
      &                 zone_start, zone_end, nzones)
       call assert_i('Z11 nzones_max=1 caps',
      &              nzones, 1, npass, nfail)
@@ -180,7 +180,7 @@ c     ==============================================================
      &               npts, ierr)
 
       call zone_select(epochs, ha, npts,
-     &                 8, 10.d0, 0.90d0, -1.d0, 4,
+     &                 8, 10.d0, 0.d0, 0.90d0, -1.d0, 4,
      &                 zone_start, zone_end, nzones)
 
       if (nzones .ge. 1) then
@@ -253,7 +253,7 @@ c     ==============================================================
      &               npts, ierr)
 
       call zone_select(epochs, ha, npts,
-     &                 8, 10.d0, 0.90d0, -1.d0, 4,
+     &                 8, 10.d0, 0.d0, 0.90d0, -1.d0, 4,
      &                 zone_start, zone_end, nzones)
 
       if (nzones .ge. 1) then
@@ -292,7 +292,7 @@ c     ==============================================================
      &               npts, ierr)
 
       call zone_select(epochs, ha, npts,
-     &                 8, 10.d0, 0.90d0, -1.d0, 4,
+     &                 8, 10.d0, 0.d0, 0.90d0, -1.d0, 4,
      &                 zone_start, zone_end, nzones)
 
       if (nzones .ge. 1) then
@@ -331,7 +331,7 @@ c     ==============================================================
      &               npts, ierr)
 
       call zone_select(epochs, ha, npts,
-     &                 8, 10.d0, 0.90d0, -1.d0, 4,
+     &                 8, 10.d0, 0.d0, 0.90d0, -1.d0, 4,
      &                 zone_start, zone_end, nzones)
 
       if (nzones .ge. 1) then
@@ -370,7 +370,7 @@ c     Z24: 42928 zone-0 subset: should be 1 zone covering all
      &               ha, hp, ls_out,
      &               npts, ierr)
       call zone_select(epochs, ha, npts,
-     &                 5, 10.d0, 0.85d0, -0.5d0, 4,
+     &                 5, 10.d0, 0.d0, 0.85d0, -0.5d0, 4,
      &                 zone_start, zone_end, nzones)
       if (nzones .ge. 1) then
          call assert_i('Z24 42928-z0 >=1 zone',
@@ -443,11 +443,11 @@ c     Use 42928 for parameter tests
 
 c     Z28: Relaxed R² (0.80) finds more or equal zones
       call zone_select(epochs, ha, npts,
-     &                 8, 10.d0, 0.90d0, -1.d0, 10,
+     &                 8, 10.d0, 0.d0, 0.90d0, -1.d0, 10,
      &                 zone_start, zone_end, nzones)
       nz_strict = nzones
       call zone_select(epochs, ha, npts,
-     &                 8, 10.d0, 0.80d0, -1.d0, 10,
+     &                 8, 10.d0, 0.d0, 0.80d0, -1.d0, 10,
      &                 zone_start, zone_end, nzones)
       if (nzones .ge. nz_strict) then
          call assert_i('Z28 relaxed R2 >= strict',
@@ -459,11 +459,11 @@ c     Z28: Relaxed R² (0.80) finds more or equal zones
 
 c     Z29: Smaller min_zone_pts finds more or equal zones
       call zone_select(epochs, ha, npts,
-     &                 8, 10.d0, 0.90d0, -1.d0, 10,
+     &                 8, 10.d0, 0.d0, 0.90d0, -1.d0, 10,
      &                 zone_start, zone_end, nzones)
       nz_strict = nzones
       call zone_select(epochs, ha, npts,
-     &                 5, 10.d0, 0.90d0, -1.d0, 10,
+     &                 5, 10.d0, 0.d0, 0.90d0, -1.d0, 10,
      &                 zone_start, zone_end, nzones)
       if (nzones .ge. nz_strict) then
          call assert_i('Z29 smaller minpts >= strict',
@@ -475,14 +475,14 @@ c     Z29: Smaller min_zone_pts finds more or equal zones
 
 c     Z30: min_zone_pts > npts → 0 zones
       call zone_select(epochs, ha, npts,
-     &                 npts+1, 10.d0, 0.90d0, -1.d0, 4,
+     &                 npts+1, 10.d0, 0.d0, 0.90d0, -1.d0, 4,
      &                 zone_start, zone_end, nzones)
       call assert_i('Z30 minpts>npts: 0 zones',
      &              nzones, 0, npass, nfail)
 
 c     Z31: Very short max_zone_days (2 days)
       call zone_select(epochs, ha, npts,
-     &                 5, 2.d0, 0.85d0, -0.5d0, 10,
+     &                 5, 2.d0, 0.d0, 0.85d0, -0.5d0, 10,
      &                 zone_start, zone_end, nzones)
 c     All zones should be <= 2 days
       iall_ok = 1
@@ -495,11 +495,11 @@ c     All zones should be <= 2 days
 
 c     Z32: Lenient slope threshold (-0.1) finds more zones
       call zone_select(epochs, ha, npts,
-     &                 8, 10.d0, 0.90d0, -10.d0, 10,
+     &                 8, 10.d0, 0.d0, 0.90d0, -10.d0, 10,
      &                 zone_start, zone_end, nzones)
       nz_strict = nzones
       call zone_select(epochs, ha, npts,
-     &                 8, 10.d0, 0.90d0, -0.1d0, 10,
+     &                 8, 10.d0, 0.d0, 0.90d0, -0.1d0, 10,
      &                 zone_start, zone_end, nzones)
       if (nzones .ge. nz_strict) then
          call assert_i('Z32 lenient slope >= strict',
@@ -529,7 +529,7 @@ c     Z33: Two-segment decay with flat middle → finds 2 zones
          ha(i) = ha(25) - 80.d0*dble(i-25)*0.5d0
       end do
       call zone_select(epochs, ha, 40,
-     &                 8, 15.d0, 0.90d0, -1.d0, 4,
+     &                 8, 15.d0, 0.d0, 0.90d0, -1.d0, 4,
      &                 zone_start, zone_end, nzones)
       if (nzones .ge. 2) then
          call assert_i('Z33 two-segment: >=2 zones',
@@ -547,7 +547,7 @@ c     Should still find zone if R² threshold is 0.90
      &         + 5.d0*dsin(dble(i)*7.d0)
       end do
       call zone_select(epochs, ha, 30,
-     &                 8, 15.d0, 0.90d0, -1.d0, 4,
+     &                 8, 15.d0, 0.d0, 0.90d0, -1.d0, 4,
      &                 zone_start, zone_end, nzones)
       if (nzones .ge. 1) then
          call assert_i('Z34 noisy linear: >=1 zone',
@@ -567,7 +567,7 @@ c     Z35: Step function (abrupt drop then linear)
          ha(i) = 28000.d0 - 50.d0*dble(i-10)*0.5d0
       end do
       call zone_select(epochs, ha, 30,
-     &                 8, 15.d0, 0.90d0, -1.d0, 4,
+     &                 8, 15.d0, 0.d0, 0.90d0, -1.d0, 4,
      &                 zone_start, zone_end, nzones)
       if (nzones .ge. 1) then
 c        Zone should be in the post-step region
@@ -590,14 +590,14 @@ c     Both should be found with slope_threshold = -1
          ha(i) = 30000.d0 - 500.d0*dble(i-1)*0.3d0
       end do
       call zone_select(epochs, ha, 15,
-     &                 8, 15.d0, 0.90d0, -1.d0, 4,
+     &                 8, 15.d0, 0.d0, 0.90d0, -1.d0, 4,
      &                 zone_start, zone_end, nzones)
       nz1 = nzones
       do i = 1, 15
          ha(i) = 30000.d0 - 5.d0*dble(i-1)*0.3d0
       end do
       call zone_select(epochs, ha, 15,
-     &                 8, 15.d0, 0.90d0, -1.d0, 4,
+     &                 8, 15.d0, 0.d0, 0.90d0, -1.d0, 4,
      &                 zone_start, zone_end, nzones)
       if (nz1 .ge. 1 .and. nzones .ge. 1) then
          call assert_i('Z36 steep+gradual both found',
@@ -623,7 +623,7 @@ c     Z37-Z39: 42928 zone details
      &               ha, hp, ls_out,
      &               npts, ierr)
       call zone_select(epochs, ha, npts,
-     &                 8, 10.d0, 0.90d0, -1.d0, 4,
+     &                 8, 10.d0, 0.d0, 0.90d0, -1.d0, 4,
      &                 zone_start, zone_end, nzones)
 
 c     Z37: All zone durations within max_zone_days
@@ -662,7 +662,7 @@ c     Z40-Z42: 35497 zone details
      &               ha, hp, ls_out,
      &               npts, ierr)
       call zone_select(epochs, ha, npts,
-     &                 8, 10.d0, 0.90d0, -1.d0, 4,
+     &                 8, 10.d0, 0.d0, 0.90d0, -1.d0, 4,
      &                 zone_start, zone_end, nzones)
 
 c     Z40: Durations valid (positive and reasonable)
@@ -707,13 +707,13 @@ c     Z43: Two calls with same input → identical zones
      &               ha, hp, ls_out,
      &               npts, ierr)
       call zone_select(epochs, ha, npts,
-     &                 8, 10.d0, 0.90d0, -1.d0, 4,
+     &                 8, 10.d0, 0.d0, 0.90d0, -1.d0, 4,
      &                 zone_start, zone_end, nzones)
       nz1 = nzones
       ns1 = zone_start(1)
       ne1 = zone_end(1)
       call zone_select(epochs, ha, npts,
-     &                 8, 10.d0, 0.90d0, -1.d0, 4,
+     &                 8, 10.d0, 0.d0, 0.90d0, -1.d0, 4,
      &                 zone_start, zone_end, nzones)
       iall_ok = 1
       if (nzones .ne. nz1) iall_ok = 0
@@ -726,7 +726,7 @@ c     Z43: Two calls with same input → identical zones
 
 c     Z44: Large nzones_max (100) doesn't crash
       call zone_select(epochs, ha, npts,
-     &                 8, 10.d0, 0.90d0, -1.d0, mxz,
+     &                 8, 10.d0, 0.d0, 0.90d0, -1.d0, mxz,
      &                 zone_start, zone_end, nzones)
       if (nzones .ge. 0 .and. nzones .le. mxz) then
          call assert_i('Z44 large nzmax safe',
@@ -738,7 +738,7 @@ c     Z44: Large nzones_max (100) doesn't crash
 
 c     Z45: nzones_max=0 → 0 zones (edge)
       call zone_select(epochs, ha, npts,
-     &                 8, 10.d0, 0.90d0, -1.d0, 0,
+     &                 8, 10.d0, 0.d0, 0.90d0, -1.d0, 0,
      &                 zone_start, zone_end, nzones)
       call assert_i('Z45 nzmax=0: 0 zones',
      &              nzones, 0, npass, nfail)
@@ -757,7 +757,7 @@ c     Z46-Z48: 37151 Long March 3B deep checks
      &               ha, hp, ls_out,
      &               npts, ierr)
       call zone_select(epochs, ha, npts,
-     &                 8, 10.d0, 0.90d0, -1.d0, 4,
+     &                 8, 10.d0, 0.d0, 0.90d0, -1.d0, 4,
      &                 zone_start, zone_end, nzones)
 
 c     Z46: Durations valid
@@ -796,7 +796,7 @@ c     Z49-Z51: 39615 Proton-M deep checks
      &               ha, hp, ls_out,
      &               npts, ierr)
       call zone_select(epochs, ha, npts,
-     &                 8, 10.d0, 0.90d0, -1.d0, 4,
+     &                 8, 10.d0, 0.d0, 0.90d0, -1.d0, 4,
      &                 zone_start, zone_end, nzones)
 
 c     Z49: Durations valid
@@ -844,7 +844,7 @@ c     Z52: 42928 no local ha spike in zones
      &               ha, hp, ls_out,
      &               npts, ierr)
       call zone_select(epochs, ha, npts,
-     &                 8, 10.d0, 0.90d0, -1.d0, 4,
+     &                 8, 10.d0, 0.d0, 0.90d0, -1.d0, 4,
      &                 zone_start, zone_end, nzones)
       iall_ok = 1
       do i = 1, nzones
@@ -868,7 +868,7 @@ c     Z53: 37151 no local ha spike
      &               ha, hp, ls_out,
      &               npts, ierr)
       call zone_select(epochs, ha, npts,
-     &                 8, 10.d0, 0.90d0, -1.d0, 4,
+     &                 8, 10.d0, 0.d0, 0.90d0, -1.d0, 4,
      &                 zone_start, zone_end, nzones)
       iall_ok = 1
       do i = 1, nzones
@@ -892,7 +892,7 @@ c     ==============================================================
 
 c     Z54: 37151 max_zone_days=10 enforced
       call zone_select(epochs, ha, npts,
-     &                 8, 10.d0, 0.90d0, -1.d0, 4,
+     &                 8, 10.d0, 0.d0, 0.90d0, -1.d0, 4,
      &                 zone_start, zone_end, nzones)
       iall_ok = 1
       do i = 1, nzones
@@ -910,7 +910,7 @@ c     Z55: 39615 max_zone_days=10 enforced
      &               ha, hp, ls_out,
      &               npts, ierr)
       call zone_select(epochs, ha, npts,
-     &                 8, 10.d0, 0.90d0, -1.d0, 4,
+     &                 8, 10.d0, 0.d0, 0.90d0, -1.d0, 4,
      &                 zone_start, zone_end, nzones)
       iall_ok = 1
       do i = 1, nzones
@@ -934,7 +934,7 @@ c     Z56: 42928 (2+ years) should have 1-10 zones, not 50+
      &               ha, hp, ls_out,
      &               npts, ierr)
       call zone_select(epochs, ha, npts,
-     &                 8, 10.d0, 0.90d0, -1.d0, mxz,
+     &                 8, 10.d0, 0.d0, 0.90d0, -1.d0, mxz,
      &                 zone_start, zone_end, nzones)
       if (nzones .ge. 1 .and. nzones .le. 10) then
          call assert_i('Z56 42928 count in [1,10]',
@@ -952,7 +952,7 @@ c     Z57: 35497 (3+ years) zone count reasonable
      &               ha, hp, ls_out,
      &               npts, ierr)
       call zone_select(epochs, ha, npts,
-     &                 8, 10.d0, 0.90d0, -1.d0, mxz,
+     &                 8, 10.d0, 0.d0, 0.90d0, -1.d0, mxz,
      &                 zone_start, zone_end, nzones)
       if (nzones .ge. 1 .and. nzones .le. 10) then
          call assert_i('Z57 35497 count in [1,10]',
@@ -974,7 +974,7 @@ c     Z58: npts exactly = min_zone_pts, linear decay → 1 zone
          ha(i) = 30000.d0 - 200.d0*dble(i-1)
       end do
       call zone_select(epochs, ha, 8,
-     &                 8, 15.d0, 0.90d0, -1.d0, 4,
+     &                 8, 15.d0, 0.d0, 0.90d0, -1.d0, 4,
      &                 zone_start, zone_end, nzones)
       if (nzones .eq. 1) then
          call assert_i('Z58 npts=minpts: 1 zone',
@@ -986,7 +986,7 @@ c     Z58: npts exactly = min_zone_pts, linear decay → 1 zone
 
 c     Z59: npts = min_zone_pts - 1 → 0 zones
       call zone_select(epochs, ha, 7,
-     &                 8, 15.d0, 0.90d0, -1.d0, 4,
+     &                 8, 15.d0, 0.d0, 0.90d0, -1.d0, 4,
      &                 zone_start, zone_end, nzones)
       call assert_i('Z59 npts=minpts-1: 0 zones',
      &              nzones, 0, npass, nfail)
@@ -1005,7 +1005,7 @@ c     Should find 0 zones (gaps too large for single zone)
          ha(i) = 30000.d0 - 100.d0*dble(i-1)*30.d0
       end do
       call zone_select(epochs, ha, 10,
-     &                 8, 15.d0, 0.90d0, -1.d0, 4,
+     &                 8, 15.d0, 0.d0, 0.90d0, -1.d0, 4,
      &                 zone_start, zone_end, nzones)
       call assert_i('Z60 sparse 30d gaps: 0 zones',
      &              nzones, 0, npass, nfail)
@@ -1021,7 +1021,7 @@ c     Each cluster has 10 pts in 5 days, gap = 60 days
          ha(i) = 25000.d0 - 80.d0*dble(i-11)*0.5d0
       end do
       call zone_select(epochs, ha, 20,
-     &                 8, 15.d0, 0.90d0, -1.d0, 4,
+     &                 8, 15.d0, 0.d0, 0.90d0, -1.d0, 4,
      &                 zone_start, zone_end, nzones)
       if (nzones .ge. 2) then
          call assert_i('Z61 two clusters: >=2 zones',
@@ -1080,7 +1080,7 @@ c     Z63: All identical epochs → 0 zones (degenerate)
          ha(i) = 30000.d0 - dble(i)*100.d0
       end do
       call zone_select(epochs, ha, 10,
-     &                 8, 15.d0, 0.90d0, -1.d0, 4,
+     &                 8, 15.d0, 0.d0, 0.90d0, -1.d0, 4,
      &                 zone_start, zone_end, nzones)
       call assert_i('Z63 identical epochs: 0 zones',
      &              nzones, 0, npass, nfail)
@@ -1091,7 +1091,7 @@ c     Z64: 2 points only (< default min_zone_pts) → 0 zones
       ha(1) = 30000.d0
       ha(2) = 29500.d0
       call zone_select(epochs, ha, 2,
-     &                 8, 15.d0, 0.90d0, -1.d0, 4,
+     &                 8, 15.d0, 0.d0, 0.90d0, -1.d0, 4,
      &                 zone_start, zone_end, nzones)
       call assert_i('Z64 2pts < minpts: 0 zones',
      &              nzones, 0, npass, nfail)
@@ -1102,7 +1102,7 @@ c     Z65: Very steep decay (-10000 km/day)
          ha(i) = 30000.d0 - 10000.d0*dble(i-1)*0.1d0
       end do
       call zone_select(epochs, ha, 10,
-     &                 8, 2.d0, 0.85d0, -1.d0, 4,
+     &                 8, 2.d0, 0.d0, 0.85d0, -1.d0, 4,
      &                 zone_start, zone_end, nzones)
       if (nzones .ge. 1) then
          call assert_i('Z65 very steep: >=1 zone',
@@ -1153,7 +1153,7 @@ c     perfect R2=1.0, so pure R2-greedy selection always loses it.
 
 c     Z66: nzones_max=2 -- both a recent and an older zone present
       call zone_select(epochs, ha, 32,
-     &                 8, 10.d0, 0.90d0, -1.d0, 2,
+     &                 8, 10.d0, 0.d0, 0.90d0, -1.d0, 2,
      &                 zone_start, zone_end, nzones)
       call assert_i('Z66 recency: nzones_max=2 fills both slots',
      &              nzones, 2, npass, nfail)
@@ -1170,7 +1170,7 @@ c     Z68: nzones_max=1 -- only one slot exists; pure R2-greedy would
 c     pick window A (first perfect-R2 tie), but the guarantee means
 c     the MOST RECENT window (D) must win instead.
       call zone_select(epochs, ha, 32,
-     &                 8, 10.d0, 0.90d0, -1.d0, 1,
+     &                 8, 10.d0, 0.d0, 0.90d0, -1.d0, 1,
      &                 zone_start, zone_end, nzones)
       iall_ok = 0
       if (nzones .eq. 1) then
@@ -1179,6 +1179,56 @@ c     the MOST RECENT window (D) must win instead.
       end if
       call assert_i('Z68 recency: sole slot goes to most recent',
      &              iall_ok, 1, npass, nfail)
+
+c     ==============================================================
+c     PRIMARY-zone recency cap (live predictions only) -- issue [#NN]
+c     ==============================================================
+      write(*,*) ''
+      write(*,*) '  --- PRIMARY recency cap (primary_max_days) ---'
+
+c     Z69: dense daily tracking over 59 days, perfectly linear decay.
+c     With primary_max_days=15, the guaranteed PRIMARY zone should be
+c     trimmed back to <=15 days (still meets min_zone_pts/R2/slope on
+c     the trimmed sub-window) instead of the full 59-day span.
+      do i = 1, 60
+         epochs(i) = 2460000.d0 + dble(i-1)
+         ha(i) = 30000.d0 - 300.d0*dble(i-1)
+      end do
+      call zone_select(epochs, ha, 60,
+     &                 8, 100.d0, 15.d0, 0.90d0, -1.d0, 1,
+     &                 zone_start, zone_end, nzones)
+      span_days = epochs(zone_end(1)) - epochs(zone_start(1))
+      iall_ok = 0
+      if (span_days .le. 15.001d0 .and. span_days .lt. 58.d0)
+     &   iall_ok = 1
+      call assert_i('Z69 dense: 15d cap trims the PRIMARY zone',
+     &              iall_ok, 1, npass, nfail)
+
+c     Z70: same dense data, primary_max_days=0 (disabled) -- must
+c     reproduce the untrimmed, pre-feature behavior exactly (full
+c     59-day span), proving the disabled default is a true no-op.
+      call zone_select(epochs, ha, 60,
+     &                 8, 100.d0, 0.d0, 0.90d0, -1.d0, 1,
+     &                 zone_start, zone_end, nzones)
+      span_days = epochs(zone_end(1)) - epochs(zone_start(1))
+      call assert_d('Z70 disabled (0.d0): untrimmed 59d span',
+     &              span_days, 59.d0, 0.01d0, npass, nfail)
+
+c     Z71: sparse tracking (5-day cadence, 7 points over 30 days) --
+c     a 15-day sub-window only contains 4 points, below min_zone_pts=6,
+c     so the cap must fall back to the untrimmed 30-day window rather
+c     than reject the zone entirely. No regression versus today for
+c     sparsely-tracked objects.
+      do i = 1, 7
+         epochs(i) = 2460000.d0 + dble(i-1)*5.d0
+         ha(i) = 30000.d0 - 500.d0*dble(i-1)
+      end do
+      call zone_select(epochs, ha, 7,
+     &                 6, 30.d0, 15.d0, 0.90d0, -1.d0, 1,
+     &                 zone_start, zone_end, nzones)
+      span_days = epochs(zone_end(1)) - epochs(zone_start(1))
+      call assert_d('Z71 sparse: falls back to untrimmed 30d span',
+     &              span_days, 30.d0, 0.01d0, npass, nfail)
 
 c     ==============================================================
 c     Summary

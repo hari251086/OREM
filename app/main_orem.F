@@ -22,7 +22,8 @@ c     Config
       integer norad_id
       double precision t_obs_cal(6)
       integer nzones_max, min_zone_pts
-      double precision max_zone_days, r2_thresh, slope_thresh
+      double precision max_zone_days, primary_max_days
+      double precision r2_thresh, slope_thresh
       double precision bn_min, bn_max
       integer n_bn_sweep
       integer idrag_flag
@@ -80,7 +81,7 @@ c     ============================================================
       read(10,*) t_obs_cal(1), t_obs_cal(2), t_obs_cal(3),
      &           t_obs_cal(4), t_obs_cal(5), t_obs_cal(6)
       read(10,*) nzones_max
-      read(10,*) min_zone_pts, max_zone_days,
+      read(10,*) min_zone_pts, max_zone_days, primary_max_days,
      &           r2_thresh, slope_thresh
       read(10,*) bn_min, bn_max, n_bn_sweep
       read(10,*) ipopsize, maxgen, nbits_e, nbits_a,
@@ -182,6 +183,7 @@ c     ============================================================
      &   tle_file, norad_id,
      &   t_obs_cal,
      &   nzones_max, min_zone_pts, max_zone_days,
+     &   primary_max_days,
      &   r2_thresh, slope_thresh,
      &   bn_min, bn_max, n_bn_sweep,
      &   idrag_flag, 0, 0,
