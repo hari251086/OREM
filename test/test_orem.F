@@ -222,7 +222,7 @@ c     ============================================================
 c     D6: Bad TLE file → ierr=1
       call orem_run(
      &   'nonexistent.tle', 42928,
-     &   t_obs, 4, 8, 10.d0, 0.90d0, -1.d0,
+     &   t_obs, 4, 8, 10.d0, 0.d0, 0.90d0, -1.d0,
      &   80.d0, 160.d0, 0, 0, 0, 0,
      &   20, 500, 40, 16, 0.8d0, 0.01d0, 0.123d0,
      &   2, 0, 0,
@@ -240,7 +240,7 @@ c     D6: Bad TLE file → ierr=1
 c     D7: Wrong NORAD → ierr=1 (no match)
       call orem_run(
      &   'input/example_42928_zone0.tle.txt', 99999,
-     &   t_obs, 4, 8, 10.d0, 0.90d0, -1.d0,
+     &   t_obs, 4, 8, 10.d0, 0.d0, 0.90d0, -1.d0,
      &   80.d0, 160.d0, 0, 0, 0, 0,
      &   20, 500, 40, 16, 0.8d0, 0.01d0, 0.123d0,
      &   2, 0, 0,
@@ -290,7 +290,7 @@ c     Observed re-entry: 2019-03-03
 
       call orem_run(
      &   'input/example_42928.tle.txt', 42928,
-     &   t_obs, mxz, 8, 10.d0, 0.90d0, -1.d0,
+     &   t_obs, mxz, 8, 10.d0, 0.d0, 0.90d0, -1.d0,
      &   80.d0, 160.d0, 0, 0, 0, 0,
      &   20, 200, 40, 16, 0.8d0, 0.01d0, 0.123d0,
      &   2, 0, 0,
@@ -429,7 +429,7 @@ c     for the single zone in this file -> RSM ierr=2 -> zone_status=1.
 c     Also confirms the call completes without crashing.
       call orem_run(
      &   'input/example_42928_zone0.tle.txt', 42928,
-     &   t_obs, mxz, 8, 10.d0, 0.90d0, -1.d0,
+     &   t_obs, mxz, 8, 10.d0, 0.d0, 0.90d0, -1.d0,
      &   0.d0, 0.d0, 0, 0, 0, 0,
      &   20, 200, 40, 16, 0.8d0, 0.01d0, 0.123d0,
      &   2, 0, 0,
@@ -461,7 +461,7 @@ c     Verifies detection + warning; the driver loop must still
 c     complete normally.
       call orem_run(
      &   'input/example_42928.tle.txt', 42928,
-     &   t_obs, mxz, 8, 10.d0, 0.90d0, -1.d0,
+     &   t_obs, mxz, 8, 10.d0, 0.d0, 0.90d0, -1.d0,
      &   20.d0, 30.d0, 0, 0, 0, 0,
      &   20, 200, 40, 16, 0.8d0, 0.01d0, 0.123d0,
      &   2, 0, 0,
@@ -484,7 +484,7 @@ c     zones are still found and processed (just all flagged failed),
 c     and nzones_valid correctly reports 0 when every zone fails.
       call orem_run(
      &   'input/example_42928.tle.txt', 42928,
-     &   t_obs, mxz, 8, 10.d0, 0.90d0, -1.d0,
+     &   t_obs, mxz, 8, 10.d0, 0.d0, 0.90d0, -1.d0,
      &   0.d0, 0.d0, 0, 0, 0, 0,
      &   20, 200, 40, 16, 0.8d0, 0.01d0, 0.123d0,
      &   2, 0, 0,
@@ -552,7 +552,7 @@ c     ============================================================
 
       call orem_run(
      &   'input/example_37151.tle.txt', 37151,
-     &   t_obs, mxz, 8, 10.d0, 0.90d0, -1.d0,
+     &   t_obs, mxz, 8, 10.d0, 0.d0, 0.90d0, -1.d0,
      &   80.d0, 160.d0, 0, 0, 0, 0,
      &   20, 200, 40, 16, 0.8d0, 0.01d0, 0.123d0,
      &   2, 0, 0,
@@ -620,7 +620,7 @@ c     ============================================================
 
       call orem_run(
      &   'input/example_42928_zone0.tle.txt', 42928,
-     &   t_obs, mxz, 8, 10.d0, 0.90d0, -1.d0,
+     &   t_obs, mxz, 8, 10.d0, 0.d0, 0.90d0, -1.d0,
      &   80.d0, 160.d0, 0, 0, 0, 0,
      &   20, 200, 40, 16, 0.8d0, 0.01d0, 0.123d0,
      &   2, 0, 0,

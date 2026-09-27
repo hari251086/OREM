@@ -188,6 +188,7 @@ c     ============================================================
 c     ============================================================
       subroutine zone_select(epochs, ha, npts,
      &                       min_zone_pts, max_zone_days,
+     &                       primary_max_days,
      &                       r2_threshold, slope_threshold,
      &                       nzones_max,
      &                       zone_start, zone_end, nzones)
@@ -201,6 +202,21 @@ c       ha(npts)         : mean apogee altitude in km
 c       npts             : number of points
 c       min_zone_pts     : minimum TLE observations per zone
 c       max_zone_days    : maximum zone duration (days)
+c       primary_max_days : live-prediction PRIMARY recency cap (days).
+c                          <= 0 disables this entirely (every existing
+c                          caller -- validation/backfill, Object
+c                          Detail, manuscript/research campaigns --
+c                          passes 0.d0 and sees no behavior change).
+c                          When > 0, Pass 1.5's guaranteed most-recent
+c                          zone is trimmed back to at most this many
+c                          days (ending at the same point) if doing so
+c                          still meets min_zone_pts/r2_threshold/
+c                          slope_threshold -- otherwise it silently
+c                          falls back to the untrimmed candidate
+c                          (today's behavior), never a regression for
+c                          sparsely-tracked objects. Only ever applied
+c                          to the ONE Pass-1.5 zone; every other zone
+c                          keeps the general max_zone_days cap.
 c       r2_threshold     : minimum R² for linearity (e.g. 0.90)
 c       slope_threshold  : min negative slope km/day (e.g. -1.0)
 c       nzones_max       : max zones to return
@@ -213,7 +229,7 @@ c     ============================================================
       implicit double precision (a-h, o-z)
       integer npts, min_zone_pts, nzones_max, nzones
       double precision epochs(npts), ha(npts)
-      double precision max_zone_days, r2_threshold
+      double precision max_zone_days, primary_max_days, r2_threshold
       double precision slope_threshold
       integer zone_start(nzones_max), zone_end(nzones_max)
 
@@ -342,6 +358,34 @@ c     ---------------------------------------------------------
          nzones = nzones + 1
          zone_start(nzones) = cand_s(ncand)
          zone_end(nzones)   = cand_e(ncand)
+
+c        Live-prediction PRIMARY recency cap (see header comment).
+c        istart/iend/slope/intercept/r2 are Pass 1's own working
+c        variables -- safe to reuse here since Pass 1 has already
+c        exited and nothing later depends on their old values.
+         if (primary_max_days .gt. 0.d0) then
+            iend = cand_e(ncand)
+            if (epochs(iend) - epochs(cand_s(ncand)) .gt.
+     &          primary_max_days) then
+               istart = cand_s(ncand)
+ 35            continue
+               if (epochs(iend) - epochs(istart) .le.
+     &             primary_max_days) goto 36
+               istart = istart + 1
+               goto 35
+ 36            continue
+               if (iend - istart + 1 .ge. min_zone_pts) then
+                  call linfit(epochs(istart), ha(istart),
+     &               iend - istart + 1, slope, intercept, r2)
+                  if (r2 .ge. r2_threshold .and.
+     &                slope .lt. slope_threshold) then
+                     zone_start(nzones) = istart
+                     zone_end(nzones)   = iend
+                  end if
+               end if
+            end if
+         end if
+
          cand_r2(ncand) = -1.d0
       end if
 

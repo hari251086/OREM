@@ -11,6 +11,7 @@ c     ============================================================
      &   tle_file, norad_id,
      &   t_obs_cal,
      &   nzones_max, min_zone_pts, max_zone_days,
+     &   primary_max_days,
      &   r2_thresh, slope_thresh,
      &   bn_min_init, bn_max_init, n_bn_sweep,
      &   idrag_flag, iadapt_zone, irefine,
@@ -33,6 +34,16 @@ c       tle_file         : TLE file path
 c       norad_id         : target NORAD catalog number
 c       t_obs_cal(6)     : observed re-entry [yr,mo,dy,hr,mn,sc]
 c                          (all zeros = operational mode)
+c       primary_max_days : live-prediction PRIMARY recency cap, passed
+c                          straight through to zone_select's own
+c                          parameter of the same name -- <= 0 disables
+c                          it (validation/backfill/manuscript configs
+c                          all pass 0.d0, unaffected). Only applies to
+c                          the iadapt_zone=0 path (zone_select); issue
+c                          #41's zone_select_next path is a diagnostic/
+c                          ceiling-study mode already restricted to
+c                          known-re-entry runs, never used live, so it
+c                          is untouched.
 c       iadapt_zone      : issue #41 -- 0=off (default: single
 c                          upfront zone_select call, unchanged
 c                          behavior), 1=on (RPE-driven sequential zone
@@ -117,7 +128,8 @@ c     --- Input arguments ---
       character*(*) tle_file
       integer norad_id, nzones_max
       integer min_zone_pts
-      double precision max_zone_days, r2_thresh, slope_thresh
+      double precision max_zone_days, primary_max_days
+      double precision r2_thresh, slope_thresh
       double precision t_obs_cal(6)
       double precision bn_min_init, bn_max_init
       integer n_bn_sweep
@@ -341,7 +353,7 @@ c     Step 3: Zone selection
 c     ============================================================
       if (iadapt_zone .eq. 0) then
          call zone_select(epochs, ha_tle, npts,
-     &      min_zone_pts, max_zone_days,
+     &      min_zone_pts, max_zone_days, primary_max_days,
      &      r2_thresh, slope_thresh,
      &      nzones_max,
      &      zone_start, zone_end, nzones)
