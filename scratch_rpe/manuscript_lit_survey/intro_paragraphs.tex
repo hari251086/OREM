@@ -1,0 +1,74 @@
+% intro_paragraphs.tex -- SOTA literature-review paragraphs for the OREM
+% manuscript Introduction (issue #46, broader background survey).
+% Companion files: literature_matrix.md, references.bib (this folder).
+%
+% This is the broad state-of-the-art framing paragraph(s); the specific
+% novelty paragraph distinguishing this work from Mutyalarao & Sharma
+% (2010,2011) / Sellamuthu & Sharma (2017,2018) / Sharma & Raj is already
+% drafted separately in issue #46's own comment thread and should follow
+% immediately after this block in the final Introduction, not duplicate it.
+
+The prediction of atmospheric re-entry for resident space objects (RSOs)
+decaying from highly eccentric orbits (HEO, $e>0.2$) and geostationary
+transfer orbits (GTO) is a classical problem in astrodynamics and Space
+Domain Awareness (SDA), originating with Shute's early treatment of
+highly-eccentric-satellite lifetimes \cite{shute1965,shutechiville1966}
+and King-Hele's foundational analytical theory of orbital contraction
+under upper-atmospheric drag dissipation \cite{kinghele1987}. Building on
+this lineage, Sharma and coworkers developed a family of
+Kustaanheimo--Stiefel (KS) regularized analytical and semi-analytical
+theories that couple drag-driven semi-major-axis reduction with Earth's
+oblateness \cite{sharmaraj1988,sharma1997} and the diurnal atmospheric
+density bulge \cite{swinerdboulton1983}, establishing regularized orbital
+elements as a numerically robust alternative to Cartesian propagation in
+the highly eccentric, drag-active regime addressed by this work. More
+recent, standards-level assessments confirm that atmospheric-density-model
+uncertainty -- not propagator or force-model fidelity -- remains the
+dominant error source for orbit-lifetime and re-entry-time prediction
+across the field \cite{vallado2014,iso27852}.
+
+Beyond drag, lunisolar third-body gravitational perturbations exert a
+first-order influence on the long-term evolution of GTO/HEO perigee
+altitude. Kozai's secular perturbation theory \cite{kozai1962} and Hough's
+critical-inclination analysis \cite{hough1981} established that third-body
+forcing can drive large-amplitude eccentricity and perigee-lowering
+oscillations near the classical critical inclination, a mechanism
+independently corroborated by Colombo's long-term, drag-free evolution
+study of highly elliptical orbits \cite{colombo2015}. For GTO specifically,
+Wang and Gurfil identified and characterized \emph{solar apsidal
+resonance} -- a 1:1 commensurability between the GTO apsidal-line
+precession rate and the Sun's apparent motion -- that converts the
+normally periodic, few-hundred-day perigee-height oscillation into a
+monotonic, one-way collapse or rise
+\cite{wanggurfil2016,wanggurfil2017asr,wanggurfil2017jsr}, with Luo and
+Wang subsequently generalizing this lunisolar resonance corridor to
+inclined GTOs \cite{luowang2019}. These resonance corridors impose a
+fundamental, quantifiable ceiling on deterministic re-entry predictability:
+post-resonance orbital evolution becomes acutely sensitive to sub-degree
+uncertainties in right ascension of the ascending node and area-to-mass
+ratio, a sensitivity independently reproduced within a KS-regularized
+dynamical framework closely related to the propagator used in this work
+\cite{sellamuthusharma2021}.
+
+The response-surface-methodology (RSM) and genetic-algorithm (GA) approach
+used here to fit an object's eccentricity and ballistic number to its
+observed apogee decay traces to Sharma, Bandyopadhyay, and Adimurthy's
+original zone-fitting cost function \cite{sharmabandyopadhyay2006} and its
+extension to short-term (${<}\,3$-month) GTO decay-zone prediction by
+Mutyalarao and Sharma \cite{mutyalaraosharma2010,mutyalaraosharma2011}; a
+structurally similar essential-ballistic-parameter fit was independently
+developed by Gupta and Anilkumar for terminal-phase decay
+\cite{guptaanilkumar2015}. A recent benchmarking study within this same
+methodological lineage found that no single re-entry-prediction method --
+RSM-GA included -- dominates across the full decay horizon, motivating
+multi-method or ensemble approaches \cite{dutt2023}. This growing body of
+SDA modeling work is set against a tightening regulatory landscape: the
+Inter-Agency Space Debris Coordination Committee's mitigation guidelines
+\cite{iadc2021} and, more recently, the U.S. Federal Communications
+Commission's rule requiring post-mission disposal within five years of
+end-of-mission for satellites passing through low-Earth orbit
+\cite{fcc2022,fedreg2024} have sharply shortened the operationally relevant
+re-entry-prediction horizon relative to the legacy 25-year disposal
+guideline, increasing the practical value of accurate short- and
+medium-term GTO/HEO decay prediction of exactly the kind addressed in this
+work.
