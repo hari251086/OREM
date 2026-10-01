@@ -374,7 +374,7 @@ c        orem.F's own a_kep/x0/xd0 construction (lines ~736-751).
 
          period_d = 2.d0*pi*dsqrt(a_kep(1)**3/amue) / 86400.d0
          nrev_re = int(5.d0*365.25d0 / period_d) + 1
-         if (nrev_re .gt. max_traj) nrev_re = max_traj
+         if (nrev_re .gt. max_traj-1) nrev_re = max_traj-1
 
          idump_re = 1
          do i = 1, max_traj
