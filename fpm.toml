@@ -1,5 +1,5 @@
 name = "orem"
-version = "0.1.0"
+version = "1.48.0"
 license = "license"
 author = "Harishkumar Sellamuthu"
 description = "Re-entry prediction: RSM/GA fitting over KS-regularized propagation"
