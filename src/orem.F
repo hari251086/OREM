@@ -798,7 +798,7 @@ c        Re-entry propagation with optimal (e, BN)
             period_s = 2.d0*pi*dsqrt(a_kep(1)**3/amue)
             period_d = period_s / 86400.d0
             nrev_re = int(5.d0*365.25d0 / period_d) + 1
-            if (nrev_re .gt. max_reentry) nrev_re = max_reentry
+            if (nrev_re .gt. max_reentry-1) nrev_re = max_reentry-1
 
             idump_re = 1
             call propagate_ks(
@@ -1049,7 +1049,8 @@ c     Insertion sort (nvalid <= nzones_max, always small) then median
       do i = 2, nvalid
          vtmp = vals(i)
          j = i - 1
-         do while (j .ge. 1 .and. vals(j) .gt. vtmp)
+         do while (j .ge. 1)
+            if (vals(j) .le. vtmp) exit
             vals(j+1) = vals(j)
             j = j - 1
          end do
@@ -1289,7 +1290,9 @@ c     Insertion sort (nb is a per-zone TLE count, always small)
       do i = 2, nb
          btmp = bvals(i)
          j = i - 1
-         do while (j .ge. 1 .and. bvals(j) .gt. btmp)
+c        Fortran .and. is not short-circuit: test j before bvals(j)
+         do while (j .ge. 1)
+            if (bvals(j) .le. btmp) exit
             bvals(j+1) = bvals(j)
             j = j - 1
          end do

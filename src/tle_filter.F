@@ -67,6 +67,7 @@ c     ============================================================
       integer nfiltered, nremoved, ngaps
 
       integer i, j, w0, nw
+      logical lgap
       double precision wx(1000), wha(1000), we(1000)
       double precision wmean, wstd, wslope, wintc, wr2
       double precision epred, resid, ssres
@@ -90,8 +91,11 @@ c        Two cases: point i is itself the first point after a gap
 c        (checked directly, since that pair sits outside the j-loop
 c        below, which only checks pairs strictly inside the window);
 c        or an older gap lies further back inside the window.
-         if (i .gt. 1 .and.
-     &       epochs(i) - epochs(i-1) .gt. gap_days) then
+         lgap = .false.
+         if (i .gt. 1) then
+            if (epochs(i) - epochs(i-1) .gt. gap_days) lgap = .true.
+         end if
+         if (lgap) then
             w0 = i
          else
             do j = i - 1, w0 + 1, -1

@@ -615,8 +615,9 @@ c     Re-entry / divergence check (every step, h_alt = |r| - R_E)
                exit_code = 2
                return
             else if (h_alt .lt. 80.d0) then
-c              Dump re-entry point and return
-               idump = idump + 1
+c              Dump re-entry point and return (if the buffer is full,
+c              overwrite the last sample rather than write past the end)
+               if (idump .lt. max_pts) idump = idump + 1
                traj_jd(idump) = djulian + T/86400.d0
                do i = 1,3
                   traj_x(i,idump)  = x(i)
@@ -628,7 +629,14 @@ c              Dump re-entry point and return
 
          end do
 
-c     Dump state once per revolution (after all steps)
+c     Dump state once per revolution (after all steps). Stop cleanly
+c     at buffer capacity instead of writing past traj_*(max_pts):
+c     callers clamp nrev to the buffer size but the initial point
+c     takes one slot too, so nrev revolutions can need nrev+1 points.
+         if (idump .ge. max_pts) then
+            exit_code = 0
+            return
+         end if
          idump = idump + 1
          traj_jd(idump) = djulian + T/86400.d0
          do i = 1,3
