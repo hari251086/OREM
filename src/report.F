@@ -71,6 +71,13 @@ c     ============================================================
       double precision rel_spread
       double precision cal_band(6), band_width
       integer iz, nre, izl, ivals(8), i_band
+c     Issue #44: stale-PRIMARY detection. NSTALE_MIN consecutive latest
+c     valid zones (by epoch) with no predicted re-entry => the latest
+c     zone with a prediction is stale, not a current estimate.
+      integer NSTALE_MIN
+      parameter(NSTALE_MIN = 3)
+      integer ntrail, izlast_valid
+      logical stale_primary
 
       zslab(0) = 'ok        '
       zslab(1) = 'propfail  '
@@ -152,8 +159,46 @@ c     Ensemble block
          end if
       end do
 
+c     Count trailing valid zones (status 0/2/3; skipped zones 1/4 are
+c     failures, not "no re-entry" evidence) that predict no re-entry,
+c     walking back from the latest zone until one that does.
+      ntrail = 0
+      izlast_valid = 0
+      do iz = nzones_used, 1, -1
+         if (zone_status(iz) .le. 3 .and. zone_status(iz) .ne. 1) then
+            if (reentry_jd(iz) .gt. 0.d0) goto 45
+            ntrail = ntrail + 1
+            if (izlast_valid .eq. 0) izlast_valid = iz
+         end if
+      end do
+ 45   continue
+      stale_primary = (t_obs_jd .le. 0.d0 .and. nre .ge. 1 .and.
+     &                 ntrail .ge. NSTALE_MIN)
+
       write(44,'(A)') ''
-      if (nre .ge. 1) then
+      if (stale_primary) then
+c        Issue #44: the freshest zones unanimously predict no
+c        re-entry, so the latest predicting zone (izl) is stale.
+c        Do NOT print the "PRIMARY estimate (latest zone, Z" line
+c        (parsers read it as a current estimate); report the
+c        condition explicitly instead.
+         call jd2cal(reentry_jd(izl), cal)
+         write(44,'(A,I3,A)')
+     &      'PRIMARY estimate: none -- the latest ', ntrail,
+     &      ' valid zones all predict no re-entry within cap'
+         write(44,'(A,I2,A,I5,I3,I3,A)')
+     &      '  last predicting zone Z', izl, ' is STALE (',
+     &      int(cal(1)), int(cal(2)), int(cal(3)),
+     &      ' ), not reported as PRIMARY'
+         call jd2cal(t_mean, cal)
+         write(44,'(A,I2,A,I2,A)')
+     &      'Ensemble (', nre, ' of ', nzones_used,
+     &      ' zones with a predicted re-entry, includes stale zones):'
+         write(44,'(A,F13.4,A,I5,I3,I3,A,F8.2,A)')
+     &      '  median re-entry JD ', t_mean, '  (',
+     &      int(cal(1)), int(cal(2)), int(cal(3)),
+     &      ' )  +- ', t_std, ' days'
+      else if (nre .ge. 1) then
 c        Latest-zone prediction is the PRIMARY estimate: on the
 c        7-object validation campaign it lands within 15% for every
 c        object (median |RPE| 8.2%, mean 7.6%) vs the uniform mean's
@@ -209,7 +254,8 @@ c     and a band adds nothing). Real space weather, only BN swept
 c     across the PRIMARY zone's own fitted search window -- see
 c     bn_dispersion.F for the ISRO monograph precedent (Fig 8.6,
 c     GSLV-D1) this reuses.
-      if (t_obs_jd .le. 0.d0 .and. n_band_valid .gt. 0) then
+      if (t_obs_jd .le. 0.d0 .and. n_band_valid .gt. 0 .and.
+     &    .not. stale_primary) then
          write(44,'(A)') ''
          write(44,'(A)') 'Dispersion band (BN swept across the '//
      &      'PRIMARY zone''s fitted search window, real space '//
