@@ -608,6 +608,7 @@ c     ============================================================
 
       character*200 line
       integer ihdr, izone, iens, ilgd, iperi, iperi_ok
+      integer i44, ilatest, inone, istale
 
       call read_atm_orem(alt, den, sch, ndim_a, natm)
 
@@ -745,6 +746,63 @@ c     median |RPE| 8.2% vs the uniform mean's 45% mean error).
      &              npass, nfail)
       call assert_i('R7 latest-zone RPE line present', izone, 1,
      &              npass, nfail)
+
+c     R8-R12 (issue #44): operational mode (no observed epoch), 4
+c     zones. Z1 predicts a re-entry, Z2-Z4 (the freshest) predict none.
+c     Three trailing valid zones with no re-entry => Z1 is stale and
+c     must NOT be printed as the "PRIMARY estimate (latest zone"
+c     line. With only two trailing no-re-entry zones (Z3 predicts)
+c     the normal PRIMARY line must stay.
+      do i44 = 1, 6
+         t_obs(i44) = 0.d0
+      end do
+      nzu = 4
+      zepoch(4)  = 2458300.d0
+      reentry(1) = 2458700.d0
+      reentry(2) = 0.d0
+      reentry(3) = 0.d0
+      reentry(4) = 0.d0
+      e_opt(4) = 0.15d0
+      bn_opt(4) = 50.d0
+      rms_o(4) = 0.1d0
+      zstat(4) = 0
+      rpe(4) = 0.d0
+      t_mean = reentry(1)
+      t_std  = 0.d0
+      call orem_report(
+     &   'output/test_report3.txt', 42928, t_obs,
+     &   80.d0, 160.d0, 1,
+     &   reentry, e_opt, bn_opt, rms_o,
+     &   zepoch, nzu,
+     &   zstat, 4,
+     &   rpe, t_mean, t_std,
+     &   bnb_t, tb_t, 0, 0,
+     &   mxz, last_perigee, ierr_rep)
+      call assert_i('R8 stale report ierr_rep=0', ierr_rep, 0,
+     &              npass, nfail)
+      call scan_primary('output/test_report3.txt', ilatest, inone,
+     &                  istale)
+      call assert_i('R9 stale: no "latest zone" PRIMARY line',
+     &              ilatest, 0, npass, nfail)
+      call assert_i('R10 stale: PRIMARY none + STALE flagged',
+     &              inone*istale, 1, npass, nfail)
+
+      reentry(3) = 2458650.d0
+      call orem_report(
+     &   'output/test_report4.txt', 42928, t_obs,
+     &   80.d0, 160.d0, 1,
+     &   reentry, e_opt, bn_opt, rms_o,
+     &   zepoch, nzu,
+     &   zstat, 4,
+     &   rpe, t_mean, t_std,
+     &   bnb_t, tb_t, 0, 0,
+     &   mxz, last_perigee, ierr_rep)
+      call scan_primary('output/test_report4.txt', ilatest, inone,
+     &                  istale)
+      call assert_i('R11 2 trailing no-reentry: normal PRIMARY',
+     &              ilatest, 1, npass, nfail)
+      call assert_i('R12 2 trailing no-reentry: not flagged stale',
+     &              inone+istale, 0, npass, nfail)
       return
 
  800  call assert_i('R2 report file readable', 0, 1, npass, nfail)
@@ -752,6 +810,31 @@ c     median |RPE| 8.2% vs the uniform mean's 45% mean error).
  810  call assert_i('R5 synthetic report readable', 0, 1,
      &              npass, nfail)
       return
+      end
+
+c     ============================================================
+c     Issue #44 helper: scan a report for the PRIMARY-line variants.
+c       ilatest : 1 if a 'PRIMARY estimate (latest zone, Z' line exists
+c       inone   : 1 if a 'PRIMARY estimate: none' line exists
+c       istale  : 1 if a 'is STALE' line exists
+c     ============================================================
+      subroutine scan_primary(fname, ilatest, inone, istale)
+      implicit none
+      character*(*) fname
+      integer ilatest, inone, istale
+      character*200 line
+      ilatest = 0
+      inone = 0
+      istale = 0
+      open(unit=46, file=fname, status='old', err=900)
+ 10   read(46,'(A)',end=20) line
+      if (index(line, 'PRIMARY estimate (latest zone, Z') .gt. 0)
+     &   ilatest = 1
+      if (index(line, 'PRIMARY estimate: none') .gt. 0) inone = 1
+      if (index(line, 'is STALE') .gt. 0) istale = 1
+      goto 10
+ 20   close(46)
+ 900  return
       end
 
 c     ============================================================
