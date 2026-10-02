@@ -216,3 +216,5 @@ solar azimuth ψ = (Ω + ω − L_sun) mod 360° (Wang & Gurfil's angle).
 
 **Recommendation for the report / Object Detail page:** for i > 46.4° the top panel (solar azimuth) is a featureless sawtooth and hides the driver. Replace or
 supplement it with the Moon azimuth 2ω′_Moon (or the Sun+Moon drive dq/dt, Fig. 1c), whose sign change marks the perigee peak.
+
+**Implemented 2026-10-02:** the recommendation above is done for the validation report (OREM-Watchlist `lunisolar_drive.py` + `plot_object_evolution(tle_path=...)`; 23 of 28 objects now show the Sun+Moon drive in the top panel; `OREM_Validation_Report.pdf` replaced, 135 pages). The dashboard Object Detail page is unchanged until its evolution CSV carries i, Ω, ω.
