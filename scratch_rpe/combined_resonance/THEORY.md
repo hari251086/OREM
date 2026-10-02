@@ -1,4 +1,4 @@
-# Combined resonant-azimuth theory for high-inclination HEO re-entry (draft v0, 2026-10-02)
+# Combined resonant-azimuth theory for high-inclination HEO re-entry (draft v1, 2026-10-02)
 
 Follow-up to OREM #56 and `E:\Research\References\11_Molniya_Resonances\literature_review.md`.
 Goal: a theory in the spirit of Wang & Gurfil's solar-azimuth U-turn, but built on the drivers that
@@ -99,11 +99,8 @@ tracked orbit evolution*, not that TLEs are independent truth; (iii) all in-samp
 
 ## 6. Open items / next steps
 
-- **[?] Closed form of ω̇′_P** from J2 + the perturber's plane precession, and the U-turn locus in (a, e, i) per
-  perturber — the direct analogue of Wang & Gurfil's λ_crit(i). The family in §3 gives its Fourier content; the
-  single-angle form should give the exact condition.
-- **[?] Persistence-time detector** with windows of 2–4 years (R4 showed 180 days is too short), validated on
-  decay timing.
+- **Closed form of ω̇′_P** — done (§8.3): exact chain rule, verified; but not a usable stand-alone U-turn locus (the azimuth rate swings sign with the nodal phase).
+- **Persistence-time detector** — superseded by the forecast detector of §8.4, which predicts the sign change of the drive (the perigee peak) and the fall below 300 km years ahead.
 - **[?] Generality check:** the same machinery should also reproduce the drive at i < 46.4° (including the 7
   confirmed solar U-turn objects); not yet run.
 - **[?] Beyond quadrupole:** Moon octupole grows with a (Celletti 2016, full text); Sun semi-secular terms near
@@ -117,3 +114,77 @@ tracked orbit evolution*, not that TLEs are independent truth; (iii) all in-samp
 `drivers.py` (family, J2 rates, loci) · `loci_table.py` · `quadrupole_drive.py` (exact drive, ω′_P) ·
 `check_apogee_perigee.py` (§1) · `validate_drive.py`, `robust_stats.py` (R3) · `identify_drivers.py` (R4) ·
 `validate_strength.py` (R5). Data: `apogee_perigee_stats.csv`, `drive_windows.json`.
+
+---
+
+## 8. The Molniya perigee cycle: what drives the rise before decay (second pass, 2026-10-02)
+
+**Question (from the OREM validation report plots):** for Molniya-type orbits the perigee rises by 1–3 thousand km over
+~5–7 years and then falls to decay, while the apogee moves the opposite way. What drives it, and is it a known resonance?
+
+### 8.1 Observation (OREM_Validation_Report.pdf, evolution pages) [N]
+MOLNIYA 1-28 (NORAD 7480): perigee altitude 650 → 1,890 km (peak at 6.7 yr) → decay at ~11 yr; apogee 39,700 → 38,450 km
+over the first 7 yr — the constant-a signature of §1 (δr_p ≈ −δr_a) on a multi-year scale.
+
+### 8.2 The driver is the lunisolar quadrupole [N]  (`molniya_cycle.py`, `forecast_test.py`, `make_figures.py`)
+19 Molniya-type objects (i ≈ 62–66°, e ≈ 0.7, a ≈ 26,000–27,000 km: Molniya satellites, SL-6 R/Bs, Cosmos debris):
+- **Reconstruction.** Integrating the exact Sun+Moon quadrupole drive along the observed elements reproduces the perigee
+  rise in 18 of 19 objects: correlation ≈ 1.000, median normalised RMSE 0.009; rise amplitudes 1,100–3,300 km with
+  modelled/observed ratio 1.00. The Moon supplies ≈ 70 % (65–73 %), the Sun ≈ 30 %. (Exception: COSMOS 1030 DEB, 12907,
+  peak at 32 yr, outside the regime.)
+- **The peak is a sign change of the Moon's drive.** At the observed perigee maximum, 2ω′_Moon lies within a few degrees of
+  180° for every object (175°–180°), i.e. sin 2ω′_Moon changes sign and the perigee turns.
+- **Forecast, no free parameters** (secular propagator `secular_propagator.py`: J2 + Sun + Moon quadrupole, a = const, no
+  drag, started from TLE mean elements): from the *first* TLE (horizon ≈ 10.7 yr) the perigee-peak epoch has median error
+  0.11 yr and the epoch of perigee < 300 km 0.19 yr (bias +0.00; 17 objects); started 4 yr / 2 yr before the peak, 0.11 / 0.08 yr.
+  A naive "every object lives the median lifetime" baseline has mean error 1.67 yr vs 0.22 yr (skill 0.87); predicted and
+  observed horizons (9–15 yr) correlate at 0.991.
+- **Ablation (which driver is required):** J2 alone gives no rise; J2+Sun gets the peak epoch wrong by 7.7 yr; J2+Moon gets the
+  peak right (0.23 yr) but the fall wrong by ≈ 5.8 yr; **both perturbers are needed** — the Moon makes the rise and its peak,
+  the Sun the descent (Fig. 1, middle panel; Fig. 2, right).
+- **Beyond the Molniya clones** (`forecast_pool.py`): 46 pool objects with i_mean ≥ 46.4°, e > 0.3, record reaching 300 km:
+  median relative error 3 %, 86 % within 10 %, 90 % within 25 %, mean abs error 0.89 yr vs 4.45 yr for the median-lifetime
+  baseline (skill 0.80), log–log corr 0.944. Mix: 30 objects at 62–66°, 3 at 46–56°, 6 at 66–90°. Failures: 4 of 46 give no
+  drop within 45 yr (e.g. 10370, inclination varies 36 to >46°) and two are off by a factor 2–3.
+
+### 8.3 Which resonance? — and a correction about the closed form
+- **Known-resonance reading [N+L].** These orbits sit at the **critical inclination (2ω̇ ≈ 0, 63.43°)**: the J2 apsidal drift almost
+  cancels, so the quadrupole drive ∝ sin 2ω′ keeps one sign for years. At a Molniya state (a = 26,562 km, e = 0.70, i = 63.4°)
+  Ψ̇ = +0.0006°/day for 2ω and ≈ ±0.01°/day for 2ω+Ω−2Ω_L, 2ω−Ω+2Ω_L (§3). This is the lunisolar critical-inclination resonance
+  of the literature, here in its Kozai-type "apsidal slow-passage" form relative to the Moon/Sun planes.
+- **Azimuth rate, exact chain rule (verified).** ω̇′ = ω̇ − (∂ω_N/∂Δ)(Ω̇ − Ω̇_P) − (∂ω_N/∂i)·i̇ − (∂ω_N/∂I)·İ_P with
+  tan ω_N = sin I sin Δ /(sin i cos I − cos i sin I cos Δ) (`omega_prime_rate.py`): matches the vector geometry to 3×10⁻¹⁴° and
+  finite differences along the propagated trajectory to 4 digits.
+- **But it is not a stand-alone U-turn locus.** (i) For the Sun the J2-only stationarity condition f(i, Ω) = (5c²−1)/2 + c·∂ω_N/∂Δ = 0
+  has a node-dependent critical inclination, i*(Ω) = 57.7° (Ω = 180°) … 69.6° (Ω = 0°) [N]. (ii) Along a real Molniya orbit the
+  azimuth rate is **not** slow and signed: it swings from −18 to +21°/yr within ~6 yr because Ω circulates at ≈ −41°/yr
+  (period ≈ 8.8 yr) and ∂ω_N/∂Δ depends on the nodal phase. A straight-line "observed sweep rate" therefore disagrees with the
+  J2-only closed form (median ratio 0.36, spread −0.95…+4.6) and with the full-quadrupole chain rule (median 0.34); this is a
+  comparison artefact of averaging a strongly oscillating rate, not an error in the formula. **Physical reading:** ω is nearly
+  frozen (critical inclination) while the nodal phase modulates the drive with the 8.8-yr period; the drive is positive for
+  ≈ 6–7 yr and then negative, which is the multi-year perigee cycle. Hence a single inequality in (a, e, i) is the wrong detector;
+  the quantity to follow is the sign and phase of the full drive, i.e. the forecast below.
+
+### 8.4 A U-turn-style time detector for i > 46.4°
+Detector = **epoch at which the Moon+Sun quadrupole drive changes sign (perigee maximum), and the epoch the perigee then drops below
+300 km**, obtained by integrating the secular model from the latest TLE mean elements. Performance (Molniya-class, §8.2): peak epoch
+±0.04–0.11 yr, fall below 300 km ±0.08–0.19 yr, 2–10.7 yr ahead. As a real-time flag: "perigee is rising and the Moon drive is still
+positive" ⇒ time to peak and to the 300 km crossing are forecastable, giving years of lead before decay; after the peak the
+remaining lifetime is bounded by the same forecast.
+
+### 8.5 Caveats (read before using)
+- **Mean elements.** TLEs are SDP4-type mean elements; agreement shows consistency with tracked evolution, not independence from the TLE model.
+- **Sample.** The 17 Molniya-class objects are near-clones (similar a, e, i, ω; different RAAN/epoch); the 46-object pool is 65 % Molniya-class.
+  Out-of-class generality rests on 9 objects (46–56° and 66–90°).
+- **Definitions.** E300 (perigee < 300 km, smoothed) is chosen to stay above the drag regime; no drag is modelled, so the final months are not
+  predicted. No parameter was fitted, but event definitions and the 22-year/45-year horizon caps were set before running; results are in-sample on this pool.
+- **Model scope.** Quadrupole only (octupole matters for the Moon at larger a); Moon and Sun on circular orbits; a held constant.
+- **Status.** Analysis tooling in `scratch_rpe/`; no change to OREM's prediction pipeline.
+
+### 8.6 Next
+(1) Run the forecast as an *independent cross-check* beside OREM's Molniya predictions (OREM median RPE 0.98 % overall on the 28-object
+campaign); (2) add drag at low perigee to extend the forecast to re-entry itself; (3) test the same forecast on the 7 confirmed solar-U-turn
+objects (i < 46.4°); (4) quantify sensitivity to initial-element noise (propagate perturbed initial states) to turn the forecast into a distribution.
+
+**Figures:** `figures/fig1_molniya_7480_forecast.png`, `figures/fig2_forecast_skill.png`. **Scripts:** `molniya_cycle.py`,
+`secular_propagator.py`, `forecast_test.py`, `forecast_baseline.py`, `forecast_pool.py`, `omega_prime_rate.py`, `make_figures.py`.
