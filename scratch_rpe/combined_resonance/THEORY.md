@@ -188,3 +188,31 @@ objects (i < 46.4°); (4) quantify sensitivity to initial-element noise (propaga
 
 **Figures:** `figures/fig1_molniya_7480_forecast.png`, `figures/fig2_forecast_skill.png`. **Scripts:** `molniya_cycle.py`,
 `secular_propagator.py`, `forecast_test.py`, `forecast_baseline.py`, `forecast_pool.py`, `omega_prime_rate.py`, `make_figures.py`.
+
+---
+
+## 9. Trends across the 28 plots of OREM_Validation_Report.pdf (third pass, 2026-10-02)
+
+Read all-object evolution plots (pages = summary + 1 of each 4-page object block; 11 viewed directly, all 28 re-extracted from the
+same TLE data by `trend_all28.py`; `trend_phase.py`; Fig. 3 `figures/fig3_report_trends.png`). The report's "resonance angle" is the
+solar azimuth ψ = (Ω + ω − L_sun) mod 360° (Wang & Gurfil's angle).
+
+| Group | n | Inclination | Solar azimuth ψ | Perigee | Apogee |
+|---|---|---|---|---|---|
+| High-i | 23 | 63.5–68° | circulates steadily, ψ̇ = −1.08…−1.18°/day (period ≈ 0.9 yr), same value in the last 15 % of the record | hump +1,100…+3,300 km (median ≈ 1,500), peak 4.4–7.6 yr after the first TLE, then fall to decay | mirror image (a const) |
+| Low-i | 5 | 5.7–25.5° | ψ̇ ≈ −0.3°/day and shrinking; **sign flips in the last 30 % for 3 of 5** (35497, 27526, 37151) | stays 120–260 km (small ±20–35 km annual swings; FALCON 9 R/B +147 km) | falls steadily 40,000 → < 10,000 km (apogee-led decay) |
+
+- **High-i: the solar U-turn is never engaged [N+D].** ψ̇ = (ω̇ + Ω̇) − n_sun with (ω̇ + Ω̇) ∝ (5cos²i − 2cos i − 1) < 0 above 46.4°, so ψ̇ ≈ −(0.14 + 0.99)°/day
+  ≈ −1.1°/day for ever, as measured. The perigee hump therefore has nothing to do with the plotted angle; it is the lunisolar quadrupole of §8
+  (Moon ≈ 70 %, Sun ≈ 30 %), reproduced to ~1 % by the model.
+- **Low-i: the U-turn is visible in the plots [N].** |ψ̇| falls and crosses zero within ~1–2 yr of the end for 3 of 5 objects, as the solar-resonance picture predicts;
+  the perigee, however, stays low (drag regime), so the signature is a late apogee-led collapse, not a perigee hump. (40943 and 59347 do not reverse: ψ̇ −0.17 / −0.85°/day.)
+- **Post-peak lifetime is bimodal and tied to the starting nodal phase [N].** For the high-i group the time from the perigee peak to the last TLE is ≈ 3.8–4.7 yr for
+  first-TLE Ω ≈ 120–225° and ≈ 7.4–10.2 yr for Ω ≈ 20–115° (cos/sin regression R² = 0.63, n = 22); the time of the peak (R² = 0.19) and the rise amplitude
+  (R² = 0.10) depend only weakly on Ω. Consistent with the 8.8-yr nodal modulation of §8.3 and reproduced by the forecast of §8.2 (error ≈ 0.2 yr). Correlation, small n,
+  first-TLE epochs differ; 9269 (Ω₀ = 205°, 8.0 yr) and 27902 (Ω₀ = 356°, 12.8 yr) do not follow the grouping.
+- **Exceptions in the high-i group:** COSMOS 1109 DEB (32977) starts near its peak (rise 47 km); COSMOS 1030 DEB (12907) and 1261 DEB (27902) show multi-decade cycles with
+  perigee 3,500–5,800 km (the model over-predicts 12907); FREGAT R/B (35009) starts at 196 km perigee and rises 900 km.
+
+**Recommendation for the report / Object Detail page:** for i > 46.4° the top panel (solar azimuth) is a featureless sawtooth and hides the driver. Replace or
+supplement it with the Moon azimuth 2ω′_Moon (or the Sun+Moon drive dq/dt, Fig. 1c), whose sign change marks the perigee peak.
