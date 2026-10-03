@@ -218,3 +218,47 @@ solar azimuth ψ = (Ω + ω − L_sun) mod 360° (Wang & Gurfil's angle).
 supplement it with the Moon azimuth 2ω′_Moon (or the Sun+Moon drive dq/dt, Fig. 1c), whose sign change marks the perigee peak.
 
 **Implemented 2026-10-02:** the recommendation above is done for the validation report (OREM-Watchlist `lunisolar_drive.py` + `plot_object_evolution(tle_path=...)`; 23 of 28 objects now show the Sun+Moon drive in the top panel; `OREM_Validation_Report.pdf` replaced, 135 pages). The dashboard Object Detail page is unchanged until its evolution CSV carries i, Ω, ω.
+
+---
+
+## 10. Cross-check against OREM's Molniya predictions (2026-10-03)
+
+Question: do the parameter-free secular forecast (§8) and OREM's validation predictions agree, and where do they diverge?
+Script `cross_check_orem.py` (outputs `cross_check_orem_{300,200,150}.csv`, `figures/fig4_cross_check_orem.png`).
+
+**Setup, and why it is not a like-for-like contest [read first].**
+- OREM: validation-campaign hindcast, TLE history cut ≈ 90 d before decay, full multi-zone RSM/GA; error = predicted − SATCAT decay (days).
+- Forecast: J2+Sun+Moon secular propagator from the **first TLE only** (≈ 12–13 yr ahead), no drag; it predicts the epoch the perigee altitude first
+  falls below a threshold after the perigee peak. To express it as a decay date, that epoch is shifted by the **leave-one-out median** of
+  (decay − event epoch) over the *other* objects — one empirical constant, never the object's own decay date.
+- The two use different information (OREM sees the end of the life; the forecast sees only the start), so they test different things.
+- Objects: the Molniya-type members of the 28-object campaign with a usable event (17 / 16 / 11 at 300 / 200 / 150 km; 9506 never reaches 300 km after its peak).
+- Event definition: first crossing *after* the smoothed perigee peak, same on observed and model series. A first run used the first crossing anywhere and
+  gave identical numbers; a 30-yr propagation window was tried and rejected (the model's global peak lands on a later hump; the earlier tests used 22 yr).
+  Three thresholds are reported because 300 km turned out to be a poor decay proxy for three objects (below); none was selected after the fact.
+
+| Event: perigee < | n | OREM median \|err\| (bias) | Forecast median \|err\| (bias) | Forecast mean / max \|err\| | median \|OREM − forecast\| | corr. of errors |
+|---|---|---|---|---|---|---|
+| 300 km | 17 | 41 d (−41) | 155 d (−39) | 360 / 1,639 d | 146 d | +0.02 |
+| 200 km | 16 | 43 d (−43) | 123 d (−38) | 278 / 1,602 d | 122 d | −0.07 |
+| 150 km | 11 | 53 d (−53) | 121 d (−37) | 330 / 1,494 d | 138 d | −0.72 (n = 11, unstable) |
+
+As a share of the history span (decay − first TLE): OREM ≈ 1 %, forecast ≈ 3 %.
+
+**Agreement.** At 300 km the forecast decay date is within 300 d of the actual for 14 of 17 objects (within 150 d for 8), from the first TLE, a decade ahead; the two
+methods' predicted decay dates differ by a median of 122–146 d. Both are biased early by a similar amount (OREM ≈ −41 d, forecast ≈ −39 d) — an observation only; no cause established.
+The error correlation is ≈ 0 at 300 and 200 km (n ≈ 16–17), i.e. the errors look independent; the −0.72 at 150 km rests on 11 objects and is not stable.
+
+**Divergence — one clear failure mode.** For NORAD 8844, 9269 and 11073 the forecast is off by −1,273 / −1,639 / −1,264 d while OREM is within 14–66 d. In the TLE
+data the perigee of these objects dips below 300 km on a *marginal first minimum*, then lunisolar forcing raises it again (second hump), and decay only happens 3.5–5 yr later.
+A threshold event on a no-drag model flags the first approach as decay; OREM, which sees the real tail, does not. The same sensitivity (a minimum near the
+threshold) is the weak point of using this forecast as a decay-date predictor; it is better read as locating the **approach windows** (perigee peak, perigee minima)
+than as a decay date unless the minimum depth is resolved.
+
+**Reading.** Complementary, not competing: OREM is the near-term tool (data up to ~90 d before decay, median ≈ 41 d); the forecast gives a decade-ahead window with
+median ≈ 4–5 months for these objects and flags where a perigee minimum is marginal. **Untested idea:** use the forecast as a prior/flag for "second-hump risk" when
+OREM is run live near a marginal dip — the situation in which an extrapolating method is most likely to call decay too early.
+
+**Next test.** Mid-life cutoff for 8844 / 9269 / 11073: run OREM with the TLE history cut at the first dip below 300 km, and the forecast from the same epoch, and compare both with the real decay.
+
+**Caveats.** Small n (17/16/11), Molniya-type only, forecast event and LOO gap constructed after seeing a first run (disclosed above), TLE mean elements, no drag.
