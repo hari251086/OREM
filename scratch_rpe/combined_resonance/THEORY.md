@@ -380,3 +380,18 @@ B from DISCOS/default values; TLE mean elements (mean vs osculating perigee not 
 no independent validation set beyond these objects.
 
 **Next.** Epoch-resolved solar activity (OREM's `SW-All.csv` / ATM2D); then surface the forecast as an "approach window" next to OREM's PRIMARY when OREM reports no re-entry; confirm on non-Molniya high-inclination objects.
+
+## 14. Window coverage: does max(250 d, 0.15 H) hold the true decay date? (2026-10-03)
+
+The Watchlist "approach window" is the forecast decay date +- max(250 d, 0.15 x forecast horizon H). Two coverage tests, forecast started 0.5 / 1 / 2 yr before the real decay, "no decay date within the horizon" counted as a miss (`window_coverage_test.py`, `window_coverage_pool.py`).
+
+- **In-sample (the 17 Molniya-type objects):** 100 % coverage, worst error 247 d. Not independent: the window rule was chosen on these.
+- **Out-of-sample (40 decayed, i >= 46.4 deg, e >= 0.3 objects from the 253-object pool, none of the 17; B from DISCOS/SATCAT RCS, 3 default):**
+
+| lead (yr) | n | decay date produced | median abs err (d) | 90th pct | max | coverage |
+|---|---|---|---|---|---|---|
+| 0.5 | 36 | 31/36 | 30 | 78 | 112 | 0.86 |
+| 1.0 | 39 | 34/39 | 33 | 127 | 779 | 0.82 |
+| 2.0 | 38 | 34/38 | 39 | 160 | 676 | 0.82 |
+
+**Reading.** The median error is as good as in-sample, but 11-14 % of objects that really decayed within 2 yr get no forecast decay date (the model keeps the perigee above the decay threshold), and a few forecasts that do produce a date miss by ~2 yr. Where a date is produced the window holds the truth in 91-100 % of cases; the shortfall is mainly the no-date objects. Consequence for the dashboard: a forecast without a decay date is shown blank and never as "long-lived"; the caption and Definitions quote both tests. Not investigated: why the no-date objects keep their perigee up (second-hump behaviour as in 8844/9269/11073, an extreme B, or the static atmosphere).
