@@ -262,3 +262,44 @@ OREM is run live near a marginal dip — the situation in which an extrapolating
 **Next test.** Mid-life cutoff for 8844 / 9269 / 11073: run OREM with the TLE history cut at the first dip below 300 km, and the forecast from the same epoch, and compare both with the real decay.
 
 **Caveats.** Small n (17/16/11), Molniya-type only, forecast event and LOO gap constructed after seeing a first run (disclosed above), TLE mean elements, no drag.
+
+---
+
+## 11. Mid-life cutoff test: OREM vs the forecast at the first perigee dip (2026-10-03)
+
+Follow-up to §10. Idea being tested: at a marginal first perigee minimum an extrapolating method might call decay too early, and the lunisolar forecast —
+which sees the perigee recover — could flag that. Script `midlife_test.py` (outputs `midlife_cutoffs.csv`, `midlife_forecast.csv`, `midlife_summary.csv`).
+
+**Design.** Cutoff = first epoch the smoothed perigee falls below 300 km after its peak. Truncated TLE histories (830–1,472 TLEs) were run through **production OREM**
+(v1.48 exe, Watchlist cfg conventions, `write_orem_cfg` defaults; nothing written to the Watchlist DB or cache) and the secular forecast was started from the
+elements at the same epoch (15-yr propagation, event = first model crossing below a perigee threshold, shifted by the leave-one-out median gap decay − event from the
+*other* objects' full lives). Compared with the real SATCAT decay. Objects: the 3 second-hump failures of §10 (8844, 9269, 11073; decay 1,318–1,818 d after the cutoff) and
+4 ordinary controls (7480, 8833, 14297, 7903; decay 96–572 d after). **n = 7 — indicative only.**
+
+| NORAD | Group | Decay after cutoff | OREM | Forecast err, 150 km event | Forecast err, 200 km event |
+|---|---|---|---|---|---|
+| 8844 | second hump | 1,525 d | no re-entry date | +75 d | +107 d |
+| 9269 | second hump | 1,818 d | no re-entry date | +121 d | −1,422 d |
+| 11073 | second hump | 1,318 d | no re-entry date | +147 d | −887 d |
+| 7480 | control | 336 d | no re-entry date | +39 d | +5 d |
+| 8833 | control | 183 d | no re-entry date | +75 d | +108 d |
+| 14297 | control | 96 d | PRIMARY 1998-05-24 (+13 d) | +212 d | +237 d |
+| 7903 | control | 572 d | no re-entry date | −215 d | −241 d |
+
+**Findings.**
+- **The hypothesis was not supported.** OREM did *not* call decay too early at the dip. For 6 of 7 objects it reported "no zone predicted a re-entry within the
+  propagation cap" (including all three second-hump objects and three of four controls); only 14297, 96 d from decay, got a date (error +13 d). The reason is structural:
+  OREM extrapolates the apogee decay trend, which has not started yet when the perigee first dips; its predictions become informative only in the last phase.
+- **So the forecast's value here is information, not correction of a wrong OREM call:** it gives a decay date at the dip for all seven objects — median |error| 121 d at the
+  150 km event (mean 126 d; second-hump objects +75/+121/+147 d, 3.6–5 yr ahead) — in the situation where OREM is silent. For comparison the first-TLE forecast of §10 was off by
+  −1,273/−1,639/−1,264 d for the same three objects; started from the dip the model sees the perigee behaviour and recovers.
+- **Threshold sensitivity again:** the 200 km event fails for two of the three second-hump objects (−1,422 and −887 d) because the model perigee dips just below 200 km on its first
+  minimum; the 150 km event does not. The 150 km result for these objects was seen after the 200 km one, so it should be treated as a post-hoc observation until confirmed on
+  more objects (§10 reports all three thresholds; this test reports two).
+- Controls: forecast errors −215…+212 d (median |err| 75 d at 150 km); OREM silent on three of four (it needs the final apogee collapse).
+
+**Caveats.** n = 7; Molniya-type only; the leave-one-out gap borrows the other objects' full lives (as in §10); TLE mean elements; no drag; "OREM silent" is a statement about this
+configuration at this cutoff, not about OREM's accuracy near decay (§10: median 41 d at 90 d before decay).
+
+**Next.** Confirm the 150 km (vs 200 km) behaviour on all Molniya-type objects with a mid-life cutoff; add drag so the event is decay itself rather than a threshold; consider surfacing the forecast
+as an "approach window" annotation alongside OREM's PRIMARY when OREM reports no re-entry (the situation of this test).
