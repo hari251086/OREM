@@ -6,3 +6,13 @@ norad,group,lead_d,orem_status,orem_primary,orem_noreentry,orem_err_d,hp_cut,hp_
 8833,control,183,ok,,False,,311,802,108,75
 14297,control,96,ok,1998-05-24,False,13.0,414,414,237,212
 7903,control,572,ok,,False,,331,666,-241,-215
+7641,new (out-of-sample),319,ok,,False,,340,340,7,19
+7653,new (out-of-sample),299,ok,,False,,343,343,53,40
+8187,new (out-of-sample),433,ok,,False,,368,368,-72,-61
+9411,new (out-of-sample),216,ok,,False,,320,976,96,78
+9574,new (out-of-sample),179,ok,,False,,311,1038,107,69
+10605,new (out-of-sample),372,ok,,False,,311,389,-42,-5
+10802,new (out-of-sample),344,ok,,False,,314,320,-19,3
+11602,new (out-of-sample),243,ok,,False,,330,1192,69,42
+13107,new (out-of-sample),265,ok,,False,,313,317,67,55
+15030,new (out-of-sample),159,ok,,False,,310,600,123,85

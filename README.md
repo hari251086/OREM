@@ -1061,6 +1061,8 @@ The strongest evidence is the direct empirical test already run on OREM's own pi
 
 **2026-10-03 (later) — Mid-life cutoff test, OREM vs the secular forecast at the first perigee dip (issue #56 follow-up, `THEORY.md` §11).** TLE histories cut at the first dip below 300 km, run through production OREM v1.48 and the forecast from the same epoch (n = 7: the 3 second-hump objects 8844/9269/11073 plus 4 controls). The proposed failure — OREM calling decay too early — did not occur: OREM issued no re-entry date for 6 of 7 (only 14297, 96 d from decay, got one, +13 d), because it extrapolates apogee decay that has not started yet. The forecast dated all seven (150 km event: median |error| 121 d; second-hump objects +75/+121/+147 d, 3.6–5 yr ahead); the 200 km event fails for two of the three (threshold sensitivity; 150 km chosen post hoc). Indicative only (n = 7). Analysis tooling only.
 
+**2026-10-03 (later) — Mid-life cutoff test extended to all 17 Molniya-type objects plus 2 extra second-hump objects (issue #56 follow-up, `THEORY.md` §12).** Cutoff at the first perigee dip below 300 km: production OREM gave a re-entry date for only 1 of 17 objects (none of the 10 not examined before; decay 159–433 d later), while the secular forecast dated all of them — 150 km event: median |error| 48 d on the 10 out-of-sample objects (all within 85 d), 69 d over all 17 (17/17 within 250 d). Two further pool objects with a recovering perigee (42908 at i = 47.7°, 6231) are also dated within +151…+175 d. Confirmed: the forecast from a mid-life dip gives a usable date where OREM gives none. Not confirmed: 150 km being better than 200 km for second-hump objects (the 200 km failures are two in-sample objects). Analysis tooling only.
+
 ---
 
 ## 9. References

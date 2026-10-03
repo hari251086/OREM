@@ -303,3 +303,38 @@ configuration at this cutoff, not about OREM's accuracy near decay (§10: median
 
 **Next.** Confirm the 150 km (vs 200 km) behaviour on all Molniya-type objects with a mid-life cutoff; add drag so the event is decay itself rather than a threshold; consider surfacing the forecast
 as an "approach window" annotation alongside OREM's PRIMARY when OREM reports no re-entry (the situation of this test).
+
+---
+
+## 12. Mid-life cutoff test, extended: all 17 Molniya-type objects + 2 extra second-hump objects (2026-10-03)
+
+Confirmation of §11 (script `midlife_test.py`, `midlife_extra.py`, `scan_second_hump.py`; `midlife_summary.csv`). §11's seven objects were examined before the
+150-vs-200 km choice, so the other 10 of the 17 serve as an out-of-sample check; the pool was also scanned for further second-hump objects.
+
+**Results (cutoff = first dip below 300 km after the perigee peak; decay 96–1,818 d later).**
+
+| Set | n | OREM gave a date | Forecast 200 km event | Forecast 150 km event |
+|---|---|---|---|---|
+| Seen in §11 | 7 | 1 / 7 (14297, +13 d) | median \|err\| 237 d, mean 430, >1 yr off: 2 | median 121 d, mean 126, within 250 d: 7/7 |
+| **New, out-of-sample** | 10 | **0 / 10** | median 68 d, mean 66, within 250 d: 10/10 | **median 48 d, mean 46, within 250 d: 10/10** |
+| All | 17 | 1 / 17 | median 96 d, mean 215, within 250 d: 15/17 | median 69 d, mean 79, within 250 d: 17/17 |
+
+- **OREM is silent at this cutoff on 16 of 17 objects** ("no zone predicted a re-entry within the propagation cap"), including the ten new ones whose decay came 159–433 d later. Production
+  configuration, OREM v1.48; this concerns this mid-life cutoff, not OREM near decay (§10: median 41 d at 90 d before decay).
+- **The forecast dates all of them.** On the ten new objects every 150 km estimate is within 85 d of the real decay (−61…+85 d). Errors are mostly positive (+19…+85 d): the leave-one-out gap
+  slightly over-shifts; no correction was applied.
+- **Second-hump objects.** The pool contains only two further objects with a perigee dip below 300 km, recovery and > 2 yr of remaining record (42908, i = 47.7°, decay 4.03 yr after the
+  dip, model max perigee 513 km; 6231, i = 65.9°, 2.69 yr, 415 km). The forecast from the dip gives +171 / +175 d at 200 km and +151 / +160 d at 150 km — both thresholds work on them. With the
+  original three (150 km: +75 / +121 / +147 d) that is **five second-hump objects, all within 160 d at 150 km**; at 200 km two of the five (9269, 11073) fail by 2.4–3.9 yr.
+
+**What is and is not confirmed.**
+- Confirmed (out of sample, n = 10 + 2): the forecast from a mid-life dip gives a usable decay date where OREM gives none, at 150 km and at 200 km.
+- *Not* confirmed: that 150 km is better than 200 km for second-hump objects. The 200 km failures are two in-sample objects (9269, 11073, marginal first minima); the two out-of-sample second-hump
+  objects succeed at both thresholds. At 150 km the forecast has never been worse than 215 d on any of 19 objects, but the preference rests on those two. Note 42908 shows the approach also works at i = 47.7°.
+- The ten "new" objects are all ordinary (decay 159–433 d after the dip), so they test the ordinary case, not the second-hump case.
+
+**Caveats.** Molniya-type and two further high-inclination objects only; leave-one-out gap borrows other objects' full lives; TLE mean elements; no drag; event = threshold crossing, not decay itself;
+OREM-silent statement is configuration- and cutoff-specific.
+
+**Next.** Add drag so the event is decay itself (removes the gap conversion); show the forecast as an "approach window" alongside OREM's PRIMARY when OREM reports no re-entry; extend to objects outside the
+Molniya class once more second-hump examples exist.
