@@ -17,7 +17,13 @@ WORK = Path('E:/claude/p58/midlife'); WORK.mkdir(parents=True, exist_ok=True)
 D = 'E:/GitHub/OREM/scratch_rpe/combined_resonance'
 KEY = [8844, 9269, 11073]            # second-hump objects (forecast failed at 300 km)
 CONTROL = [7480, 8833, 14297, 7903]  # ordinary objects: the dip is the final approach
-ALL = KEY + CONTROL
+_CUT = pd.read_csv(f"{D}/cross_check_orem_300.csv")        # the 17 Molniya-type objects with a post-peak <300 km event
+NEW = [int(n) for n in _CUT["norad"] if int(n) not in KEY + CONTROL]   # not examined before the 150-vs-200 km choice
+ALL = KEY + CONTROL + NEW
+
+
+def group_of(n):
+    return "second-hump" if n in KEY else "control" if n in CONTROL else "new (out-of-sample)"
 ROOT = "E:/Research/1. R&D/Re-entry/2026/Data/objects"
 
 
@@ -53,7 +59,7 @@ def prep():
         out.write_text('\n'.join(keep) + '\n')
         decay = float(df.loc[n, 'decay'])
         rows.append(dict(norad=n, cutoff_jd=c, cutoff_date=str(jd_to_date(c)), decay_jd=decay, decay_date=str(jd_to_date(decay)),
-                         lead_to_decay_d=decay - c, n_tle=kept, group='second-hump' if n in KEY else 'control'))
+                         lead_to_decay_d=decay - c, n_tle=kept, group=group_of(n)))
         print(n, 'cutoff', jd_to_date(c), 'decay', jd_to_date(decay), f'lead {decay - c:.0f} d', 'TLEs kept', kept)
     pd.DataFrame(rows).to_csv(f'{D}/midlife_cutoffs.csv', index=False)
 
@@ -140,6 +146,18 @@ def summary():
     pd.set_option('display.width', 220)
     print(t.to_string(index=False))
     t.to_csv(f'{D}/midlife_summary.csv', index=False)
+    print()
+    for lab, sel in (("all", t), ("seen before (7)", t[t.group != "new (out-of-sample)"]), ("NEW out-of-sample", t[t.group == "new (out-of-sample)"])):
+        if len(sel) == 0:
+            continue
+        line = f"{lab:<20} n={len(sel):2d}  OREM gave a date: {int(sel['orem_err_d'].notna().sum())}/{len(sel)}"
+        oe = sel['orem_err_d'].dropna()
+        if len(oe):
+            line += f" (median |err| {oe.abs().median():.0f} d)"
+        for thr in (200, 150):
+            e = sel[f'fc{thr}_err_d'].dropna()
+            line += f" | forecast {thr} km: median |err| {e.abs().median():.0f} d, mean {e.abs().mean():.0f} d, within 250 d {int((e.abs() <= 250).sum())}/{len(e)}, >1 yr off {int((e.abs() > 365).sum())}"
+        print(line)
 
 
 if __name__ == '__main__':
