@@ -338,3 +338,45 @@ OREM-silent statement is configuration- and cutoff-specific.
 
 **Next.** Add drag so the event is decay itself (removes the gap conversion); show the forecast as an "approach window" alongside OREM's PRIMARY when OREM reports no re-entry; extend to objects outside the
 Molniya class once more second-hump examples exist.
+
+---
+
+## 13. Adding drag: the event becomes decay itself (2026-10-03)
+
+Follow-up to §10-§12, whose forecasts predicted a perigee-threshold epoch and converted it to a decay date with an empirical leave-one-out gap. Here the secular propagator is extended
+with orbit-averaged drag so the model reaches decay on its own (`secular_drag.py`, `secular_drag_prop.py`, `drag_test.py`, `test_secular_drag.py`; `drag_test.csv`; `figures/fig5_forecast_with_drag.png`).
+
+**Model.**
+- State (a, e, i, Ω, ω); J2 + Sun + Moon quadrupole rates as before (`secular_propagator.rates`) plus orbit-averaged drag. Drag acceleration a_D = −½ B ρ v² v̂ (B = C_d A/m; atmosphere at rest,
+  co-rotation neglected). Instantaneous da/dt = −(a²/μ) B ρ v³ and dh/dt = −½ B ρ v h (h = angular momentum); de/dt from h² = μ a (1−e²); both averaged over the orbit by quadrature in eccentric anomaly.
+- Density: OREM's own `input/ATM.DAT` (60-500 km scale height and density — a static, **low-activity** atmosphere, 5×10⁻¹² kg/m³ at 300 km), extended above 500 km with a growing scale height.
+  No solar-cycle variation, no diurnal bulge, no epoch-resolved space weather (OREM proper uses all three).
+- **B is not fitted**: C_d, A, m from the Watchlist object parameters (DISCOS for 16 of the 17 objects: BN = m/(C_d A) ≈ 50-61 kg/m²; 14297 uses a generic default, BN 23), with ×0.5 and ×2 sensitivity.
+- Adaptive step (perigee altitude changes ≤ 10 km per step). **Decay** = perigee altitude < 80 km (OREM's re-entry threshold) or apogee altitude < 150 km (an orbit wholly below this circularizes in dense atmosphere and
+  decays within days). Sanity tests: circular-orbit limit da/dt = −Bρ√(μa) within 2 %, density anchors and monotonicity, drag acting at perigee.
+- Physical behaviour seen in the model (7480): perigee falls to ~160 km, then the apogee collapses over ~130 d (40,000 → 12,000 km) and the orbit circularizes near 93 km — the same shape as the observed last phase.
+
+**Disclosure of a false start [read before the numbers].** A first run stopped when e → 0 and returned "no decay" for most objects; its summary statistics, computed only over the runs that returned a date, looked good and were
+**survivorship-biased**, so they were discarded. The termination rule was corrected on physical grounds (a circularized orbit at low altitude *is* decay) after inspecting the 7480/7641 trajectories (which also showed the model decay
+within ~35 d of the real one — so the corrected rule was fixed having seen two objects' outcomes). Statistics below count every object; all 17 produce a date.
+
+**Results — decay-date error in days (17 Molniya-type objects).**
+
+| Start | Method | median \|err\| | mean | bias | within 250 d | > 1 yr off |
+|---|---|---|---|---|---|---|
+| Mid-life cutoff (first dip < 300 km; decay 96-1,818 d ahead) | no drag + gap, 150 km event (§12) | 69 | 79 | +55 | 17/17 | 0 |
+| | **with drag, B × 0.5 / × 1 / × 2** | **26 / 30 / 35** | 42 / 47 / 58 | −26 / −28 / −33 | 17/17 | 0 |
+| First TLE (≈ 10-15 yr ahead) | no drag + gap, 300 km event (§10) | 155 | 360 | −39 | 12/17 | 3 |
+| | with drag, B × 0.5 / × 1 / × 2 | 200 / 202 / 156 | 277 / 271 / 268 | −40 / −41 / −41 | 12/17 | 3 / 4 / 4 |
+
+- **From a mid-life dip, drag helps and removes the empirical gap**: median 30 d (vs 69 d), 17/17 within 250 d, and the answer is insensitive to B over a factor of 4. The three second-hump objects now come out
+  −35 / −79 / −20 d (they were +75 / +121 / +147 d with the 150 km event), 3.6-5 yr ahead. The model decays on average ~28 d early.
+- **From the first TLE, drag does not help**: errors of the two methods are similar (median 202 d vs 155 d; 12/17 within 250 d each). Drag fixes some objects (8844, 9269, 11073) and worsens others (7480 +670 d, 7903 +1,220 d);
+  at that horizon the error is dominated by the timing of lunisolar minima (whether a marginal perigee minimum is crossed), not by the drag law.
+- For comparison, production OREM at this mid-life cutoff gave a date for 1 of 17 objects (§12).
+
+**Caveats.** Static low-activity atmosphere (no solar cycle; real decays at solar maximum come earlier and at minimum later — the −28 d bias is not explained by this and not investigated); atmosphere co-rotation neglected;
+B from DISCOS/default values; TLE mean elements (mean vs osculating perigee not distinguished); n = 17, Molniya-type, in-sample for the stopping-rule choice (HA_DECAY = 150 km, fixed after the false start, not tuned on errors);
+no independent validation set beyond these objects.
+
+**Next.** Epoch-resolved solar activity (OREM's `SW-All.csv` / ATM2D); then surface the forecast as an "approach window" next to OREM's PRIMARY when OREM reports no re-entry; confirm on non-Molniya high-inclination objects.
