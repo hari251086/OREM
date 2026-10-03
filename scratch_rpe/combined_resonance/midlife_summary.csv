@@ -1,0 +1,8 @@
+norad,group,lead_d,orem_status,orem_primary,orem_noreentry,orem_err_d,hp_cut,hp_max8,fc200_err_d,fc150_err_d
+8844,second-hump,1525,ok,,False,,318,517,107,75
+9269,second-hump,1818,ok,,False,,317,660,-1422,121
+11073,second-hump,1318,ok,,False,,335,335,-887,147
+7480,control,336,ok,,False,,330,330,5,39
+8833,control,183,ok,,False,,311,802,108,75
+14297,control,96,ok,1998-05-24,False,13.0,414,414,237,212
+7903,control,572,ok,,False,,331,666,-241,-215
