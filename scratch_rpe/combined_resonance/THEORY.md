@@ -395,3 +395,5 @@ The Watchlist "approach window" is the forecast decay date +- max(250 d, 0.15 x 
 | 2.0 | 38 | 34/38 | 39 | 160 | 676 | 0.82 |
 
 **Reading.** The median error is as good as in-sample, but 11-14 % of objects that really decayed within 2 yr get no forecast decay date (the model keeps the perigee above the decay threshold), and a few forecasts that do produce a date miss by ~2 yr. Where a date is produced the window holds the truth in 91-100 % of cases; the shortfall is mainly the no-date objects. Consequence for the dashboard: a forecast without a decay date is shown blank and never as "long-lived"; the caption and Definitions quote both tests. Not investigated: why the no-date objects keep their perigee up (second-hump behaviour as in 8844/9269/11073, an extreme B, or the static atmosphere).
+
+**Status (2026-10-04).** The secular + drag forecast is a testing and verification tool only. A Watchlist "approach window" built on it was implemented, published for one day and then withdrawn at the user's direction: it is not deployed, and no forecast-derived dates are shown to dashboard users. This code stays here in `scratch_rpe/combined_resonance/`.
