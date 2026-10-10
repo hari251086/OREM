@@ -416,3 +416,25 @@ Question: how much of the forecast's error is the secular/averaged model, as opp
 4. The largest secular-vs-KSROP gaps are first-TLE cases (10605, 11073, 9269, 7480) and a few short ones (10605 at 0.5 yr: KSROP +304 d, secular +15 d; 7480 at 0.5-1 yr: KSROP +140 d, secular +12 d), where the full-force run decays later than the secular one.
 
 **Not attributed.** KSROP and the secular model differ in several terms at once (full geopotential incl. tesseral vs J2, full lunisolar vs quadrupole, co-rotating drag vs none, orbit averaging); no ablation arm was run, so the 129-424 d outliers are not assigned to a term. SRP and epoch-resolved solar activity were not used on either side.
+
+## 16. Why some decayed objects get no forecast decay date (2026-10-10)
+
+Section 14 left 11-14 % of out-of-sample cases with no forecast decay date (14 cases, 6 objects: 27906, 21935, 9892, 27963, 45349, 26463), and section 15 showed KSROP fails on the same objects. Four candidate causes were tested on every case of `window_coverage_pool.csv` for these objects plus every 1-yr-lead dated case as the comparison group (`diag_nodate.py`, `diag_nodate_bscan.py`, `diag_nodate_grid.py`; `diag_nodate.csv`, `diag_nodate_bscan.csv`).
+
+**Two objects are not forecast failures (5 cases).**
+- **9892 (COSMOS 862 DEB): the catalogued decay date is wrong.** SATCAT gives 1995-02-13, but its TLEs continue for 15.7 yr after that, ending at a 1,655 km perigee, so "no decay" is the right answer. The coverage test only rejected decay dates long *after* the last TLE, not before it.
+- **26463 (ESA Cluster II FM5 "Rumba"): an operated spacecraft.** A 2015 disposal manoeuvre set up its 2025 re-entry, and the Cluster re-entries were targeted (ESA SDC9 paper 145; SpaceOps 2025 paper 0088). It also has a ~130,000 km apogee and an inclination swinging 65-154 deg. It is out of scope, like the campaign's excluded Falcon 9 stages.
+
+**Atmosphere: not the main cause.** The no-date cases decayed under *lower* solar activity than the dated ones (median F10.7 over start-to-decay 105 vs 124), so the static low-activity atmosphere is if anything closer for them. 21935 (F10.7 ~160, 2024) is the one case where it can contribute.
+
+**The remaining four objects (9 cases): high area-to-mass debris, perigee lost faster than the model allows.** All four are fragments (SL-12 DEB x3, Cosmos 1481 deb) whose B comes from the Watchlist's SATCAT-RCS fallback: a category area paired with an assumed 500 kg mass (`heowatch/object_info.py`), i.e. BN = 758 kg/m2 versus 50-61 kg/m2 for DISCOS objects.
+- The assumed B is far too small, but that alone does not explain the failure. Seven other debris objects on the same fallback forecast fine, because lunisolar forcing drives their perigee to a median of 147 km, where decay takes days and barely depends on B. The four no-date objects never get below 250-530 km in the record; decay there is slow and drag-driven.
+- Scaling B does not rescue them. With B x1 to x64 the model's perigee minimum comes too late and stays too high: 27906 reaches 160 km at +300 d (real decay +186 d), and 45349 reaches 188 km at +618 d (real +183 d). A date appears only at x512-x4096 (BN 1.5-0.2 kg/m2). 21935's model perigee never falls (539 km) while the observed one falls 540 -> 382 km.
+- The observed perigee drops faster than lunisolar plus drag can produce. For light debris the obvious missing force is solar radiation pressure, which is not in the secular model or in the section 15 KSROP runs. Order of magnitude: at A/m ~0.6 m2/kg (what 45349's best-fit B implies), SRP changes e by ~0.03/yr at a ~11,800 km, i.e. ~300 km/yr in perigee, the size of the observed drops. **Not yet tested by adding SRP**, so this is the leading explanation, not a confirmed one.
+- 27963 is also suspect as truth: its last TLE, 47 d before the catalogued decay, has a 572 km perigee and a 17,055 km apogee. Decay within 47 d of that is not plausible for any B.
+
+**Effect on section 14.** Excluding 9892 (wrong decay date) and 26463 (manoeuvred), coverage of the max(250 d, 0.15 H) window rises from 0.86 / 0.82 / 0.82 to **0.88 / 0.86 / 0.86** at 0.5 / 1 / 2 yr leads; the median errors are unchanged. Every remaining no-date case is one of the four high area-to-mass debris objects.
+
+**Caveats.** n = 4 debris objects; the fitted-B diagnostic in `diag_nodate.py` is unreliable when the perigee is high in the fit year (non-drag changes in TLE mean semi-major axis get attributed to B), so only the B scans are used above; the SRP estimate is order-of-magnitude.
+
+**Next.** (1) Add orbit-averaged SRP with a fitted A/m to the secular model and test it on these four objects without degrading the others. (2) Make the coverage test reject truth whose decay date precedes the last TLE or is inconsistent with the final orbit. (3) The SATCAT-RCS fallback's fixed 500 kg mass is wrong for debris; that belongs to OREM-Watchlist and matters only where a prescribed B is used, not to OREM's fitted-B production runs.
