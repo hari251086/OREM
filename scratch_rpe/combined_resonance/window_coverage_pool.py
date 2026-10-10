@@ -12,12 +12,14 @@ from prepare_plot_data_fullpool import BASE, build_object_list, load_full_record
 from resonance_campaign_sweep import cal2jd                                           # noqa: E402
 from validate_drive import clean_rows                                                 # noqa: E402
 from secular_drag_prop import propagate_drag                                          # noqa: E402
+from truth_check import check_decay_truth                                             # noqa: E402
 
 D = 'E:/GitHub/OREM/scratch_rpe/combined_resonance'
 cfg = load_config()
 seen = set(pd.read_csv(f'{D}/midlife_cutoffs.csv')['norad'])
 LEADS = (0.5, 1.0, 2.0)
 rows = []
+rejected = []
 for o in build_object_list():
     n = o['norad']
     if n in seen:
@@ -34,6 +36,11 @@ for o in build_object_list():
         continue
     decay = cal2jd(*o['decay_ymd'])
     if decay < jd[0] or decay - jd[-1] > 400:           # record must reach (nearly) to the decay
+        continue
+    ok, why, detail = check_decay_truth(jd, a, e, decay)  # section 17: reject truth the tracking contradicts
+    if not ok:
+        rejected.append(dict(norad=n, name=o.get('name', ''), reason=why, detail=detail))
+        print(n, 'REJECTED as truth:', why, detail, flush=True)
         continue
     try:
         p = get_object_params(n, cfg); B0 = p.cd * p.area_m2 / p.mass_kg * 1e-6; src = p.source
@@ -56,6 +63,8 @@ for o in build_object_list():
                          fc_horizon_d=H, err_d=(dj - decay) if dj == dj else float('nan')))
     print(n, 'done', flush=True)
 df = pd.DataFrame(rows); df.to_csv(f'{D}/window_coverage_pool.csv', index=False)
+pd.DataFrame(rejected, columns=['norad', 'name', 'reason', 'detail']).to_csv(f'{D}/window_coverage_pool_rejected.csv', index=False)
+print(f"rejected as truth: {len(rejected)} object(s)", [r['norad'] for r in rejected])
 print(f"\nobjects: {df['norad'].nunique()}  (B source: {df['B_src'].value_counts().to_dict()})")
 print('lead (yr) |  n | forecast gave a decay date | median |err| d | 90th pct | max |err| | coverage of max(250 d, 0.15 H) (no date = miss)')
 for L, g in df.groupby('lead_yr'):

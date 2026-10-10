@@ -394,6 +394,8 @@ The Watchlist "approach window" is the forecast decay date +- max(250 d, 0.15 x 
 | 1.0 | 39 | 34/39 | 33 | 127 | 779 | 0.82 |
 | 2.0 | 38 | 34/38 | 39 | 160 | 676 | 0.82 |
 
+*(Superseded by section 17: the test now rejects truth the tracking contradicts, which removes 9892; coverage becomes 0.89 / 0.84 / 0.84.)*
+
 **Reading.** The median error is as good as in-sample, but 11-14 % of objects that really decayed within 2 yr get no forecast decay date (the model keeps the perigee above the decay threshold), and a few forecasts that do produce a date miss by ~2 yr. Where a date is produced the window holds the truth in 91-100 % of cases; the shortfall is mainly the no-date objects. Consequence for the dashboard: a forecast without a decay date is shown blank and never as "long-lived"; the caption and Definitions quote both tests. Not investigated: why the no-date objects keep their perigee up (second-hump behaviour as in 8844/9269/11073, an extreme B, or the static atmosphere).
 
 **Status (2026-10-04).** The secular + drag forecast is a testing and verification tool only. A Watchlist "approach window" built on it was implemented, published for one day and then withdrawn at the user's direction: it is not deployed, and no forecast-derived dates are shown to dashboard users. This code stays here in `scratch_rpe/combined_resonance/`.
@@ -431,10 +433,31 @@ Section 14 left 11-14 % of out-of-sample cases with no forecast decay date (14 c
 - The assumed B is far too small, but that alone does not explain the failure. Seven other debris objects on the same fallback forecast fine, because lunisolar forcing drives their perigee to a median of 147 km, where decay takes days and barely depends on B. The four no-date objects never get below 250-530 km in the record; decay there is slow and drag-driven.
 - Scaling B does not rescue them. With B x1 to x64 the model's perigee minimum comes too late and stays too high: 27906 reaches 160 km at +300 d (real decay +186 d), and 45349 reaches 188 km at +618 d (real +183 d). A date appears only at x512-x4096 (BN 1.5-0.2 kg/m2). 21935's model perigee never falls (539 km) while the observed one falls 540 -> 382 km.
 - The observed perigee drops faster than lunisolar plus drag can produce. For light debris the obvious missing force is solar radiation pressure, which is not in the secular model or in the section 15 KSROP runs. Order of magnitude: at A/m ~0.6 m2/kg (what 45349's best-fit B implies), SRP changes e by ~0.03/yr at a ~11,800 km, i.e. ~300 km/yr in perigee, the size of the observed drops. **Not yet tested by adding SRP**, so this is the leading explanation, not a confirmed one.
-- 27963 is also suspect as truth: its last TLE, 47 d before the catalogued decay, has a 572 km perigee and a 17,055 km apogee. Decay within 47 d of that is not plausible for any B.
+- 27963's decay date looked suspect: its last TLE, 47 d before the catalogued decay, has a 572 km perigee and a 17,055 km apogee. **Corrected in section 17:** other SL-12 fragments in the pool descend that fast (normalised rate 6.3e-4/day needed vs up to 9.0e-4/day observed), so the date is physically plausible.
 
 **Effect on section 14.** Excluding 9892 (wrong decay date) and 26463 (manoeuvred), coverage of the max(250 d, 0.15 H) window rises from 0.86 / 0.82 / 0.82 to **0.88 / 0.86 / 0.86** at 0.5 / 1 / 2 yr leads; the median errors are unchanged. Every remaining no-date case is one of the four high area-to-mass debris objects.
 
 **Caveats.** n = 4 debris objects; the fitted-B diagnostic in `diag_nodate.py` is unreliable when the perigee is high in the fit year (non-drag changes in TLE mean semi-major axis get attributed to B), so only the B scans are used above; the SRP estimate is order-of-magnitude.
 
 **Next.** (1) Add orbit-averaged SRP with a fitted A/m to the secular model and test it on these four objects without degrading the others. (2) Make the coverage test reject truth whose decay date precedes the last TLE or is inconsistent with the final orbit. (3) The SATCAT-RCS fallback's fixed 500 kg mass is wrong for debris; that belongs to OREM-Watchlist and matters only where a prescribed B is used, not to OREM's fitted-B production runs.
+
+## 17. Truth check in the coverage test (2026-10-10)
+
+The out-of-sample coverage test (`window_coverage_pool.py`) now rejects a catalogued decay date when the object's own TLE record contradicts it (`truth_check.py`; rejected objects are listed in `window_coverage_pool_rejected.csv`):
+1. **Tracked after decay:** the last TLE is more than 30 d after the catalogued decay.
+2. **Final orbit too high:** reaching a 120 km perigee by the catalogued date would need a perigee descent faster than 1.6e-3 per day, normalised by the semi-major axis ((dhp / a) per day; perigee change ~ a de, so this is size-independent). The threshold is 2x the 99th percentile of the fastest 30-day descent seen in each pool object's own history while its perigee was above 200 km and more than 60 d before decay (`perigee_descent_rates.py`, 147 objects: median 5.3e-5, p90 2.8e-4, p99 7.9e-4/day). It comes from the data, not from the forecast model, so objects the model cannot follow are not rejected on that account.
+
+**Result.** One object is rejected: 9892 (last TLE 5,737 d after its catalogued decay). Every other case reproduces exactly.
+
+| lead (yr) | n | decay date produced | median abs err (d) | 90th pct | max | coverage (was, section 14) |
+|---|---|---|---|---|---|---|
+| 0.5 | 35 | 31/35 | 30 | 78 | 112 | **0.89** (0.86) |
+| 1.0 | 38 | 34/38 | 33 | 127 | 779 | **0.84** (0.82) |
+| 2.0 | 37 | 34/37 | 39 | 160 | 676 | **0.84** (0.82) |
+
+- **27963 passes**, which corrects section 16. Reaching decay 47 d after a 572 km perigee needs 6.3e-4/day, within what other SL-12 fragments actually did (up to 9.0e-4/day). Its catalogued date is plausible.
+- The fastest perigee descents in the pool are nearly all SL-12 debris, consistent with the high area-to-mass / solar-radiation-pressure explanation of section 16.
+- **26463 (Cluster FM5) is not rejected:** its decay date is real. It is an operated spacecraft, which is a scope question rather than a truth error, and it is left in this table. Excluding it as well gives 0.88 / 0.86 / 0.86 (section 16).
+- The in-sample test (`window_coverage_test.py`, 17 Molniya-type objects) was not changed: all 17 have consistent decay dates.
+
+**Caveats.** The 2x-p99 factor and the 120 km reference perigee are choices. The descent-rate sample excludes the last 60 d before decay and perigees below 200 km, so it does not cover the final plunge. One outlier (32971, 6.5e-3/day) is likely a TLE glitch; it is above the threshold but does not affect it because the threshold uses p99.
