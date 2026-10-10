@@ -461,3 +461,18 @@ The out-of-sample coverage test (`window_coverage_pool.py`) now rejects a catalo
 - The in-sample test (`window_coverage_test.py`, 17 Molniya-type objects) was not changed: all 17 have consistent decay dates.
 
 **Caveats.** The 2x-p99 factor and the 120 km reference perigee are choices. The descent-rate sample excludes the last 60 d before decay and perigees below 200 km, so it does not cover the final plunge. One outlier (32971, 6.5e-3/day) is likely a TLE glitch; it is above the threshold but does not affect it because the threshold uses p99.
+
+## 18. The no-date debris cases with OREM's own estimated ballistic number (2026-10-10)
+
+Sections 14 and 16 *prescribed* B from the Watchlist object parameters. For these four debris objects that is the SATCAT-RCS fallback, BN 758 kg/m2 from an assumed 500 kg mass. OREM itself never uses a prescribed value: its optimizer estimates BN from the tracking. So the no-date cases were re-run with OREM's own estimate (`diag_nodate_orembn.py`, `diag_nodate_orembn.csv`): BN from `rpe_campaign.csv`, taking the latest zone whose 20-day fit window ended before the forecast start (OREM-valid zones preferred). Everything else is unchanged.
+
+| object | lead (yr) | OREM BN (zone, valid?, age at start) | forecast | model perigee min | real decay after start |
+|---|---|---|---|---|---|
+| 27906 | 0.5 / 1 / 2 | 117 (z2, valid, 8-9.5 yr old) | no date (all three) | 161-169 km at +300 / +480 / +841 d | +186 / +366 / +732 d |
+| 21935 | 0.5 / 1 / 2 | 114 (z7, valid, 0.8-2.3 yr old) | no date (all three) | 382-574 km | +280 / +365 / +731 d |
+| 45349 | 0.5 | 10.4 (z7, **flagged invalid**, 50 d old) | **+1,375 d** late | 129 km at +1,559 d | +184 d |
+| 27963 | 0.5 / 1 | not in the OREM campaign | — | — | — |
+
+**Reading.** Using OREM's estimate instead of the prescribed value rescues none of these cases. The model's perigee minimum still comes far later than the real decay (or, for 21935, never comes down), as in section 16. So the failure is not an artefact of prescribing B. It is a perigee-lowering effect the secular model lacks; high area-to-mass solar radiation pressure remains the leading (untested) candidate. OREM's own campaign runs show the same split: 21935 got no prediction, 45349 had an ensemble RPE of 97 %, and 27906 was predicted well (ensemble RPE 1.9 %), but only from late zones that OREM flagged invalid. The campaign ran SRP at a fixed A/m of 0.01 m2/kg, far below what these fragments would need.
+
+**Caveats.** The campaign's BN search starts at 80-160 kg/m2 (G2 floor and boundary widening can move it), so 27906's and 21935's estimates of ~115 may partly reflect that start. 27906's latest valid zone is 8-9.5 yr before the forecast start. OREM's BN is fitted with its own force model, so it is not exactly the secular model's B. n = 3 objects.
