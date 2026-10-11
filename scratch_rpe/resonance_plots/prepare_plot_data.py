@@ -26,6 +26,8 @@ already done in resonance_campaign_sweep.py.
 import csv
 import math
 import sys
+sys.path.insert(0, 'E:/GitHub/OREM/scratch_rpe')
+from tle_lines import tle_pairs  # noqa: E402  (3-line-safe; see THEORY section 19)
 
 sys.path.insert(0, 'E:/GitHub/OREM/scratch_rpe')
 from resonance_campaign_sweep import (  # noqa: E402
@@ -82,10 +84,7 @@ def load_full_record(path):
     rows = []
     with open(path) as f:
         lines = [l.rstrip('\n') for l in f]
-    for k in range(0, len(lines) - 1, 2):
-        l1, l2 = lines[k], lines[k + 1]
-        if not (l1.startswith('1 ') and l2.startswith('2 ')):
-            continue
+    for _name, l1, l2 in tle_pairs(lines):
         jd = parse_epoch_jd(l1)
         inc_deg = float(l2[8:16])
         raan_deg = float(l2[17:25])

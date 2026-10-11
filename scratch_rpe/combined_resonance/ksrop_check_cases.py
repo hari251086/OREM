@@ -4,6 +4,8 @@ drag_test.py / window_coverage_test.py / window_coverage_pool.py (median a, e, i
 epoch); mean anomaly is the last TLE's.  Also recomputes the secular forecast decay date for each case (same code) so both models can be compared
 against the same real decay.  Writes ksrop_check_cases.csv."""
 import sys
+sys.path.insert(0, 'E:/GitHub/OREM/scratch_rpe')
+from tle_lines import tle_pairs  # noqa: E402  (3-line-safe; see THEORY section 19)
 import numpy as np
 import pandas as pd
 sys.path.insert(0, 'E:/GitHub/OREM-Watchlist/src')
@@ -26,10 +28,8 @@ def load_M(path):
     with open(path) as f:
         lines = [l.rstrip('\n') for l in f]
     out = {}
-    for k in range(0, len(lines) - 1, 2):
-        l1, l2 = lines[k], lines[k + 1]
-        if l1.startswith('1 ') and l2.startswith('2 '):
-            out[round(parse_epoch_jd(l1), 6)] = float(l2[43:51])
+    for _name, l1, l2 in tle_pairs(lines):
+        out[round(parse_epoch_jd(l1), 6)] = float(l2[43:51])
     return out
 
 
