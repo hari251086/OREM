@@ -27,6 +27,9 @@ Only real TLE data is used (a, e, i straight from each TLE's own mean
 elements via Kepler's third law on the mean motion -- no propagation),
 same basis as the validated 30-object sweep this extends.
 """
+import sys
+sys.path.insert(0, 'E:/GitHub/OREM/scratch_rpe')
+from tle_lines import tle_pairs  # noqa: E402  (3-line-safe; see THEORY section 19)
 import math
 import re
 
@@ -83,10 +86,7 @@ def load_record(path):
     rows = []
     with open(path) as f:
         lines = [l.rstrip('\n') for l in f]
-    for k in range(0, len(lines) - 1, 2):
-        l1, l2 = lines[k], lines[k + 1]
-        if not (l1.startswith('1 ') and l2.startswith('2 ')):
-            continue
+    for _name, l1, l2 in tle_pairs(lines):
         jd = parse_epoch_jd(l1)
         inc_deg = float(l2[8:16])
         ecc = float('0.' + l2[26:33].strip())

@@ -6,6 +6,9 @@ records at/after its detected resonance epoch (last lambda/lambda_crit
 crossing) -- OREM's zone_select/GA pipeline then only ever sees
 post-resonance data, never anything from the pre-resonance regime.
 """
+import sys
+sys.path.insert(0, 'E:/GitHub/OREM/scratch_rpe')
+from tle_lines import tle_pairs  # noqa: E402  (3-line-safe; see THEORY section 19)
 import csv
 
 from resonance_campaign_sweep import load_record, parse_epoch_jd  # noqa: F401
@@ -28,10 +31,7 @@ def main():
             lines = [l.rstrip('\n') for l in f]
 
         kept_pairs = []
-        for k in range(0, len(lines) - 1, 2):
-            l1, l2 = lines[k], lines[k + 1]
-            if not (l1.startswith('1 ') and l2.startswith('2 ')):
-                continue
+        for _name, l1, l2 in tle_pairs(lines):
             jd = parse_epoch_jd(l1)
             if jd >= resonance_jd:
                 kept_pairs.append((jd, l1, l2))
