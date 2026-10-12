@@ -81,7 +81,8 @@ c     ============================================================
       end do
 
       do i = 1, npts
-         w0 = i - nwin
+c        the window buffers hold 1000 points
+         w0 = i - min(nwin, 1000)
          if (w0 .lt. 1) w0 = 1
 c        Clip the trailing window at any real epoch gap -- a window
 c        straddling a data-availability gap mixes two disconnected
@@ -106,6 +107,13 @@ c        or an older gap lies further back inside the window.
             end do
  40         continue
          end if
+c        Flagged points deliberately stay in later windows: that lets
+c        the window adapt to a genuine level change in apogee (e.g. a
+c        fast perigee-pass drop). Excluding them was tried 2026-10-12
+c        and flagged 25-35 % of real 42928/35497 points, because every
+c        point after a real step was then judged against the stale
+c        pre-step window (test_tle_filter F12/F14). The cost is that a
+c        large outlier can hide a smaller one just after it.
          nw = i - w0
          if (nw .lt. 3) goto 50
 

@@ -186,7 +186,7 @@ c  exit_code: 0=normal, 1=reentry (alt<80 km), 2=divergence (NaN)
 
 | Perturbation | Model | Notes |
 |---|---|---|
-| Earth gravity | EGM2008 zonal harmonics, configurable degree | `geo_coeff` reads J2..Jn from `EGM2008_to2190_TideFree` |
+| Earth gravity | EGM2008 zonal harmonics, configurable degree (≤ 100) | `geo_coeff_body` (KSROP) reads J2..Jn from `input/EGM2008_to100_TideFree` and stops if the file is missing or short. Before 2026-10-12 the file was a 0-byte placeholder and every zonal term was silently zero |
 | Luni-solar | Third-body Legendre expansion (degree 2–3) | M&G analytic ephemerides (KSROP sync v1.8) |
 | Atmospheric drag | Per-revolution King-Hele: ρ_p at the oblate perigee altitude, exp(−βae(1−cosE)) along the rev, co-rotation factor F | Density phase keyed to the **true eccentric anomaly of the state** (v1.18 — the analytic sweep it replaced dephased along decay arcs) |
 | Atmosphere reference | **Static**: Jacchia-71 profile (Roberts-1971 anchors) from `input/ATM.DAT`, F10.7=72, Kp=1.0, nighttime-min T∞=626.3 K. **Epoch-resolved** (opt-in, v1.23): 2-D ρ(h,T∞)/H(h,T∞) table from `input/ATM2D.DAT`, looked up at the exospheric temperature implied by real F10.7/Kp history for the revolution's own epoch | `KSROP/gen_atm_jr71.F` (static, validated 0.80–0.95× GMAT JacchiaRoberts over 102–300 km, v1.17) / `KSROP/gen_atm2d_jr71.F` + `swx.F` (epoch-resolved, §4.1). SCH column = local −dz/dlnρ in both |
@@ -223,7 +223,7 @@ input/ATM2D.DAT (KSROP gen_atm2d_jr71.F: ρ(h,T∞)/H(h,T∞) over        │  a
                 per revolution, same slot the static path always filled
 ```
 
-**Opt-in, zero-cost when unused**: `sw_tinf`/`atm2d_interp` live inside `propagate_ks.F` itself (not `swx.F`) so that executables which never call `sw_load`/`atm2d_load` link without `swx.F` and run the legacy single-table path bit-unchanged — every pre-v1.23 build, result, and test is unaffected. `main_orem.F` auto-detects both files at startup and prints ENABLED/DISABLED loudly; only opt-in executables (`orem.exe`, `test_sw.exe`) link `swx.F`.
+**Opt-in, zero-cost when unused**: with no history loaded (`nsw=0`/`n2d_t=0`) `sw_tinf` returns 0 and the legacy single-table path runs unchanged. The loaders and lookups (`sw_load`, `atm2d_load`, `sw_tinf`, `atm2d_interp`, the bulge routines) and the ATM.DAT reader `atm_load` come from KSROP's `src/swx.F`; OREM kept identical copies in its own `swx.F`/`propagate_ks.F` until 2026-10-12. `main_orem.F` auto-detects both files at startup and prints ENABLED/DISABLED loudly.
 
 **Status**: shipped and closed (issue #26, `test_sw.F` now 18 checks after the v1.42 diurnal-bulge addition — G5-storm T∞=1216.56 K hand-verified against the Jacchia formula; W12 smoke test shows storm-epoch decay 55.4 km vs quiet-epoch 31.1 km over 7 days, correct direction and rough magnitude; W13–W18 hand-verify the bulge extrema formula and geometry). Full curated-7 regression against the static baseline found weather+bulge a real but non-uniform effect (§1) — kept, since the physics is directionally validated and literature-grounded even where it interacts with the BN-carryover chain's own fragility (§5.3).
 

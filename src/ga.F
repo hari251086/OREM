@@ -141,6 +141,7 @@ c        Preselect mating pool
          call ga_preselect(oldfit, ipopsize, avg,
      &                     choices, fraction,
      &                     oldrand, jrand)
+         nremain = ipopsize
 
 c        Create new population via crossover + mutation
          j = 1
@@ -148,9 +149,9 @@ c        Create new population via crossover + mutation
          if (j .gt. ipopsize) goto 20
 
 c        Select two mates
-         call ga_select2(choices, ipopsize,
+         call ga_select2(choices, ipopsize, nremain,
      &                   oldrand, jrand, mate1)
-         call ga_select2(choices, ipopsize,
+         call ga_select2(choices, ipopsize, nremain,
      &                   oldrand, jrand, mate2)
 
 c        Crossover + mutation
@@ -317,11 +318,14 @@ c     ============================================================
       do igen = 1, maxgen
          call ga_preselect(oldfit, ipopsize, avg,
      &                     choices, fraction, oldrand, jrand)
+         nremain = ipopsize
          j = 1
  30      continue
          if (j .gt. ipopsize) goto 40
-         call ga_select2(choices, ipopsize, oldrand, jrand, mate1)
-         call ga_select2(choices, ipopsize, oldrand, jrand, mate2)
+         call ga_select2(choices, ipopsize, nremain,
+     &                   oldrand, jrand, mate1)
+         call ga_select2(choices, ipopsize, nremain,
+     &                   oldrand, jrand, mate2)
          call ga_crossover(j, mate1, mate2,
      &      oldchr, newchr, maxpop, lchrom,
      &      pcross, pmute, ncross, nmute, oldrand, jrand)
@@ -412,7 +416,9 @@ c     ============================================================
          if (all_nobs(iz) .le. 0) goto 100
 
          zone_ss = 0.d0
-         do it = 1, all_nobs(iz)
+c        all_tobs/all_apobs hold 500 observations per zone
+         nob_z = min(all_nobs(iz), 500)
+         do it = 1, nob_z
             do ih = 1, 3
                do ia = 1, 3
                   f2d(ih, ia) = all_surf(it, ih, ia, iz)
@@ -424,7 +430,7 @@ c     ============================================================
      &         ((fout - all_apobs(it, iz)) / 100.d0)**2
          end do
          total_rms = total_rms +
-     &      dsqrt(zone_ss / dble(all_nobs(iz)))
+     &      dsqrt(zone_ss / dble(nob_z))
          nzv = nzv + 1
 
  100     continue
@@ -538,11 +544,14 @@ c     ============================================================
       do igen = 1, maxgen
          call ga_preselect(oldfit, ipopsize, avg,
      &                     choices, fraction, oldrand, jrand)
+         nremain = ipopsize
          j = 1
  50      continue
          if (j .gt. ipopsize) goto 60
-         call ga_select2(choices, ipopsize, oldrand, jrand, mate1)
-         call ga_select2(choices, ipopsize, oldrand, jrand, mate2)
+         call ga_select2(choices, ipopsize, nremain,
+     &                   oldrand, jrand, mate1)
+         call ga_select2(choices, ipopsize, nremain,
+     &                   oldrand, jrand, mate2)
          call ga_crossover(j, mate1, mate2,
      &      oldchr, newchr, maxpop, lchrom,
      &      pcross, pmute, ncross, nmute, oldrand, jrand)
@@ -651,7 +660,6 @@ c     ============================================================
       double precision tobs(nobs), apobs(nobs)
 
       double precision sout, fout
-      double precision dum(500), tsurf(500)
       double precision f2d(3, 3)
       integer ih, ia, it
 
@@ -887,7 +895,7 @@ c     value is never anywhere near that bound anyway.
       do j = 1, ipopsize
          expected = oldfit(j) / avg
          jassign = int(expected)
-         if (jassign .ne. jassign .or. jassign .lt. 0) jassign = 0
+         if (jassign .lt. 0) jassign = 0
          if (jassign .gt. ipopsize) jassign = ipopsize
          fraction(j) = expected - dble(jassign)
          if (fraction(j) .ne. fraction(j)) fraction(j) = 0.d0
@@ -943,11 +951,16 @@ c     is arbitrary and does not bias the search.
       end
 
 c     ============================================================
-      subroutine ga_select2(choices, ipopsize,
+      subroutine ga_select2(choices, ipopsize, nremain,
      &                      oldrand, jrand, iselected)
-c     Pick from mating pool without replacement.
+c     Pick from the mating pool without replacement (Goldberg's SGA):
+c     draw from the first nremain entries, swap the pick to the end of
+c     that range and shrink it. Callers set nremain = ipopsize after
+c     each ga_preselect. Until 2026-10-12 the range never shrank, so
+c     picks were with replacement and choices(ipopsize) was duplicated
+c     over the slot drawn. A pool used up (odd population) restarts.
       implicit double precision (a-h, o-z)
-      integer ipopsize, iselected
+      integer ipopsize, nremain, iselected
       integer choices(ipopsize)
       double precision oldrand(55)
       integer jrand
@@ -955,9 +968,13 @@ c     Pick from mating pool without replacement.
       integer jpick
       integer ga_irnd
 
-      jpick = ga_irnd(1, ipopsize, oldrand, jrand)
+      if (nremain .lt. 1 .or. nremain .gt. ipopsize)
+     &   nremain = ipopsize
+      jpick = ga_irnd(1, nremain, oldrand, jrand)
       iselected = choices(jpick)
-      choices(jpick) = choices(ipopsize)
+      choices(jpick) = choices(nremain)
+      choices(nremain) = iselected
+      nremain = nremain - 1
 
       return
       end

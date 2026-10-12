@@ -399,8 +399,11 @@ c     G18: Different seed still converges
      &   0.30d0, 0.34d0, 80.d0, 160.d0,
      &   4, 500, 40, 16, 0.8d0, 0.01d0, 0.987d0,
      &   e_opt, a_opt, rms_opt)
-      if (dabs(e_opt - 0.32d0) .lt. 0.01d0 .and.
-     &    rms_opt .lt. 50.d0) then
+      write(*,'(A,F9.5,A,F8.2,A,F8.4)') '  [INFO]  G18 e=', e_opt,
+     &   ' A=', a_opt, ' rms=', rms_opt
+c     same landscape as G14: only 50(e-0.32)+0.5(A-120) is
+c     identifiable, so convergence = a near-zero fit (2026-10-12)
+      if (rms_opt .lt. 0.1d0) then
          call assert_i('G18 diff seed same optimum',
      &                 1, 1, npass, nfail)
       else
@@ -414,8 +417,11 @@ c     G19: Wider bounds still finds optimum
      &   0.28d0, 0.36d0, 60.d0, 180.d0,
      &   4, 500, 40, 20, 0.8d0, 0.01d0, 0.456d0,
      &   e_opt, a_opt, rms_opt)
-      if (dabs(e_opt - 0.32d0) .lt. 0.01d0 .and.
-     &    dabs(a_opt - 120.d0) .lt. 20.d0) then
+      write(*,'(A,F9.5,A,F8.2,A,F8.4)') '  [INFO]  G19 e=', e_opt,
+     &   ' A=', a_opt, ' rms=', rms_opt
+c     same landscape as G14: only 50(e-0.32)+0.5(A-120) is
+c     identifiable, so convergence = a near-zero fit (2026-10-12)
+      if (rms_opt .lt. 0.1d0) then
          call assert_i('G19 wide bounds converges',
      &                 1, 1, npass, nfail)
       else
@@ -429,12 +435,15 @@ c     G20: pop=4 with more generations (1000)
      &   0.30d0, 0.34d0, 80.d0, 160.d0,
      &   4, 1000, 40, 16, 0.8d0, 0.01d0, 0.555d0,
      &   e_opt, a_opt, rms_opt)
-      if (dabs(e_opt - 0.32d0) .lt. 0.01d0 .and.
-     &    rms_opt .lt. 50.d0) then
+      write(*,'(A,F9.5,A,F8.2,A,F8.4)') '  [INFO]  G20 e=', e_opt,
+     &   ' A=', a_opt, ' rms=', rms_opt
+c     same landscape as G14: only 50(e-0.32)+0.5(A-120) is
+c     identifiable, so convergence = a near-zero fit (2026-10-12)
+      if (rms_opt .lt. 0.1d0) then
          call assert_i('G20 1000gen converges',
      &                 1, 1, npass, nfail)
       else
-         call assert_i('G20 pop=8 converges',
+         call assert_i('G20 1000gen converges',
      &                 0, 1, npass, nfail)
       end if
 
@@ -867,16 +876,16 @@ c     layout bug zeroed high-order bits, biasing toward lower bounds.
      &   e_opt, a_opt, rms_opt)
       write(*,'(A,F9.5,A,F8.2,A,F8.4)') '  [INFO]  G46 e=', e_opt,
      &   ' A=', a_opt, ' rms=', rms_opt
-c     e moves this surface by only 50 km per unit e, i.e. 2 km over the
-c     whole [0.30,0.34] range, which is below the GA's resolution (the
-c     fitness is scaled by 1/100 km); A (0.5 km per kg/m2, 40 km over
-c     its range) is what this landscape actually identifies. Asserting
-c     e~0.30 passed before 2026-10-12 only through the layout bug.
-      if (dabs(a_opt - 80.d0) .lt. 8.d0) then
-         call assert_i('G46 corner opt A~80',
+c     e moves this surface by only 2 km over its whole range. With
+c     the population-layout bug fixed but selection still with
+c     replacement the GA missed e here (e=0.334); with selection
+c     without replacement (2026-10-12) it lands on the corner.
+      if (dabs(e_opt - 0.30d0) .lt. 0.01d0 .and.
+     &    dabs(a_opt - 80.d0) .lt. 8.d0) then
+         call assert_i('G46 corner opt e~0.30, A~80',
      &                 1, 1, npass, nfail)
       else
-         call assert_i('G46 corner opt A~80',
+         call assert_i('G46 corner opt e~0.30, A~80',
      &                 0, 1, npass, nfail)
       end if
 

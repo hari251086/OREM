@@ -798,33 +798,9 @@ c     ============================================================
       double precision alt(maxn), den(maxn), sch(maxn)
 
 c     Build altitude array: 60-200 km (1 km), 202-500 (2 km) = 291
-      natm = 291
-      if (natm .gt. maxn) natm = maxn
-      alt(1) = 60.d0
-      do i = 2, 141
-         alt(i) = alt(i-1) + 1.d0
-      end do
-      do i = 142, natm
-         alt(i) = alt(i-1) + 2.d0
-      end do
-
-c     Read scale heights then densities from ATM.DAT
-      open(unit=88, file='input/ATM.DAT', status='old',
-     &     err=900)
-      read(88,110) (sch(i), i=1,61)
-      read(88,110) (sch(i), i=62,natm)
-      read(88,111) (den(i), i=1,61)
-      read(88,111) (den(i), i=62,natm)
-      close(88)
- 110  format(8f10.3)
- 111  format(8e10.3)
-
-c     Convert to SI: km→m, km→m, density scaling
-      do i = 1, natm
-         alt(i) = alt(i) * 1000.d0
-         sch(i) = sch(i) * 1000.d0
-         den(i) = den(i) * 1.0d10
-      end do
+      call atm_load('input/ATM.DAT', alt, den, sch,
+     &              maxn, natm, ierr_ld)
+      if (ierr_ld .ne. 0) goto 900
 
       return
  900  continue

@@ -34,29 +34,9 @@ c     --- Initialize constants from const_new.dat ---
       call init_constants()
 
 c     --- Build atmosphere table (same as driver_KS) ---
-      ALT_atm(1) = 60.d0
-      do i = 2, 141
-         ALT_atm(i) = ALT_atm(i-1) + 1.d0
-      end do
-      do i = 142, ndim_atm
-         ALT_atm(i) = ALT_atm(i-1) + 2.d0
-      end do
-
-      open(unit=60, file='input/ATM.DAT', status='old',
-     &     err=900)
-      read(60,110) (SCH_atm(i), i=1,61)
-      read(60,110) (SCH_atm(i), i=62,ndim_atm)
-      read(60,111) (DEN_atm(i), i=1,61)
-      read(60,111) (DEN_atm(i), i=62,ndim_atm)
-      close(60)
- 110  format(8f10.3)
- 111  format(8e10.3)
-
-      do i = 1, ndim_atm
-         ALT_atm(i) = ALT_atm(i) * 1000.d0
-         SCH_atm(i) = SCH_atm(i) * 1000.d0
-         DEN_atm(i) = DEN_atm(i) * 1.0d10
-      end do
+      call atm_load('input/ATM.DAT', ALT_atm, DEN_atm, SCH_atm,
+     &              ndim_atm, natm_ld, ierr_ld)
+      if (ierr_ld .ne. 0) goto 900
 
 c     ==============================================================
 c     T1: Two-body propagation — energy conservation

@@ -154,21 +154,22 @@ c     re-entry propagation
 c     ============================================================
 c     Read config (same format as main_orem.F)
 c     ============================================================
-      open(unit=10, file=cfg_file, status='old', err=900)
-      read(10,'(A)') tle_file
-      read(10,*) norad_id
-      read(10,*) t_obs_cal(1), t_obs_cal(2), t_obs_cal(3),
-     &           t_obs_cal(4), t_obs_cal(5), t_obs_cal(6)
-      read(10,*) nzones_max
-      read(10,*) min_zone_pts, max_zone_days, primary_max_days,
-     &           r2_thresh, slope_thresh
-      read(10,*) bn_min, bn_max, n_bn_sweep
-      read(10,*) ipopsize, maxgen, nbits_e, nbits_a,
-     &           pcross, pmute, ga_seed
-      read(10,*) ngeo_deg, nsun_deg, nmoon_deg
-      read(10,*) idrag_flag, WE_rot, EPS_f, FR_rot
-      read(10,*) IPSR, CR_srp, AM_srp, ISHAD
-      close(10)
+      call orem_read_cfg(cfg_file,
+     &   tle_file, norad_id, t_obs_cal, nzones_max,
+     &   min_zone_pts, max_zone_days, primary_max_days,
+     &   r2_thresh, slope_thresh,
+     &   bn_min, bn_max, n_bn_sweep,
+     &   ipopsize, maxgen, nbits_e, nbits_a, pcross, pmute, ga_seed,
+     &   ngeo_deg, nsun_deg, nmoon_deg,
+     &   idrag_flag, WE_rot, EPS_f, FR_rot,
+     &   IPSR, CR_srp, AM_srp, ISHAD,
+     &   ierr_cfg, nbad_cfg)
+      if (ierr_cfg .eq. 1) goto 900
+      if (ierr_cfg .ne. 0) then
+         write(*,'(A,I3,A,A)') ' ERROR: config line', nbad_cfg,
+     &      ' missing or too few values in ', trim(cfg_file)
+         stop 1
+      end if
       if (nzones_max .gt. 50) nzones_max = 50
 
       PSR_srp = 4.56d-6
@@ -179,26 +180,9 @@ c     ============================================================
 c     Atmosphere table (verbatim from app/main_orem.F)
 c     ============================================================
       natm = ndim_a
-      ALT_a(1) = 60.d0
-      do i = 2, 141
-         ALT_a(i) = ALT_a(i-1) + 1.d0
-      end do
-      do i = 142, natm
-         ALT_a(i) = ALT_a(i-1) + 2.d0
-      end do
-      open(unit=60, file='input/ATM.DAT', status='old', err=910)
-      read(60,110) (SCH_a(i), i=1,61)
-      read(60,110) (SCH_a(i), i=62,natm)
-      read(60,111) (DEN_a(i), i=1,61)
-      read(60,111) (DEN_a(i), i=62,natm)
-      close(60)
- 110  format(8f10.3)
- 111  format(8e10.3)
-      do i = 1, natm
-         ALT_a(i) = ALT_a(i) * 1000.d0
-         SCH_a(i) = SCH_a(i) * 1000.d0
-         DEN_a(i) = DEN_a(i) * 1.0d10
-      end do
+      call atm_load('input/ATM.DAT', ALT_a, DEN_a, SCH_a,
+     &              ndim_a, natm, ierr_ld)
+      if (ierr_ld .ne. 0) goto 910
 
 c     ============================================================
 c     Full TLE evolution -> Fig 5.30-style CSV. Resonance angle
@@ -435,34 +419,4 @@ c        scratch_rpe/diag_osc_vs_mean_apogee.F.
       stop 1
  910  write(*,*) 'ERROR opening input/ATM.DAT'
       stop 1
-      end
-
-c     ============================================================
-c     tle_find_ma -- verbatim copy of orem.F's own helper (src/orem.F
-c     ~line 1069). Not linked from orem.F directly to avoid pulling in
-c     orem_run's whole dependency graph for one small lookup helper.
-c     ============================================================
-      subroutine tle_find_ma(norad_id, epoch_jd,
-     &   norad_raw, epoch_yr_raw, epoch_day_raw,
-     &   ama_raw, ntle_raw, maxtle, ma_out)
-      implicit double precision (a-h, o-z)
-      integer norad_id, ntle_raw, maxtle
-      integer norad_raw(maxtle), epoch_yr_raw(maxtle)
-      double precision epoch_day_raw(maxtle)
-      double precision ama_raw(maxtle)
-      double precision epoch_jd, ma_out
-
-      ma_out = 0.d0
-      do i = 1, ntle_raw
-         if (norad_raw(i) .eq. norad_id) then
-            call tle_epoch2jd(epoch_yr_raw(i),
-     &           epoch_day_raw(i), djd_tmp)
-            if (dabs(djd_tmp - epoch_jd) .lt. 0.01d0) then
-               ma_out = ama_raw(i)
-               return
-            end if
-         end if
-      end do
-
-      return
       end

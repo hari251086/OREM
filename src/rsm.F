@@ -1,8 +1,8 @@
 c     ============================================================
 c     rsm.F — Response Surface Methodology for OREM
 c
-c     Generates 9 mean-apogee surfaces per zone by calling
-c     propagate_ks with a 3×3 grid of (eccentricity, area).
+c     Generates 9 apogee surfaces per zone by calling propagate_ks
+c     with a 3x3 grid of (eccentricity, ballistic number BN).
 c     Extracts observed TLE mean apogee at matching time epochs
 c     for GA fitness evaluation.
 c
@@ -32,23 +32,24 @@ c       ha_zone(nzone)      : mean apogee altitude (km)
 c       e_zone(nzone)       : eccentricities from TLE
 c       inc/raan/aop/ma/a_zone : orbital elements (deg/km)
 c       nzone               : number of TLEs in zone
-c       e_min, e_max        : eccentricity grid bounds
-c       a_min, a_max        : cross-sectional area bounds (m²)
-c       fixed_mass          : spacecraft mass (kg)
-c       cd_drag             : drag coefficient
+c       e_min, e_max        : eccentricity grid bounds (the orbit
+c                             keeps the zone's first perigee radius)
+c       bn_min, bn_max      : ballistic number grid bounds (kg/m2)
 c       nrev_prop, etc.     : propagator configuration
 c       ALT/DEN/SCH_atm     : atmosphere tables
 c
 c     Output
-c       surfaces(nsurf_pts, 3, 3) : 9 mean-apogee time-series
-c       nsurf_pts           : time points per surface
+c       surfaces(nsurf_pts, 3, 3) : 9 apogee time-series, sampled at
+c                             the observation epochs; a grid point
+c                             whose propagation failed is all NaN
+c       nsurf_pts           : time points per surface (= nobs)
 c       tobs(nobs)          : observation times (days from zone start)
 c       apobs(nobs)         : observed TLE mean apogee (km)
 c       nobs                : number of observations
 c       e_grid(3)           : eccentricity grid values
-c       a_grid(3)           : area grid values
+c       bn_grid(3)          : BN grid values
 c       ierr                : 0=ok, 1=insufficient zone data,
-c                             2=propagator failure
+c                             2=more than 6 of 9 grid points failed
 c     ============================================================
       implicit double precision (a-h, o-z)
       common /xy/ pi, d2r, r2d, amue, AU, R_Earth
@@ -196,9 +197,13 @@ c           Check for propagator failure
                   ierr = 2
                   return
                end if
-c              Fill surface with zeros for failed run
+c              Mark the failed surface as missing (NaN). It used to be
+c              filled with zeros, i.e. a 0 km apogee that ga_twoint then
+c              blended into every neighbouring cell; with NaN,
+c              ga_fitness's non-finite guard (issue #30) scores any
+c              point whose interpolation touches it as worst instead.
                do ipt = 1, max_surf
-                  surfaces(ipt, ie, ia) = 0.d0
+                  surfaces(ipt, ie, ia) = rsm_nan()
                end do
                goto 20
             end if
@@ -236,6 +241,18 @@ c           Store in temporary arrays for interpolation
                traj_t(ntraj) = traj_jd(ipt)
             end do
  16         continue
+c           no trajectory point inside the zone: same as a failure
+            if (ntraj .eq. 0) then
+               nfail = nfail + 1
+               if (nfail .gt. 6) then
+                  ierr = 2
+                  return
+               end if
+               do ipt = 1, max_surf
+                  surfaces(ipt, ie, ia) = rsm_nan()
+               end do
+               goto 20
+            end if
 
 c           Interpolate surface at observation times (zone only)
             nsurf_pts = nobs
@@ -693,5 +710,14 @@ c     skipped without counting, so .lt. never ended the loop
       bn_refined = bn_best
       rms_refined = rms_best
 
+      return
+      end
+
+c     ============================================================
+      double precision function rsm_nan()
+c     Quiet NaN used to mark a failed RSM grid point.
+      use, intrinsic :: ieee_arithmetic
+      implicit none
+      rsm_nan = ieee_value(1.d0, ieee_quiet_nan)
       return
       end
