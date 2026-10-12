@@ -3,16 +3,16 @@ norad,group,lead_d,orem_status,orem_primary,orem_noreentry,orem_err_d,hp_cut,hp_
 9269,second-hump,1827,ok,,False,,305,658,-1436,95
 11073,second-hump,1320,ok,,False,,324,360,-884,138
 7480,control,336,ok,,False,,311,311,0,12
-8833,control,181,ok,,False,,304,794,105,71
-14297,control,104,ok,1998-05-24,False,13.0,401,400,227,192
-7903,control,577,ok,,False,,317,669,-242,-228
-7641,new (out-of-sample),326,ok,,False,,321,321,-1,-2
-7653,new (out-of-sample),297,ok,,False,,328,328,45,32
-8187,new (out-of-sample),442,ok,,False,,341,341,-97,-93
-9411,new (out-of-sample),218,ok,,False,,308,975,84,64
+8833,control,181,ok,1990-01-22,False,-13.0,304,794,105,71
+14297,control,104,ok,1998-05-03,False,-8.0,401,400,227,192
+7903,control,577,ok,1986-12-19,False,-280.0,317,669,-242,-228
+7641,new (out-of-sample),326,ok,1985-05-30,False,-66.0,321,321,-1,-2
+7653,new (out-of-sample),297,ok,1985-10-24,False,-49.0,328,328,45,32
+8187,new (out-of-sample),442,ok,1985-05-22,False,-181.0,341,341,-97,-93
+9411,new (out-of-sample),218,ok,1991-06-18,False,-45.0,308,975,84,64
 9574,new (out-of-sample),181,ok,,False,,309,1046,100,66
 10605,new (out-of-sample),373,ok,,False,,305,391,-32,-14
 10802,new (out-of-sample),344,ok,,False,,308,335,-9,5
-11602,new (out-of-sample),242,ok,,False,,321,1188,65,31
+11602,new (out-of-sample),242,ok,1994-08-16,False,-59.0,321,1188,65,31
 13107,new (out-of-sample),266,ok,,False,,305,325,56,47
 15030,new (out-of-sample),160,ok,,False,,306,602,117,77

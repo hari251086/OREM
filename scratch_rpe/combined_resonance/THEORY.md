@@ -553,3 +553,18 @@ The secular forecast starts from TLE *mean* elements, and every "observed perige
 **Conclusions.** None changed. The resonance is still not a useful prediction trigger (post-resonance-only data still makes OREM about 4-5x worse). The secular + drag forecast is still a good mid-life tool (median ~31 d) and poor from the first TLE. The four debris no-date cases remain unexplained.
 
 **Also fixed during the regeneration:** `ksrop_check_run.py` called the CPU check without `-ExecutionPolicy Bypass`, which this machine's PowerShell policy blocks, so it waited forever. Fixed.
+
+## 21. OREM results with the geopotential on (2026-10-12)
+
+Every OREM run before 2026-10-12 had the zonal geopotential (J2 included) switched off: the coefficient file OREM read was an empty placeholder and KSROP's loader returned zero coefficients without an error (fixed in OREM and KSROP v2.12.x; see the OREM README section 8). The secular forecasts in sections 8-19 are a separate Python model with J2 and are unaffected. The OREM-based results were re-run on the same inputs:
+
+| result | geopotential off | geopotential on |
+|---|---|---|
+| 11-12: OREM gives a date at the mid-life cutoff | 1 / 17 (14297, +13 d) | **8 / 17**, all early: -8 to -280 d, median 54 d (14297 -8 d, 8833 -13 d, 9411 -45 d, 7653 -49 d, 11602 -59 d, 7641 -66 d, 8187 -181 d, 7903 -280 d) |
+| Post-resonance OREM campaign: objects predicting | 7 / 16 | 8 / 16 |
+| Capstone (objects predicting with full history and post-resonance only; mean ensemble \|RPE\|) | 13.6 % -> 29.4 %, 6/7 worse | 12.0 % -> 15.4 %, 5/8 worse |
+| New-7 post-resonance campaign | no zones | no zones (unchanged) |
+
+(The capstone here uses one definition for both columns: objects predicting in both the 97-object full-history campaign and the post-resonance campaign. Section 20's 5.36 % -> 23.85 % used a different object set, so the numbers are not comparable with it.)
+
+**What changes.** Section 11-12's "OREM gives no date at the mid-life dip" no longer holds: with J2 OREM dates 8 of the 17, but every one of them early, two by half a year or more, while the secular + drag forecast from the same epoch has a median error of 30 d (section 13). The capstone keeps its direction (post-resonance-only data still makes OREM worse for most objects) but the effect is much smaller. The resonance conclusions of sections 8-19 do not depend on OREM and stand.
