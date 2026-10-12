@@ -82,7 +82,7 @@ def write_inputs(wd, c, ngeo, fr, nrev):
 def run_case(args):
     c, ngeo, fr, years_margin = args
     wd = f'{WORK}/{os.getpid()}'
-    while subprocess.run(['powershell', '-NoProfile', '-File', WAIT], capture_output=True).returncode != 0:
+    while subprocess.run(['powershell', '-NoProfile', '-ExecutionPolicy', 'Bypass', '-File', WAIT], capture_output=True).returncode != 0:
         time.sleep(60)
     cap_years = min(float(c['years_cap']), c['real_horizon_d'] / 365.25 + years_margin)
     P_days = 2 * math.pi * math.sqrt(c['a'] ** 3 / MU) / 86400.0
