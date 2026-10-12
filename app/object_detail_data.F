@@ -114,6 +114,8 @@ c     atmosphere
 
 c     per-zone working arrays
       double precision epz(2000), haz(2000), ez(2000), incz(2000)
+      double precision a_kep_osc1(7)
+      logical osc_ok
       double precision raanz(2000), aopz(2000), maz(2000), smaz(2000)
       integer nzone
 
@@ -274,7 +276,8 @@ c     ============================================================
 
       do iz = 1, nzones_do
          nzone = zone_end(iz) - zone_start(iz) + 1
-         if (nzone .gt. 2000) nzone = 2000
+c        500 = orem_run's own zone limit (its work arrays)
+         if (nzone .gt. 500) nzone = 500
          do i = 1, nzone
             j = zone_start(iz) + i - 1
             epz(i)   = epochs_f(j)
@@ -288,6 +291,22 @@ c     ============================================================
      &         norad_raw, epoch_yr_raw, epoch_day_raw,
      &         ama_raw, ntle_raw, maxtle, maz(i))
          end do
+
+c        Same as orem_run: osculating starting state (issue #31),
+c        2026-10-12
+         call tle_find_osc(norad_id, epz(1),
+     &      norad_raw, epoch_yr_raw, epoch_day_raw,
+     &      ainc_raw, raan_raw, ecc_raw, aop_raw, ama_raw,
+     &      amm_raw, bstar_raw, ntle_raw, maxtle, a_kep_osc1, osc_ok)
+         if (osc_ok) then
+            smaz(1)  = a_kep_osc1(1)
+            ez(1)    = a_kep_osc1(2)
+            incz(1)  = a_kep_osc1(3)
+            raanz(1) = a_kep_osc1(4)
+            aopz(1)  = a_kep_osc1(5)
+            maz(1)   = a_kep_osc1(6)
+         end if
+
 
 c        e_mid +- de : verbatim from orem.F's own zone-grid construction
          e_mid = ez(1)
