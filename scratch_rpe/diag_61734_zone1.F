@@ -35,6 +35,8 @@ c     Analysis only -- not part of the build/test suite.
       double precision t_obs(6), t_mean, t_std
       integer nzu, ierr, nzv
       integer zstat(mxz)
+      double precision bnb_t(10), tb_t(10)
+      integer nbv_t
       double precision t_obs_jd, horiz, rpe_ens
       integer iz
 
@@ -51,8 +53,8 @@ c     61734 H-3 R/B -- real observed re-entry 2025-03-22
 
       call orem_run(
      &   'input/example_61734.tle.txt', 61734,
-     &   t_obs, mxz, 8, 20.d0, 0.90d0, -1.d0,
-     &   80.d0, 160.d0, 1,
+     &   t_obs, mxz, 8, 20.d0, 0.d0, 0.90d0, -1.d0,
+     &   80.d0, 160.d0, 0, 1, 0, 0,
      &   20, 500, 40, 16, 0.8d0, 0.01d0, 0.123d0,
      &   20, 2, 3,
      &   7.2921150d-5, 3.35281066d-3, 1.d0,
@@ -62,7 +64,8 @@ c     61734 H-3 R/B -- real observed re-entry 2025-03-22
      &   reentry, e_opt, bn_opt, rms_o,
      &   zepoch, nzu,
      &   zstat, nzv,
-     &   rpe, t_mean, t_std, ierr)
+     &   rpe, t_mean, t_std,
+     &   bnb_t, tb_t, nbv_t, ierr)
 
       write(*,'(A,I3)') ' ierr=', ierr
       call cal2jd(t_obs, t_obs_jd)
