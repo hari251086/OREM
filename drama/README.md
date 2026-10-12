@@ -63,44 +63,27 @@ Scaffolding + one verified working OSCAR run only. A full multi-object
 validation campaign (comparable in scope to the KSROP<->GMAT campaign) is a
 deliberate follow-on, not done here.
 
-## Campaign results (OREM vs. DRAMA/OSCAR, 53 comparable objects)
+## Campaign results (OREM vs. DRAMA/OSCAR, 49 comparable objects)
 
 Full run of `run_oscar_campaign.py` + `compare_orem_drama.py` against all
 92 objects in `scratch_rpe/rpe_campaign.csv`:
 
 | metric | OREM | DRAMA/OSCAR |
 |---|---|---|
-| median \|RPE%\| | 31.89 | 41.29 |
-| mean \|RPE%\| | 49.34 | 236.22 |
+| median \|RPE%\| | 22.92 | 32.42 |
+| mean \|RPE%\| | 40.31 | 37.97 |
 
-Median is the fairer headline comparison -- OSCAR's mean is dragged out by
-7 extreme outliers (NORAD [39802, 41679, 41686, 41695, 44482, 45036, 46429], all with
-\|orem_rpe - oscar_rpe\| > 500%: OSCAR predicts a multi-decade lifetime
-where the object actually decayed within ~1-1.5 years). Two hypotheses were tested and
-ruled out: an eccentricity mismatch (OREM's own fitted eccentricity for the same zone is
-close to the raw TLE eccentricity used here) and OSCAR's solar/geomagnetic activity
-scenario choice (tested directly across all 4 of OSCAR's scenario options for NORAD
-39802 -- lifetime only varies 27-37 years across all of them, nowhere near enough to
-explain a 30x gap from the true ~1.35-year lifetime). What the outliers actually share:
-**6/7** sit within 3&deg; of the Molniya
-critical inclination (63.4&deg;, inclination range 25.9-64.9&deg;),
-perigee altitude 203-385 km --
-and their NORAD IDs cluster tightly (41679/41686/41695), consistent with fragments of the
-same debris-generating breakup event. The most likely explanation is that OREM's own
-ballistic-number fit for these small-sample, late-zone objects doesn't transfer as a
-physically portable quantity into OSCAR's own density/decay model for this specific
-regime -- not root-caused further than that here (would need per-fragment attitude/shape
-modeling or a direct atmosphere-model diff to close out).
+OSCAR's mean is dragged out by a handful of extreme outliers -- see `oscar_campaign_results.csv` for the worst-disagreement objects (inc_deg/perigee_alt_km columns included for follow-up).
 
 DRAMA/OSCAR's independent prediction landed closer to the true observed
 re-entry date than OREM's own primary-zone estimate for
-**20/53** objects.
+**22/49** objects.
 
-31 objects had no OREM primary-zone estimate to
+42 objects had no OREM primary-zone estimate to
 compare against (DRAMA/OSCAR was still run on these -- see
-`oscar_campaign_results.csv`); 17 objects showed
+`oscar_campaign_results.csv`); 21 objects showed
 no OSCAR re-entry within the 100-year propagation window;
-4 OSCAR runs errored.
+2 OSCAR runs errored.
 
 This campaign used the "simpler" orbit-state method (raw TLE semi-major
 axis/eccentricity; only OREM's fitted ballistic number feeds in, via mass)
