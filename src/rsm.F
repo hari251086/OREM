@@ -625,8 +625,11 @@ c     ============================================================
 
  10   continue
       if (neval .ge. max_eval) goto 90
-      if (de .lt. 1.d-6*(e_hi-e_lo) .and.
-     &    dbn .lt. 1.d-6*(bn_hi-bn_lo)) goto 90
+c     .le. (not .lt.): with a zero-width range the steps are exactly
+c     0, every candidate collapses onto the current point and is
+c     skipped without counting, so .lt. never ended the loop
+      if (de .le. 1.d-6*(e_hi-e_lo) .and.
+     &    dbn .le. 1.d-6*(bn_hi-bn_lo)) goto 90
 
       e_cand(1) = e_best + de
       bn_cand(1) = bn_best

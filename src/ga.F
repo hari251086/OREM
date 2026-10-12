@@ -90,6 +90,7 @@ c     Working
       integer ga_iflip
 
       lchrom = nbits_e + nbits_a
+      call ga_check_size(ipopsize, maxpop, lchrom, maxbits)
       alow(1) = e_lo
       ahigh(1) = e_hi
       alow(2) = a_lo
@@ -154,7 +155,7 @@ c        Select two mates
 
 c        Crossover + mutation
          call ga_crossover(j, mate1, mate2,
-     &      oldchr, newchr, ipopsize, lchrom,
+     &      oldchr, newchr, maxpop, lchrom,
      &      pcross, pmute, ncross, nmute,
      &      oldrand, jrand)
 
@@ -282,6 +283,7 @@ c     ============================================================
       integer ga_iflip
 
       lchrom = nbits_bn
+      call ga_check_size(ipopsize, maxpop, lchrom, maxbits)
       alow(1) = bn_lo
       ahigh(1) = bn_hi
       lsubstr(1) = nbits_bn
@@ -321,7 +323,7 @@ c     ============================================================
          call ga_select2(choices, ipopsize, oldrand, jrand, mate1)
          call ga_select2(choices, ipopsize, oldrand, jrand, mate2)
          call ga_crossover(j, mate1, mate2,
-     &      oldchr, newchr, ipopsize, lchrom,
+     &      oldchr, newchr, maxpop, lchrom,
      &      pcross, pmute, ncross, nmute, oldrand, jrand)
 
          do k = 1, lchrom
@@ -434,7 +436,14 @@ c     ============================================================
          total_rms = 1.d10
       end if
 
-      ga_camp_fitness = 1.d0 / (1.d0 + total_rms)
+c     Issue #30 guard, as in ga_fitness: a non-finite surface value
+c     must give the worst fitness (0), never NaN
+      if (total_rms .ne. total_rms .or. dabs(total_rms) .gt. 1.d30)
+     &   then
+         ga_camp_fitness = 0.d0
+      else
+         ga_camp_fitness = 1.d0 / (1.d0 + total_rms)
+      end if
 
       return
       end
@@ -487,6 +496,7 @@ c     ============================================================
       integer ga_iflip
 
       lchrom = nbits_e + nbits_bn
+      call ga_check_size(ipopsize, maxpop, lchrom, maxbits)
       alow(1) = e_lo
       ahigh(1) = e_hi
       alow(2) = bn_lo
@@ -534,7 +544,7 @@ c     ============================================================
          call ga_select2(choices, ipopsize, oldrand, jrand, mate1)
          call ga_select2(choices, ipopsize, oldrand, jrand, mate2)
          call ga_crossover(j, mate1, mate2,
-     &      oldchr, newchr, ipopsize, lchrom,
+     &      oldchr, newchr, maxpop, lchrom,
      &      pcross, pmute, ncross, nmute, oldrand, jrand)
 
          do k = 1, lchrom
@@ -612,7 +622,13 @@ c     ============================================================
       call ga_twoint(e_grid, bn_grid, surf_slopes,
      &               e_val, bn_val, slope_pred, 3, 3)
 
-      ga_slope_fitness = 1.d0 / (1.d0 + dabs(slope_pred - obs_slope))
+c     Issue #30 guard, as in ga_fitness
+      dsl = dabs(slope_pred - obs_slope)
+      if (dsl .ne. dsl .or. dsl .gt. 1.d30) then
+         ga_slope_fitness = 0.d0
+      else
+         ga_slope_fitness = 1.d0 / (1.d0 + dsl)
+      end if
 
       return
       end
@@ -761,6 +777,24 @@ c     Bilinear interpolation
 c     ============================================================
 c     GA internal subroutines
 c     ============================================================
+
+      subroutine ga_check_size(ipopsize, maxpop, lchrom, maxbits)
+c     The GA work arrays are dimensioned (maxpop, maxbits); a larger
+c     population or chromosome would write past them, and an odd
+c     population equal to maxpop would overflow on the second child of
+c     the last pair. Stop instead of corrupting memory.
+      integer ipopsize, maxpop, lchrom, maxbits
+      if (ipopsize .lt. 2 .or. ipopsize .gt. maxpop .or.
+     &    (ipopsize .eq. maxpop .and. mod(ipopsize, 2) .eq. 1) .or.
+     &    lchrom .lt. 1 .or. lchrom .gt. maxbits) then
+         write(*,'(A,I6,A,I4,A,I6,A,I4,A)') ' GA: population ',
+     &      ipopsize, ' (max ', maxpop, ') or chromosome ', lchrom,
+     &      ' bits (max ', maxbits, ') out of range'
+         stop 1
+      end if
+      return
+      end
+
 
       subroutine ga_decode(chrom, lchrom, xvec, nparam,
      &                     lsubstr, alow, ahigh, factor)
@@ -934,6 +968,13 @@ c     ============================================================
      &   pcross, pmute, ncross, nmute,
      &   oldrand, jrand)
 c     Single-point crossover with integrated mutation.
+c     ipopsize here is the LEADING DIMENSION of oldchr/newchr as the
+c     caller declared them (maxpop), not the active population size.
+c     Passing the population size instead (as all three callers did
+c     until 2026-10-12) scrambles the chromosomes whenever the
+c     population is smaller than maxpop: with 4 individuals the GA
+c     never left its random initial population (test_coverage C10b).
+c     Production runs use 20 = maxpop and were unaffected.
       implicit double precision (a-h, o-z)
       integer ipop, mate1, mate2, ipopsize, lchrom
       integer oldchr(ipopsize, lchrom)

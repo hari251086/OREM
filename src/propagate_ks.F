@@ -133,16 +133,19 @@ c     Local copies of constants that force_models may zero
       call oe2car(pek,x,xd,tole)
       call cal2jd(cal,djulian)
       call force_models(n_force,ngeo_loc,amuS_loc,amuM_loc)
+c     Everything below uses ngeo_loc, which force_models sets to 0
+c     when n_force(1)=0 (it used ngeo_deg until 2026-10-12, so
+c     the geopotential switch was ignored).
       if (IPSR .eq. 0) PSR_loc = 0.d0
       SRPC_srp = CR_srp * AM_srp
 
-      if(ngeo_deg.eq.0.or.ngeo_deg.eq.1) then
+      if(ngeo_loc.eq.0.or.ngeo_loc.eq.1) then
          do i = 1,cn0
             c_j(i) = 0.d0
          end do
       else
 !     compute j_n values
-         call geo_coeff(ngeo_deg,c_j)
+         call geo_coeff(ngeo_loc,c_j)
       end if
 
 !     Initialization
@@ -181,7 +184,7 @@ c     Local copies of constants that force_models may zero
       call third_body_aux(nmoon_deg, x, tm, R(1), amuM_loc,
      &                    Rm(1), RbyRm, first_m, cphi_m, cphi_m2)
 
-      do i = 1,ngeo_deg
+      do i = 1,ngeo_loc
          ObyR(i+1) = ObyR(i)*ObyR(1)
          Re(i+1) = Re(i)*Re(1)
       end do
@@ -189,13 +192,13 @@ c     Local copies of constants that force_models may zero
       V_pot = 0.d0
 
 c     +1: the force/time-element formulas below need aleg(i+2)
-c     (degree i+1) for i up to ngeo_deg (same for sleg/oleg) --
+c     (degree i+1) for i up to ngeo_loc (same for sleg/oleg) --
 c     KSROP off-by-one fix, 2026-07-11.
-      call aLegP(ngeo_deg+1,ZbyR(1),aleg)
+      call aLegP(ngeo_loc+1,ZbyR(1),aleg)
       call aLegP(nsun_deg+1,cphi_s,sleg)
       call aLegP(nmoon_deg+1,cphi_m,oleg)
 
-      do i = 2,ngeo_deg
+      do i = 2,ngeo_loc
          cn_j(i) = amue*Re(i)*c_j(i)*ObyR(i+1)
          V_p(i) = cn_j(i)*aleg(i+1)
          V_pot = V_pot+V_p(i)
@@ -455,7 +458,7 @@ c     per zonal term +amue*(n-1)*c_j(n)*Re(n)*P_n*ObyR(n).
 c     KSROP fix 2026-07-11: old form omitted amue and had the
 c     wrong sign (only affects epoch labeling, not trajectory).
             Tau_geo = 0.d0
-            do i = 2,ngeo_deg
+            do i = 2,ngeo_loc
                Tau_geo = Tau_geo
      &              +amue*(i-1)*c_j(i)*Re(i)*aleg(i+1)
      &              *ObyR(i)
@@ -489,8 +492,8 @@ c     Time element
      &           - z(10)*(2.d0/(w*w))
      &           *dotp4(u,us)
 
-            if (ngeo_deg  .gt. 1)
-     &         call aLegP(ngeo_deg+1, ZbyR(1), aleg)
+            if (ngeo_loc  .gt. 1)
+     &         call aLegP(ngeo_loc+1, ZbyR(1), aleg)
             if (nsun_deg  .gt. 1)
      &         call aLegP(nsun_deg+1, cphi_s,  sleg)
             if (nmoon_deg .gt. 1)
@@ -507,7 +510,7 @@ c     Time element
 !     oblateness terms
                z2mR2=x(3)**2-R(1)**2
                qj=0.d0
-               do i = 2,ngeo_deg
+               do i = 2,ngeo_loc
                   qj = dble(ObyR(i+1)*Re(i)*c_j(i)*
      &              (R(1)*(i+1)*aleg(i+2)
      &              *(R(1)*uu(j)-x(3)*u(j))+
@@ -586,7 +589,7 @@ c     State: conservative + drag + SRP, energy corr
             V = vmn(xd)
             ZbyR(1) = x(3)/R(1)
             ObyR(1) = 1.d0/R(1)
-            do i = 1,ngeo_deg
+            do i = 1,ngeo_loc
                ZbyR(i+1) = ZbyR(i)*ZbyR(1)
                ObyR(i+1) = ObyR(i)*ObyR(1)
             end do

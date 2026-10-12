@@ -344,11 +344,18 @@ c     G14: GA finds optimal e near 0.32
      &   4, 500, 40, 16, 0.8d0, 0.01d0, 0.123d0,
      &   e_opt, a_opt, rms_opt)
 
-      if (dabs(e_opt - 0.32d0) .lt. 0.005d0) then
-         call assert_i('G14 e_opt near 0.32',
+      write(*,'(A,F9.5,A,F8.2,A,F8.4)') '  [INFO]  G14 e=', e_opt,
+     &   ' A=', a_opt, ' rms=', rms_opt
+c     The residual -50(e-0.32)-0.5(A-120) is the same at every t, so
+c     only that combination is identifiable: any point on the line
+c     fits exactly. Until 2026-10-12 this asserted e near 0.32, which
+c     passed only because the GA's population layout bug kept it near
+c     its initial points; check the fit instead.
+      if (rms_opt .lt. 0.1d0) then
+         call assert_i('G14 on the zero-residual line',
      &                 1, 1, npass, nfail)
       else
-         call assert_i('G14 e_opt near 0.32',
+         call assert_i('G14 on the zero-residual line',
      &                 0, 1, npass, nfail)
       end if
 
@@ -834,7 +841,10 @@ c     ============================================================
       ag(2) = 120.d0
       ag(3) = 160.d0
 
-c     G46: Optimum at grid corner (e=0.30, A=80)
+c     G46: Optimum at grid corner (e=0.30, A=80). Production
+c     population (20): with 4 the GA lands ~9 km off this unique
+c     corner; it passed before 2026-10-12 only because the population
+c     layout bug zeroed high-order bits, biasing toward lower bounds.
       do k = 1, na
          do j = 1, ne
             do i = 1, npts
@@ -853,13 +863,20 @@ c     G46: Optimum at grid corner (e=0.30, A=80)
       call ga_optimize(surf, npts, eg, ag, ne, na, npts,
      &   tob, apob, nob,
      &   0.30d0, 0.34d0, 80.d0, 160.d0,
-     &   4, 500, 40, 16, 0.8d0, 0.01d0, 0.123d0,
+     &   20, 500, 40, 16, 0.8d0, 0.01d0, 0.123d0,
      &   e_opt, a_opt, rms_opt)
-      if (dabs(e_opt - 0.30d0) .lt. 0.01d0) then
-         call assert_i('G46 corner opt e~0.30',
+      write(*,'(A,F9.5,A,F8.2,A,F8.4)') '  [INFO]  G46 e=', e_opt,
+     &   ' A=', a_opt, ' rms=', rms_opt
+c     e moves this surface by only 50 km per unit e, i.e. 2 km over the
+c     whole [0.30,0.34] range, which is below the GA's resolution (the
+c     fitness is scaled by 1/100 km); A (0.5 km per kg/m2, 40 km over
+c     its range) is what this landscape actually identifies. Asserting
+c     e~0.30 passed before 2026-10-12 only through the layout bug.
+      if (dabs(a_opt - 80.d0) .lt. 8.d0) then
+         call assert_i('G46 corner opt A~80',
      &                 1, 1, npass, nfail)
       else
-         call assert_i('G46 corner opt e~0.30',
+         call assert_i('G46 corner opt A~80',
      &                 0, 1, npass, nfail)
       end if
 
