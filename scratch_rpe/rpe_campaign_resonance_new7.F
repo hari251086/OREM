@@ -103,7 +103,7 @@ c     rpe_campaign.F/rpe_campaign_resonance16.F for comparability.
 
          call orem_run(
      &      tle_file(io), norad(io),
-     &      t_obs, mxz, 8, 20.d0, 0.90d0, -1.d0,
+     &      t_obs, mxz, 8, 20.d0, 0.d0, 0.90d0, -1.d0,
      &      80.d0, 160.d0, 0, 1, 0, irefine_cli,
      &      20, 500, 40, 16, 0.8d0, 0.01d0, 0.123d0,
      &      20, 2, 3,
