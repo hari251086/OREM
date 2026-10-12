@@ -15,8 +15,10 @@ c       Object   : 42928 PSLV-C39 R/B
 c       Zone     : Zone 0 (2017-09-24 21:09:49 UTC)
 c       Duration : 7 days (604800 s)
 c       Gravity  : EGM2008 zonal-only, Degree=4/Order=0 (matches
-c                  propagate_ks's geo_coeff, which reads J2-J4 straight
-c                  from EGM2008_to2190_TideFree)
+c                  propagate_ks, which reads J2-J4 from
+c                  input/EGM2008_to100_TideFree; until 2026-10-12 it
+c                  read a 0-byte placeholder and ran with no zonals,
+c                  which these apogee-drop checks could not see)
 c       3rd body : Sun + Luna, exact GMAT point mass (propagate_ks uses
 c                  a degree-2 truncated series -- known, already
 c                  characterized residual, not tested here)
@@ -73,7 +75,7 @@ c     -------------------------------------------------------
       integer fail9
 
       integer npass, nfail, ie, ia
-      integer n_force(3)
+      integer n_force(3), nf_nogeo(3)
       integer nrev_test, istep_test
       double precision pek(7)
 
@@ -95,26 +97,9 @@ c     propagate_ks: a(1+e), so these match propagate_ks's own apo_t0)
 
 c     Read atmosphere table
       natm = ndim_a
-      ALT_a(1) = 60.d0
-      do i = 2, 141
-         ALT_a(i) = ALT_a(i-1) + 1.d0
-      end do
-      do i = 142, natm
-         ALT_a(i) = ALT_a(i-1) + 2.d0
-      end do
-
-      open(unit=88, file='input/ATM.DAT', status='old', err=900)
-      read(88,'(8f10.3)') (SCH_a(i), i=1,61)
-      read(88,'(8f10.3)') (SCH_a(i), i=62,natm)
-      read(88,'(8e10.3)') (DEN_a(i), i=1,61)
-      read(88,'(8e10.3)') (DEN_a(i), i=62,natm)
-      close(88)
-
-      do i = 1, natm
-         ALT_a(i) = ALT_a(i) * 1000.d0
-         SCH_a(i) = SCH_a(i) * 1000.d0
-         DEN_a(i) = DEN_a(i) * 1.0d10
-      end do
+      call atm_load('input/ATM.DAT', ALT_a, DEN_a, SCH_a,
+     &              ndim_a, natm, ierr_ld)
+      if (ierr_ld .ne. 0) goto 900
 
       npass = 0
       nfail = 0
@@ -359,38 +344,15 @@ c     osculating-apogee sampling and diurnal-bulge geometry that a
 c     static-atmosphere model cannot reproduce, so the GMAT numbers
 c     are reported as context, not asserted.
 c     ============================================================
-      d80  = drop_ks(1,1)
-      d160 = drop_ks(1,3)
-      if (d80 .gt. -18.10d0 .and. d80 .lt. -14.81d0) then
-         write(*,'(A,F7.2,A)')
-     &      '  [PASS]  N13 BN=80 drop=', d80,
-     &      ' km (exact-model ref=-16.45, +-10%)'
-         npass = npass + 1
-      else
-         write(*,'(A,F7.2,A)')
-     &      '  [FAIL]  N13 BN=80 drop=', d80,
-     &      ' km outside [-18.10,-14.81] km band'
-         nfail = nfail + 1
-      end if
-
-      if (d160 .gt. -9.03d0 .and. d160 .lt. -7.39d0) then
-         write(*,'(A,F7.2,A)')
-     &      '  [PASS]  N14 BN=160 drop=', d160,
-     &      ' km (exact-model ref=-8.21, +-10%)'
-         npass = npass + 1
-      else
-         write(*,'(A,F7.2,A)')
-     &      '  [FAIL]  N14 BN=160 drop=', d160,
-     &      ' km outside [-9.03,-7.39] km band'
-         nfail = nfail + 1
-      end if
-      write(*,'(A)')
-     &   '  [INFO]  GMAT 7-day refs for context: BN=80 -62.26 km,'//
-     &   ' BN=160 -42.81 km (64.1 revs vs the 35 tested here)'
-
-c     ============================================================
-c     N11: IDRAG=0 gives near-zero decay (< 0.5 km in 7 days)
-c     Use e_grid(1), BN=80 as the test case
+c     No-drag runs from the e_grid(1) initial state (2026-10-12).
+c     drop_nd_full: same force model as the grid runs (J2-J4 + Sun +
+c     Moon). Now that the geopotential is really on (the coefficient
+c     file used to be empty), the osculating apogee at the sample
+c     points drifts ~+2 km over 35 revolutions without drag (J2
+c     periodic terms), so N13/N14 compare the DRAG-ONLY drop
+c     (with drag minus without) against the two-body drag reference.
+c     drop_nodrag (N11): geopotential switched off, as N11 was
+c     originally calibrated.
 c     ============================================================
       ae = e_grid(1)
       f_rad = ta_base * d2r
@@ -429,8 +391,63 @@ c     ============================================================
       apo_t0 = pek(1)*(1.d0 + pek(2))
       call car2oe(traj_x(1,idump), traj_xd(1,idump), pek)
       apo_tf = pek(1)*(1.d0 + pek(2))
+      drop_nd_full = apo_tf - apo_t0
+
+      nf_nogeo(1) = 0
+      nf_nogeo(2) = n_force(2)
+      nf_nogeo(3) = n_force(3)
+      idump = 1
+      call propagate_ks(
+     &   x0, xd0, cal0,
+     &   nrev_test, istep_test, 1.d-12,
+     &   nf_nogeo, n_force(1), n_force(2), n_force(3),
+     &   80.d0, 0, WE_rot, EPS_f, FR_rot,
+     &   0.d0, 0.d0, 0, 0,
+     &   0.d0, amuS, amuM,
+     &   ALT_a, DEN_a, SCH_a, natm,
+     &   max_traj, idump,
+     &   traj_jd, traj_x, traj_xd,
+     &   exit_code)
+
+      call car2oe(traj_x(1,1), traj_xd(1,1), pek)
+      apo_t0 = pek(1)*(1.d0 + pek(2))
+      call car2oe(traj_x(1,idump), traj_xd(1,idump), pek)
+      apo_tf = pek(1)*(1.d0 + pek(2))
       drop_nodrag = apo_tf - apo_t0
 
+
+      d80  = drop_ks(1,1) - drop_nd_full
+      d160 = drop_ks(1,3) - drop_nd_full
+      if (d80 .gt. -18.10d0 .and. d80 .lt. -14.81d0) then
+         write(*,'(A,F7.2,A)')
+     &      '  [PASS]  N13 BN=80 drag-only drop=', d80,
+     &      ' km (exact-model ref=-16.45, +-10%)'
+         npass = npass + 1
+      else
+         write(*,'(A,F7.2,A)')
+     &      '  [FAIL]  N13 BN=80 drop=', d80,
+     &      ' km outside [-18.10,-14.81] km band'
+         nfail = nfail + 1
+      end if
+
+      if (d160 .gt. -9.03d0 .and. d160 .lt. -7.39d0) then
+         write(*,'(A,F7.2,A)')
+     &      '  [PASS]  N14 BN=160 drag-only drop=', d160,
+     &      ' km (exact-model ref=-8.21, +-10%)'
+         npass = npass + 1
+      else
+         write(*,'(A,F7.2,A)')
+     &      '  [FAIL]  N14 BN=160 drop=', d160,
+     &      ' km outside [-9.03,-7.39] km band'
+         nfail = nfail + 1
+      end if
+      write(*,'(A)')
+     &   '  [INFO]  GMAT 7-day refs for context: BN=80 -62.26 km,'//
+     &   ' BN=160 -42.81 km (64.1 revs vs the 35 tested here)'
+
+c     N11: IDRAG=0 gives near-zero decay (< 0.5 km), geopotential off
+      write(*,'(A,F8.4,A)') '  [INFO]  no-drag drift with J2-J4: ',
+     &   drop_nd_full, ' km (removed from N13/N14)'
       if (dabs(drop_nodrag) .lt. 0.5d0) then
          write(*,'(A,F7.4,A)')
      &      '  [PASS]  N11 IDRAG=0 drop=', drop_nodrag,
@@ -442,6 +459,8 @@ c     ============================================================
      &      ' km (should be near zero)'
          nfail = nfail + 1
       end if
+
+c     ============================================================
 
 c     ============================================================
 c     N15: BN sensitivity comparison diagnostic

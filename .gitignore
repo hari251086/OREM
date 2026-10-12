@@ -54,3 +54,7 @@ scratch_rpe/resonance_plots/pages/
 # data CSVs (data_fullpool/) and manifest stay tracked for reproducibility.
 scratch_rpe/resonance_plots/pages_fullpool/
 scratch_rpe/resonance_plots/OREM_solar_apsidal_resonance_plots_FULLPOOL*.pdf
+
+# Full EGM2008 coefficient file (242 MB, too large for git); OREM reads
+# the tracked degree-100 extract input/EGM2008_to100_TideFree
+input/EGM2008_to2190_TideFree

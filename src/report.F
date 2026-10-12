@@ -214,11 +214,14 @@ c        the median is far more robust to exactly that failure mode).
      &      'PRIMARY estimate (latest zone, Z', izl,
      &      '): JD ', reentry_jd(izl), '  (',
      &      int(cal(1)), int(cal(2)), int(cal(3)), ' )'
+c        RPE over the latest zone's own horizon, the same definition
+c        as the per-zone table (compute_rpe). Until 2026-10-12 this
+c        divided by zone 1's horizon, so the same zone had two RPEs.
          if (t_obs_jd .gt. 0.d0 .and.
-     &       t_obs_jd .gt. zone_epoch(1)) then
+     &       t_obs_jd .gt. zone_epoch(izl)) then
             write(44,'(A,F8.2,A)')
      &         '  latest-zone RPE:', (reentry_jd(izl) - t_obs_jd)
-     &         /(t_obs_jd - zone_epoch(1))*100.d0, ' %'
+     &         /(t_obs_jd - zone_epoch(izl))*100.d0, ' %'
          end if
          call jd2cal(t_mean, cal)
          write(44,'(A,I2,A,I2,A)')

@@ -31,8 +31,8 @@ c     ============================================================
       double precision x(nn), y(nn)
       double precision slope, intercept, r2
 
-      double precision sx, sy, sxx, sxy, syy, xmean, ymean
-      double precision ss_res, ss_tot, denom
+      double precision sxx, sxy, xmean, ymean, dx
+      double precision ss_res, ss_tot
       integer i
 
       slope = 0.d0
@@ -41,35 +41,39 @@ c     ============================================================
 
       if (nn .lt. 2) return
 
-      sx  = 0.d0
-      sy  = 0.d0
+c     Two-pass, centred sums. The old one-pass form n*sum(x^2) -
+c     (sum x)^2 cancels catastrophically when x is a Julian date
+c     (~2.46e6): on a 0.5-day window the slope came out 2-4 % wrong
+c     (test_coverage C30). Centring keeps full precision; the
+c     intercept is still returned for the caller's own x.
+      xmean = 0.d0
+      ymean = 0.d0
+      do i = 1, nn
+         xmean = xmean + x(i)
+         ymean = ymean + y(i)
+      end do
+      xmean = xmean / dble(nn)
+      ymean = ymean / dble(nn)
+
       sxx = 0.d0
       sxy = 0.d0
-      syy = 0.d0
-
-      do i = 1, nn
-         sx  = sx  + x(i)
-         sy  = sy  + y(i)
-         sxx = sxx + x(i)*x(i)
-         sxy = sxy + x(i)*y(i)
-         syy = syy + y(i)*y(i)
-      end do
-
-      denom = dble(nn)*sxx - sx*sx
-      if (dabs(denom) .lt. 1.d-30) return
-
-      slope     = (dble(nn)*sxy - sx*sy) / denom
-      intercept = (sy - slope*sx) / dble(nn)
-
-c     R² = 1 - SS_res / SS_tot
-      xmean = sx / dble(nn)
-      ymean = sy / dble(nn)
-
-      ss_res = 0.d0
       ss_tot = 0.d0
       do i = 1, nn
-         ss_res = ss_res + (y(i) - slope*x(i) - intercept)**2
+         dx = x(i) - xmean
+         sxx = sxx + dx*dx
+         sxy = sxy + dx*(y(i) - ymean)
          ss_tot = ss_tot + (y(i) - ymean)**2
+      end do
+      if (sxx .lt. 1.d-30) return
+
+      slope     = sxy / sxx
+      intercept = ymean - slope*xmean
+
+c     R2 = 1 - SS_res / SS_tot, residuals about the centred fit
+      ss_res = 0.d0
+      do i = 1, nn
+         ss_res = ss_res
+     &      + (y(i) - ymean - slope*(x(i) - xmean))**2
       end do
 
       if (ss_tot .gt. 1.d-30) then

@@ -88,6 +88,9 @@ c     Local working variables
       double precision lambda_s
       double precision twopi_val, ne_val
       integer i, iunit
+c     Candidate records (this object's TLEs), ordered by epoch
+      integer idx(maxtle), ncand, nkeep, k, kk, kfirst, itmp
+      double precision cjd(maxtle), dtmp
 
       ierr = 0
       npts = 0
@@ -109,19 +112,63 @@ c     --- Read all TLEs from file ---
          return
       end if
 
-c     --- Filter by NORAD ID and extract evolution ---
-c     Skip duplicate epochs (same epoch within 0.001 day ≈ 86 sec)
+c     --- Select this object's TLEs, order them by epoch, drop
+c     duplicates (same epoch within 0.001 day = 86 s) ---
+c     Until 2026-10-12 records were taken in file order and only
+c     compared with the previous one, so an unsorted file kept
+c     duplicates and produced a non-monotonic epoch series, and a
+c     record past maxpts was dropped silently -- the NEWEST ones.
+      ncand = 0
       do i = 1, ntle
          if (target_norad .gt. 0 .and.
-     &       norad(i) .ne. target_norad) goto 20
+     &       norad(i) .ne. target_norad) goto 15
+         ncand = ncand + 1
+         idx(ncand) = i
+         call tle_epoch2jd(epoch_yr(i), epoch_day(i), cjd(ncand))
+ 15      continue
+      end do
 
-         if (npts .ge. maxpts) goto 30
+c     stable insertion sort by epoch (files are nearly sorted, so this
+c     is close to linear); a multi-object read (target_norad <= 0)
+c     keeps file order
+      if (target_norad .gt. 0) then
+         do k = 2, ncand
+            dtmp = cjd(k)
+            itmp = idx(k)
+            kk = k - 1
+            do while (kk .ge. 1)
+               if (cjd(kk) .le. dtmp) exit
+               cjd(kk+1) = cjd(kk)
+               idx(kk+1) = idx(kk)
+               kk = kk - 1
+            end do
+            cjd(kk+1) = dtmp
+            idx(kk+1) = itmp
+         end do
+      end if
 
-c        Compute epoch JD for duplicate check
-         call tle_epoch2jd(epoch_yr(i), epoch_day(i), djd)
-         if (npts .ge. 1) then
-            if (dabs(djd - epochs(npts)) .lt. 0.001d0) goto 20
+      nkeep = 0
+      do k = 1, ncand
+         if (nkeep .ge. 1) then
+            if (dabs(cjd(k) - cjd(nkeep)) .lt. 0.001d0) goto 17
          end if
+         nkeep = nkeep + 1
+         cjd(nkeep) = cjd(k)
+         idx(nkeep) = idx(k)
+ 17      continue
+      end do
+
+c     more records than the output arrays hold: keep the most recent
+      kfirst = 1
+      if (nkeep .gt. maxpts) then
+         kfirst = nkeep - maxpts + 1
+         write(*,'(A,I7,A,I7,A)') '  [WARN] tle_evolve: ', nkeep,
+     &      ' TLEs, keeping the latest ', maxpts, ' (maxpts)'
+      end if
+
+      do k = kfirst, nkeep
+         i = idx(k)
+         djd = cjd(k)
 
          npts = npts + 1
 
@@ -163,11 +210,7 @@ c        Compute Sun azimuth w.r.t. orbital plane
      &        sun_ra, sun_dec, lambda_s)
 
          lambda_s_out(npts) = lambda_s * r2d
-
- 20      continue
       end do
-
- 30   continue
 
       if (npts .eq. 0) then
          ierr = 2

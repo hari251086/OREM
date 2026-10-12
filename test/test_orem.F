@@ -926,31 +926,9 @@ c     ============================================================
       integer maxn, natm
       double precision alt(maxn), den(maxn), sch(maxn)
 
-      natm = 291
-      if (natm .gt. maxn) natm = maxn
-      alt(1) = 60.d0
-      do i = 2, 141
-         alt(i) = alt(i-1) + 1.d0
-      end do
-      do i = 142, natm
-         alt(i) = alt(i-1) + 2.d0
-      end do
-
-      open(unit=88, file='input/ATM.DAT', status='old',
-     &     err=900)
-      read(88,110) (sch(i), i=1,61)
-      read(88,110) (sch(i), i=62,natm)
-      read(88,111) (den(i), i=1,61)
-      read(88,111) (den(i), i=62,natm)
-      close(88)
- 110  format(8f10.3)
- 111  format(8e10.3)
-
-      do i = 1, natm
-         alt(i) = alt(i) * 1000.d0
-         sch(i) = sch(i) * 1000.d0
-         den(i) = den(i) * 1.0d10
-      end do
+      call atm_load('input/ATM.DAT', alt, den, sch,
+     &              maxn, natm, ierr_ld)
+      if (ierr_ld .ne. 0) goto 900
       return
  900  natm = 0
       return

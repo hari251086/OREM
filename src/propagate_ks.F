@@ -21,7 +21,7 @@ c     arguments. Caller must call init_constants() before this
 c     subroutine to populate common block /xy/.
 c     -------------------------------------------------------------
 c     Subroutines used
-c     geo_coeff,car2ks,ks2car,aLegP,car2oe,ks2ksr,INTPOL
+c     geo_coeff_body,car2ks,ks2car,aLegP,car2oe,ks2ksr,INTPOL
 c     -------------------------------------------------------------c
 
       subroutine propagate_ks(
@@ -145,7 +145,14 @@ c     the geopotential switch was ignored).
          end do
       else
 !     compute j_n values
-         call geo_coeff(ngeo_loc,c_j)
+c        Degree-<=100 extract of EGM2008 (the full 242 MB file is too
+c        large for git). Until 2026-10-12 this read a 0-byte
+c        placeholder of the full file through geo_coeff, which returned
+c        all-zero coefficients without an error: J2 and every other
+c        zonal term were off in every OREM run. KSROP v2.12.0's loader
+c        stops if the file is missing or shorter than ngeo_loc.
+         call geo_coeff_body(ngeo_loc, c_j,
+     &        'input/EGM2008_to100_TideFree')
       end if
 
 !     Initialization
@@ -239,7 +246,6 @@ c     KSROP off-by-one fix, 2026-07-11.
 
       sie = dsin(E/2.d0)
       cse = dcos(E/2.d0)
-      iE = dint(E)
 
       call car2oe(x,xd,pek)
 
@@ -610,7 +616,6 @@ c     State: conservative + drag + SRP, energy corr
             if (I_rkg .le. 1) goto 60
 
             E_0 = E_0+dE_0
-            iE = dint(E_0*r2d)
 
 c     Re-entry / divergence check (every step, h_alt = |r| - R_E)
             h_alt = R(1) - R_Earth
@@ -654,208 +659,6 @@ c     Normal completion
       return
       end
 
-c     ============================================================
-c     sw_tinf — exospheric temperature at JD t from the loaded
-c     space-weather history (issue #26). J71 nighttime-minimum plus
-c     the h<200 km geomagnetic term (same convention as the ATM.DAT
-c     generator). Returns tinf=0 when no history is loaded or t
-c     precedes the record -- callers then use the legacy path.
-c     Lives in this file (not swx.F) so executables that never load
-c     space weather link without swx.F; the common defaults to
-c     nsw=0.
-c     ============================================================
-      subroutine sw_tinf(t, tinf)
-      implicit none
-      double precision t, tinf
-
-      integer NSWMAX
-      parameter (NSWMAX = 31000)
-      double precision sw_jd(NSWMAX), sw_f107(NSWMAX)
-      double precision sw_f81(NSWMAX), sw_kp(NSWMAX)
-      integer nsw
-      common /swdat/ sw_jd, sw_f107, sw_f81, sw_kp, nsw
-
-      double precision tc
-      integer lo, hi, mid
-
-      tinf = 0.d0
-      if (nsw .le. 0) return
-      if (t .lt. sw_jd(1)) return
-
-c     binary search: largest i with sw_jd(i) <= t (rows are daily
-c     in the observed era but monthly in the predicted tail, so
-c     index arithmetic is never valid -- always search)
-      lo = 1
-      hi = nsw
-      do while (hi - lo .gt. 1)
-         mid = (lo + hi)/2
-         if (sw_jd(mid) .le. t) then
-            lo = mid
-         else
-            hi = mid
-         end if
-      end do
-      if (sw_jd(hi) .le. t) lo = hi
-
-      tc = 379.d0 + 3.24d0*sw_f81(lo)
-     &   + 1.3d0*(sw_f107(lo) - sw_f81(lo))
-      tinf = tc + 14.d0*sw_kp(lo) + 0.02d0*dexp(sw_kp(lo))
-
-      return
-      end
-
-c     ============================================================
-c     atm2d_interp — bilinear rho/H at (altitude h [m], tinf [K])
-c     from the 2-D table loaded by atm2d_load (swx.F), in the same
-c     internal scaled units as the legacy path (den x1e10, H in m).
-c     Tinf clamps to the grid edges; altitude outside the table
-c     returns istat=1 (drag treated inactive, same contract as the
-c     legacy range gate); istat=2 = table not loaded.
-c     ============================================================
-      subroutine atm2d_interp(h, tinf, rho_s, h_s, istat)
-      implicit none
-      double precision h, tinf, rho_s, h_s
-      integer istat
-
-      integer NA2D, NT2D
-      parameter (NA2D = 291, NT2D = 39)
-      double precision t2d(NT2D), alt2d(NA2D)
-      double precision den2d(NA2D,NT2D), sch2d(NA2D,NT2D)
-      integer n2d_alt, n2d_t
-      common /atm2dc/ t2d, alt2d, den2d, sch2d, n2d_alt, n2d_t
-
-      double precision tv, fa, ft, d1, d2, s1, s2
-      integer ia, it, i
-
-      istat = 0
-      rho_s = 0.d0
-      h_s   = 1.d0
-      if (n2d_t .le. 0) then
-         istat = 2
-         return
-      end if
-      if (h .lt. alt2d(1) .or. h .gt. alt2d(n2d_alt)) then
-         istat = 1
-         return
-      end if
-
-      tv = tinf
-      if (tv .lt. t2d(1))      tv = t2d(1)
-      if (tv .gt. t2d(n2d_t))  tv = t2d(n2d_t)
-
-      ia = 1
-      do i = 2, n2d_alt
-         if (alt2d(i) .ge. h) then
-            ia = i - 1
-            goto 20
-         end if
-      end do
-      ia = n2d_alt - 1
- 20   continue
-      it = 1
-      do i = 2, n2d_t
-         if (t2d(i) .ge. tv) then
-            it = i - 1
-            goto 30
-         end if
-      end do
-      it = n2d_t - 1
- 30   continue
-
-      fa = (h - alt2d(ia)) / (alt2d(ia+1) - alt2d(ia))
-      ft = (tv - t2d(it)) / (t2d(it+1) - t2d(it))
-
-      d1 = den2d(ia,it)   + fa*(den2d(ia+1,it)   - den2d(ia,it))
-      d2 = den2d(ia,it+1) + fa*(den2d(ia+1,it+1) - den2d(ia,it+1))
-      rho_s = d1 + ft*(d2 - d1)
-
-      s1 = sch2d(ia,it)   + fa*(sch2d(ia+1,it)   - sch2d(ia,it))
-      s2 = sch2d(ia,it+1) + fa*(sch2d(ia+1,it+1) - sch2d(ia,it+1))
-      h_s = s1 + ft*(s2 - s1)
-      if (h_s .le. 0.d0) h_s = 1.d0
-
-      return
-      end
-
-c     ============================================================
-c     jacchia_bulge_extrema — exospheric temperature extrema (issue
-c     #32 Phase 5 diurnal-bulge follow-up). Implements Swinerd &
-c     Boulton 1983 eq. (28)-(29) (their own real-tracking best fit
-c     against satellite 1963-27A found k_F=1.02 vs this J77-lineage
-c     formula, i.e. the real diurnal amplitude is within 2% of what
-c     this predicts): given the mean exospheric temperature (from
-c     sw_tinf) and the Sun's current declination, returns the
-c     GLOBAL max/min of the diurnal temperature distribution — the
-c     inputs to the diurnal density bulge amplitude (mapped through
-c     atm2d_interp by the caller; see bulge_cosphi for the separate
-c     geometric factor). K_max/K_min and the 0.15/0.24 coefficients
-c     are the paper's own literature-cited constants, not fitted
-c     here.
-c
-c     tmean       : mean exospheric temperature, K (sw_tinf output)
-c     decl_sun_deg: Sun declination, degrees
-c     tmax, tmin  : output temperature extrema, K
-c     ============================================================
-      subroutine jacchia_bulge_extrema(tmean, decl_sun_deg,
-     &                                  tmax, tmin)
-      implicit none
-      double precision tmean, decl_sun_deg, tmax, tmin
-
-      double precision eps_ecl, ratio, kmax, kmin
-      double precision phi_max, phi_min
-      parameter (eps_ecl = 23.439d0)
-      parameter (kmax = 0.5458d0, kmin = -0.5722d0)
-
-      ratio = decl_sun_deg / eps_ecl
-
-      phi_max = datan((5.d0/8.d0)*ratio/kmax)
-      tmax = tmean*(1.d0 + 0.15d0*ratio*dsin(phi_max)
-     &     + 0.24d0*kmax*dcos(phi_max))
-
-      phi_min = datan((5.d0/8.d0)*ratio/kmin)
-      tmin = tmean*(1.d0 + 0.15d0*ratio*dsin(phi_min)
-     &     + 0.24d0*kmin*dcos(phi_min))
-
-      return
-      end
-
-c     ============================================================
-c     bulge_cosphi — geocentric angular factor for the diurnal
-c     density bulge (issue #32 Phase 5 diurnal-bulge follow-up).
-c     Returns cos(phi), phi = angular distance from the satellite's
-c     current position to the bulge-maximum direction: same
-c     declination as the Sun, right ascension lagging the Sun by
-c     lam_deg (Swinerd & Boulton 1983's real-tracking fit,
-c     lam=37deg, matching CIRA 1972's independent 14.1h
-c     local-solar-time estimate almost exactly).
-c
-c     x(3)    : satellite geocentric position (any consistent units)
-c     ts(3)   : Sun geocentric position (same frame as x — already
-c               computed via solarnpv for third-body/SRP physics)
-c     lam_deg : bulge lag angle, degrees
-c     ============================================================
-      subroutine bulge_cosphi(x, ts, lam_deg, cosphi)
-      implicit none
-      double precision x(3), ts(3), lam_deg, cosphi
-
-      double precision d2r_loc
-      parameter (d2r_loc = 0.017453292519943295d0)
-
-      double precision r_sat, r_sun, dec_sat, ra_sat
-      double precision dec_sun, ra_sun, ra_bulge
-
-      r_sat = dsqrt(x(1)**2 + x(2)**2 + x(3)**2)
-      r_sun = dsqrt(ts(1)**2 + ts(2)**2 + ts(3)**2)
-
-      dec_sat = dasin(x(3)/r_sat)
-      ra_sat  = datan2(x(2), x(1))
-
-      dec_sun = dasin(ts(3)/r_sun)
-      ra_sun  = datan2(ts(2), ts(1))
-      ra_bulge = ra_sun + lam_deg*d2r_loc
-
-      cosphi = dsin(dec_sat)*dsin(dec_sun)
-     &       + dcos(dec_sat)*dcos(dec_sun)*dcos(ra_sat - ra_bulge)
-
-      return
-      end
+c     sw_tinf, atm2d_interp, jacchia_bulge_extrema and bulge_cosphi
+c     (used above) come from KSROP's src/swx.F; OREM kept identical
+c     copies here and in its own swx.F until 2026-10-12.

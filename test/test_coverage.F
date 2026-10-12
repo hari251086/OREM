@@ -6,7 +6,8 @@ c     ga_slope_fitness, ga_preselect, ga_select2, ga_crossover,
 c     ga_advance, rsm_tinterp, rsm_direct_eval, rsm_refine,
 c     zone_select_next, linfit, compute_rpe, tle_find_ma,
 c     tle_find_osc, tle_find_bstar, estimate_bn_bstar_prior,
-c     estimate_bn_floor, propagate_ks force switches.
+c     estimate_bn_floor, propagate_ks force switches, tle_filter,
+c     tle_evolve ordering, orem_report, rsm_nan.
 c     Run from the repo root (reads input/ATM.DAT).
 c     -------------------------------------------------------
       program test_coverage
@@ -57,6 +58,14 @@ c     -------------------------------------------------------
       call t_direct_refine(npass, nfail)
 
       write(*,*) ''
+      write(*,*) '  --- tle_filter, tle_evolve, report, NaN ---'
+      call t_filter_window(npass, nfail)
+      call t_evolve_order(npass, nfail)
+      call t_report_rpe(npass, nfail)
+      call t_nan_marker(npass, nfail)
+      call t_read_cfg(npass, nfail)
+
+      write(*,*) ''
       write(*,*) '=============================================='
       write(*,100) npass + nfail, npass, nfail
  100  format(' Total: ',i3,'   Passed: ',i3,'   Failed: ',i3)
@@ -82,7 +91,7 @@ c     ============================================================
       double precision oldrand(55), fit(8), frac(8), sl(3,3)
       double precision eg(3), bg(3), xv(2)
       integer oldchr(ld, lc), newchr(ld, lc), ich(8)
-      integer jrand, ncross, nmute, ok, i, j, k, nseen
+      integer jrand, ncross, nmute, ok, i, j, k, nseen, nrem
       integer ga_iflip
       double precision ga_slope_fitness
 
@@ -135,16 +144,16 @@ c     indices when every fitness is 0 (all fractions 0)
       call ck_i('C5 preselect flat population: valid pool', ok, 1,
      &          npass, nfail)
 
-c     C6: ga_select2 always returns an index from the pool. (INFO:
-c     the pool range is never shrunk by the callers, so draws are
-c     with replacement despite the "without replacement" comment.)
+c     C6/C6b: ga_select2 draws from the pool without replacement: one
+c     round of 8 picks from a pool of 8 is a permutation
       do i = 1, 8
          ich(i) = i
       end do
       ok = 1
       nseen = 0
+      nrem = 8
       do j = 1, 8
-         call ga_select2(ich, 8, oldrand, jrand, k)
+         call ga_select2(ich, 8, nrem, oldrand, jrand, k)
          if (k .lt. 1 .or. k .gt. 8) ok = 0
          fit(j) = dble(k)
       end do
@@ -158,8 +167,8 @@ c     with replacement despite the "without replacement" comment.)
          end do
  61      continue
       end do
-      write(*,'(A,I2,A)') '  [INFO]  select2: 8 draws hit ', nseen,
-     &   ' distinct of 8 (a permutation would hit 8)'
+      call ck_i('C6b select2: 8 picks are a permutation', nseen, 8,
+     &          npass, nfail)
 
 c     C7: ga_slope_fitness exact match = 1, offset d gives 1/(1+d)
       do i = 1, 3
@@ -482,9 +491,9 @@ c     ============================================================
       call linfit(x, y, 5, s, c, r2)
       write(*,'(A,F12.6,A)') '  [INFO]  linfit slope ', s,
      &   ' (exact -10) on a 0.5-day JD window'
-      call ck_known('C30 linfit slope, 0.5-day JD window', s, -10.d0,
+      call ck_d('C30 linfit slope, 0.5-day JD window', s, -10.d0,
      &          1.d-6, npass, nfail)
-      call ck_known('C31 linfit R2 of exact line', r2, 1.d0, 1.d-9,
+      call ck_d('C31 linfit R2 of exact line', r2, 1.d0, 1.d-9,
      &          npass, nfail)
       return
       end
@@ -584,10 +593,10 @@ c     ============================================================
 
       call tle_epoch2jd(2020, eday(2), ep2)
       call tle_find_ma(11111, ep2, nr, iyr, eday, ama, mt, mt, xma)
-      call ck_known('C36 find_ma: exact epoch, not first in tolerance',
+      call ck_d('C36 find_ma: exact epoch, not first in tolerance',
      &          xma, 20.d0, 0.d0, npass, nfail)
       call tle_find_bstar(11111, ep2, nr, iyr, eday, bst, mt, mt, b)
-      call ck_known('C37 find_bstar: exact epoch', b, 2.d-4, 0.d0,
+      call ck_d('C37 find_bstar: exact epoch', b, 2.d-4, 0.d0,
      &          npass, nfail)
       call tle_epoch2jd(2020, eday(3), ep3)
       call tle_find_ma(11111, ep3, nr, iyr, eday, ama, mt, mt, xma)
@@ -662,6 +671,17 @@ c     estimate_bn_floor early exits (no propagation reached)
       if (lok) ok = 0
       call ck_i('C46 bn_floor: flat a(t) -> not ok', ok, 1,
      &          npass, nfail)
+c     a rising a(t) carries no drag signal
+      do i = 1, 3
+         sm(i) = 26000.d0 + 2.d0*dble(i)
+      end do
+      call estimate_bn_floor(epz, sm, ez, az, az, az, az, 3,
+     &   nf, 2, 0, 0, 0.d0, 0.d0, 0.d0, 0.d0, 0.d0, 0, 0, 0.d0,
+     &   0.d0, 0.d0, alt, den, sch, 1, bfl, lok)
+      ok = 1
+      if (lok) ok = 0
+      call ck_i('C46b bn_floor: rising a(t) -> not ok', ok, 1,
+     &          npass, nfail)
       return
       end
 
@@ -732,14 +752,13 @@ c     positive control: geopotential on (n_force(1)=1, ngeo=4)
       end do
       write(*,'(A,ES10.3,A)') '  [INFO]  ngeo=4 on vs off: max |dr| = ',
      &   d, ' km'
-c     KNOWN-BUG while input/EGM2008_to2190_TideFree is the 0-byte
-c     file committed in c820803: geo_coeff then reads no coefficients
-c     and every zonal term (J2 included) is zero. C47 is only a real
-c     check once the file has data.
+c     Until 2026-10-12 the coefficient file was a 0-byte placeholder,
+c     every zonal term (J2 included) was zero and this difference was
+c     exactly 0 (C47 then passed trivially)
       ok = 0
       if (d .gt. 1.d-2) ok = 1
-      call ck_known('C47b geopotential on changes the orbit',
-     &          dble(ok), 1.d0, 0.d0, npass, nfail)
+      call ck_i('C47b geopotential on changes the orbit', ok, 1,
+     &          npass, nfail)
       return
       end
 
@@ -827,31 +846,211 @@ c     Degenerate ranges (e_lo=e_hi, bn_lo=bn_hi): must terminate
       end
 
 c     ============================================================
+c     tle_filter on a synthetic series: a 500 km spike is flagged.
+c     ============================================================
+      subroutine t_filter_window(npass, nfail)
+      implicit double precision (a-h, o-z)
+      integer npass, nfail
+      parameter(n = 40)
+      double precision ep(n), ha(n), ee(n)
+      integer msk(n), nf, nr, ng
+
+      do i = 1, n
+         ep(i) = 2460000.d0 + dble(i)
+         ha(i) = 30000.d0 + dble(mod(i, 2))
+         ee(i) = 0.5d0
+      end do
+      ha(25) = ha(25) + 500.d0
+      ha(30) = ha(30) + 40.d0
+      call tle_filter(ep, ha, ee, n, 4.d0, 6.d0, 30.d0, 20,
+     &                msk, nf, nr, ng)
+      call ck_i('C54 filter flags the spike', msk(25), 0,
+     &          npass, nfail)
+c     Known limit, kept by design (see tle_filter.F): the spike stays
+c     in later windows, so the 40 km jump at point 30 is not flagged.
+      write(*,'(A,I2)') '  [INFO]  filter mask at the later jump: ',
+     &   msk(30)
+      return
+      end
+
+c     ============================================================
+c     tle_evolve on a file written in REVERSE epoch order: the output
+c     must still be ascending and match the original file.
+c     ============================================================
+      subroutine t_evolve_order(npass, nfail)
+      implicit double precision (a-h, o-z)
+      integer npass, nfail
+      parameter(mx = 2000)
+      character*80 l1(mx), l2(mx), line
+      double precision ep1(mx), ep2(mx), w(mx, 8)
+      integer np1, np2, ier1, ier2, np, ok
+
+      open(unit=71, file='input/example_42928_zone0.tle.txt',
+     &     status='old')
+      np = 0
+ 10   read(71, '(A)', end=20) line
+      if (line(1:2) .eq. '1 ') then
+         np = np + 1
+         l1(np) = line
+         read(71, '(A)', end=20) l2(np)
+      end if
+      goto 10
+ 20   close(71)
+      open(unit=72, file='build/test_cov_reversed.tle',
+     &     status='replace')
+      do i = np, 1, -1
+         write(72, '(A)') trim(l1(i))
+         write(72, '(A)') trim(l2(i))
+      end do
+      close(72)
+
+      call tle_evolve('input/example_42928_zone0.tle.txt', 42928,
+     &   mx, ep1, w(1,1), w(1,2), w(1,3), w(1,4), w(1,5), w(1,6),
+     &   w(1,7), w(1,8), np1, ier1)
+      call tle_evolve('build/test_cov_reversed.tle', 42928,
+     &   mx, ep2, w(1,1), w(1,2), w(1,3), w(1,4), w(1,5), w(1,6),
+     &   w(1,7), w(1,8), np2, ier2)
+      ok = 0
+      if (ier1 .eq. 0 .and. ier2 .eq. 0 .and. np1 .eq. np2) ok = 1
+      do i = 2, np2
+         if (ep2(i) .le. ep2(i-1)) ok = 0
+      end do
+      if (ok .eq. 1) then
+         do i = 1, np2
+            if (ep1(i) .ne. ep2(i)) ok = 0
+         end do
+      end if
+      call ck_i('C57 tle_evolve orders an unsorted file', ok, 1,
+     &          npass, nfail)
+
+c     maxpts smaller than the record: the LATEST points are kept
+      call tle_evolve('input/example_42928_zone0.tle.txt', 42928,
+     &   3, ep2, w(1,1), w(1,2), w(1,3), w(1,4), w(1,5), w(1,6),
+     &   w(1,7), w(1,8), np2, ier2)
+      call ck_d('C58 maxpts keeps the latest epoch', ep2(3),
+     &          ep1(np1), 0.d0, npass, nfail)
+      return
+      end
+
+c     ============================================================
+c     orem_report: the latest-zone RPE uses the latest zone's own
+c     horizon. Zone 2 starts 50 d before the observed decay and
+c     predicts 10 d late: 20 % (zone 1's horizon would give 10 %).
+c     ============================================================
+      subroutine t_report_rpe(npass, nfail)
+      implicit double precision (a-h, o-z)
+      integer npass, nfail
+      double precision tc(6), rj(2), eo(2), bo(2), ro(2), ze(2)
+      double precision rp(2), bb(10), tb(10)
+      integer zst(2), ier
+      character*120 line
+
+      tc(1) = 2020.d0
+      tc(2) = 1.d0
+      tc(3) = 1.d0
+      tc(4) = 0.d0
+      tc(5) = 0.d0
+      tc(6) = 0.d0
+      call cal2jd(tc, tobs)
+      ze(1) = tobs - 100.d0
+      ze(2) = tobs - 50.d0
+      rj(1) = tobs
+      rj(2) = tobs + 10.d0
+      do i = 1, 2
+         eo(i) = 0.5d0
+         bo(i) = 100.d0
+         ro(i) = 1.d0
+         zst(i) = 0
+      end do
+      do i = 1, 10
+         bb(i) = 0.d0
+         tb(i) = 0.d0
+      end do
+      call compute_rpe(rj, ze, 2, tobs, rp, tm, ts, 2)
+      call orem_report('build/test_cov_report.txt', 11111, tc,
+     &   10.d0, 160.d0, 1, rj, eo, bo, ro, ze, 2, zst, 2,
+     &   rp, tm, ts, bb, tb, 0, 0, 2, 300.d0, ier)
+      val = -999.d0
+      open(unit=73, file='build/test_cov_report.txt', status='old')
+ 30   read(73, '(A)', end=40) line
+      k = index(line, 'latest-zone RPE:')
+      if (k .gt. 0) read(line(k+16:), *) val
+      goto 30
+ 40   close(73)
+      call ck_d('C59 report latest-zone RPE uses its own horizon',
+     &          val, 20.d0, 1.d-2, npass, nfail)
+      call ck_d('C60 ... and equals the table RPE of that zone',
+     &          val, rp(2), 1.d-2, npass, nfail)
+      return
+      end
+
+c     ============================================================
+      subroutine t_nan_marker(npass, nfail)
+      implicit double precision (a-h, o-z)
+      integer npass, nfail, ok
+      double precision rsm_nan
+      x = rsm_nan()
+      ok = 0
+      if (x .ne. x) ok = 1
+      call ck_i('C61 rsm_nan is a NaN (failed-grid-point marker)',
+     &          ok, 1, npass, nfail)
+      return
+      end
+
+c     ============================================================
+c     orem_read_cfg: a shipped config parses to the intended values;
+c     a line with too few values is an error, not a silent read of
+c     the next line (all 8 shipped configs were one value short on
+c     line 5 from 2026-09-27 to 2026-10-12).
+c     ============================================================
+      subroutine t_read_cfg(npass, nfail)
+      implicit double precision (a-h, o-z)
+      integer npass, nfail
+      character*200 tf
+      double precision tc(6), zd
+      integer nz, mz, nsw, ipop, mg, nbe, nba, ng, ns, nm, idr
+      integer ips, ish, ier, nbad
+
+      call orem_read_cfg('input/orem_42928.cfg', tf, nid, tc, nz,
+     &   mz, zd, pmd, r2t, slt, bmn, bmx, nsw, ipop, mg, nbe, nba,
+     &   pc, pm, sd, ng, ns, nm, idr, we, ep, fr, ips, cr, am, ish,
+     &   ier, nbad)
+      call ck_i('C62 shipped config parses', ier, 0, npass, nfail)
+      call ck_d('C63 max_zone_days', zd, 20.d0, 0.d0, npass, nfail)
+      call ck_d('C64 slope threshold', slt, -1.d0, 0.d0,
+     &          npass, nfail)
+      call ck_i('C65 GA population', ipop, 20, npass, nfail)
+
+      open(unit=74, file='build/test_cov_short.cfg',
+     &     status='replace')
+      write(74, '(A)') 'input/example_42928.tle.txt'
+      write(74, '(A)') '42928'
+      write(74, '(A)') '0 0 0 0 0 0.0'
+      write(74, '(A)') '8'
+      write(74, '(A)') '8 20.0 0.90 -1.0'
+      write(74, '(A)') '80.0 160.0 0'
+      write(74, '(A)') '20 500 40 16 0.8 0.01 0.123'
+      write(74, '(A)') '4 2 3'
+      write(74, '(A)') '1 7.2921150d-5 3.35281066d-3 1.0'
+      write(74, '(A)') '0 0.0 0.0 0'
+      close(74)
+      call orem_read_cfg('build/test_cov_short.cfg', tf, nid, tc, nz,
+     &   mz, zd, pmd, r2t, slt, bmn, bmx, nsw, ipop, mg, nbe, nba,
+     &   pc, pm, sd, ng, ns, nm, idr, we, ep, fr, ips, cr, am, ish,
+     &   ier, nbad)
+      call ck_i('C66 short line 5 is an error', ier, 2, npass, nfail)
+      call ck_i('C67 ... reported on line 5', nbad, 5, npass, nfail)
+      return
+      end
+
+c     ============================================================
       subroutine read_atm2(alt, den, sch, maxn, natm)
       implicit double precision (a-h, o-z)
       integer maxn, natm
       double precision alt(maxn), den(maxn), sch(maxn)
-      natm = 291
-      alt(1) = 60.d0
-      do i = 2, 141
-         alt(i) = alt(i-1) + 1.d0
-      end do
-      do i = 142, natm
-         alt(i) = alt(i-1) + 2.d0
-      end do
-      open(unit=88, file='input/ATM.DAT', status='old', err=900)
-      read(88,110) (sch(i), i=1,61)
-      read(88,110) (sch(i), i=62,natm)
-      read(88,111) (den(i), i=1,61)
-      read(88,111) (den(i), i=62,natm)
-      close(88)
- 110  format(8f10.3)
- 111  format(8e10.3)
-      do i = 1, natm
-         alt(i) = alt(i) * 1000.d0
-         sch(i) = sch(i) * 1000.d0
-         den(i) = den(i) * 1.0d10
-      end do
+      call atm_load('input/ATM.DAT', alt, den, sch,
+     &              maxn, natm, ierr_ld)
+      if (ierr_ld .ne. 0) goto 900
       return
  900  write(*,*) 'read_atm2: cannot open input/ATM.DAT'
       stop 1

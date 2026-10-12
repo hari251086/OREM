@@ -36,26 +36,9 @@ c     -------------------------------------------------------
 
 c     Build altitude grid and read atmosphere table
       natm = ndim_a
-      ALT_a(1) = 60.d0
-      do i = 2, 141
-         ALT_a(i) = ALT_a(i-1) + 1.d0
-      end do
-      do i = 142, natm
-         ALT_a(i) = ALT_a(i-1) + 2.d0
-      end do
-
-      open(unit=88, file='input/ATM.DAT', status='old', err=900)
-      read(88,'(8f10.3)') (SCH_a(i), i=1,61)
-      read(88,'(8f10.3)') (SCH_a(i), i=62,natm)
-      read(88,'(8e10.3)') (DEN_a(i), i=1,61)
-      read(88,'(8e10.3)') (DEN_a(i), i=62,natm)
-      close(88)
-
-      do i = 1, natm
-         ALT_a(i) = ALT_a(i) * 1000.d0
-         SCH_a(i) = SCH_a(i) * 1000.d0
-         DEN_a(i) = DEN_a(i) * 1.0d10
-      end do
+      call atm_load('input/ATM.DAT', ALT_a, DEN_a, SCH_a,
+     &              ndim_a, natm, ierr_ld)
+      if (ierr_ld .ne. 0) goto 900
 
       npass = 0
       nfail = 0

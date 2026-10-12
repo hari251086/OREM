@@ -116,7 +116,7 @@ c                                zone succeeded)
 c       n_band_valid           : how many of n_bn_sweep points
 c                                produced a re-entry within cap
 c       ierr                   : 0=ok, 1=TLE error, 2=no zones,
-c                                3=all zones failed
+c                                3=no zone re-entered (drag on)
 c     ============================================================
       implicit double precision (a-h, o-z)
       common /xy/ pi, d2r, r2d, amue, AU, R_Earth
@@ -256,6 +256,8 @@ c     Issue #41: RPE-driven sequential zone selection (adapt mode)
       double precision rpe_this, rpe_best, horiz_z
       double precision e_opt_best, bn_opt_best
       double precision rms_best, reentry_best
+      logical bnb_best
+      double precision bnv_best
 
 c     Issue #40: direct-propagation local refinement (refine mode)
 c     refine_max_eval starts with 'r' -- would default to DOUBLE
@@ -408,6 +410,8 @@ c     downward from bn_min_init, never touches bn_hi, never raises
 c     the floor. Targets objects like 39615 whose true BN falls
 c     entirely below the hardcoded default floor.
       nzone1 = zone_end(1) - zone_start(1) + 1
+c     the zone work arrays hold 500 points (BN floor needs only a trend)
+      if (nzone1 .gt. 500) nzone1 = 500
       do i = 1, nzone1
          epz(i)   = epochs(zone_start(1) + i - 1)
          ez(i)    = e_tle(zone_start(1) + i - 1)
@@ -494,8 +498,16 @@ c           forget on one of them.
          rpe_best = 1.d30
 
  70      continue
-c        Extract TLE data within zone
+c        Extract TLE data within zone. The zone work arrays (and the
+c        RSM/GA observation arrays) hold 500 points: a longer zone is
+c        cut to its first 500 instead of overflowing them.
          nzone = zone_end(iz) - zone_start(iz) + 1
+         if (nzone .gt. 500) then
+            write(*,'(A,I2,A,I6,A)') '  [WARN] Z', iz, ': ', nzone,
+     &         ' TLEs, using the first 500'
+            zone_end(iz) = zone_start(iz) + 499
+            nzone = 500
+         end if
 
 c        Issue #12: too few TLEs for reliable RSM. This is a fixed
 c        RSM-reliability floor (3 TLEs is sufficient), independent of
@@ -515,6 +527,7 @@ c        (#10) can shrink a zone after selection.
             write(*,'(A,I2,A,I3,A)')
      &         '  [WARN] Z', iz, ': skip, too few TLEs for '//
      &         'reliable RSM: nzone=', nzone, ' < 3'
+            if (iadapt_zone .eq. 1 .and. iadapt_try .gt. 0) goto 82
             goto 50
          end if
 
@@ -655,6 +668,7 @@ c        the prior window doesn't overlap the caller's range at all.
      &         '  [WARN] Z', iz, ': skip, RSM/propagator failure '//
      &         '(propagate_ks diverged on more than 6 of 9 grid '//
      &         'points)'
+            if (iadapt_zone .eq. 1 .and. iadapt_try .gt. 0) goto 82
             goto 50
          end if
 
@@ -668,17 +682,20 @@ c        violation would flood the console. Warn only -- still runs
 c        GA on the existing surfaces.
          nobound_cnt = 0
          do i = 1, nobs
-            smin = surfaces(i,1,1)
-            smax = surfaces(i,1,1)
+c           failed grid points are NaN (rsm_generate) and are skipped
+            smin = 1.d30
+            smax = -1.d30
             do ie2 = 1, 3
                do ia2 = 1, 3
-                  if (surfaces(i,ie2,ia2) .lt. smin)
-     &               smin = surfaces(i,ie2,ia2)
-                  if (surfaces(i,ie2,ia2) .gt. smax)
-     &               smax = surfaces(i,ie2,ia2)
+                  sv = surfaces(i,ie2,ia2)
+                  if (sv .eq. sv) then
+                     if (sv .lt. smin) smin = sv
+                     if (sv .gt. smax) smax = sv
+                  end if
                end do
             end do
-            if (apobs(i) .lt. smin .or. apobs(i) .gt. smax)
+            if (smin .le. smax .and.
+     &          (apobs(i) .lt. smin .or. apobs(i) .gt. smax))
      &         nobound_cnt = nobound_cnt + 1
          end do
          if (nobound_cnt .gt. 0) then
@@ -877,6 +894,8 @@ c        across all attempts.
                rms_best     = rms_out(iz)
                reentry_best = reentry_jd(iz)
                zstat_best   = zone_status(iz)
+               bnb_best     = bn_at_bound
+               bnv_best     = bn_bound_val
             end if
 
             if (dabs(rpe_this) .gt. rpe_adapt_thresh .and.
@@ -908,11 +927,36 @@ c                 Then shrink (never below min_zone_pts)
                rms_out(iz)     = rms_best
                reentry_jd(iz)  = reentry_best
                zone_status(iz) = zstat_best
+               bn_at_bound     = bnb_best
+               bn_bound_val    = bnv_best
             end if
             write(*,'(A,I2,A,F8.1,A,I3,A)')
      &         '  [ADAPT] Z', iz, ': final RPE=', rpe_best,
      &         '% after ', iadapt_try, ' adjustment(s)'
+         else if (iadapt_zone .eq. 1 .and. t_obs_jd .gt. 0.d0 .and.
+     &            iadapt_try .gt. 0) then
+c           this retry gave no re-entry: fall back to the best band
+            goto 82
          end if
+         goto 84
+
+c        Issue #41 fix (2026-10-12): a retry that was skipped (too few
+c        TLEs, RSM failure) or predicted no re-entry used to leave the
+c        zone on that failed attempt; return to the best band instead.
+ 82      continue
+         zone_end(iz)    = zend_best
+         e_opt_out(iz)   = e_opt_best
+         bn_opt_out(iz)  = bn_opt_best
+         rms_out(iz)     = rms_best
+         reentry_jd(iz)  = reentry_best
+         zone_status(iz) = zstat_best
+         zone_epoch(iz)  = epochs(zone_start(iz))
+         bn_at_bound     = bnb_best
+         bn_bound_val    = bnv_best
+         write(*,'(A,I2,A,F8.1,A,I3,A)')
+     &      '  [ADAPT] Z', iz, ': retry failed, best band kept, RPE=',
+     &      rpe_best, '% after ', iadapt_try, ' adjustment(s)'
+ 84      continue
 
 c        Issue #33 revisit: restore the v1.21 trust-gated BN-range
 c        narrow/widen-on-boundary logic (removed in #33 as an
@@ -978,7 +1022,8 @@ c     ============================================================
       call compute_rpe(reentry_jd, zone_epoch, nzones,
      &   t_obs_jd, rpe_out, t_mean, t_std, nzones_max)
 
-      if (nvalid .eq. 0) ierr = 3
+c     "no zone re-entered" is only a failure with drag on
+      if (nvalid .eq. 0 .and. idrag_flag .eq. 1) ierr = 3
 
       return
 
@@ -1107,7 +1152,8 @@ c     ============================================================
       subroutine tle_find_ma(norad_id, epoch_jd,
      &   norad_raw, epoch_yr_raw, epoch_day_raw,
      &   ama_raw, ntle_raw, maxtle, ma_out)
-c     Find mean anomaly from raw TLE array matching epoch.
+c     Find mean anomaly from raw TLE array matching epoch (nearest
+c     record within 0.01 d, see tle_match_idx).
 c     ============================================================
       implicit double precision (a-h, o-z)
       integer norad_id, ntle_raw, maxtle
@@ -1117,13 +1163,43 @@ c     ============================================================
       double precision epoch_jd, ma_out
 
       ma_out = 0.d0
+      call tle_match_idx(norad_id, epoch_jd,
+     &   norad_raw, epoch_yr_raw, epoch_day_raw,
+     &   ntle_raw, maxtle, im)
+      if (im .gt. 0) ma_out = ama_raw(im)
+
+      return
+      end
+
+c     ============================================================
+      subroutine tle_match_idx(norad_id, epoch_jd,
+     &   norad_raw, epoch_yr_raw, epoch_day_raw,
+     &   ntle_raw, maxtle, imatch)
+c     Index of norad_id's raw TLE whose epoch is NEAREST epoch_jd,
+c     within 0.01 d (0 if none). tle_evolve keeps TLEs that are only
+c     0.001 d (86 s) apart as separate points, so taking the FIRST
+c     record within 0.01 d -- as tle_find_ma/osc/bstar did until
+c     2026-10-12 -- could return a neighbouring TLE's mean anomaly,
+c     osculating state or BSTAR (0.6 % of points over the input
+c     files, up to 17 % for some objects).
+c     ============================================================
+      implicit double precision (a-h, o-z)
+      integer norad_id, ntle_raw, maxtle, imatch
+      integer norad_raw(maxtle), epoch_yr_raw(maxtle)
+      double precision epoch_day_raw(maxtle), epoch_jd
+      integer i
+
+      imatch = 0
+      dbest = 0.01d0
       do i = 1, ntle_raw
          if (norad_raw(i) .eq. norad_id) then
             call tle_epoch2jd(epoch_yr_raw(i),
      &           epoch_day_raw(i), djd_tmp)
-            if (dabs(djd_tmp - epoch_jd) .lt. 0.01d0) then
-               ma_out = ama_raw(i)
-               return
+            dd = dabs(djd_tmp - epoch_jd)
+            if (dd .lt. dbest) then
+               dbest = dd
+               imatch = i
+               if (dd .eq. 0.d0) return
             end if
          end if
       end do
@@ -1163,23 +1239,18 @@ c     ============================================================
       integer ierr_sv, i
 
       ok = .false.
-      do i = 1, ntle_raw
-         if (norad_raw(i) .eq. norad_id) then
-            call tle_epoch2jd(epoch_yr_raw(i),
-     &           epoch_day_raw(i), djd_tmp)
-            if (dabs(djd_tmp - epoch_jd) .lt. 0.01d0) then
-               call tle2sv(epoch_yr_raw(i), epoch_day_raw(i),
-     &            ainc_raw(i), raan_raw(i), ecc_raw(i),
-     &            aop_raw(i), ama_raw(i), amm_raw(i),
-     &            bstar_raw(i), r_osc, v_osc, ierr_sv)
-               if (ierr_sv .eq. 0) then
-                  call car2oe(r_osc, v_osc, a_kep_osc)
-                  ok = .true.
-               end if
-               return
-            end if
-         end if
-      end do
+      call tle_match_idx(norad_id, epoch_jd,
+     &   norad_raw, epoch_yr_raw, epoch_day_raw,
+     &   ntle_raw, maxtle, i)
+      if (i .eq. 0) return
+      call tle2sv(epoch_yr_raw(i), epoch_day_raw(i),
+     &   ainc_raw(i), raan_raw(i), ecc_raw(i),
+     &   aop_raw(i), ama_raw(i), amm_raw(i),
+     &   bstar_raw(i), r_osc, v_osc, ierr_sv)
+      if (ierr_sv .eq. 0) then
+         call car2oe(r_osc, v_osc, a_kep_osc)
+         ok = .true.
+      end if
 
       return
       end
@@ -1188,8 +1259,8 @@ c     ============================================================
       subroutine tle_find_bstar(norad_id, epoch_jd,
      &   norad_raw, epoch_yr_raw, epoch_day_raw, bstar_raw,
      &   ntle_raw, maxtle, bstar_out)
-c     Find BSTAR from raw TLE array matching epoch (same epoch-match
-c     tolerance/pattern as tle_find_ma).
+c     Find BSTAR from raw TLE array matching epoch (nearest record
+c     within 0.01 d, see tle_match_idx).
 c     ============================================================
       implicit double precision (a-h, o-z)
       integer norad_id, ntle_raw, maxtle
@@ -1199,16 +1270,10 @@ c     ============================================================
       integer i
 
       bstar_out = 0.d0
-      do i = 1, ntle_raw
-         if (norad_raw(i) .eq. norad_id) then
-            call tle_epoch2jd(epoch_yr_raw(i),
-     &           epoch_day_raw(i), djd_tmp)
-            if (dabs(djd_tmp - epoch_jd) .lt. 0.01d0) then
-               bstar_out = bstar_raw(i)
-               return
-            end if
-         end if
-      end do
+      call tle_match_idx(norad_id, epoch_jd,
+     &   norad_raw, epoch_yr_raw, epoch_day_raw,
+     &   ntle_raw, maxtle, i)
+      if (i .gt. 0) bstar_out = bstar_raw(i)
 
       return
       end
@@ -1395,7 +1460,10 @@ c     Observed da/dt across zone 1's own TLEs (reuses zone_select's
 c     proven linfit, matching the issue's "delta-n-bar/delta-t" ask).
       call linfit(epz, smaz, nzone, slope_obs, intcpt_obs, r2_obs)
 
-      if (r2_obs .lt. 0.5d0 .or. dabs(slope_obs) .lt. 1.d-6) return
+c     Only a decaying a(t) carries a drag signal: a rising or flat
+c     trend (e.g. a luni-solar phase) gave a meaningless "floor"
+c     through dabs() until 2026-10-12.
+      if (r2_obs .lt. 0.5d0 .or. slope_obs .gt. -1.d-6) return
 
 c     Short trial propagation at BN_trial from the zone's first TLE.
       a_kep(1) = smaz(1)
@@ -1437,9 +1505,9 @@ c     Short trial propagation at BN_trial from the zone's first TLE.
       slope_trial = (sma_tf - sma_t0) /
      &   (traj_jd(idump_trial) - traj_jd(1))
 
-      if (dabs(slope_trial) .lt. 1.d-9) return
+      if (slope_trial .gt. -1.d-9) return
 
-      bn_floor_est = BN_trial * dabs(slope_trial) / dabs(slope_obs)
+      bn_floor_est = BN_trial * slope_trial / slope_obs
       if (bn_floor_est .lt. 5.d0) bn_floor_est = 5.d0
       if (bn_floor_est .gt. 500.d0) bn_floor_est = 500.d0
       ok = .true.
@@ -1496,7 +1564,11 @@ c     ============================================================
          return
       end if
 
-      perigee_alt = hp_lp(npts_lp)
+      ilast = 1
+      do i = 2, npts_lp
+         if (epochs_lp(i) .gt. epochs_lp(ilast)) ilast = i
+      end do
+      perigee_alt = hp_lp(ilast)
       ierr_lp = 0
 
       return

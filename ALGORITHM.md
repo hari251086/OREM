@@ -343,7 +343,7 @@ cross-validation of its own, only real-decay-date comparison.
   on Falcon 9 second stages — this whole fitting methodology's validity
   depends on drag+gravity+SRP being the complete force model, which does
   not hold for actively-maneuvered objects.
-- Only degree-2190 EGM2008 zonals, drag (including the diurnal density
+- Only EGM2008 zonals (up to degree 100, the bundled extract), drag (including the diurnal density
   bulge, v1.42), luni-solar third-body, and SRP are modeled — same
   force-model scope as KSROP, no thrust/maneuver modeling, no additions
   specific to OREM's own re-entry-prediction use case beyond the drag
