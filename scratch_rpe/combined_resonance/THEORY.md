@@ -119,6 +119,8 @@ tracked orbit evolution*, not that TLEs are independent truth; (iii) all in-samp
 
 ## 8. The Molniya perigee cycle: what drives the rise before decay (second pass, 2026-10-02)
 
+*Numbers in this section were computed before the section 20 TLE-loader fix (3-line TLE files were half-read). Section 20 gives the regenerated values; no conclusion of this section changed.*
+
 **Question (from the OREM validation report plots):** for Molniya-type orbits the perigee rises by 1–3 thousand km over
 ~5–7 years and then falls to decay, while the apogee moves the opposite way. What drives it, and is it a known resonance?
 
@@ -193,6 +195,8 @@ objects (i < 46.4°); (4) quantify sensitivity to initial-element noise (propaga
 
 ## 9. Trends across the 28 plots of OREM_Validation_Report.pdf (third pass, 2026-10-02)
 
+*Numbers in this section were computed before the section 20 TLE-loader fix (3-line TLE files were half-read). Section 20 gives the regenerated values; no conclusion of this section changed.*
+
 Read all-object evolution plots (pages = summary + 1 of each 4-page object block; 11 viewed directly, all 28 re-extracted from the
 same TLE data by `trend_all28.py`; `trend_phase.py`; Fig. 3 `figures/fig3_report_trends.png`). The report's "resonance angle" is the
 solar azimuth ψ = (Ω + ω − L_sun) mod 360° (Wang & Gurfil's angle).
@@ -222,6 +226,8 @@ supplement it with the Moon azimuth 2ω′_Moon (or the Sun+Moon drive dq/dt, Fi
 ---
 
 ## 10. Cross-check against OREM's Molniya predictions (2026-10-03)
+
+*Numbers in this section were computed before the section 20 TLE-loader fix (3-line TLE files were half-read). Section 20 gives the regenerated values; no conclusion of this section changed.*
 
 Question: do the parameter-free secular forecast (§8) and OREM's validation predictions agree, and where do they diverge?
 Script `cross_check_orem.py` (outputs `cross_check_orem_{300,200,150}.csv`, `figures/fig4_cross_check_orem.png`).
@@ -267,6 +273,8 @@ OREM is run live near a marginal dip — the situation in which an extrapolating
 
 ## 11. Mid-life cutoff test: OREM vs the forecast at the first perigee dip (2026-10-03)
 
+*Numbers in this section were computed before the section 20 TLE-loader fix (3-line TLE files were half-read). Section 20 gives the regenerated values; no conclusion of this section changed.*
+
 Follow-up to §10. Idea being tested: at a marginal first perigee minimum an extrapolating method might call decay too early, and the lunisolar forecast —
 which sees the perigee recover — could flag that. Script `midlife_test.py` (outputs `midlife_cutoffs.csv`, `midlife_forecast.csv`, `midlife_summary.csv`).
 
@@ -308,6 +316,8 @@ as an "approach window" annotation alongside OREM's PRIMARY when OREM reports no
 
 ## 12. Mid-life cutoff test, extended: all 17 Molniya-type objects + 2 extra second-hump objects (2026-10-03)
 
+*Numbers in this section were computed before the section 20 TLE-loader fix (3-line TLE files were half-read). Section 20 gives the regenerated values; no conclusion of this section changed.*
+
 Confirmation of §11 (script `midlife_test.py`, `midlife_extra.py`, `scan_second_hump.py`; `midlife_summary.csv`). §11's seven objects were examined before the
 150-vs-200 km choice, so the other 10 of the 17 serve as an out-of-sample check; the pool was also scanned for further second-hump objects.
 
@@ -342,6 +352,8 @@ Molniya class once more second-hump examples exist.
 ---
 
 ## 13. Adding drag: the event becomes decay itself (2026-10-03)
+
+*Numbers in this section were computed before the section 20 TLE-loader fix (3-line TLE files were half-read). Section 20 gives the regenerated values; no conclusion of this section changed.*
 
 Follow-up to §10-§12, whose forecasts predicted a perigee-threshold epoch and converted it to a decay date with an empirical leave-one-out gap. Here the secular propagator is extended
 with orbit-averaged drag so the model reaches decay on its own (`secular_drag.py`, `secular_drag_prop.py`, `drag_test.py`, `test_secular_drag.py`; `drag_test.csv`; `figures/fig5_forecast_with_drag.png`).
@@ -383,6 +395,8 @@ no independent validation set beyond these objects.
 
 ## 14. Window coverage: does max(250 d, 0.15 H) hold the true decay date? (2026-10-03)
 
+*Numbers in this section were computed before the section 20 TLE-loader fix (3-line TLE files were half-read). Section 20 gives the regenerated values; no conclusion of this section changed.*
+
 The Watchlist "approach window" is the forecast decay date +- max(250 d, 0.15 x forecast horizon H). Two coverage tests, forecast started 0.5 / 1 / 2 yr before the real decay, "no decay date within the horizon" counted as a miss (`window_coverage_test.py`, `window_coverage_pool.py`).
 
 - **In-sample (the 17 Molniya-type objects):** 100 % coverage, worst error 247 d. Not independent: the window rule was chosen on these.
@@ -402,6 +416,8 @@ The Watchlist "approach window" is the forecast decay date +- max(250 d, 0.15 x 
 
 ## 15. KSROP full-force check of the secular + drag forecast, all test cases (2026-10-06)
 
+*Numbers in this section were computed before the section 20 TLE-loader fix (3-line TLE files were half-read). Section 20 gives the regenerated values; no conclusion of this section changed.*
+
 Question: how much of the forecast's error is the secular/averaged model, as opposed to the starting elements, B and atmosphere? Every test case of sections 13-14 (mid-life cutoff 17, first TLE 17, leads 0.25-4 yr on the 17 Molniya-type objects 83, leads 0.5/1/2 yr on the 40 pool objects 113: **230 cases, 57 objects**) was re-run with KSROP's `driver_KS` (KS-regularised, v2.11.2 sources, fresh ifx build) from the identical start elements (`ksrop_check_cases.py`; the secular dates recomputed there reproduce the stored errors exactly). KSROP set-up: EGM2008 degree 20, Sun (degree 2) and Moon (degree 3), drag with OREM's static `ATM.DAT` (no `SW-All.csv`/`ATM2D.DAT`, so the same atmosphere family as the secular model), co-rotation on, no SRP, B = Cd A/m as before; the TLE mean elements are used as osculating elements at the start epoch (both models do the same). Decay = the driver's own stop at altitude < 80 km (`ksrop_check_run.py`, `ksrop_check_analyze.py`, `ksrop_check_*.csv`).
 
 | set | n | KSROP date | secular date | abs err vs real, KSROP (med / p90 / max, d) | abs err vs real, secular | abs(secular - KSROP), both dated (med / p90 / max, d) |
@@ -420,6 +436,8 @@ Question: how much of the forecast's error is the secular/averaged model, as opp
 **Not attributed.** KSROP and the secular model differ in several terms at once (full geopotential incl. tesseral vs J2, full lunisolar vs quadrupole, co-rotating drag vs none, orbit averaging); no ablation arm was run, so the 129-424 d outliers are not assigned to a term. SRP and epoch-resolved solar activity were not used on either side.
 
 ## 16. Why some decayed objects get no forecast decay date (2026-10-10)
+
+*Numbers in this section were computed before the section 20 TLE-loader fix (3-line TLE files were half-read). Section 20 gives the regenerated values; no conclusion of this section changed.*
 
 Section 14 left 11-14 % of out-of-sample cases with no forecast decay date (14 cases, 6 objects: 27906, 21935, 9892, 27963, 45349, 26463), and section 15 showed KSROP fails on the same objects. Four candidate causes were tested on every case of `window_coverage_pool.csv` for these objects plus every 1-yr-lead dated case as the comparison group (`diag_nodate.py`, `diag_nodate_bscan.py`, `diag_nodate_grid.py`; `diag_nodate.csv`, `diag_nodate_bscan.csv`).
 
@@ -443,6 +461,8 @@ Section 14 left 11-14 % of out-of-sample cases with no forecast decay date (14 c
 
 ## 17. Truth check in the coverage test (2026-10-10)
 
+*Numbers in this section were computed before the section 20 TLE-loader fix (3-line TLE files were half-read). Section 20 gives the regenerated values; no conclusion of this section changed.*
+
 The out-of-sample coverage test (`window_coverage_pool.py`) now rejects a catalogued decay date when the object's own TLE record contradicts it (`truth_check.py`; rejected objects are listed in `window_coverage_pool_rejected.csv`):
 1. **Tracked after decay:** the last TLE is more than 30 d after the catalogued decay.
 2. **Final orbit too high:** reaching a 120 km perigee by the catalogued date would need a perigee descent faster than 1.6e-3 per day, normalised by the semi-major axis ((dhp / a) per day; perigee change ~ a de, so this is size-independent). The threshold is 2x the 99th percentile of the fastest 30-day descent seen in each pool object's own history while its perigee was above 200 km and more than 60 d before decay (`perigee_descent_rates.py`, 147 objects: median 5.3e-5, p90 2.8e-4, p99 7.9e-4/day). It comes from the data, not from the forecast model, so objects the model cannot follow are not rejected on that account.
@@ -464,6 +484,8 @@ The out-of-sample coverage test (`window_coverage_pool.py`) now rejects a catalo
 
 ## 18. The no-date debris cases with OREM's own estimated ballistic number (2026-10-10)
 
+*Numbers in this section were computed before the section 20 TLE-loader fix (3-line TLE files were half-read). Section 20 gives the regenerated values; no conclusion of this section changed.*
+
 Sections 14 and 16 *prescribed* B from the Watchlist object parameters. For these four debris objects that is the SATCAT-RCS fallback, BN 758 kg/m2 from an assumed 500 kg mass. OREM itself never uses a prescribed value: its optimizer estimates BN from the tracking. So the no-date cases were re-run with OREM's own estimate (`diag_nodate_orembn.py`, `diag_nodate_orembn.csv`): BN from `rpe_campaign.csv`, taking the latest zone whose 20-day fit window ended before the forecast start (OREM-valid zones preferred). Everything else is unchanged.
 
 | object | lead (yr) | OREM BN (zone, valid?, age at start) | forecast | model perigee min | real decay after start |
@@ -481,6 +503,8 @@ Sections 14 and 16 *prescribed* B from the Watchlist object parameters. For thes
 
 ## 19. TLE mean versus osculating elements at the forecast start (2026-10-11)
 
+*Numbers in this section were computed before the section 20 TLE-loader fix (3-line TLE files were half-read). Section 20 gives the regenerated values; no conclusion of this section changed.*
+
 The secular forecast starts from TLE *mean* elements, and every "observed perigee" in sections 14-18 is the mean-element a(1-e). For these eccentric orbits SGP4/SDP4's periodic terms could make the perigee the object actually reaches differ from that. `diag_mean_osc.py` (`diag_mean_osc.csv`) tests this on all 110 coverage-test cases. For the 11 start TLEs of each case it finds the minimum and maximum SGP4 radius over one revolution (`sgp4` 2.27), then runs the forecast twice with the same TLEs and B: **A** from the median mean elements, as before, and **B** with a and e set from the SGP4 minimum and maximum.
 
 **Result: not the cause.**
@@ -491,3 +515,41 @@ The secular forecast starts from TLE *mean* elements, and every "observed perige
 **Loader bug found on the way.** `prepare_plot_data_fullpool.load_full_record` steps through a TLE file two lines at a time, so for **3-line files (name line + lines 1 and 2) it reads only every second TLE**. 84 of the 269 pool files are 3-line, and 63,860 of their 127,764 TLEs were read. The pairs it does read are consistent (no mixing between TLEs); two-line files are unaffected. Three of the four debris objects (27906, 21935, 45349) are 3-line files. The test above uses its own loader that keeps every record. Variant A against the published section 14-17 numbers isolates the loader's effect: median 2.4 d, maximum 138 d (2805 / 2924 / 8529), and one case (26463 at 0.5 yr) loses its date. The shared loader is **not yet fixed**, so the published sections 8-18 numbers still carry it.
 
 **Remaining for the four debris cases:** they are still unexplained. Elements are not the cause (this section), nor B (section 18), nor SRP (withdrawn, section 18). The static atmosphere (only 21935 decayed near solar maximum) and decay dates that pass the section 17 check but are still wrong remain open.
+
+## 20. Regeneration after the 3-line TLE loader fix (2026-10-11/12)
+
+**Bug.** Six `scratch_rpe` loaders (`resonance_campaign_sweep.load_record`, `prepare_plot_data(_fullpool).load_full_record`, `phase3_resonance_33587`, `make_postresonance_tles`, `ksrop_check_cases.load_M`) stepped through TLE files two lines at a time. That stays in step only for 2-line files; on 3-line files (name + lines 1/2) they read every second TLE. 84 of the 269 pool files, and 1,680 of the 1,739 files in the Watchlist object store used for the Molniya set, are 3-line. All six now use `scratch_rpe/tle_lines.tle_pairs`, which works for either format. The pairs that were read had been consistent (no mixing between TLEs), so the effect was lost data, not corrupt data.
+
+**Regeneration.** Everything in sections 8-19 was re-run in dependency order (`scratch_rpe/regen_after_loader_fix.py`, `regen_phase2a.py`, `regen_phase2b.py`; before/after comparison with `regen_diff.py`). That covered the resonance sweeps, the post-resonance TLE files, the plot data, the Molniya forecast tests, the 17 mid-life OREM runs, the drag and coverage tests, the full KSROP check (241 cases), the section 16-19 diagnostics, and the 16-object post-resonance OREM campaign (its inputs changed for 7 objects).
+
+| section / result | published | regenerated |
+|---|---|---|
+| Sweep: pool objects flagged resonant | 27 / 253 | 29 / 253 (4431 and 13112, see below) |
+| 8: first-TLE forecast, peak epoch / perigee < 300 km (median, 17) | 0.11 / 0.19 yr | 0.09 / 0.20 yr |
+| 8: high-i pool, median relative error; within 25 % | 3 %; 90 % | 2 %; 93 % (44 objects) |
+| 10: first-TLE forecast median abs error, 300 / 200 / 150 km | 155 / 123 / 121 d | 136 / 88 / 91 d |
+| 10: OREM median abs error (90 d before decay), 300 / 200 / 150 km | 41 / 43 / 53 d | 41 / 42.5 / 53 d |
+| 11-12: OREM gives a date at the mid-life cutoff | 1 / 17 | 1 / 17 (14297, same date) |
+| 12: mid-life forecast, 150 km event, median abs error (all 17 / out-of-sample 10) | 69 / 48 d | 64 / 40 d |
+| 12: mid-life forecast, 200 km event | 96 d, 15/17 within 250 d | 87 d, 15/17 |
+| 13: drag forecast from the mid-life dip, B x1 (x0.5 / x2) | 30 (26 / 35) d, bias -28 | 31 (30 / 38) d, bias -28 |
+| 13: drag forecast from the first TLE, B x1 | 202 d, 12/17 within 250 d | 147 d, 12/17 |
+| 14: in-sample window coverage, worst error | 100 %, 247 d | 100 %, 238 d |
+| 14/17: out-of-sample coverage at 0.5 / 1 / 2 yr | 0.89 / 0.84 / 0.84 (39 objects) | **0.82 / 0.83 / 0.82** (44 objects) |
+| 15: secular vs KSROP decay date, both dated | median 14 d (<= 2 yr) | median 12-18 d by set; bias -6 d; KSROP closer in 129/218 |
+| 16: no-date cases | 14 cases, 6 objects | 16 cases, 7 objects (below) |
+| 19: mean vs osculating perigee offset, median (p10 / p90) | +7 (-26 / +30) km | +5 (-21 / +28) km; dates unchanged in median (34 d) |
+| Post-resonance OREM campaign: objects predicting | 8 / 16 | 7 / 16 (13112 lost) |
+| Capstone: mean ensemble RPE, full history -> post-resonance only | 4.74 % -> 22.47 %, 6/7 worse | 5.36 % -> 23.85 %, 5/6 worse |
+
+**What changed in substance.**
+- **Out-of-sample coverage fell to 0.82-0.83** because the pool grew from 39 to 44 objects (more objects pass the 300-TLE minimum once every record is read) and the newcomers include no-date cases. The median errors are unchanged (26-42 d).
+- **No-date set:** 21935, 27906, 27963, 45349 (the four unexplained debris objects, unchanged), 26463 (Cluster, manoeuvred), plus **37798** (Express-AM4) and **41695** (SL-12 deb), new to the pool. 9892 is still rejected as truth (tracked 15.7 yr after its catalogued decay). OREM-estimated BN still rescues none, and the osculating start does not either.
+- **Section 16's atmosphere argument no longer distinguishes the groups.** The no-date cases now decayed under the same solar activity as the dated ones (median F10.7 116 vs 117; was 105 vs 124). So that is not evidence for or against the atmosphere.
+- **Truth check corrected (section 17).** With every TLE read, 19881 was rejected because its last TLE showed a 140 km perigee one day before decay. That is the final plunge, outside the regime the descent-rate threshold was measured in (perigee above 200 km). The check now applies only above 200 km (`truth_check.MIN_HP_FOR_RATE_KM`), so only 9892 is rejected. The threshold itself is 2 x p99 = 1.56e-3/day (p99 now 7.81e-4).
+- **4431 and 13112 in the sweep are artefacts.** The September sweep has no outlier filter. With every record read, 13112's "resonance" moves onto a single stray TLE 224 d after its catalogued decay (the forecast tests' `clean_rows` removes it), and that is why its post-resonance OREM prediction disappears. 4431's new crossing is likewise at its last TLE. The detector hardened on 2026-10-01 (terminal-TLE guard, outlier filter) is built for exactly these cases.
+- **10724's post-resonance ensemble error rose from 22 % to 63 %:** twice as many post-resonance TLEs, so 5 zones instead of 1.
+
+**Conclusions.** None changed. The resonance is still not a useful prediction trigger (post-resonance-only data still makes OREM about 4-5x worse). The secular + drag forecast is still a good mid-life tool (median ~31 d) and poor from the first TLE. The four debris no-date cases remain unexplained.
+
+**Also fixed during the regeneration:** `ksrop_check_run.py` called the CPU check without `-ExecutionPolicy Bypass`, which this machine's PowerShell policy blocks, so it waited forever. Fixed.
