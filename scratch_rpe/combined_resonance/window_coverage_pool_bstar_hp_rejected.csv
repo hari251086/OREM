@@ -1,0 +1,3 @@
+norad,name,reason,detail
+37798,37798 ExpressAM-4,final_orbit_too_high,"last perigee 660 km, 1 d before decay: needs 3.20e-02/day > 1.56e-03"
+9892,COSMOS 862 DEB,tracked_after_decay,last TLE 5737 d after the catalogued decay

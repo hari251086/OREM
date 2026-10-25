@@ -27,7 +27,7 @@ import math
 import re
 import sys
 sys.path.insert(0, 'E:/GitHub/OREM/scratch_rpe')
-from tle_lines import tle_pairs  # noqa: E402  (3-line-safe; see THEORY section 19)
+from tle_lines import bstar, tle_pairs
 
 sys.path.insert(0, 'E:/GitHub/OREM/scratch_rpe')
 from resonance_campaign_sweep import (  # noqa: E402
@@ -93,6 +93,13 @@ def load_full_record(path):
         rows.append((jd, a, ecc, inc_deg, raan_deg, argp_deg))
     rows.sort()
     return rows
+
+
+def load_bstar(path):
+    """Sorted (jd, B*) for every TLE of the file (issue #56, THEORY section 22)."""
+    with open(path) as f:
+        lines = [l.rstrip('\n') for l in f]
+    return sorted((parse_epoch_jd(l1), bstar(l1)) for _name, l1, _l2 in tle_pairs(lines))
 
 
 def jd_to_decimal_year(jd):

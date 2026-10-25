@@ -437,6 +437,8 @@ Question: how much of the forecast's error is the secular/averaged model, as opp
 
 ## 16. Why some decayed objects get no forecast decay date (2026-10-10)
 
+*Revised in section 22 (2026-10-25): the four debris objects' drag is real and large, the forecast's B and atmosphere were both far too weak for it, and the SRP withdrawal (section 18) rested on an OREM BN that is not a measurement.*
+
 *Numbers in this section were computed before the section 20 TLE-loader fix (3-line TLE files were half-read). Section 20 gives the regenerated values; no conclusion of this section changed.*
 
 Section 14 left 11-14 % of out-of-sample cases with no forecast decay date (14 cases, 6 objects: 27906, 21935, 9892, 27963, 45349, 26463), and section 15 showed KSROP fails on the same objects. Four candidate causes were tested on every case of `window_coverage_pool.csv` for these objects plus every 1-yr-lead dated case as the comparison group (`diag_nodate.py`, `diag_nodate_bscan.py`, `diag_nodate_grid.py`; `diag_nodate.csv`, `diag_nodate_bscan.csv`).
@@ -483,6 +485,8 @@ The out-of-sample coverage test (`window_coverage_pool.py`) now rejects a catalo
 **Caveats.** The 2x-p99 factor and the 120 km reference perigee are choices. The descent-rate sample excludes the last 60 d before decay and perigees below 200 km, so it does not cover the final plunge. One outlier (32971, 6.5e-3/day) is likely a TLE glitch; it is above the threshold but does not affect it because the threshold uses p99.
 
 ## 18. The no-date debris cases with OREM's own estimated ballistic number (2026-10-10)
+
+*Revised in section 22 (2026-10-25): OREM's BN for these objects is its search prior or its BN >= 10 clamp, not a measurement, so the SRP withdrawal below does not follow; the TLEs' own drag gives BN ~0.1-4 kg/m2.*
 
 *Numbers in this section were computed before the section 20 TLE-loader fix (3-line TLE files were half-read). Section 20 gives the regenerated values; no conclusion of this section changed.*
 
@@ -568,3 +572,62 @@ Every OREM run before 2026-10-12 had the zonal geopotential (J2 included) switch
 (The capstone here uses one definition for both columns: objects predicting in both the 97-object full-history campaign and the post-resonance campaign. Section 20's 5.36 % -> 23.85 % used a different object set, so the numbers are not comparable with it.)
 
 **What changes.** Section 11-12's "OREM gives no date at the mid-life dip" no longer holds: with J2 OREM dates 8 of the 17, but every one of them early, two by half a year or more, while the secular + drag forecast from the same epoch has a median error of 30 d (section 13). The capstone keeps its direction (post-resonance-only data still makes OREM worse for most objects) but the effect is much smaller. The resonance conclusions of sections 8-19 do not depend on OREM and stand.
+
+**In-domain capstone (added 2026-10-25, `capstone_indomain.py`).** The capstone above includes two objects at i > 46.4 deg (18983, 37819), outside the Wang & Gurfil domain, so they are not evidence about the resonance. Over the six in-domain objects (10724, 27526, 35497, 37151, 40943, 59347) the geopotential-on result is 15.6 % -> 20.0 %, 4/6 worse; 35497 (5.9 -> 3.6 %) and 37151 (5.4 -> 1.8 %) improve. 10724 dominates the mean (63 -> 66 %); without it, 6.1 % -> 10.9 %, 3/5 worse. The direction is the same as for all eight objects.
+
+## 22. The no-date debris objects: drag far stronger than the forecast's B and atmosphere allow (2026-10-25)
+
+Sections 16, 18 and 20 left five decayed debris objects with no forecast decay date in the coverage test (21935, 27963, 41695, 45349: SL-12 debris; 27906: Cosmos 1481 debris), and the section 20 regeneration added a sixth, 37798 (Express-AM4). Section 18 had withdrawn solar radiation pressure (SRP) and left them unexplained. Scripts: `diag_nodate_decompose.py` (parts 1-3), `window_coverage_pool.py --b-source {params,bstar,tlefit} --atmosphere {atm_dat,hp}`, `capstone_indomain.py`; outputs `diag_nodate_decompose.csv`, `diag_nodate_rates.csv`, `diag_nodate_f107.csv`, `window_coverage_pool[_bstar|_tlefit][_hp].csv`.
+
+**37798 is a controlled de-orbit, not a natural decay.** Its perigee holds at ~650 km for its last 200 d of tracking and is 660 km at its last TLE, 0.3 d after the catalogued decay. It passed the section 17 truth check because that check returned "valid" whenever the last TLE came at or after the decay date, without looking at the orbit. `truth_check.py` now tests the last orbit tracked before the date (gap floored at 1 d); 37798 is rejected (it would need 3.2e-2/day against the 1.56e-3 threshold). It is the only object whose verdict changes; the baseline coverage table is otherwise identical.
+
+**What lowers their perigee: drag, not lunisolar eccentricity growth** (part 1, last year before decay; perigee change split into a size part (1-e) da and a shape part -a de):
+
+| object | perigee, start -> end (km) | dhp | size part | shape part | BN from the TLEs' B* (kg/m2) |
+|---|---|---|---|---|---|
+| 21935 | 530 -> 384 | -147 | -244 | +98 | 0.6 |
+| 27906 | 443 -> 254 | -189 | -40 | -149 | 20.7 |
+| 27963 | 722 -> 572 | -150 | -385 | +235 | 0.7 |
+| 41695 | 567 -> 414 | -153 | -149 | -4 | 1.4 |
+| 45349 | 347 -> 250 | -97 | -1,971 | +1,874 | 1.35 |
+| 35 dated objects (median) | 473 -> 149 | -337 | -42 | -220 | 132 |
+
+For the dated objects 93 % (median) of the perigee drop is eccentricity growth (lunisolar), which is why they forecast well with almost any B. For the no-date objects it is 41 %: their semi-major axis shrinks by hundreds to thousands of km (energy loss), and the shape part is mostly drag's own circularisation (positive). BN = 1/(12.741621 B*): SGP4's reference density 2.461e-8 kg/m3 x one earth radius = 0.15697 kg/m2/ER, with B* = rho0 (Cd A/m) / 2.
+
+**The forecast's B was 35-1,260x too small** (BN too large) for five of the six: it used the Watchlist SATCAT-RCS fallback, BN 757.6 kg/m2 (MEDIUM RCS area 0.3 m2 with an assumed 500 kg).
+
+**The forecast's atmosphere is far too thin above 300 km.** `input/ATM.DAT` matches the J71 table `input/ATM2D.DAT` at an exospheric temperature of ~620 K at 300, 400 and 500 km alike, i.e. deep solar minimum, night side. Compared with Harris-Priester for mean solar activity (Montenbruck & Gill, *Satellite Orbits*, Table 3.8; units 1e-12 kg/m3):
+
+| altitude (km) | ATM.DAT | Harris-Priester min / max | ATM.DAT below min / max by |
+|---|---|---|---|
+| 200 | 128 | 256 / 316 | 2x / 2.5x |
+| 300 | 5.0 | 17.1 / 35.3 | 3.4x / 7x |
+| 400 | 0.33 | 2.25 / 7.49 | 7x / 23x |
+| 500 | 0.031 | 0.39 / 2.04 | 12x / 65x |
+| 600 | 0.006 | 0.081 / 0.64 | 13x / 106x |
+
+That barely matters for objects that lunisolar forcing drives to ~150 km, and matters a great deal for a drag-driven decay from 350-720 km. Part 2 tests it directly: over the 120 d after each forecast start, the observed da/dt divided by the model's drag da/dt at the B* B has a median of 54 (cases inside the window) and 229 (no-date cases) with ATM.DAT, but 4.5 and 4.3 with Harris-Priester. Most of the "non-drag" change in the TLE mean semi-major axis that section 16 worried about is therefore drag the thin atmosphere could not produce. The remaining ~4x is common to both groups (B* is fitted against SGP4's density, which sits near the Harris-Priester maximum). `secular_drag.set_atmosphere('hp')` adds Harris-Priester (mean of min and max, the orbit average of cos^2(psi/2)); ATM.DAT stays the default.
+
+**OREM's BN for these objects is not a measurement, so section 18's SRP withdrawal does not follow.** 45349's last four zones sit at BN 10.1-10.2, the BN >= 10 clamp on the zone-to-zone carry-over (`src/orem.F`, line 1005); 21935 and 41695 stay at 83-156, inside the initial [60, 140] search range (the 20-day apogee fit cannot see drag on these orbits, as for the SL-12 objects of the 2026-10-12 investigation). Two dated debris objects also sit on the clamp, with B* BN 4.0 (27882) and 8.1 (29202). OREM's default path (weather off) uses the same ATM.DAT and applies drag only while the perigee is below 500 km.
+
+**Fixing B and the atmosphere in the forecast** (coverage of max(250 d, 0.15 H); 26463 excluded, 9892 and 37798 rejected as truth; 37 / 41 / 39 cases at 0.5 / 1 / 2 yr):
+
+| B / atmosphere | coverage 0.5 / 1 / 2 yr | median \|err\| (d) | 90th pct (d) |
+|---|---|---|---|
+| object parameters / ATM.DAT (baseline) | 0.86 / 0.85 / 0.85 | 26 / 31 / 42 | 83 / 131 / 157 |
+| B* (median, year before start) / ATM.DAT | 0.84 / 0.85 / 0.87 | 27 / 30 / 38 | 127 / 132 / 151 |
+| object parameters / Harris-Priester | 0.86 / 0.85 / 0.85 | 31 / 35 / 42 | 83 / 133 / 153 |
+| B* / Harris-Priester | 0.89 / 0.88 / 0.87 | 27 / 32 / 38 | 124 / 129 / 158 |
+| fitted to TLE da/dt, 180 d before start / ATM.DAT | 0.89 / 0.88 / 0.85 | 29 / 36 / 43 | 131 / 137 / 164 |
+| **fitted to TLE da/dt / Harris-Priester** | **0.95 / 0.88 / 0.87** | 25 / 31 / 46 | 82 / 101 / 194 |
+
+All B estimates are causal (data before the forecast start only). With the fitted B and Harris-Priester, three no-date cases at the 0.5-yr lead get good dates: 21935 -83 d, 27963 -14 d, 45349 -60 d (B* / Harris-Priester: +520, +924, +11 d). 45349 at 2 yr comes inside the window (+235 d; baseline +626 d); at 1 yr it stays late (+366 d; baseline +799 d). The price on the other objects is small but real: over the 105 cases dated by both, median |error| 32 -> 35 d, 45 better / 60 worse, and the 2-yr 90th percentile rises 157 -> 194 d. **Not adopted as the default.**
+
+**Still no date at 1-2 yr leads in every variant:** 21935 (1, 2 yr), 27963 (1 yr), 41695 (all leads) and 27906 (all leads).
+- Rising solar activity after the start is not the general cause (part 3): 81-day F10.7 over the forecast divided by that over the B-fit window has a median of 1.00 for the no-date cases and 1.01 for the cases in the window. It does rise for 41695 (1.22-1.36) and for 21935 at 2 yr (1.31).
+- At high perigee the eccentricity grows faster than lunisolar forcing allows: 27963 at 1 yr (perigee 724 km) +17.3e-5/day observed vs +1.9e-5 modelled, 41695 at 2 yr (954 km) +23.1e-5 vs +1.9e-5. Drag is negligible there. The SRP upper bound 1.5 F sqrt(p/mu) (Sun in the orbit plane, Cr 1.2) at the A/m the drag fits imply: 27963, fitted BN 0.43 (A/m ~1.1 m2/kg), 12.5e-5/day against 17.3e-5 observed, the right size; 41695 has no drag fit at that lead (a not decreasing), and its fits at 0.5-1 yr (BN 0.6-3.1, A/m 0.15-0.8 m2/kg) give at most 9e-5/day against 23.1e-5, short by >= 2.5x, so for 41695 SRP would need a higher A/m than its drag implies. **SRP is therefore again the leading candidate for this phase**, now with an A/m that comes from the drag, not from the decay date (section 16's circularity). Not yet tested by adding SRP.
+- 27906 (e = 0.74, B* BN 42-55) has lunisolar de/dt matching the model; its model perigee minimum (~160 km, section 18) is too shallow for it to decay. Unexplained.
+
+**Caveats.** Five debris objects. The fitted B depends on the atmosphere it is fitted with; the B* B leaves a common ~4x in da/dt. Harris-Priester at mean activity is still a static atmosphere. B* absorbs whatever SGP4 does not model.
+
+**Next.** (1) Orbit-averaged SRP in the secular model with A/m from the drag fit, tested on 21935, 27963, 41695 and 27906 without degrading the rest; 41695 is the case that would show whether the drag-derived A/m is enough. (2) An epoch-resolved density (J71 from `ATM2D.DAT` with observed F10.7/Ap, as OREM's weather mode does) as a hindcast upper bound. (3) Outside #56: the Watchlist SATCAT-RCS fallback's 500 kg mass is wrong for debris (OREM-Watchlist), and OREM's BN >= 10 clamp and 500 km drag cut-off exclude objects like these.
