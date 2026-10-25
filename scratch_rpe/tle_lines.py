@@ -4,7 +4,10 @@
 there is one. It works for 2-line and 3-line (name + lines 1/2) files alike: it scans line by line and accepts a pair
 only when line 1 is directly followed by a line 2 of the same catalogue number. It replaces the older pattern
 `for k in range(0, len(lines) - 1, 2)`, which stays in step only for 2-line files and silently read every second
-record of 3-line files (issue #56, THEORY section 19)."""
+record of 3-line files (issue #56, THEORY section 19).
+
+`bstar(line1)` is line 1's B* drag term (1/earth radii; columns 54-61, implied leading decimal point and exponent),
+NaN when blank or unreadable (section 22)."""
 
 
 def tle_pairs(lines):
@@ -19,3 +22,11 @@ def tle_pairs(lines):
         else:
             k += 1
     return out
+
+
+def bstar(l1):
+    s = l1[53:61].strip()
+    try:
+        return float(s[:-2] or '0') * 1e-5 * 10.0 ** int(s[-2:])
+    except ValueError:
+        return float('nan')

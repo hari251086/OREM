@@ -6,6 +6,9 @@ A decay date is rejected as truth when the tracking contradicts it:
      in; below it the object is already in its final plunge): from the last tracked orbit, reaching the 120 km perigee by the catalogued date would need a
      perigee descent faster than MAX_DESCENT_PER_A, normalised by the semi-major axis ((dhp / a) per day; perigee
      change ~ a * de, so this is size-independent).
+     An object tracked up to or past the catalogued date is tested from its last orbit tracked BEFORE that date, the
+     gap floored at MIN_GAP_D (section 22: 37798 was still at a 660 km perigee on its catalogued decay date, a
+     controlled de-orbit, and passed because its last TLE came 0.3 d after it).
 MAX_DESCENT_PER_A is 2 x the 99th percentile of the fastest 30-day descent observed in each pool object's own history
 while its perigee was above 200 km and > 60 d before decay (perigee_descent_rates.py: p99 7.81e-4 / day). The threshold
 comes from data, not from the forecast model, so objects the model cannot follow (e.g. high area-to-mass debris) are not
@@ -17,6 +20,7 @@ MAX_TRACKED_AFTER_D = 30.0
 MAX_DESCENT_PER_A = 1.56e-3     # per day; 2 x the pool's p99 (7.81e-4, after the section 20 loader fix)
 HP_REENTRY_KM = 120.0
 MIN_HP_FOR_RATE_KM = 200.0   # the threshold comes from descents above 200 km, so it is applied only there
+MIN_GAP_D = 1.0              # days; floor on the time left to the catalogued decay (section 22)
 
 
 def check_decay_truth(jd, a, e, decay_jd):
@@ -25,8 +29,12 @@ def check_decay_truth(jd, a, e, decay_jd):
     if after > MAX_TRACKED_AFTER_D:
         return False, 'tracked_after_decay', f'last TLE {after:.0f} d after the catalogued decay'
     gap = float(decay_jd - jd[-1])
-    if gap <= 0.0:
-        return True, '', ''
+    if gap <= 0.0:                         # tracked up to/after the catalogued date: test the last orbit before it
+        m = np.asarray(jd) <= decay_jd
+        if not m.any():
+            return True, '', ''
+        jd, a, e = np.asarray(jd)[m], np.asarray(a)[m], np.asarray(e)[m]
+        gap = max(float(decay_jd - jd[-1]), MIN_GAP_D)
     k = slice(max(0, len(jd) - 3), len(jd))                 # median of the last 3 TLEs: robust to one bad element set
     a_last = float(np.median(a[k]))
     hp_last = float(np.median(a[k] * (1.0 - e[k]))) - RE
