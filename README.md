@@ -4,6 +4,8 @@ Optimal re-entry time prediction for resident space objects from highly elliptic
 
 **Author:** Harishkumar Sellamuthu · hari251086@gmail.com
 
+Copyright (c) 2018–2026 Harishkumar Sellamuthu, released under the MIT License
+
 ---
 
 ## 1. Overview
